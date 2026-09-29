@@ -224,9 +224,64 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     }};
     new Chart(document.getElementById('totalCostChart'),{type:'bar',data:{labels:costLabels,datasets:[{label:'Purchase Price',data:purchasePrices,backgroundColor:'rgba(224,148,34,0.4)',borderColor:amber,borderWidth:1,borderRadius:3},{label:'True All-In Cost',data:totalCosts,backgroundColor:'rgba(192,57,43,0.5)',borderColor:red,borderWidth:1,borderRadius:3}]},plugins:[multiplierPlugin],options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:20,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{if(c.datasetIndex===1)return c.dataset.label+': $'+c.parsed.y.toLocaleString()+' ('+costMultipliers[c.dataIndex]+'× purchase price)';return c.dataset.label+': $'+c.parsed.y.toLocaleString()}}}},scales:{x:{...cso(),ticks:{font:{size:9}}},y:{...cso('US Dollars'),ticks:{color:tickColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
 
-    // TAB 3: CALCULATOR
+    // House icons and the ownership visual, shared by both calculators (the
+    // projection's markup, moved here in PR 4e so the retrospective can use it;
+    // the projection's output is unchanged).
+    function reHouseIcons(n){
+        var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+        var pI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.45"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
+        var fH = Math.floor(n), pt = n - fH, ic = '';
+        for(var i = 0; i < Math.min(fH, 15); i++) ic += fI;
+        if(pt > 0.05) ic += pI;
+        if(fH === 0 && pt <= 0.05) ic += pI;
+        var ov = fH > 15 ? '<span style="font-size:.8rem;color:var(--amber);margin-left:.4rem;align-self:center">+'+(fH-15)+' more</span>' : '';
+        return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:.6rem 0 .8rem">' + ic + ov + '</div>';
+    }
+    function reOwnershipVisual(cash, equityPct, clipId){
+        if(cash){
+            return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
+              '<svg viewBox="0 0 24 24" width="32" height="32">' +
+                '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/>' +
+              '</svg>' +
+              '<span style="font-size:.9rem;color:var(--text)">1 house, outright</span>' +
+            '</div>';
+        }
+        var _fh = Math.max(0, Math.min(20, equityPct * 0.20));
+        var outlineColor = equityPct >= 100 ? '#e09422' : '#c0392b';
+        var label = equityPct < 0 ? '<span style="color:var(--red)">Underwater</span>' : equityPct + '% owned';
+        return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
+          '<svg viewBox="0 0 24 24" width="32" height="32">' +
+            '<defs><clipPath id="'+clipId+'"><rect x="0" y="'+(24-_fh)+'" width="24" height="'+_fh+'"/></clipPath></defs>' +
+            '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+outlineColor+'" stroke-width="1.5" stroke-linejoin="round"/>' +
+            '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#'+clipId+')"/>' +
+          '</svg>' +
+          '<span style="font-size:.9rem;color:var(--text)">'+label+'</span>' +
+        '</div>';
+    }
+
+    // TAB 3: CALCULATOR — the retrospective (PR 4e; rulings M11, M4, M2, M6, P8)
+    // All math is in RealEstateModel.bvreRetro: from July of the start year to
+    // today, month by month, with equal cash out. The page parses inputs and
+    // renders, in the projection's card layout. Monthly amounts and totals are
+    // in the dollars of the day; end values are today's.
+    var RETRO_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    function retroMonth(key){ var p = String(key).split('-'); return RETRO_MONTHS[+p[1] - 1] + ' ' + p[0]; }
+    function retroSpan(n){
+        var y = Math.floor(n / 12), m = n % 12;
+        return (y ? y + (y === 1 ? ' year' : ' years') : '') + (y && m ? ' and ' : '') + (m ? m + (m === 1 ? ' month' : ' months') : '');
+    }
+    function rFmt(v){ return '$' + Math.round(v).toLocaleString(); }
+    function rSigned(v){ return (v < 0 ? '−' : '+') + rFmt(Math.abs(v)); }
+    function rPct(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+    // Where today's price came from: 'live' once the shared fetcher's quote
+    // lands, else the latest PL_DATA sample it is seeded with.
+    var _retroPriceSource = 'seed';
     function runCalculator(){
-        const sy=parseInt(document.getElementById('calcYear').value);
+        // A link or stored value naming a year the select doesn't offer
+        // leaves it blank; fall back to the default start year.
+        const _yearSel=document.getElementById('calcYear');
+        if(!isFinite(parseInt(_yearSel.value)))_yearSel.value='2017';
+        const sy=parseInt(_yearSel.value);
         // Scope to .toggle-group so we pick the retrospective method
         // toggle's active button, never the Real/Nominal display-mode
         // toggle (which also has .toggle-btn class and a .active state).
@@ -234,180 +289,136 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         // button is found.
         const _retroBtn = document.querySelector('.toggle-group .toggle-btn.active');
         const mode = _retroBtn ? _retroBtn.dataset.mode : 'leverage';
-        const dca=document.getElementById('calcDCA').checked;
-        const ey=2025;
-        const medianHs=homeData[sy],medianHe=homeData[ey],bs=btcData[sy],be=btcData[ey];const _customRaw=(document.getElementById('customHomePrice')||{}).value||'';const _customNum=parseFloat(_customRaw.replace(/[$,\s]/g,''));const _customValid=!isNaN(_customNum)&&_customNum>=50000&&_customNum<=10000000;const hs=_customValid?_customNum:medianHs;const he=_customValid?Math.round(_customNum*(medianHe/medianHs)):medianHe;const _isCustom=_customValid;
-        const _prevailingRate=mortgageRates[sy];const _rateRaw=(document.getElementById('customRate')||{}).value||'';const _rateNum=parseFloat(_rateRaw.replace(/[%\s]/g,''));const _rateValid=!isNaN(_rateNum)&&_rateNum>=0.5&&_rateNum<=15;const rate=_rateValid?_rateNum:_prevailingRate;const _isCustomRate=_rateValid;const yrs=ey-sy;
-        // Optional user-override for down payment %. Default 20 (identity:
-        // a paramless/blank load reproduces the original 20%-down numbers
-        // exactly). Bounds 3–95: below 3 the up-front bitcoin-equivalent is
-        // negligible, and 100 is the cash-purchase toggle's territory (0 would
-        // collapse the bitcoin side to nothing) — both excluded.
+        const cash = mode === 'cash';
+        const medianHs=homeData[sy];const _customRaw=(document.getElementById('customHomePrice')||{}).value||'';const _customNum=parseFloat(_customRaw.replace(/[$,\s]/g,''));const _customValid=!isNaN(_customNum)&&_customNum>=50000&&_customNum<=10000000;const hs=_customValid?_customNum:medianHs;const _isCustom=_customValid;
+        const _prevailingRate=mortgageRates[sy];const _rateRaw=(document.getElementById('customRate')||{}).value||'';const _rateNum=parseFloat(_rateRaw.replace(/[%\s]/g,''));const _rateValid=!isNaN(_rateNum)&&_rateNum>=0.5&&_rateNum<=15;const rate=_rateValid?_rateNum:_prevailingRate;const _isCustomRate=_rateValid;
+        // Optional user-override for down payment %. Default 20. Bounds 3–95:
+        // below 3 the up-front bitcoin-equivalent is negligible, and 100 is
+        // the cash-purchase toggle's territory.
         const _dpRaw=(document.getElementById('customDownPct')||{}).value||'';const _dpNum=parseFloat(_dpRaw.replace(/[%\s]/g,''));const _dpValid=!isNaN(_dpNum)&&_dpNum>=3&&_dpNum<=95;const downPct=_dpValid?_dpNum:20;const dpf=downPct/100;const _dpLabel=(Math.round(downPct*10)/10);
         // Keep the leverage toggle label in sync with the chosen down payment.
         var _retroLevPct=document.querySelector('.toggle-group .toggle-btn[data-mode="leverage"] .retro-dp-pct');if(_retroLevPct)_retroLevPct.textContent=_dpLabel;
-        const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;const _isCustomRent=_rentValid;
-        // ── ENGINE: shared/real-estate-model.js (PR 3) ──
-        // All retrospective math; the page parses inputs and renders. ey is
-        // the end point (P8 will pass today).
-        const R=RealEstateModel.bvreRetro({sy:sy,ey:ey,mode:mode,hs:hs,he:he,bs:bs,be:be,rate:rate,dpf:dpf,rentOverride:_rentValid?_rentNum:null,btcData:btcData});
-        const dp=R.dp;
-        const asOf='April 2025';
-        const medianRef=_isCustom?('at $'+Math.round(hs).toLocaleString()+' each'):('at $'+he.toLocaleString()+' each (median)');
+        // Your rent: the July rent of the start year; it then resets each July
+        // with market rents, like the default.
+        const _rentRaw=(document.getElementById('customRent')||{}).value||'';const _rentNum=parseFloat(_rentRaw.replace(/[$,\s]/g,''));const _rentValid=!isNaN(_rentNum)&&_rentNum>=100&&_rentNum<=50000;
+        const D = RealEstateModel.PAIR_DEFAULTS;
+        const _investEl = document.getElementById('calcInvestDiff');
+        const invest = _investEl ? _investEl.checked : true;
+        // ── ENGINE: shared/real-estate-model.js (PR 4e) ──
+        const R = RealEstateModel.bvreRetro({ sy: sy, method: cash ? 'cash' : 'mortgage', homePrice: hs, mortRate: rate, dpf: dpf,
+            rent: _rentValid ? _rentNum : null, investDiff: invest, btcToday: TODAY_PRICE, nowMs: Date.now(),
+            closingPct: D.closingPct, propTaxPct: D.propTaxPct, insurancePer400K: D.insurancePer400K,
+            maintPct: D.maintPct, sellPct: D.sellPct, btcTxPct: D.btcTxPct });
+        // Placeholders name the defaults a blank field falls back to (also
+        // when an unoffered year fell back to 2017 above).
+        var _cpPh=document.getElementById('customHomePrice');if(_cpPh&&medianHs)_cpPh.placeholder=rFmt(medianHs)+' ('+sy+' median)';
+        var _crtPh=document.getElementById('customRate');if(_crtPh&&_prevailingRate)_crtPh.placeholder=_prevailingRate+'% ('+sy+' avg)';
+        if (!R) {
+            document.getElementById('calcResultsContainer').innerHTML = '<p class="annotation" style="margin-top:1.5rem">The data for ' + sy + ' isn\u2019t complete yet, so this start year can\u2019t be shown.</p>';
+            const _eq0 = document.getElementById('calcCashOutLine'); if (_eq0) _eq0.innerHTML = '';
+            return;
+        }
+        const startLabel = retroMonth(R.startKey), endLabel = retroMonth(R.endKey), houseLabel = retroMonth(R.houseKey);
+        const span = retroSpan(R.months);
+        const f1 = R.first, fN = R.last, T = R.totals;
+        const mutedS = 'font-size:.78rem;color:var(--text-muted)';
+        var _crUpdate=document.getElementById('customRent');if(_crUpdate){_crUpdate.placeholder=rFmt(R.rentDefault)+' (market rent)';}
 
         // Assumptions display
-        const assumeEl=document.getElementById('calcAssumptions');
-        if(mode==='cash'){
-            assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' (median home price). You either bought the house outright in cash, or invested the full amount in bitcoin and continued renting.';
-        }else{
-            assumeEl.innerHTML='<strong style="color:var(--text-dim)">Scenario:</strong> You had $'+dp.toLocaleString()+' in '+sy+' ('+_dpLabel+'% of median home price $'+hs.toLocaleString()+'). You either used it as a down payment with a 30-year fixed mortgage at '+rate+'%'+(_isCustomRate?' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. prevailing '+_prevailingRate+'%)</span>':'')+', or invested it in bitcoin and rented instead.';
+        const homeDesc = _isCustom ? ('your home price, ' + rFmt(hs)) : (sy + '’s median price of a new house, ' + rFmt(hs));
+        const rateNote = _isCustomRate ? ' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. prevailing ' + _prevailingRate + '%)</span>' : '';
+        document.getElementById('calcAssumptions').innerHTML = '<strong style="color:var(--text-dim)">Scenario:</strong> ' + (cash
+            ? ('In ' + startLabel + ' you had ' + rFmt(R.upfront) + ': ' + homeDesc + ', plus ' + rFmt(R.closing) + ' of closing costs. You either bought the house outright, or rented one like it and put the ' + rFmt(R.upfront) + ' into bitcoin at ' + sy + '’s average price, ' + rFmt(R.entryPrice) + '.')
+            : ('In ' + startLabel + ' you had ' + rFmt(R.upfront) + ': a ' + _dpLabel + '% down payment on ' + homeDesc + ', plus ' + rFmt(R.closing) + ' of closing costs. You either bought the house with a 30-year fixed mortgage at ' + rPct(rate) + rateNote + ', or rented one like it and put the ' + rFmt(R.upfront) + ' into bitcoin at ' + sy + '’s average price, ' + rFmt(R.entryPrice) + '.'))
+            + ' Both paths run to today, ' + endLabel + '.';
+
+        // What the renter did each month, in words. It quotes the first and
+        // the latest month; the mixed case is worded so it stays true however
+        // often the sign flips in between.
+        const rentFirst = rFmt(f1.rent) + ' in ' + startLabel + ', reset each July with market rents';
+        const ranOut = (R.ranOutKey && R.btcHeld === 0) ? retroMonth(R.ranOutKey) : null;
+        const firstSpan = '<span class="' + (f1.diff < 0 ? 'negative' : 'highlight') + '">' + rSigned(f1.diff) + '/mo</span>';
+        let monthlyLine;
+        if(!invest){
+            if(f1.diff >= 0 && fN.diff >= 0) monthlyLine = 'Each month: paid rent (' + rentFirst + ') and spent the difference from the owner’s cost instead of investing it.';
+            else if(f1.diff < 0 && fN.diff < 0) monthlyLine = 'Each month: paid rent (' + rentFirst + '), which cost more than the owner paid; the extra came from income, and the bitcoin was left alone.';
+            else monthlyLine = 'Each month: paid rent (' + rentFirst + '). When the owner paid more, the difference was spent instead of invested; when rent cost more, the extra came from income.';
+        } else if(f1.diff >= 0 && fN.diff >= 0){
+            monthlyLine = 'Each month: paid rent (' + rentFirst + ') and invested what the owner paid beyond it: ' + firstSpan + ' in ' + startLabel + ', ' + rSigned(fN.diff) + '/mo in ' + endLabel + '.';
+        } else if(f1.diff < 0 && fN.diff < 0){
+            monthlyLine = ranOut
+                ? ('Each month: paid rent (' + rentFirst + '), which cost more than the owner paid, and sold bitcoin to cover it (' + firstSpan + ' in ' + startLabel + ') until the bitcoin ran out in ' + ranOut + '; after that the extra came from income (' + rSigned(fN.diff) + '/mo in ' + endLabel + ').')
+                : ('Each month: paid rent (' + rentFirst + '), which cost more than the owner paid, and sold bitcoin to cover it: ' + firstSpan + ' in ' + startLabel + ', ' + rSigned(fN.diff) + '/mo in ' + endLabel + '.');
+        } else {
+            monthlyLine = 'Each month: paid rent (' + rentFirst + '), invested the difference when the owner paid more, and sold bitcoin to cover rent when it cost more: ' + firstSpan + ' in ' + startLabel + ', ' + rSigned(fN.diff) + '/mo in ' + endLabel + '.'
+                + (ranOut ? ' The bitcoin ran out in ' + ranOut + '; after that, rent above the owner’s cost came from income.' : '');
         }
+        const btcFromMonthly = R.btcHeld - R.btcUpfront;
+        const monthlyTotals = invest
+            ? ('Invested monthly: ' + rFmt(T.invested) + ' · sold to cover rent: ' + rFmt(T.sold) + (T.shortfall > 0.5 ? ' · <span class="negative">not covered (bitcoin ran out): ' + rFmt(T.shortfall) + '</span>' : '') + ' <span style="' + mutedS + '">(nominal sums)</span>')
+            : ('Monthly differences not invested: ' + rFmt(T.spent) + ' spent' + (T.fromIncome > 0.5 ? ', ' + rFmt(T.fromIncome) + ' of rent above the owner’s cost paid from income' : '') + ' <span style="' + mutedS + '">(nominal sums)</span>');
+        const srcNote = _retroPriceSource === 'live' ? ' (live)' : (typeof todayPriceNote === 'function' ? todayPriceNote(_retroPriceSource) : '');
 
-        // ── SHARED CALCS (from the engine) ──
-        const bb=R.bb;
-        const lumpValue=R.lumpValue;
-        const lumpReturn=R.lumpReturn;
-        const mortgageMonthly=R.mortgageMonthly;
-        const _defaultRent=R._defaultRent;const estRent=R.estRent;
-        const totalRentPaid=R.totalRentPaid;
-        const lumpNet=R.lumpNet;
-        const lumpHouses=R.lumpHouses;
+        // ── BITCOIN CARD (left) ──
+        const btcHtml =
+          '<div class="calc-card bitcoin">' +
+            '<h4>&#8383; Rented, invested in bitcoin</h4>' +
+            '<div class="period-label">' + startLabel + ' · Bought</div>' +
+            '<div class="invested-line">Invested <strong>' + rFmt(R.upfront) + '</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(the buyer’s up-front cash)</span></div>' +
+            '<div class="detail-line">' + R.btcUpfront.toFixed(4) + ' BTC at ' + rFmt(R.entryPrice) + ' <span style="' + mutedS + '">(' + sy + '’s average price), after ' + rPct(D.btcTxPct) + ' costs</span></div>' +
+            '<div class="detail-line">' + monthlyLine + '</div>' +
+            '<div class="period-divider"></div>' +
+            '<div class="period-label">' + endLabel + ' · Today</div>' +
+            '<div class="big-number">' + rFmt(R.btcIfSold) + ' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+            '<div class="big-number-label">bitcoin, if sold today, before tax</div>' +
+            (R.btcHeld > 0 ? reHouseIcons(R.housesCanBuy) : '') +
+            '<div class="detail-line">BTC held: ' + R.btcHeld.toFixed(4) + ' <span style="' + mutedS + '">(' + R.btcUpfront.toFixed(4) + ' up front ' + (btcFromMonthly >= 0 ? '+ ' : '− ') + Math.abs(btcFromMonthly).toFixed(4) + ' from the monthly differences)</span></div>' +
+            '<div class="detail-line">Bitcoin today: <strong>' + rFmt(R.btcToday) + '</strong><span class="retro-price-src" style="' + mutedS + '">' + srcNote + '</span></div>' +
+            (R.btcHeld > 0 ? '<div class="detail-line">Value: ' + rFmt(R.btcValue) + '; sale costs (' + rPct(D.btcTxPct) + '): <span class="negative">−' + rFmt(R.btcSaleCost) + '</span></div>' : '') +
+            '<div class="detail-line">' + monthlyTotals + '</div>' +
+            '<div class="detail-line">Rent paid: ' + rFmt(T.rent) + ' <span style="' + mutedS + '">over ' + span + (invest && T.sold > 0.5 ? ', ' + rFmt(T.sold) + ' of it from bitcoin sales and the rest from income' : ', from income, like the owner’s costs') + '</span></div>' +
+            (R.ranOutKey && R.btcHeld === 0
+              ? '<div class="detail-line" style="font-weight:500;margin-top:.6rem"><span class="negative">The bitcoin ran out in ' + retroMonth(R.ranOutKey) + ': rent above the owner’s cost came from income after that, and nothing is left to buy a house with.</span></div>'
+              : '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy ' + R.housesCanBuy.toFixed(1) + ' houses <strong>outright</strong> today <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">at ' + rFmt(R.homeEnd) + ' each, the house’s value by the Case-Shiller index (' + houseLabel + ')</span></div>') +
+          '</div>';
 
-        // ── HOUSE SIDE ──
-        let houseEquity=0,monthlyMortgage=0,houseTotalSpent=0,remainingBal=0,equityPct=0,debtFreeYear=sy+30;
-        let hL,hD;
-        if(mode==='cash'){
-            const ha=R.ha;
-            houseEquity=R.houseEquity;houseTotalSpent=R.houseTotalSpent;remainingBal=R.remainingBal;equityPct=R.equityPct;debtFreeYear=R.debtFreeYear;
-            monthlyMortgage=R.monthlyMortgage;
-            hL='$'+Math.round(he).toLocaleString();
-            var _cv='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/></svg><span style="font-size:0.9rem;color:var(--text)">1 house, outright</span></div>';
-            hD=_cv+'Home appreciation: '+ha+'%<br>'+
-               'Current value: $'+Math.round(he).toLocaleString()+(_isCustom?' <span style="font-size:0.78rem;color:var(--text-muted)">(applied same appreciation rate)</span>':'')+'<br>'+
-               'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span><br>'+
-               'No debt — but no bitcoin either';
-        }else{
-            monthlyMortgage=R.monthlyMortgage;
-            const bal=R.bal;
-            remainingBal=R.remainingBal;houseEquity=R.houseEquity;equityPct=R.equityPct;debtFreeYear=R.debtFreeYear;
-            houseTotalSpent=R.houseTotalSpent;
-            const interestMain=R.interestMain;
-            hL='$'+Math.round(houseEquity).toLocaleString();
-            var _fh=Math.max(0,Math.min(20,equityPct*0.20));var _ev='<div style=\"display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem\"><svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\"><defs><clipPath id=\"ec\"><rect x=\"0\" y=\"'+(24-_fh)+'\" width=\"24\" height=\"'+_fh+'\"/></clipPath></defs><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"'+(equityPct>=100?'#e09422':'#c0392b')+'\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\" clip-path=\"url(#ec)\"/></svg><span style=\"font-size:0.9rem;color:var(--text)\">'+(equityPct<0?'<span style=\\\'color:var(--red)\\\'>Underwater</span>':equityPct+'% owned')+'</span></div>';hD=_ev+
-               'Monthly mortgage: $'+Math.round(monthlyMortgage).toLocaleString()+'/mo<br>'+
-               'Interest paid so far: <span style="color:var(--red)">$'+interestMain.toLocaleString()+'</span> <span style="font-size:0.78rem;color:var(--text-muted)">(not recovered at sale)</span><br>'+
-               'Remaining loan: <span style="color:var(--red)">$'+Math.round(bal).toLocaleString()+'</span><br>'+
-               'Rent paid: $0 <span style="font-size:0.78rem;color:var(--text-muted)">(you live in it)</span>';
+        // ── HOUSE CARD (right) ──
+        const ownerMonthly = cash
+            ? ('Each month: ' + rFmt(f1.owner) + ' in ' + startLabel + ' <span style="' + mutedS + '">(property tax ' + rFmt(f1.tax) + ' + insurance ' + rFmt(f1.ins) + ' + maintenance ' + rFmt(f1.maint) + '), following the home’s value, reset each July</span>')
+            : ('Each month: ' + rFmt(f1.owner) + ' in ' + startLabel + ' <span style="' + mutedS + '">(mortgage ' + rFmt(f1.pi) + ' + property tax ' + rFmt(f1.tax) + ' + insurance ' + rFmt(f1.ins) + ' + maintenance ' + rFmt(f1.maint) + '); the mortgage payment is fixed, the rest follows the home’s value, reset each July</span>');
+        const houseHtml =
+          '<div class="calc-card house">' +
+            '<h4>&#127968; Bought the house</h4>' +
+            '<div class="period-label">' + startLabel + ' · Bought</div>' +
+            '<div class="invested-line">Invested <strong>' + rFmt(R.upfront) + '</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(' + (cash ? 'the full price' : _dpLabel + '% down') + ' of ' + rFmt(hs) + ' + ' + rFmt(R.closing) + ' closing costs)</span></div>' +
+            (cash ? '' : '<div class="detail-line">Mortgage: ' + rFmt(R.loan) + ' at ' + rPct(rate) + ', 30-year fixed</div>') +
+            '<div class="detail-line">' + ownerMonthly + '</div>' +
+            '<div class="period-divider"></div>' +
+            '<div class="period-label">' + endLabel + ' · Today</div>' +
+            '<div class="big-number">' + rFmt(R.houseIfSold) + ' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+            '<div class="big-number-label">the house, if sold today, before tax</div>' +
+            reOwnershipVisual(cash, R.equityPct, 'ecRetro') +
+            '<div class="detail-line">Home value: ' + rFmt(R.homeEnd) + ' <span style="' + mutedS + '">(Case-Shiller National to ' + houseLabel + ', the latest month: ×' + R.homeGrowth.toFixed(2) + ' since ' + startLabel + ')</span></div>' +
+            '<div class="detail-line">Selling costs (' + rPct(D.sellPct) + '): <span class="negative">−' + rFmt(R.sellCosts) + '</span></div>' +
+            (cash ? '' : '<div class="detail-line">Remaining loan: ' + (R.balance > 0 ? '<span class="negative">−' + rFmt(R.balance) + '</span>' : 'paid off') + '</div>') +
+            '<div class="detail-line">If held instead of sold: ' + rFmt(R.houseHeld) + ' <span style="' + mutedS + '">(value less ' + (cash ? 'nothing owed' : 'the loan') + ')</span></div>' +
+            (cash ? '' : '<div class="detail-line">Interest paid: <span class="negative">' + rFmt(T.interest) + '</span> <span style="' + mutedS + '">(nominal sum; not recovered at sale)</span></div>') +
+            '<div class="detail-line">Tax, insurance and maintenance: ' + rFmt(T.tax + T.ins + T.maint) + ' <span style="' + mutedS + '">(nominal sum)</span></div>' +
+          '</div>';
+
+        document.getElementById('calcResultsContainer').innerHTML = '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>';
+
+        // Equal cash out, stated with its number (M2).
+        const eq = document.getElementById('calcCashOutLine');
+        if(eq){
+            eq.innerHTML = invest
+                ? (T.shortfall > 0.5
+                    ? ('The owner paid out <strong>' + rFmt(R.cumCashOutOwner) + '</strong> and the renter <strong>' + rFmt(R.cumCashOutRenter) + '</strong> from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: the same ' + rFmt(R.upfront) + ' up front, then the renter matched the owner’s monthly costs with rent plus bitcoin purchases, or with bitcoin sales when rent cost more, until the bitcoin ran out in ' + retroMonth(R.ranOutKey) + '. <span class="negative">After that, ' + rFmt(T.shortfall) + ' of rent above the owner’s cost came from income.</span>')
+                    : ('Both households paid out <strong>' + rFmt(R.cumCashOutOwner) + '</strong> from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: ' + rFmt(R.upfront) + ' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'))
+                : ('The owner paid out ' + rFmt(R.cumCashOutOwner) + ' and the renter ' + rFmt(R.cumCashOutRenter) + ' from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: with the toggle off, only the up-front sum went into bitcoin.');
         }
-
-        // ── MAIN CARDS ──
-        document.getElementById('calcResultsContainer').innerHTML=
-            '<div class="calc-result-card bitcoin">'+
-                '<h4>\u20BF Bought Bitcoin + Rented ('+sy+')</h4>'+
-                '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
-                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">('+_dpLabel+'% down)</span>':' <span class="note">(cash equivalent)</span>')+'</div>'+
-                '<div class="period-divider"></div>'+
-                '<div class="period-label">'+asOf+' \u00B7 Current Value</div>'+
-                '<div class="result-value">$'+Math.round(lumpNet).toLocaleString()+' <span style="font-size:0.85rem;color:var(--text-muted)">net</span></div>'+
-                '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:-0.3rem;margin-bottom:0.7rem;font-style:italic">after $'+totalRentPaid.toLocaleString()+' rent paid over '+yrs+' years</div>'+
-                '<div class="result-detail">'+(function(){var lh=lumpHouses;var fH=Math.floor(lh);var pt=lh-fH;var ic='';var fI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg>';var pI='<svg viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" style=\"margin:1px;opacity:0.45\"><path d=\"M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.2\" stroke-dasharray=\"2 2\" stroke-linejoin=\"round\"/></svg>';for(var i=0;i<Math.min(fH,15);i++)ic+=fI;if(pt>0.05)ic+=pI;var ov=fH>15?'<span style=\"font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center\">+'+(fH-15)+' more</span>':'';return '<div style=\"display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-bottom:0.8rem\">'+ic+ov+'</div>';})()+
-                    'BTC purchased: '+bb.toFixed(2)+' @ $'+bs.toLocaleString()+'<br>'+
-                    'Gross BTC value:<span class="help-tip" tabindex="0">?<span class="tip-content">Value of your BTC holdings at today\u2019s market price, before subtracting rent paid during the holding period.</span></span> $'+Math.round(lumpValue).toLocaleString()+' <span style="font-size:0.78rem;color:var(--text-muted)">(before rent)</span><br>'+
-                    'Est. monthly rent: $'+estRent.toLocaleString()+'/mo'+(mode==='leverage'?(' <span style="font-size:0.78rem;color:var(--text-muted)">(vs. mortgage $'+Math.round(mortgageMonthly).toLocaleString()+')</span>'):'')+'<br>'+
-                    'Total rent paid: $'+totalRentPaid.toLocaleString()+'<br>'+
-                    '<span style="color:var(--amber);font-weight:500">You could now buy '+lumpHouses.toFixed(1)+' houses <strong>outright</strong></span> <span style="font-size:0.78rem;color:var(--text-muted)">('+medianRef+')</span><br>'+
-                    '<span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:0.4rem">No mortgage, property tax or maintenance on this side; rent is the housing cost.</span>'+
-                '</div>'+
-            '</div>'+
-            '<div class="calc-result-card house">'+
-                '<h4>\uD83C\uDFE0 Bought the House ('+sy+')</h4>'+
-                '<div class="period-label">'+sy+' \u00B7 Purchased</div>'+
-                '<div class="invested-line">Invested <strong>$'+dp.toLocaleString()+'</strong>'+(mode==='leverage'?' <span class="note">('+_dpLabel+'% down of $'+hs.toLocaleString()+')</span>':' <span class="note">(cash, paid in full)</span>')+'</div>'+
-                '<div class="period-divider"></div>'+
-                '<div class="period-label">'+asOf+' \u00B7 Current Value</div>'+
-                '<div class="result-value">'+hL+'</div>'+
-                '<div class="result-detail">'+hD+'</div>'+
-            '</div>';
-
-        // ── DCA SECTION ──
-        const dcaContainer=document.getElementById('dcaResultContainer');
-        const totalSummary=document.getElementById('totalSummary');
-        const totalWrapper=document.getElementById('totalSummaryWrapper');
-
-        if(dca){
-            // DCA math from the engine (R); yrsRemaining now counts from the
-            // end point ey (2025 today, so unchanged).
-            const monthlySavings=R.monthlySavings;
-            const dcaBtc=R.dcaBtc,dcaTotalInvested=R.dcaTotalInvested;
-            const dcaValue=R.dcaValue;
-            const totalBtc=R.totalBtc;
-            const totalBtcValue=R.totalBtcValue;
-            const totalBtcNet=R.totalBtcNet;
-            const totalHouses=R.totalHouses;
-            const extraHouses=R.extraHouses;
-            const totalInvested=R.totalInvested;
-            const yrsRemaining=R.yrsRemaining;
-            const principalRepaid=R.principalRepaid;
-            const interestPaid=R.interestPaid;
-            const houseOutflow=R.houseOutflow;
-            const btcOutflow=R.btcOutflow;
-
-            dcaContainer.innerHTML=
-                '<div class="calc-result-card bitcoin" style="border-style:dashed">'+
-                    '<h4>\u20BF Monthly DCA — Rent vs. Mortgage Savings</h4>'+
-                    '<div class="result-value">$'+Math.round(dcaValue).toLocaleString()+'</div>'+
-                    '<div class="result-detail">'+
-                        'Est. mortgage: $'+Math.round(mortgageMonthly).toLocaleString()+'/mo<br>'+
-                        'Est. rent: $'+estRent.toLocaleString()+'/mo<br>'+
-                        'Monthly DCA into BTC: <span style="color:var(--amber)">$'+monthlySavings.toLocaleString()+'/mo</span><br>'+
-                        'BTC accumulated: '+dcaBtc.toFixed(2)+' BTC<br>'+
-                        '<span>Total invested via DCA: $'+dcaTotalInvested.toLocaleString()+'</span>'+
-                        ' <span style="font-size:0.78rem;color:var(--text-muted)">($'+monthlySavings.toLocaleString()+'/mo \u00d7 '+(yrs*12)+' months)</span>'+
-                    '</div>'+
-                '</div>';
-
-            const ls='font-size:0.88rem;line-height:2.2;';
-            const lm='color:var(--text-muted)';
-            const lr='color:var(--red)';
-            const la='color:var(--amber)';
-            totalWrapper.style.display='block';
-            var _bh = (function(){var hf='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';var hp='<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';var lh=Math.max(0,totalHouses);var fH=Math.floor(lh);var pt=lh-fH;var ic="";for(var i=0;i<Math.min(fH,15);i++)ic+=hf;if(pt>0.05)ic+=hp;if(fH===0&&pt<=0.05)ic+=hp;var ov=fH>15?('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fH-15)+' more</span>'):"";return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem">'+ic+ov+'</div>';})();
-            totalSummary.innerHTML=
-                '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'+
-                    '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin — Total Position</div>'+
-                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">$'+Math.round(totalBtcNet).toLocaleString()+' <span style="font-size:0.8rem;color:var(--text-muted)">net</span></div>'+
-                    '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.7rem;font-style:italic">= $'+Math.round(lumpValue).toLocaleString()+' gross BTC + $'+Math.round(dcaValue).toLocaleString()+' DCA \u2212 $'+totalRentPaid.toLocaleString()+' rent</div>'+_bh+
-                    '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">values as of '+asOf+'</div>'+
-                    '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
-                        '<div style="'+ls+la+'">You could now buy <strong>the house, outright</strong></div>'+
-                        '<div style="'+ls+la+'">Debt outstanding: $0</div>'+
-                        (mode==='leverage'?'<div style="'+ls+la+'">Interest paid: $0</div>':'')+
-                        '<div style="'+ls+la+'">Debt-free: <strong>now</strong></div>'+
-                        '<div style="'+ls+la+';font-weight:600">You could now buy '+extraHouses.toFixed(1)+' additional houses, also outright <span style="color:var(--text-muted);font-weight:400;font-size:0.82rem">('+(1+extraHouses).toFixed(1)+' total)</span></div>'+
-                        '<div style="'+ls+'color:var(--text-dim)">Rent paid: $'+totalRentPaid.toLocaleString()+'</div>'+
-                        '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+btcOutflow.toLocaleString()+'</div>'+
-                    '</div>'+
-                '</div>'+
-                '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'+
-                    '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House — Total Position</div>'+
-                    '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.3rem">$'+Math.round(houseEquity).toLocaleString()+'</div>'+(function(){var fh=Math.max(0,Math.min(20,equityPct*0.20));var st=equityPct>=100?'#e09422':'#c0392b';return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="tlc"><rect x="0" y="'+(24-fh)+'" width="24" height="'+fh+'"/></clipPath></defs>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+st+'" stroke-width="1.5" stroke-linejoin="round"/>'+'<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#tlc)"/></svg>'+'<span style="font-size:0.85rem;color:var(--text-muted)">'+(equityPct>=100?'fully owned':equityPct+'% owned')+'</span></div>';})()+
-                    '<div style="font-size:0.78rem;'+lm+';margin-bottom:0.6rem">values as of '+asOf+'</div>'+
-                    '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'+
-                        '<div style="'+ls+lm+'">Ownership: <span style="color:var(--text)">'+equityPct+'% of 1 home</span></div>'+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt outstanding: $'+Math.round(remainingBal).toLocaleString()+'</div>':'')+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Interest paid: $'+interestPaid.toLocaleString()+' <span style="'+lm+';font-size:0.78rem">(not recovered at sale)</span></div>':'')+
-                        (mode==='leverage'?'<div style="'+ls+lr+'">Debt-free: '+debtFreeYear+' <span style="'+lm+'">('+yrsRemaining+' yrs away)</span></div>':'')+
-                        '<div style="'+ls+lm+'">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'+
-                        '<div style="'+ls+'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: $'+houseOutflow.toLocaleString()+'</div>'+
-                    '</div>'+
-                '</div>';
-        }else{
-            dcaContainer.innerHTML='';
-            totalWrapper.style.display='none';
-            totalSummary.innerHTML='';
-        }
-        var _crUpdate=document.getElementById('customRent');if(_crUpdate&&typeof _defaultRent!=='undefined'){_crUpdate.placeholder='$'+_defaultRent.toLocaleString()+' (our estimate)';}
     }
+    window.runRetroCalc = runCalculator;
 
     // EVENT LISTENERS
     // Hash-based tab routing
@@ -444,10 +455,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // other group has its own scoped click handler defined elsewhere.
     document.querySelectorAll('.toggle-group .toggle-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.toggle-group .toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');runCalculator()})});
     document.getElementById('calcYear').addEventListener('change',function(){var cp=document.getElementById('customHomePrice');if(cp){cp.value='';var y=parseInt(this.value);var m=homeData[y];if(m)cp.placeholder='$'+m.toLocaleString()+' ('+y+' median)';}var cr=document.getElementById('customRent');if(cr){cr.value='';}var crt=document.getElementById('customRate');if(crt){crt.value='';var yr=parseInt(this.value);var mr=mortgageRates&&mortgageRates[yr];if(mr)crt.placeholder=mr+'% ('+yr+' avg)';}runCalculator();});var _cpEl=document.getElementById('customHomePrice');if(_cpEl){_cpEl.addEventListener('input',runCalculator);var _yVal=parseInt(document.getElementById('calcYear').value);if(homeData[_yVal])_cpEl.placeholder='$'+homeData[_yVal].toLocaleString()+' ('+_yVal+' median)';}var _crEl=document.getElementById('customRent');if(_crEl){_crEl.addEventListener('input',runCalculator);}var _crtEl=document.getElementById('customRate');if(_crtEl){_crtEl.addEventListener('input',runCalculator);var _yrInit=parseInt(document.getElementById('calcYear').value);if(mortgageRates[_yrInit])_crtEl.placeholder=mortgageRates[_yrInit]+'% ('+_yrInit+' avg)';}var _dpEl=document.getElementById('customDownPct');if(_dpEl){_dpEl.addEventListener('input',runCalculator);}
-    document.getElementById('calcDCA').addEventListener('change',function(){
-        document.getElementById('dcaSection').style.display=this.checked?'block':'none';
-        runCalculator();
-    });
+    // "The renter invests the difference" (M2; sits with the results, P6).
+    var _calcInvestEl=document.getElementById('calcInvestDiff');if(_calcInvestEl)_calcInvestEl.addEventListener('change',runCalculator);
     // Format-on-blur for the three custom optional inputs. Strips
     // non-numeric chars and reformats with $ and commas (money) or %
     // suffix (rate). Empty values stay empty so the placeholder remains
@@ -462,6 +471,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         var dpp=document.getElementById('customDownPct');if(dpp) dpp.addEventListener('blur',function(){fmtPercent(dpp);});
     })();
     runCalculator();
+    // Today's bitcoin price (P8): the shared fetcher (power-law-data.js). The
+    // first render uses the latest PL_DATA sample it is seeded with; the quote
+    // re-renders the cards, and the projection shares the same request.
+    if(typeof fetchTodayPrice==='function')fetchTodayPrice(function(p,source){_retroPriceSource=source;runCalculator();});
     
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -597,17 +610,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   function pctTxt(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
   function setPlaceholder(id, text){ var el = document.getElementById(id); if(el && el.placeholder !== text) el.placeholder = text; }
 
-  // House icons for "how many houses the bitcoin side could buy".
-  function buildHouseIcons(n){
-    var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
-    var pI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.45"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
-    var fH = Math.floor(n), pt = n - fH, ic = '';
-    for(var i = 0; i < Math.min(fH, 15); i++) ic += fI;
-    if(pt > 0.05) ic += pI;
-    if(fH === 0 && pt <= 0.05) ic += pI;
-    var ov = fH > 15 ? '<span style="font-size:.8rem;color:var(--amber);margin-left:.4rem;align-self:center">+'+(fH-15)+' more</span>' : '';
-    return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:.6rem 0 .8rem">' + ic + ov + '</div>';
-  }
+  // House icons for "how many houses the bitcoin side could buy" (shared
+  // with the retrospective since PR 4e: reHouseIcons, above).
+  function buildHouseIcons(n){ return reHouseIcons(n); }
 
   // ── The projection (PR 4b: equal cash out, market rent, sourced costs) ──
   // All math is in RealEstateModel.bvreProjection; the page parses inputs
@@ -691,29 +696,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var f1 = P.first, fN = P.last;
     var mutedS = 'font-size:.78rem;color:var(--text-muted)';
 
-    // Ownership visual (single house, filled to the equity share)
-    function buildOwnershipVisual(){
-      if(cash){
-        return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
-          '<svg viewBox="0 0 24 24" width="32" height="32">' +
-            '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/>' +
-          '</svg>' +
-          '<span style="font-size:.9rem;color:var(--text)">1 house, outright</span>' +
-        '</div>';
-      }
-      var equityPct = P.equityPct;
-      var _fh = Math.max(0, Math.min(20, equityPct * 0.20));
-      var outlineColor = equityPct >= 100 ? '#e09422' : '#c0392b';
-      var label = equityPct < 0 ? '<span style="color:var(--red)">Underwater</span>' : equityPct + '% owned';
-      return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
-        '<svg viewBox="0 0 24 24" width="32" height="32">' +
-          '<defs><clipPath id="ecFwd"><rect x="0" y="'+(24-_fh)+'" width="24" height="'+_fh+'"/></clipPath></defs>' +
-          '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="'+outlineColor+'" stroke-width="1.5" stroke-linejoin="round"/>' +
-          '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#ecFwd)"/>' +
-        '</svg>' +
-        '<span style="font-size:.9rem;color:var(--text)">'+label+'</span>' +
-      '</div>';
-    }
+    // Ownership visual (single house, filled to the equity share; shared
+    // with the retrospective since PR 4e: reOwnershipVisual, above).
+    function buildOwnershipVisual(){ return reOwnershipVisual(cash, P.equityPct, 'ecFwd'); }
 
     // What the renter does each month, in words.
     var monthlyLine;
@@ -1058,8 +1043,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 // follows SITE_GUIDE §17.5 with BvRE-specific schema:
 //
 //   Retrospective:
-//     year       integer 2014–2021       default 2017
-//     dca        '1' if checked          omit otherwise
+//     year       integer 2014–2024       default 2017 (to 2021 before PR 4e)
+//     rinv       '0' when "the renter invests the difference" is off (PR 4e)
+//     rmethod    'cash' | 'leverage'      default 'leverage' (PR 4e)
+//     rhome      integer (USD)            blank = the start year's median (PR 4e)
+//     rrent      integer (July rent, $/mo) blank = market rent (PR 4e)
+//     rrate      decimal (mortgage %)     blank = the start year's average (PR 4e)
+//     rdown      decimal (down payment %) blank = 20 (PR 4e)
 //   Projection:
 //     home       integer (USD)            default 420000
 //     horizon    integer 5|10|15|20       default 10
@@ -1083,7 +1073,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 //     btctx      decimal (bitcoin cost % per trade) default 0.5
 //     inv        '0' when "the renter invests the difference" is off
 //   Retired in PR 4b, dropped from links on load: advanced, advrate (the
-//   "go deeper" DCA and S&P leg, replaced by M2).
+//   "go deeper" DCA and S&P leg, replaced by M2). Retired in PR 4e: dca (the
+//   retrospective's "Go deeper" checkbox, replaced by rinv).
 //
 // fwdBtcNow is intentionally NOT in the URL — it's a live-fetched
 // value that goes stale within hours, so a shared link should let the
@@ -1109,7 +1100,21 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // page loads, not the visitor's last selection.
   var SCHEMA = {
     year:      { elId: 'calcYear',             type: 'int',       def: 2017,    evt: 'change' },
-    dca:       { elId: 'calcDCA',              type: 'bool',                    evt: 'change' },
+    // The retrospective's M2 toggle (PR 4e), default on; replaces `dca`, the
+    // retired "Go deeper" checkbox, which links and storage no longer carry.
+    rinv:      { elId: 'calcInvestDiff',       type: 'bool-on',                 evt: 'change' },
+    // The retrospective's own inputs (PR 4e): before 4e a shared link carried
+    // only the year, so a reader's own price, rent, rate or down payment, or
+    // the cash toggle, silently fell back to the median case. Blank = the
+    // sourced default and is omitted. Links only (persist: false), as before
+    // 4e they were never stored: a stored set would mix with a link's, and
+    // `year`'s change handler, which clears price, rent and rate, would wipe
+    // it. They come after `year` so a link's year is set first.
+    rmethod:   { type: 'btn-rmethod', sel: '.toggle-group .toggle-btn', attr: 'mode', def: 'leverage', persist: false },
+    rhome:     { elId: 'customHomePrice',      type: 'thousands', def: NaN,     evt: 'input', persist: false },
+    rrent:     { elId: 'customRent',           type: 'thousands', def: NaN,     evt: 'input', persist: false },
+    rrate:     { elId: 'customRate',           type: 'float',     def: NaN,     evt: 'input', dp: 2, persist: false },
+    rdown:     { elId: 'customDownPct',        type: 'float',     def: NaN,     evt: 'input', dp: 2, persist: false },
     home:      { elId: 'fwdHomePrice',         type: 'thousands', def: 415000,  evt: 'input'  },
     horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change' },
     // Nominal home appreciation (PR 4a, rulings M1/P3): a NEW name, because
@@ -1137,6 +1142,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false }
   };
 
+  function isBtn(spec) { return /^btn-/.test(spec.type); }
+
   function parseThousands(str) {
     if (str === null || str === undefined || str === '') return NaN;
     // Strip $, commas, and whitespace so format-on-blur values
@@ -1152,7 +1159,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
   function readValue(key) {
     var spec = SCHEMA[key];
-    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
+    if (isBtn(spec)) {
       var active = document.querySelector(spec.sel + '.active');
       return active ? active.getAttribute('data-' + spec.attr) : spec.def;
     }
@@ -1167,7 +1174,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
   function applyValue(key, raw) {
     var spec = SCHEMA[key];
-    if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
+    if (isBtn(spec)) {
       var btn = document.querySelector(spec.sel + '[data-' + spec.attr + '="' + raw + '"]');
       if (btn && !btn.classList.contains('active')) btn.click();
       return;
@@ -1238,10 +1245,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // price, M4) never reached a returning reader: their stored 420000
   // looked like a choice. migrateV1() carries a v1 value over only when it
   // differs from the v1-era default, drops keys that no longer exist
-  // (appr, advanced, advrate), and deletes v1.
+  // (appr, advanced, advrate, and since PR 4e dca), and deletes v1. A v2 blob
+  // holding the retired `dca` loses it at the next write: readers skip keys
+  // not in SCHEMA, and syncStorage() writes only SCHEMA keys.
   var STORAGE_KEY = 'lcs.bvre.calc.v2';
   var V1_KEY = 'lcs.bvre.calc.v1';
-  var V1_DEFAULTS = { year: 2017, dca: 0, home: 420000, horizon: 10, mortgage: 6.8, down: 20, method: 'mortgage' };
+  var V1_DEFAULTS = { year: 2017, home: 420000, horizon: 10, mortgage: 6.8, down: 20, method: 'mortgage' };
   function migrateV1() {
     if (typeof localStorage === 'undefined') return;
     try {
@@ -1368,7 +1377,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     });
     Object.keys(SCHEMA).forEach(function(key){
       var spec = SCHEMA[key];
-      if (spec.type === 'btn-method' || spec.type === 'btn-pscenario' || spec.type === 'btn-displaymode') {
+      if (isBtn(spec)) {
         document.querySelectorAll(spec.sel).forEach(function(b){
           b.addEventListener('click', scheduleSyncUrl);
         });
@@ -1389,12 +1398,15 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // convert to nominal at the sitewide inflation, apply it as `happr`,
   // say so in one line, and drop `appr` from the address bar (P3). Links
   // made before PR 4b may carry `advanced` / `advrate` (the retired "go
-  // deeper" DCA and S&P leg); they no longer mean anything and are dropped.
+  // deeper" DCA and S&P leg), and links made before PR 4e may carry `dca`
+  // (the retrospective's retired "Go deeper" checkbox; its successor, the
+  // "invests the difference" toggle, is on by default); none of them means
+  // anything now, and they are dropped.
   function readLegacyAppr() {
     var params = new URLSearchParams(window.location.search);
-    var had = params.has('appr') || params.has('advanced') || params.has('advrate');
+    var had = params.has('appr') || params.has('advanced') || params.has('advrate') || params.has('dca');
     if (!had) return;
-    params.delete('advanced'); params.delete('advrate');
+    params.delete('advanced'); params.delete('advrate'); params.delete('dca');
     var real = params.has('appr') ? parseFloat(params.get('appr')) : NaN;
     params.delete('appr');
     if (isFinite(real) && !params.has('happr') && window.ModelingAssumptions) {

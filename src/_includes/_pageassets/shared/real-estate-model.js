@@ -9,7 +9,10 @@
    window.RealEstateModel. Pure functions, no DOM. Depends on
    shared/power-law-data.js (plPrice, PL_FLOOR, PL_CEIL, GENESIS_TS,
    PL_DATA, TODAY_PRICE — read at call time) and, for BvRE's
-   projection, shared/calculator-helpers.js (window.CalcHelpers).
+   projection, shared/calculator-helpers.js (window.CalcHelpers). BvRE's
+   retrospective (PR 4e) also reads the monthly series in
+   shared/housing-monthly-data.js and shared/btc-monthly-data.js, through
+   retroSeries() at call time; BvRP loads neither and never calls it.
 
    PR 3 MOVES code; it does not rewrite logic. Where the pages
    behaved differently, both behaviours are kept behind explicit
@@ -653,75 +656,213 @@
     return bal;
   }
 
-  // Retrospective ("Postponed Purchase") — was the math inside
-  // runCalculator(). Inputs are already parsed by the page.
-  //   i: { sy, ey, mode:'cash'|'leverage', dca, hs, he, bs, be, rate,
-  //        dpf, rentOverride (number|null), btcData }
-  // ey is the end point. Today it is the fixed 2025 the page passes; P8
-  // (design §9) will pass today, so nothing here assumes a year.
+  // ─── BvRE retrospective: to today, month by month (PR 4e) ────────────
+  // Rulings M11 (the house follows Case-Shiller), M4 (historical market
+  // rent), M2 (equal cash out), M6 (costs) and P8 (the retrospective runs to
+  // today), replacing the pre-4 rules (rent at 75% of the mortgage payment,
+  // flat; costs on the purchase price; the new-house median as the end
+  // value; the "Go deeper" DCA; a fixed April 2025 end).
+  //
+  // The purchase is in July of the start year; both households then spend
+  // the same every month through the current month, as in bvreProjection:
+  //  - At purchase the buyer pays the down payment (or the whole price) plus
+  //    closing costs; the renter puts the same sum into bitcoin at the start
+  //    year's average price (startYearPrice below), less the trading cost.
+  //  - Each month the owner pays P&I + property tax + insurance +
+  //    maintenance; the renter pays rent and, with "invests the difference"
+  //    on, buys bitcoin with (owner's cost − rent) at the price the month
+  //    opened at (the previous month's close), or sells bitcoin to cover rent
+  //    when rent costs more. Off: only the up-front sum is invested.
+  //  - The house's value follows the Case-Shiller National index from July
+  //    of the start year (M11). Property tax, insurance and maintenance
+  //    follow that value, reset each July (M6; today's default rates, applied
+  //    to every year).
+  //  - Rent starts at market rent for the house: price ÷ 12 ÷ the start
+  //    year's price-to-rent ratio, Zillow's typical home value over its
+  //    market rent (annual averages; ZORI begins in 2015, so a 2014 start
+  //    backcasts it with CPI rent). It resets each July by Zillow's market
+  //    rent index, as a lease renewed at market would (M4).
+  //  - The end is today (P8): bitcoin at today's price; the house at the
+  //    latest Case-Shiller month (the index lags about two months); flows
+  //    through the current month. If sold, before tax (PR 5): house value −
+  //    selling costs − loan balance; bitcoin value − the trading cost.
+  //   i: { sy, method 'mortgage'|'cash', homePrice (the start year's
+  //        price), mortRate, dpf, rent (July rent | null), investDiff,
+  //        btcToday, nowMs, closingPct, propTaxPct, insurancePer400K,
+  //        maintPct, sellPct, btcTxPct, series }
+  //   series: { cs, zori, zhvi, cpiRent, btc } — monthly [['YYYY-MM', v]]
+  //        arrays (retroSeries() collects the page's globals).
+  //   Returns end values, the first and last monthly figures the cards
+  //   quote, totals, and one row per calendar year: the first from July,
+  //   the last "to date" and valued as the cards are (the ledger PR 6
+  //   renders; rePairQA.ledgerCheck asserts the parity).
+  function monthIdx(key){ var p = String(key).split('-'); return (+p[0]) * 12 + (+p[1] - 1); }
+  function monthKey(idx){ var y = Math.floor(idx / 12), m = idx % 12 + 1; return y + '-' + (m < 10 ? '0' : '') + m; }
+  // The last entry at or before month idx (monthly series carry their latest
+  // value forward until the next refresh adds a month).
+  function atOrBefore(arr, idx){
+    for (var k = arr.length - 1; k >= 0; k--) if (monthIdx(arr[k][0]) <= idx) return arr[k];
+    return null;
+  }
+  function exactAt(arr, idx){
+    var key = monthKey(idx);
+    for (var k = arr.length - 1; k >= 0; k--) if (arr[k][0] === key) return arr[k][1];
+    return null;
+  }
+  function retroSeries(){
+    return { cs: CS_NATIONAL, zori: ZORI_US, zhvi: ZHVI_US, cpiRent: CPI_RENT, btc: BTC_MONTHLY };
+  }
+  // The start year's average bitcoin price: the mean of PL_DATA's samples in
+  // that calendar year (a ~12-day grid, so close to the daily average).
+  function startYearPrice(y){
+    var sum = 0, n = 0;
+    for (var k = 0; k < PL_DATA.length; k++) {
+      var yr = new Date((GENESIS_TS + PL_DATA[k][0] * 86400) * 1000).getUTCFullYear();
+      if (yr === y) { sum += PL_DATA[k][1]; n++; }
+    }
+    return n ? sum / n : null;
+  }
+  // Zillow's rent index, backcast with CPI rent before ZORI begins.
+  function rentIndexAt(S, idx){
+    var z0 = S.zori[0], i0 = monthIdx(z0[0]);
+    if (idx >= i0) return atOrBefore(S.zori, idx)[1];
+    var c = exactAt(S.cpiRent, idx), c0 = exactAt(S.cpiRent, i0);
+    return (c === null || c0 === null) ? null : z0[1] * c / c0;
+  }
+  // Price-to-rent for a calendar year: mean ZHVI ÷ (12 × mean rent index).
+  function priceToRentForYear(S, y){
+    var hv = 0, rv = 0;
+    for (var m = 0; m < 12; m++) {
+      var idx = y * 12 + m, h = exactAt(S.zhvi, idx), r = rentIndexAt(S, idx);
+      if (h === null || r === null) return null;
+      hv += h; rv += r;
+    }
+    return (hv / 12) / (12 * rv / 12);
+  }
+
   function bvreRetro(i){
-    var sy = i.sy, ey = i.ey, hs = i.hs, he = i.he, bs = i.bs, be = i.be,
-        rate = i.rate, dpf = i.dpf, mode = i.mode, btcData = i.btcData;
+    var S = i.series || retroSeries();
+    var sy = i.sy, hs = i.homePrice, cash = i.method === 'cash';
+    var s0 = sy * 12 + 6;                                     // July of the start year
+    var now = new Date(i.nowMs), cur = now.getUTCFullYear() * 12 + now.getUTCMonth();
+    var n = cur - s0 + 1;                                     // months, July through the current month
+    if (!(n >= 1) || !(hs > 0)) return null;
+    var tx = i.btcTxPct / 100;
+    var invest = i.investDiff !== false;
+    var btcToday = i.btcToday;
+
+    var cs0 = atOrBefore(S.cs, s0)[1];
+    function valueAt(idx){ return hs * atOrBefore(S.cs, idx)[1] / cs0; }
+    var csEnd = atOrBefore(S.cs, cur);                        // the latest published month
+    var z0 = rentIndexAt(S, s0);
+    var pr = priceToRentForYear(S, sy);
+    var rentDefault = hs / (12 * pr);
+    var rent0 = (i.rent === null || i.rent === undefined) ? rentDefault : i.rent;
+    function julyOf(idx){ var y = Math.floor(idx / 12); return (idx % 12 >= 6 ? y : y - 1) * 12 + 6; }
+    function priceFor(idx){ var c = exactAt(S.btc, idx - 1); return c === null ? btcToday : c; }
+
+    var loan = cash ? 0 : hs * (1 - i.dpf);
+    var down = cash ? hs : hs * i.dpf;
+    var closing = hs * i.closingPct / 100;
+    var upfront = down + closing;
+    var mr = i.mortRate / 100 / 12;
+    var pi = loan > 0 ? mortgagePayment(loan, i.mortRate, 30, 'le0') : 0;
+    var entryPrice = startYearPrice(sy);
+    // A start year needs a full calendar year of Zillow data (for its
+    // price-to-rent) and of PL_DATA (for its average price).
+    if (!(pr > 0) || !(entryPrice > 0)) return null;
+    var btcUpfront = upfront * (1 - tx) / entryPrice;
+
+    var btc = btcUpfront, bal = loan;
+    var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
+              invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
+    var cumOwner = upfront, cumRenter = upfront;
+    var rows = [], yr = null, first = null, last = null, ranOut = null;
+    for (var m = 1; m <= n; m++) {
+      var idx = s0 + m - 1, cy = Math.floor(idx / 12);
+      if (!yr) yr = { year: cy, months: 0, first: rows.length === 0, toDate: false, interest: 0, principal: 0, tax: 0, ins: 0,
+                      maint: 0, owner: 0, rent: 0, btcBoughtUsd: 0, btcSoldUsd: 0, btcBought: 0, btcSold: 0, shortfall: 0 };
+      var jl = julyOf(idx), vj = valueAt(jl);
+      var interest = 0, principal = 0;
+      if (bal > 0) {
+        interest = bal * mr;
+        principal = Math.min(pi - interest, bal);
+        bal -= principal;
+        if (bal < 1e-6) bal = 0;
+      }
+      var tax = vj * i.propTaxPct / 100 / 12;
+      var ins = i.insurancePer400K * vj / 400000 / 12;
+      var maint = vj * i.maintPct / 100 / 12;
+      var owner = interest + principal + tax + ins + maint;
+      var rent = rent0 * rentIndexAt(S, jl) / z0;
+      var diff = owner - rent;
+      if (m === 1) first = { owner: owner, pi: interest + principal, tax: tax, ins: ins, maint: maint, rent: rent, diff: diff };
+      if (m === n) last = { owner: owner, rent: rent, diff: diff };
+      var price = priceFor(idx);
+      var sf = 0;
+      if (invest) {
+        if (diff > 0) {
+          var b = diff * (1 - tx) / price;
+          btc += b; t.invested += diff; yr.btcBoughtUsd += diff; yr.btcBought += b;
+        } else if (diff < 0) {
+          var need = -diff, sell = need / (price * (1 - tx));
+          if (sell <= btc) { btc -= sell; t.sold += need; yr.btcSoldUsd += need; yr.btcSold += sell; }
+          else {
+            var cover = btc * price * (1 - tx);
+            t.sold += cover; yr.btcSoldUsd += cover; yr.btcSold += btc;
+            sf = need - cover; btc = 0;
+            if (!ranOut) ranOut = monthKey(idx);
+          }
+        }
+      } else if (diff > 0) {
+        t.spent += diff;
+      } else {
+        t.fromIncome += -diff;
+      }
+      t.shortfall += sf; yr.shortfall += sf;
+      t.interest += interest; t.principal += principal; t.tax += tax; t.ins += ins; t.maint += maint;
+      t.owner += owner; t.rent += rent;
+      yr.months++; yr.interest += interest; yr.principal += principal; yr.tax += tax; yr.ins += ins; yr.maint += maint;
+      yr.owner += owner; yr.rent += rent;
+      cumOwner += owner;
+      cumRenter += invest ? (owner + sf) : rent;
+      if (idx % 12 === 11 || m === n) {
+        // December rows are valued at December (Case-Shiller, the month's
+        // close); the last row is "to date", valued as the cards are.
+        var end = m === n;
+        yr.toDate = end;
+        yr.homeValue = end ? hs * csEnd[1] / cs0 : valueAt(idx);
+        yr.btcPrice = end ? btcToday : (exactAt(S.btc, idx) || btcToday);
+        yr.balance = bal; yr.equity = yr.homeValue - bal;
+        yr.btcHeld = btc; yr.btcValue = btc * yr.btcPrice;
+        yr.cumCashOutOwner = cumOwner; yr.cumCashOutRenter = cumRenter;
+        rows.push(yr); yr = null;
+      }
+    }
+
     var o = {};
-    var yrs = ey - sy;
-    var dp = mode==='cash'?hs:Math.round(hs*dpf);
-    var bb = dp/bs;
-    var lumpValue = bb*be;
-    var mortgageMonthly = mortgagePayment(hs*(1-dpf),rate,30,'eq0');
-    var _defaultRent = Math.round(mortgageMonthly*0.75);
-    var estRent = (i.rentOverride !== null && i.rentOverride !== undefined) ? Math.round(i.rentOverride) : _defaultRent;
-    var totalRentPaid = estRent*yrs*12;
-    var lumpNet = lumpValue-totalRentPaid;
-    var lumpHouses = lumpNet/he;
-    o.yrs = yrs; o.dp = dp; o.bb = bb; o.lumpValue = lumpValue;
-    o.lumpReturn = ((lumpValue-dp)/dp*100).toFixed(0);
-    o.mortgageMonthly = mortgageMonthly; o._defaultRent = _defaultRent; o.estRent = estRent;
-    o.totalRentPaid = totalRentPaid; o.lumpNet = lumpNet; o.lumpHouses = lumpHouses;
+    var homeEnd = hs * csEnd[1] / cs0;
+    var sellCosts = homeEnd * i.sellPct / 100;
+    var houseHeld = homeEnd - bal;
+    var houseIfSold = homeEnd - sellCosts - bal;
+    var btcValue = btc * btcToday;
+    var btcSaleCost = btcValue * tx;
+    var btcIfSold = btcValue - btcSaleCost;
 
-    // House side
-    var houseEquity=0,monthlyMortgage=0,houseTotalSpent=0,remainingBal=0,equityPct=0,debtFreeYear=sy+30;
-    if(mode==='cash'){
-      o.ha=((he-hs)/hs*100).toFixed(1);
-      houseEquity=he;houseTotalSpent=hs;remainingBal=0;equityPct=100;debtFreeYear=sy;
-      monthlyMortgage=mortgageMonthly;
-    }else{
-      var la=hs*(1-dpf);monthlyMortgage=mortgagePayment(la,rate,30,'eq0');
-      var mps=yrs*12;var r=rate/100/12;
-      var bal=amortizeBalance(la,r,mps,monthlyMortgage);bal=Math.max(0,bal);
-      remainingBal=bal;houseEquity=he-bal;equityPct=Math.round((houseEquity/he)*100);debtFreeYear=sy+30;
-      var pt=hs*0.012*yrs,ins=150*mps,mnt=hs*0.01*yrs;
-      houseTotalSpent=(monthlyMortgage*mps)+dp+pt+ins+mnt;
-      o.interestMain=Math.round((monthlyMortgage*mps)-(la-bal));
-      o.bal=bal;
-    }
-    o.houseEquity=houseEquity;o.monthlyMortgage=monthlyMortgage;o.houseTotalSpent=houseTotalSpent;
-    o.remainingBal=remainingBal;o.equityPct=equityPct;o.debtFreeYear=debtFreeYear;
-
-    // "Go deeper" DCA (computed whether or not the page shows it)
-    var monthlySavings=Math.round(mortgageMonthly-estRent);
-    var dcaBtc=0,dcaTotalInvested=0;
-    for(var yr=sy;yr<ey;yr++){
-      var ybp=btcData[yr]||btcData[ey];
-      dcaBtc+=(monthlySavings/ybp)*12;
-      dcaTotalInvested+=monthlySavings*12;
-    }
-    var dcaValue=dcaBtc*be;
-    var totalBtc=bb+dcaBtc;
-    var totalBtcValue=totalBtc*be;
-    var totalBtcNet=totalBtcValue-totalRentPaid;
-    var totalHouses=totalBtcNet/he;
-    var totalInvested=dp+dcaTotalInvested;
-    var principalRepaid=(hs*(1-dpf))-remainingBal;
-    o.monthlySavings=monthlySavings;o.dcaBtc=dcaBtc;o.dcaTotalInvested=dcaTotalInvested;
-    o.dcaValue=dcaValue;o.totalBtc=totalBtc;o.totalBtcValue=totalBtcValue;o.totalBtcNet=totalBtcNet;
-    o.totalHouses=totalHouses;o.extraHouses=totalHouses-1;o.totalInvested=totalInvested;
-    // Years from the end point to debt-free (was the literal 2025; ey is
-    // 2025 today, so the output is unchanged).
-    o.yrsRemaining=debtFreeYear-ey;
-    o.principalRepaid=principalRepaid;
-    o.interestPaid=Math.round((mortgageMonthly*yrs*12)-principalRepaid);
-    o.houseOutflow=Math.round(houseTotalSpent);
-    o.btcOutflow=Math.round(totalInvested+totalRentPaid);
+    o.sy = sy; o.startKey = monthKey(s0); o.endKey = monthKey(cur); o.houseKey = csEnd[0];
+    o.months = n; o.investDiff = invest; o.method = i.method;
+    o.homePrice = hs; o.homeEnd = homeEnd; o.homeGrowth = csEnd[1] / cs0;
+    o.priceToRent = pr; o.rentDefault = rentDefault; o.rent0 = rent0;
+    o.down = down; o.closing = closing; o.upfront = upfront; o.loan = loan; o.monthlyPI = pi; o.mortRate = i.mortRate;
+    o.entryPrice = entryPrice; o.btcUpfront = btcUpfront; o.btcHeld = btc; o.btcToday = btcToday;
+    o.first = first; o.last = last; o.ranOutKey = ranOut;
+    o.btcValue = btcValue; o.btcSaleCost = btcSaleCost; o.btcIfSold = btcIfSold;
+    o.balance = bal; o.sellCosts = sellCosts; o.houseHeld = houseHeld; o.houseIfSold = houseIfSold;
+    o.equityPct = homeEnd > 0 ? Math.round((houseHeld / homeEnd) * 100) : 0;
+    o.housesCanBuy = homeEnd > 0 ? Math.max(0, btcIfSold / homeEnd) : 0;
+    o.totals = t;
+    o.cumCashOutOwner = cumOwner; o.cumCashOutRenter = cumRenter;
+    o.rows = rows;
     return o;
   }
 
@@ -891,57 +1032,14 @@
     return o;
   }
 
-  // ─── Ledger (PR 3: built, not rendered; PR 6 renders it) ──────────
-  // Year-by-year rows from the same computations the cards use. The end
-  // point is a parameter so P8 can run the retrospective to today:
-  //   opts.end = { year, months }  — months past Jan 1 of `year` (0–11).
-  //   When months > 0 a final partial row labelled "to date" is added.
-  //   opts.btcPriceAt(y) / opts.homeValueAt(y) — price lookups for each
-  //   row (default: the annual series and the custom-price scaling the
-  //   page already applies). P8 passes live values for the "to date" row.
-  // Rows for full years up to end.year reproduce the card figures at
-  // that year exactly (asserted by rePairQA).
-  function ledgerRetro(i, opts){
-    opts = opts || {};
-    var end = opts.end || { year: i.ey, months: 0 };
-    var sy = i.sy, hs = i.hs, dpf = i.dpf, mode = i.mode, btcData = i.btcData;
-    var btcAt = opts.btcPriceAt || function(y){ return y === i.ey ? i.be : btcData[y]; };
-    var homeAt = opts.homeValueAt || function(y){ return y === i.ey ? i.he : (y === sy ? hs : hs * (i.homeData[y] / i.homeData[sy])); };
-    var base = bvreRetro(i);
-    var la = hs*(1-dpf), r = i.rate/100/12, pmt = base.monthlyMortgage;
-    var rows = [];
-    function row(label, months, priceBtc, houseValue){
-      var yrsN = months/12;
-      var bal = mode==='cash' ? 0 : Math.max(0, amortizeBalance(la, r, months, pmt));
-      var pmtPaid = mode==='cash' ? 0 : pmt*months;
-      var rent = base.estRent*months;
-      var dcaBtc = 0, dcaIn = 0;
-      for (var m = 0; m < months; m += 12) {
-        var yrp = sy + m/12;
-        var ybp = btcData[yrp] || btcAt(end.year);
-        var inYear = Math.min(12, months - m);
-        dcaBtc += (base.monthlySavings/ybp)*inYear;
-        dcaIn += base.monthlySavings*inYear;
-      }
-      return {
-        label: label, months: months, years: yrsN,
-        house: { value: houseValue, balance: bal, equity: houseValue - bal,
-                 principalPaid: mode==='cash' ? 0 : la - bal,
-                 interestPaid: mode==='cash' ? 0 : pmtPaid - (la - bal),
-                 propertyTax: hs*0.012*yrsN, insurance: 150*months, maintenance: hs*0.01*yrsN,
-                 cashOut: mode==='cash' ? hs : (pmtPaid + base.dp + hs*0.012*yrsN + 150*months + hs*0.01*yrsN) },
-        btc: { price: priceBtc, lumpBtc: base.bb, dcaBtc: dcaBtc, value: base.bb*priceBtc,
-               dcaValue: dcaBtc*priceBtc, rentPaid: rent, dcaInvested: dcaIn,
-               net: base.bb*priceBtc - rent, cashOut: base.dp + dcaIn + rent }
-      };
-    }
-    for (var y = sy; y <= end.year; y++) rows.push(row(String(y), (y - sy)*12, btcAt(y), homeAt(y)));
-    if (end.months > 0) {
-      var mm = (end.year - sy)*12 + end.months;
-      rows.push(row('to date', mm, opts.btcPriceAt ? opts.btcPriceAt('to date') : btcAt(end.year),
-                    opts.homeValueAt ? opts.homeValueAt('to date') : homeAt(end.year)));
-    }
-    return { rows: rows, cards: base };
+  // ─── Ledger (built, not rendered; PR 6 renders it) ──────────────────
+  // The retrospective's rows come from the same monthly loop as its cards
+  // (bvreRetro): one per calendar year, the first from July of the start
+  // year, the last "to date" and valued as the cards are. rePairQA's
+  // ledgerCheck asserts final row = cards and equal cumulative cash out.
+  function ledgerRetro(i){
+    var o = bvreRetro(i);
+    return { rows: o ? o.rows : [], cards: o };
   }
 
   window.RealEstateModel = {
@@ -952,6 +1050,9 @@
     bvreRetro: bvreRetro,
     bvreProjection: bvreProjection,
     ledgerRetro: ledgerRetro,
+    retroSeries: retroSeries,
+    startYearPrice: startYearPrice,
+    priceToRentForYear: function(y, S){ return priceToRentForYear(S || retroSeries(), y); },
     PAIR_DEFAULTS: PAIR_DEFAULTS,
     // BvRP defaults and dated rates (PR 4d: M8, item 12)
     RENTAL_DEFAULTS: RENTAL_DEFAULTS,
