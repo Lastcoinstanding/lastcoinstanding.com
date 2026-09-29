@@ -1,5 +1,11 @@
 [
   {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/dashboard",
+    "summary": "Live bitcoin price restored on every page, now from several sources. When none loads, pages show the date of the price shown."
+  },
+  {
     "display": "9/20/26",
     "date": "2026-09-20",
     "page": "/",
