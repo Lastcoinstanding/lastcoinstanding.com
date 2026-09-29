@@ -120,7 +120,7 @@ load. **You do not need to touch them on the monthly refresh.**
 | Constant | What it is | How it's set now |
 |---|---|---|
 | `TODAY_DAYS` | Days since the Bitcoin Genesis Block (3 Jan 2009) | Computed at load: `Math.floor((Date.now() / 1000 - GENESIS_TS) / 86400)` |
-| `TODAY_PRICE` | Most recent USD BTC price | Seeded to the latest `PL_DATA` sample, then overwritten by `fetchTodayPrice()` (CoinGecko spot, with the latest sample as fallback) |
+| `TODAY_PRICE` | Most recent USD BTC price | Seeded to the latest `PL_DATA` sample, then overwritten by `fetchTodayPrice()` (live spot from Coinbase, else Kraken, mempool.space or CoinGecko — SITE_GUIDE §40.2 — with the latest sample as the dated fallback) |
 
 The only thing the monthly refresh now does for "today" is keep the
 fallback fresh — and that happens automatically when you append a new
@@ -144,14 +144,19 @@ append the current month's sample. A correct refresh silences it.
 
 > **Why this refresh matters most when the network is down.** `fetchTodayPrice()`
 > seeds and falls back to the **latest `PL_DATA` sample**. On a normal load the
-> live CoinGecko spot overwrites it within a second, so a stale seed is invisible.
-> But when the fetch fails (CoinGecko 429s; `api.coingecko.com` sits on ad-block
-> lists) the site shows this fallback — now correctly labelled **"latest monthly
-> data"**, never "live" (the 2026-07 honesty fix). **A stale monthly refresh
-> therefore degrades the fallback path first and worst:** in July 2026 the fallback
-> sat ~$10K below spot because the series ended in April. Keeping this sample
-> current is what keeps the fallback honest *and* close. Append at least the
-> current month every refresh; if you can only source one price, source today's.
+> live spot (Coinbase first, then Kraken, mempool.space, CoinGecko) overwrites it
+> within a second, so a stale seed is invisible. But when no source answers (a
+> network or ad-blocker that blocks them all; on 2026-09-29 CoinGecko alone
+> started refusing keyless requests, which took the whole site to the fallback
+> until the other sources were added) the site shows this fallback — labelled
+> with its date, **"as of Sep 12"**, never "live" (the 2026-07 honesty fix, dated
+> 2026-09-29). The date makes a stale refresh visible to readers: a fallback that
+> reads "as of Jul 31" in late September says plainly that the series is behind.
+> **A stale monthly refresh therefore degrades the fallback path first and
+> worst:** in July 2026 the fallback sat ~$10K below spot because the series ended
+> in April. Keeping this sample current is what keeps the fallback honest *and*
+> close. Append at least the current month every refresh; if you can only source
+> one price, source today's.
 
 ### Comparator series — `shared/tr-comparator-data.js` and `shared/btc-monthly-data.js`
 
@@ -378,6 +383,12 @@ Quick post-refresh checks to confirm everything's coherent:
 6. **Load The Bitcoin Floor live and read the console** — see §5.1. This one
    is not cosmetic: it is the only check here that can tell you the historical
    record itself has changed shape.
+7. **Confirm the live price loads** — open `/dashboard`: the price tile should
+   read **"Today (live)"** and name its source ("Live price from Coinbase, …").
+   If it reads "Price as of …", no live source answered: check the console and
+   whether a source has changed its terms (on 2026-09-29 CoinGecko began
+   refusing keyless requests without notice). The sources and their order are
+   `LCS_PRICE_SOURCES` in `shared/power-law-data.js` (SITE_GUIDE §40.2).
 
 ### 5.1 The Bitcoin Floor — `[floor-qa]` after a PL_DATA refresh
 
@@ -902,11 +913,18 @@ load and centralizing the fetch + fallback in one shared helper:
   benefit from the monthly eyeball; that discipline is preserved
   independently of the live-fetch change.
 
-Pages consuming the shared helper: BvSM, the Power Law Channel tab, the
-Bitcoin Retirement, and Borrowing Against Your Stack (Loan Health input
-auto-fill). Disciplined Rebalancing continues to use the latest `PL_DATA`
-sample for its "today" (matches the chart's historical line by design);
-a future pass may add the live anchor there too.
+Pages consuming the shared helper: every page that shows a "today" price
+(about 25; `grep -rn fetchTodayPrice src/_includes/_pageassets`), plus the
+channel ribbon on every content page. Since 2026-09-29 that includes Is Bitcoin
+a Bubble? and Living on Bitcoin, which had their own CoinGecko calls.
+
+**2026-09-29 — several sources, dated fallback.** CoinGecko began refusing
+keyless requests at 06:42 UTC, and because it was the only source, every page
+showed the fallback until PR #133 shipped the same morning. `fetchTodayPrice()`
+now tries Coinbase → Kraken → mempool.space → CoinGecko and takes the first
+sane answer; the fallback is labelled with the sample's date rather than
+"latest monthly data". Nothing is added to the monthly refresh except the §5
+check that the live price loads.
 
 ## Annual: Demographia global affordability dataset — May each year
 
