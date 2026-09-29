@@ -56,6 +56,10 @@
        runs under Stay. Like with like against 4b: new E18 (trend) is 4b's
        E6; E8a (floor) is unchanged; E8b (upper) moves to 2.5×. New E19
        captures the scenario line and the Stay button under each scenario.
+       BvRP: RP_BASE moves to `stay`; P5a is now trend (it was stay, which
+       is now P1); new P5c is floor. BvRP captures include the chips and the
+       chart, which gain Floor, so no BvRP vector is byte-comparable with
+       4b: compare the tables.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -173,16 +177,17 @@
   }
 
   // ─── BvRP ──────────────────────────────────────────────────────────
-  var RP_BASE = { path: '4', scenario: 'trend', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
+  var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
                   props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5' };
   var RP = [
-    { id: 'P1',  desc: 'defaults (Path 4, trend, $500K, 4.4%, 10y, OTHER, 24%)' },
+    { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
     { id: 'P3',  desc: 'Path 2', path: '2' },
     { id: 'P4',  desc: 'Path 3', path: '3' },
-    { id: 'P5a', desc: 'Path 4, stay', scenario: 'stay' },
+    { id: 'P5a', desc: 'Path 4, trend (the pre-4c default)', scenario: 'trend' },
     { id: 'P5b', desc: 'Path 4, upper', scenario: 'upper' },
+    { id: 'P5c', desc: 'Path 4, floor', scenario: 'floor' },
     { id: 'P6a', desc: 'Path 1, hold 1y', path: '1', hold: '1' },
     { id: 'P6b', desc: 'Path 1, hold 30y', path: '1', hold: '30' },
     { id: 'P7',  desc: 'Path 1, CA, 37%', path: '1', state: 'CA', bracket: '37' },

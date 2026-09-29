@@ -997,7 +997,7 @@ html, body {
 }
 .calc-cagr-chips {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);  /* four scenarios (PR 4c, rulings M3) */
   gap: 0.6rem;
 }
 .calc-cagr-chip {
@@ -1575,3 +1575,7 @@ html, body {
   line-height: 1.5;
   margin: 0.5rem 0 0;
 }
+
+/* PR 4c (rulings M3): four scenario chips. "Stay at today's multiple"
+   wraps at desktop width; keep the help glyph with the last word. */
+.calc-cagr-chip-nowrap { white-space: nowrap; }

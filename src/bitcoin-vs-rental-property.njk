@@ -582,13 +582,16 @@ eleventyComputed:
 
     </div>
 
-    <!-- Bitcoin CAGR scenario picker (chips above chart) — Power Law-anchored -->
+    <!-- Bitcoin scenario picker (chips above chart). One set on both pages
+         (rulings M3, PR 4c): Floor · Stay at today's multiple (default) ·
+         Trend · Upper, each moving bitcoin's multiple of the Power Law trend
+         in a straight line from today's to a target at the horizon end. -->
     <div class="calc-cagr-picker">
       <div class="calc-cagr-picker-row">
         <div class="calc-cagr-picker-label">
-          Bitcoin scenario &mdash; based on the Power Law
+          Bitcoin scenario, based on the Power Law
           <span class="help-tip" tabindex="0">?<span class="tip-content">
-            All three scenarios are anchored to the Power Law model and auto-recalibrate as bitcoin&rsquo;s current multiple-of-trend shifts. The selected chip drives the headline number and the comparison table; all three lines remain visible on the chart unless you toggle them off via the legend.
+            All four scenarios are anchored to the Power Law model and recalibrate as bitcoin&rsquo;s multiple of the trend moves. Each moves that multiple in a straight line from today&rsquo;s to a target at the end of the holding period. The selected chip drives the headline number and the comparison table. Floor is always drawn faintly on the chart; the legend shows or hides any line. All four scenarios assume the Power Law trend itself continues.
           </span></span>
         </div>
         <div class="calc-cagr-picker-current">
@@ -596,32 +599,39 @@ eleventyComputed:
         </div>
       </div>
       <div class="calc-cagr-chips" id="calc-cagr-chips">
-        <button class="calc-cagr-chip" data-scenario="stay">
-          <span class="calc-cagr-chip-name">Stay at current trend multiple
-            <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="stay">?<span class="tip-content"></span></span>
+        <button class="calc-cagr-chip" data-scenario="floor">
+          <span class="calc-cagr-chip-name">Floor
+            <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="floor">?<span class="tip-content"></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
-          <span class="calc-cagr-chip-sub">no reversion</span>
+          <span class="calc-cagr-chip-sub">ends at 0.42&times; trend</span>
         </button>
-        <button class="calc-cagr-chip active" data-scenario="trend">
-          <span class="calc-cagr-chip-name">Revert to Power Law trend
+        <button class="calc-cagr-chip active" data-scenario="stay">
+          <span class="calc-cagr-chip-name">Stay at today&rsquo;s <span class="calc-cagr-chip-nowrap">multiple
+            <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="stay">?<span class="tip-content"></span></span></span>
+          </span>
+          <span class="calc-cagr-chip-rate">&mdash;</span>
+          <span class="calc-cagr-chip-sub">no reversion either way</span>
+        </button>
+        <button class="calc-cagr-chip" data-scenario="trend">
+          <span class="calc-cagr-chip-name">Trend
             <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="trend">?<span class="tip-content"></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
-          <span class="calc-cagr-chip-sub">central case</span>
+          <span class="calc-cagr-chip-sub">ends at 1&times; trend</span>
         </button>
         <button class="calc-cagr-chip" data-scenario="upper">
-          <span class="calc-cagr-chip-name">Reach Power Law upper channel
+          <span class="calc-cagr-chip-name">Upper
             <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="upper">?<span class="tip-content"></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
-          <span class="calc-cagr-chip-sub">cycle peak</span>
+          <span class="calc-cagr-chip-sub">ends at 2.5&times; trend</span>
         </button>
       </div>
       <a class="calc-cagr-pl-link" href="/the-power-law">What is the Power Law? &rarr;</a>
     </div>
 
-    <!-- Chart — the centerpiece. Wealth over time, three bitcoin lines + rental. -->
+    <!-- Chart — the centerpiece. Wealth over time, four bitcoin lines + rental (Floor faint unless selected). -->
     <div class="calc-chart-container">
       <div class="calc-chart-header">
         <div class="calc-chart-title">Wealth over time, your scenario</div>
@@ -807,7 +817,7 @@ eleventyComputed:
   </div>
 
   <p style="margin-top:1.6rem;font-size:0.85rem;color:var(--ink-dim);font-style:italic">
-    <strong>Model simplifications:</strong> Bitcoin scenarios are anchored to the site&rsquo;s Power Law model and dynamically recalibrate to bitcoin&rsquo;s current multiple-of-trend. Reversion paths use linear interpolation from today&rsquo;s multiple to the target multiple over the holding period (a simplification; real reversion is non-linear). The calculator treats ROC distributions as untaxed for the whole holding period. In fact return of capital is tax-deferred: at current STRC/SATA rates basis runs out after about eight years, later distributions are taxed as capital gains, and the lower basis raises the gain at sale, so the after-tax figures are overstated, most for longer holds. State taxes simplified to a single rate per state. HELOC modeled as interest-only with balloon repayment.
+    <strong>Model simplifications:</strong> Bitcoin scenarios are anchored to the site&rsquo;s Power Law model and dynamically recalibrate to bitcoin&rsquo;s current multiple-of-trend. Each scenario moves bitcoin&rsquo;s multiple of the trend in a straight line from today&rsquo;s to its target over the holding period, a simplification: in the record, reversion has been irregular in timing. The default, Stay at today&rsquo;s multiple, assumes no reversion. The calculator treats ROC distributions as untaxed for the whole holding period. In fact return of capital is tax-deferred: at current STRC/SATA rates basis runs out after about eight years, later distributions are taxed as capital gains, and the lower basis raises the gain at sale, so the after-tax figures are overstated, most for longer holds. State taxes simplified to a single rate per state. HELOC modeled as interest-only with balloon repayment.
   </p>
 </section>
 
