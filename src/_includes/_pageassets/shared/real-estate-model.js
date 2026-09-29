@@ -86,23 +86,73 @@
   }
   function niitApplies(brkt){ return brkt >= 32; }
 
-  // ─── Power Law-anchored bitcoin growth scenarios ───────────────────
-  // Three named scenarios, all derived from shared/power-law-data.js so
-  // they auto-recalibrate as bitcoin's current multiple-of-trend shifts.
-  //
-  //   stay   — Bitcoin maintains today's multiple-of-trend forever.
-  //            Growth rate ≈ trend CAGR from today's price (no reversion
-  //            benefit / penalty from current entry conditions).
-  //
-  //   trend  — Bitcoin reverts from today's multiple back to 1.0× trend
-  //            linearly over the holding period. When entering below
-  //            trend (current case at ~0.45×), this is the "entry-timing
-  //            advantage" case that produces above-trend CAGR.
-  //
-  //   upper  — Bitcoin drifts from today's multiple toward 2.5× trend
-  //            (historical above-cycle peak, conservative vs the 3.0×
-  //            channel ceiling) over the holding period.
-  //
+  // ─── One bitcoin scenario set for both pages (M3, PR 4c) ─────────────
+  // Floor · Stay at today's multiple · Trend · Upper, all derived from
+  // shared/power-law-data.js, so they recalibrate as bitcoin's multiple
+  // of the trend moves. Each moves the multiple in a straight line from
+  // today's to a target at the horizon end, then multiplies by the trend
+  // on that day:
+  //   floor  → PL_FLOOR (0.42×), the channel's lower bound
+  //   stay   → today's multiple (the default: no reversion either way;
+  //            grows at the trend's own rate)
+  //   trend  → 1× (the gap to trend closes by the horizon end)
+  //   upper  → 2.5× (a stress test; see cyclePeakMultiples for the record)
+  // Both engines (BvRP's scenarioGrowthFactor, BvRE's bvreProjection)
+  // read scenarioMultiple, so the two pages can't drift apart again.
+  var UPPER_TARGET = 2.5;
+  var SCENARIOS = ['floor', 'stay', 'trend', 'upper'];
+  function scenarioTarget(scenario, mult0){
+    if (scenario === 'stay') return mult0;
+    if (scenario === 'floor') return PL_FLOOR;
+    if (scenario === 'upper') return UPPER_TARGET;
+    return 1.0;
+  }
+  function scenarioMultiple(scenario, mult0, progress){
+    var p = Math.max(0, Math.min(1, progress));
+    return mult0 + (scenarioTarget(scenario, mult0) - mult0) * p;
+  }
+
+  // The record behind Upper's caveat, computed from the price series so it
+  // can't go stale: the highest multiple of trend in each cycle-top year
+  // since the genesis era (2013, 2017, 2021) and in the current cycle
+  // (2024 to date). PL_DATA is sampled about every 12 days, so a peak
+  // between samples is missed: these are lower bounds, as on The Floor.
+  // Returns [{ year, month, mult }].
+  function cyclePeakMultiples(){
+    if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function' || typeof GENESIS_TS !== 'number') return [];
+    var out = [];
+    [[2013, 2013], [2017, 2017], [2021, 2021], [2024, 9999]].forEach(function(w){
+      var best = null;
+      for (var i = 0; i < PL_DATA.length; i++) {
+        var d = PL_DATA[i][0], dt = new Date((GENESIS_TS + d * 86400) * 1000), y = dt.getUTCFullYear();
+        if (y < w[0] || y > w[1]) continue;
+        var m = PL_DATA[i][1] / plPrice(d);
+        if (!best || m > best.mult) best = { year: y, month: dt.getUTCMonth(), mult: m };
+      }
+      if (best) out.push(best);
+    });
+    return out;
+  }
+
+  // Upper's caveat as a sentence fragment, from cyclePeakMultiples():
+  // "past cycle peaks reached at least 12× trend (2013), 5.4× (2017) and
+  // 3.2× (2021), each lower than the last and none sustained; the peak so
+  // far in this cycle is 1.2× (December 2024)". "At least" because the
+  // samples are lower bounds; "each lower than the last" is only said
+  // while it is true.
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function upperRecordText(){
+    var pk = cyclePeakMultiples();
+    if (pk.length < 2) return '';
+    var past = pk.slice(0, -1), cur = pk[pk.length - 1];
+    function x(m){ return (m >= 10 ? m.toFixed(0) : m.toFixed(1)) + '\u00d7'; }
+    var parts = past.map(function(p, i){ return x(p.mult) + (i === 0 ? ' trend' : '') + ' (' + p.year + ')'; });
+    var list = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
+    var falling = past.every(function(p, i){ return i === 0 || p.mult < past[i - 1].mult; }) && cur.mult < past[past.length - 1].mult;
+    return 'past cycle peaks reached at least ' + list + (falling ? ', each lower than the last and none sustained' : ', none sustained') +
+           '; the peak so far in this cycle is ' + x(cur.mult) + ' (' + MONTHS[cur.month] + ' ' + cur.year + ')';
+  }
+
   // currentBTCMultiple() reads today's multiple at call time so the
   // chips and chart reflect the live Power Law state.
 
@@ -123,6 +173,7 @@
       // Fallback to flat CAGR if Power Law data not loaded yet
       var fallbackCAGR = scenario === 'stay' ? 0.20
                        : scenario === 'upper' ? 0.45
+                       : scenario === 'floor' ? 0.15
                        : 0.30;
       return Math.pow(1 + fallbackCAGR, t);
     }
@@ -136,17 +187,7 @@
     var futureTrend = plPrice(todayDays + t * 365.25);
     var progress = Math.min(t / Math.max(1, holdingYears), 1.0);
 
-    var targetMult;
-    if (scenario === 'stay') {
-      targetMult = currentMult;
-    } else if (scenario === 'upper') {
-      targetMult = currentMult + progress * (2.5 - currentMult);
-    } else {
-      // 'trend' (default): linear interp to 1.0× trend
-      targetMult = currentMult + progress * (1.0 - currentMult);
-    }
-
-    var futurePrice = targetMult * futureTrend;
+    var futurePrice = scenarioMultiple(scenario, currentMult, progress) * futureTrend;
     return futurePrice / todaySpot;
   }
 
@@ -214,7 +255,8 @@
   // ─── Math: bitcoin paths ───
   // Spot BTC future value uses scenarioGrowthFactor — the growth path is
   // Power Law-anchored rather than a flat CAGR. The `holdingYears` arg
-  // matters because it sets the reversion horizon for 'trend' and 'upper'.
+  // matters because it sets the horizon over which every scenario but
+  // 'stay' moves to its target multiple (M3).
   function calcSpotBTCFV(amount, years, scenario, holdingYears){
     return amount * scenarioGrowthFactor(scenario, years, holdingYears || years);
   }
@@ -590,17 +632,16 @@
   //    appreciation, i.e. a constant price-to-rent). Property tax,
   //    insurance and maintenance follow the home's value, stepping once a
   //    year in the same way.
-  //  - Bitcoin's price each month follows the scenario's path: its
-  //    multiple of the Power Law trend moves in a straight line from
-  //    today's multiple to the scenario's target at the horizon end
-  //    (floor 0.42×, trend 1×, upper 3×), times the trend on that day. The
-  //    end price is the one PR 4a used. Purchases and sales pay the bitcoin
-  //    transaction cost.
+  //  - Bitcoin's price each month follows the scenario's path (M3,
+  //    scenarioMultiple above): its multiple of the Power Law trend moves
+  //    in a straight line from today's multiple to the scenario's target
+  //    at the horizon end, times the trend on that day. Purchases and
+  //    sales pay the bitcoin transaction cost.
   //  - At the end, If sold (before tax, which is PR 5): house value −
   //    selling costs − loan balance; bitcoin value − the transaction cost.
   //    Held: before those costs. Real = nominal ÷ (1 + inflation)^years for
   //    every end value, one factor for both paths.
-  //   i: { method 'mortgage'|'cash', scenario 'floor'|'trend'|'upper',
+  //   i: { method 'mortgage'|'cash', scenario 'floor'|'stay'|'trend'|'upper',
   //        horizonYrs, btcNow, homePrice, homeApprNominal, inflRate,
   //        mortRate, dpf, rent (month-1 $/mo | null), rentGrowth (% | null),
   //        closingPct, propTaxPct, insurance ($/yr in year 1 | null),
@@ -635,8 +676,8 @@
     // Bitcoin's monthly price path (see header).
     var d0 = (Date.now() / 1000 - GENESIS_TS) / 86400;
     var mult0 = btcNow / plPrice(d0);
-    var target = i.scenario === 'floor' ? PL_FLOOR : (i.scenario === 'upper' ? PL_CEIL : 1.0);
-    function priceAt(m){ return (mult0 + (target - mult0) * (m / n)) * plPrice(d0 + (m / 12) * 365.25); }
+    var target = scenarioTarget(i.scenario, mult0);
+    function priceAt(m){ return scenarioMultiple(i.scenario, mult0, m / n) * plPrice(d0 + (m / 12) * 365.25); }
 
     var btcUpfront = upfront * (1 - tx) / btcNow;
     var btc = btcUpfront;
@@ -721,7 +762,8 @@
     o.first = first; o.last = last;
     o.btcNow = btcNow; o.mult0 = mult0; o.targetMult = target;
     o.btcUpfront = btcUpfront; o.btcHeld = btc; o.priceEnd = priceEnd;
-    o.futureTrend = futureTrend; o.futureFloor = futureTrend * PL_FLOOR; o.futureCeil = futureTrend * PL_CEIL;
+    o.futureTrend = futureTrend; o.futureFloor = futureTrend * PL_FLOOR; o.futureUpper = futureTrend * UPPER_TARGET;
+    o.impliedGrowthPct = (Math.pow(priceEnd / btcNow, 1 / horizonYrs) - 1) * 100;
     o.btcValue = btcValue; o.btcSaleCost = btcSaleCost; o.btcIfSold = btcIfSold;
     o.homeEnd = homeEnd; o.balance = bal; o.sellCosts = sellCosts; o.houseHeld = houseHeld; o.houseIfSold = houseIfSold;
     o.equityPct = homeEnd > 0 ? Math.round((houseHeld / homeEnd) * 100) : 0;
@@ -800,6 +842,13 @@
     bvreProjection: bvreProjection,
     ledgerRetro: ledgerRetro,
     PAIR_DEFAULTS: PAIR_DEFAULTS,
+    // bitcoin scenarios (M3), shared by both pages
+    SCENARIOS: SCENARIOS,
+    UPPER_TARGET: UPPER_TARGET,
+    scenarioTarget: scenarioTarget,
+    scenarioMultiple: scenarioMultiple,
+    cyclePeakMultiples: cyclePeakMultiples,
+    upperRecordText: upperRecordText,
     // BvRP (original names kept so the page's aliases read 1:1)
     STATE_CAPGAIN: STATE_CAPGAIN,
     STATE_PROP_TAX_RATE: STATE_PROP_TAX_RATE,
