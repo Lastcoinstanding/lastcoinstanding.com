@@ -74,11 +74,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     function renderSeesaw(startYear){
       const visYrs=btcYears.filter(y=>y>=startYear);
       const idxBtc=visYrs.map(y=>+((btcData[y]/btcData[startYear])*100).toFixed(1));
-      const idxHome=visYrs.map(y=>+((homeData[y]/homeData[startYear])*100).toFixed(1));
+      // Housing grows by Case-Shiller National (csData), not the new-house
+      // median, whose mix shifts (rulings M11, PR 4e).
+      const idxHome=visYrs.map(y=>+((csData[y]/csData[startYear])*100).toFixed(1));
       const sub=document.getElementById('seesawSubtitle');
       if(sub) sub.textContent='Growth of $1 invested in '+startYear+' \u2014 bitcoin vs. housing (log scale)';
       if(seesawInstance) seesawInstance.destroy();
-      seesawInstance=new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:visYrs.map(String),datasets:[{label:'Bitcoin',data:idxBtc,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:idxHome,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';const yr=visYrs[c.dataIndex];const actual=c.dataset.label==='Bitcoin'?btcData[yr]:homeData[yr];const priceFmt='$'+actual.toLocaleString();return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since '+startYear+' ('+priceFmt+')'}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
+      seesawInstance=new Chart(document.getElementById('seesawChart'),{type:'line',data:{labels:visYrs.map(String),datasets:[{label:'Bitcoin',data:idxBtc,borderColor:amber,backgroundColor:'rgba(224,148,34,0.08)',borderWidth:2.5,pointRadius:3,tension:0.3,fill:true},{label:'Housing',data:idxHome,borderColor:red,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:0.3,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:24,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{label:c=>{const pct=(c.parsed.y-100).toFixed(0);const sign=pct>=0?'+':'';const yr=visYrs[c.dataIndex];const ref=c.dataset.label==='Bitcoin'?('$'+btcData[yr].toLocaleString()):('Case-Shiller '+csData[yr]);return c.dataset.label+': '+sign+Number(pct).toLocaleString()+'% since '+startYear+' ('+ref+')'}}}},scales:{x:{...cso()},y:{...cso('Growth of $1 Invested'),type:'logarithmic',min:30,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[50,100,200,500,1000,2000,5000,10000,12000];if(!a.includes(v))return'';if(v===100)return'$1 (start)';return'$'+(v/100).toFixed(0)}}}}}});
     }
     document.querySelectorAll('.seesaw-start-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
@@ -155,7 +157,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         let rows='<tr style="border-bottom:1px solid var(--border)"><td style="'+thStyle+'">Start Year</td><td style="'+thStyle+'">BTC at start</td><td style="'+thStyle+'">BTC Return</td><td style="'+thStyle+'">Housing Return</td><td style="'+thStyle+'">Difference</td></tr>';
         startYears.forEach(y=>{
             const btcR=((btcData[endY]-btcData[y])/btcData[y]*100).toFixed(0);
-            const homeR=((homeData[endY]-homeData[y])/homeData[y]*100).toFixed(0);
+            // Housing: Case-Shiller National growth (rulings M11, PR 4e).
+            const homeR=((csData[endY]-csData[y])/csData[y]*100).toFixed(0);
             // Wealth ratio: $1 in BTC vs $1 in housing at start year. Ratio of
             // the multipliers (1 + return) — meaningful regardless of sign.
             // Previous version divided the two return percentages directly,
@@ -165,7 +168,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             // negative — Math.max(homeR, 1) collapsed the divisor to 1 and
             // displayed the BTC return itself as the 'ratio'.
             const btcMult=btcData[endY]/btcData[y];
-            const homeMult=homeData[endY]/homeData[y];
+            const homeMult=csData[endY]/csData[y];
             const ratio=Math.round(btcMult/homeMult);
             const homeSign=homeR<0?'':'+';
             rows+='<tr style="border-bottom:1px solid rgba(224,148,34,0.06)"><td style="padding:0.6rem 0.8rem;color:var(--text);font-weight:500">'+y+' → '+endY+'</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">$'+btcData[y].toLocaleString()+'</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-weight:500">+'+Number(btcR).toLocaleString()+'%</td><td style="padding:0.6rem 0.8rem;color:var(--text-dim)">'+homeSign+homeR+'%</td><td style="padding:0.6rem 0.8rem;color:var(--amber);font-size:0.75rem">BTC outperformed '+ratio+'\u00d7</td></tr>';
@@ -179,7 +182,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         // data constants so future MONTHLY_REFRESH updates flow through.
         const endRef=document.getElementById('returnTableEndPrices');
         if(endRef){
-            endRef.innerHTML='All rows end at <strong>'+endY+'</strong> prices: <strong style="color:var(--amber)">BTC $'+btcData[endY].toLocaleString()+'</strong> &middot; <strong>Median US home $'+homeData[endY].toLocaleString()+'</strong>';
+            endRef.innerHTML='All rows end at <strong>'+endY+'</strong>: <strong style="color:var(--amber)">BTC $'+btcData[endY].toLocaleString()+'</strong> &middot; <strong>housing by the Case-Shiller National index</strong> (the '+endY+' average), which tracks the same homes over time';
         }
     })();
 
