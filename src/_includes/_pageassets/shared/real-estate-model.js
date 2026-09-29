@@ -17,9 +17,11 @@
    PR 3 MOVES code; it does not rewrite logic. Where the pages
    behaved differently, both behaviours are kept behind explicit
    parameters (e.g. mortgagePayment's zero-rate guard). Known issues
-   are moved as-is and fixed in later PRs (Phase 0 report §d):
-   BvRP recapture at a flat 25%, depreciation from today's value,
-   no state tax on rental income, ROC untaxed for the whole hold.
+   are moved as-is and fixed in later PRs (Phase 0 report §d).
+   PR 5a fixed BvRP's four: recapture at a flat 25% (now the bracket,
+   capped at 25%, and never above the gain), depreciation from today's
+   value (now the original building basis), no state tax on rental
+   income, and ROC untaxed for the whole hold (now basis tracking).
    Harmonisation (one scenario set, nominal house path, costs) is
    PR 4; tax regimes PR 5; the ledger is rendered in PR 6.
 
@@ -88,6 +90,37 @@
     return 0.20;
   }
   function niitApplies(brkt){ return brkt >= 32; }
+  var NIIT_RATE = 0.038;
+  function stateRateOf(s){
+    // A state with no tax has rate 0, so test for a missing entry, not a
+    // falsy one (PR 4d). The same top rate is applied to income and gains.
+    return (STATE_CAPGAIN[s.stateCode] !== undefined ? STATE_CAPGAIN[s.stateCode] : STATE_CAPGAIN.OTHER) / 100;
+  }
+  // Tax rates by kind of income (PR 5a, M9). Ordinary income (net rent,
+  // lending interest): the federal bracket plus the state rate, plus NIIT
+  // where it applies. Long-term gains (the sale, and distributions beyond
+  // basis): the bracket's LTCG rate plus state and NIIT. Unrecaptured §1250
+  // gain: the ordinary rate capped at 25% (IRS Topic 409).
+  function ordinaryRate(s){ return s.federalBracketPct / 100 + stateRateOf(s) + (niitApplies(s.federalBracketPct) ? NIIT_RATE : 0); }
+  function gainRate(s){ return federalLTCG(s.federalBracketPct) + stateRateOf(s) + (niitApplies(s.federalBracketPct) ? NIIT_RATE : 0); }
+  function recaptureRate(s){ return Math.min(s.federalBracketPct, 25) / 100; }
+
+  // Depreciation on the ORIGINAL building basis (PR 5a, M9; it was 80% of
+  // today's value). The reader gives today's adjusted basis A (a share of
+  // today's value) and the years already held h. Straight-line on 80% of the
+  // original cost basis B0 over 27.5 years means A = B0 x (1 - 0.8 x
+  // min(h, 27.5) / 27.5), so B0 = A / (1 - 0.8 x min(h, 27.5) / 27.5), and
+  // each year's deduction is 0.8 x B0 / 27.5 until 27.5 years in total.
+  var DEP_YEARS = 27.5, BUILDING_SHARE = 0.80;
+  function depreciationPlan(s){
+    var A = s.propertyValue * (s.adjustedBasisPct / 100);
+    var h = Math.max(0, numOr(s.yearsAlreadyHeld, 0));
+    var B0 = A / (1 - BUILDING_SHARE * Math.min(h, DEP_YEARS) / DEP_YEARS);
+    return { adjustedToday: A, heldYears: h, basis0: B0, annual: BUILDING_SHARE * B0 / DEP_YEARS };
+  }
+  // Depreciation taken from today to t years ahead, and in all (past + future).
+  function depFuture(plan, t){ return plan.annual * (Math.min(plan.heldYears + t, DEP_YEARS) - Math.min(plan.heldYears, DEP_YEARS)); }
+  function depTotal(plan, t){ return plan.annual * Math.min(plan.heldYears + t, DEP_YEARS); }
 
   // ─── One bitcoin scenario set for both pages (M3, PR 4c) ─────────────
   // Floor · Stay at today's multiple · Trend · Upper, all derived from
@@ -242,10 +275,12 @@
   // ─── Math: rental side ───
   function calcRentalAnnualCF(s){
     // Net cash flow as expressed; user input already nets the waterfall.
+    // Year 1, with no mortgage (PR 5a: depreciation on the original basis,
+    // state tax and NIIT on the income).
     var gross = s.propertyValue * (s.netRentalYield / 100);
-    var depreciation = (s.propertyValue * 0.80) / 27.5;
+    var depreciation = depFuture(depreciationPlan(s), 1);
     var taxableIncome = Math.max(0, gross - depreciation);
-    var tax = taxableIncome * (s.federalBracketPct / 100);
+    var tax = taxableIncome * ordinaryRate(s);
     return { pretax: gross, depreciation: depreciation, tax: tax, afterTax: gross - tax };
   }
 
@@ -277,17 +312,19 @@
 
   // Keep-rental cash flow year by year, with the existing mortgage (M8):
   // debt service comes off cash flow and interest is deductible against
-  // rental income. Net operating income stays flat, as before; the rest of
-  // the tax model (straight-line depreciation on 80% of value, no state tax
-  // on rental income, losses not carried) changes in PR 5 (M9).
+  // rental income. Net operating income stays flat, as before. Since PR 5a
+  // (M9) depreciation is on the original building basis and stops at 27.5
+  // years in all, and the income bears state tax (and NIIT where it
+  // applies) as well as the federal bracket. Losses are not carried.
   function rentalYears(s, units, years){
     var gross = s.propertyValue * (s.netRentalYield / 100);
-    var depreciation = (s.propertyValue * 0.80) / 27.5;
+    var plan = depreciationPlan(s);
     var loan = existingLoan(s, units, years);
     var rows = [null];
     for (var k = 1; k <= Math.max(1, years); k++) {
+      var depreciation = depFuture(plan, k) - depFuture(plan, k - 1);
       var taxable = Math.max(0, gross - depreciation - loan.interest[k]);
-      var tax = taxable * (s.federalBracketPct / 100);
+      var tax = taxable * ordinaryRate(s);
       rows.push({ pretax: gross, depreciation: depreciation, interest: loan.interest[k], debtService: loan.paid[k],
                   tax: tax, afterTax: gross - loan.paid[k] - tax });
     }
@@ -314,23 +351,24 @@
     var transactionCosts = appreciatedValue * sellCostPct(s) / 100;
     var netProceeds = appreciatedValue - transactionCosts;
 
-    // Simplified accumulated depreciation across total holding (pre + post)
-    var totalYearsHeld = s.yearsAlreadyHeld + yearsToExit;
-    var buildingBasis = s.propertyValue * 0.80;
-    var accumulatedDep = buildingBasis * Math.min(totalYearsHeld / 27.5, 1.0);
-
-    var adjustedBasis = s.propertyValue * (s.adjustedBasisPct / 100);
+    // Depreciation on the original building basis (PR 5a, M9): taken to
+    // date plus what the next yearsToExit years add, capped at 27.5 years
+    // in all; the adjusted basis falls by the future part.
+    var plan = depreciationPlan(s);
+    var accumulatedDep = depTotal(plan, yearsToExit);
+    var adjustedBasis = plan.adjustedToday - depFuture(plan, yearsToExit);
     var taxableGain = netProceeds - adjustedBasis;
 
-    var recaptureTax = accumulatedDep * 0.25;
-    var ltcgBase = Math.max(0, taxableGain - accumulatedDep);
+    // Unrecaptured §1250 gain: the depreciation, but never more than the
+    // gain, at the ordinary rate capped at 25% (it was a flat 25% on all of
+    // it). The rest of the gain at the bracket's long-term rate; state and
+    // NIIT on the whole gain.
+    var unrecaptured = Math.min(accumulatedDep, Math.max(0, taxableGain));
+    var recaptureTax = unrecaptured * recaptureRate(s);
+    var ltcgBase = Math.max(0, taxableGain - unrecaptured);
     var ltcgTax = ltcgBase * federalLTCG(s.federalBracketPct);
-    // A state with no tax on the gain has rate 0, so test for a missing
-    // entry, not a falsy one: `|| OTHER` charged TX, FL, NV, WA, TN, NH,
-    // AK, WY and SD the 5% typical rate (fixed in PR 4d).
-    var stateRate = (STATE_CAPGAIN[s.stateCode] !== undefined ? STATE_CAPGAIN[s.stateCode] : STATE_CAPGAIN.OTHER) / 100;
-    var stateTax = Math.max(0, taxableGain) * stateRate;
-    var niit = niitApplies(s.federalBracketPct) ? Math.max(0, taxableGain) * 0.038 : 0;
+    var stateTax = Math.max(0, taxableGain) * stateRateOf(s);
+    var niit = niitApplies(s.federalBracketPct) ? Math.max(0, taxableGain) * NIIT_RATE : 0;
 
     var totalTax = recaptureTax + ltcgTax + stateTax + niit;
     var netCash = netProceeds - totalTax;
@@ -340,7 +378,10 @@
       transactionCosts: transactionCosts,
       netProceeds: netProceeds,
       accumulatedDep: accumulatedDep,
+      adjustedBasis: adjustedBasis,
       taxableGain: taxableGain,
+      unrecaptured: unrecaptured,
+      recaptureRatePct: recaptureRate(s) * 100,
       recaptureTax: recaptureTax,
       ltcgTax: ltcgTax,
       stateTax: stateTax,
@@ -360,28 +401,54 @@
     return amount * scenarioGrowthFactor(scenario, years, holdingYears || years);
   }
 
-  function calcYieldPortfolio(amount, s){
+  // The yield portfolio year by year (PR 5a). STRC and SATA distributions
+  // are return of capital, as the issuers expect (Strategy's 2025 report,
+  // Strive's 2026 Forms 8937): tax-deferred, never tax-free. Each year's ROC
+  // reduces that instrument's basis; once the basis is used up (about eight
+  // years at 12-13%), distributions are long-term gains in the year paid.
+  // Lending interest is ordinary income. (Before 5a the ROC was untaxed for
+  // the whole hold, and the lending interest bore no state tax.) The gain
+  // left in the reduced basis falls due on a sale, which the If sold basis
+  // (PR 5b) will show.
+  function yieldAllocs(amount, s){
     var p = s.portfolio;
-    var alloc = {
-      strc: amount * p.strc/100,
-      sata: amount * p.sata/100,
-      lend: amount * p.lend/100,
-      spot: amount * p.spot/100
-    };
-    // Year 1 cash distributions, at the dated rates (YIELD_RATES)
-    var year1 = {
+    return { strc: amount * p.strc/100, sata: amount * p.sata/100, lend: amount * p.lend/100, spot: amount * p.spot/100 };
+  }
+  function yieldYears(amount, s, years){
+    var alloc = yieldAllocs(amount, s);
+    var dist = {
       strc: alloc.strc * (YIELD_RATES.strc / 100),   // ROC
       sata: alloc.sata * (YIELD_RATES.sata / 100),   // ROC
       lend: alloc.lend * (YIELD_RATES.lending / 100), // ordinary income
       spot: 0
     };
-    var pretax = year1.strc + year1.sata + year1.lend;
-    // Lending interest taxed; ROC tax-deferred
-    var ordinaryTax = year1.lend * (s.federalBracketPct/100);
-    var year1AfterTax = pretax - ordinaryTax;
+    var basis = { strc: alloc.strc, sata: alloc.sata };
+    var ord = ordinaryRate(s), gain = gainRate(s);
+    var rows = [null];
+    for (var k = 1; k <= Math.max(1, years); k++) {
+      var excess = 0;
+      ['strc', 'sata'].forEach(function(key){
+        var roc = Math.min(dist[key], basis[key]);
+        basis[key] -= roc;
+        excess += dist[key] - roc;
+      });
+      var pretax = dist.strc + dist.sata + dist.lend;
+      var tax = dist.lend * ord + excess * gain;
+      rows.push({ pretax: pretax, ordinaryTax: dist.lend * ord, gainTax: excess * gain, taxedAsGain: excess,
+                  tax: tax, afterTax: pretax - tax, basisLeft: basis.strc + basis.sata });
+    }
+    return { alloc: alloc, dist: dist, rows: rows };
+  }
+  function yieldCumCash(yy, t){
+    var c = 0;
+    for (var k = 1; k <= t; k++) c += yy.rows[k].afterTax;
+    return c;
+  }
 
-    // 10-year cumulative cash (flat yield assumption)
-    var cumulativeCash = year1AfterTax * s.holdingYears;
+  function calcYieldPortfolio(amount, s){
+    var yy = yieldYears(amount, s, s.holdingYears);
+    var alloc = yy.alloc, y1 = yy.rows[1];
+    var cumulativeCash = yieldCumCash(yy, s.holdingYears);
 
     // Spot BTC FV (bought net of the bitcoin transaction cost, M6)
     var spotFV = calcSpotBTCFV(alloc.spot * btcBuyFactor(s), s.holdingYears, s.btcScenario);
@@ -391,12 +458,18 @@
     var preservedPrincipal = alloc.strc + alloc.sata + alloc.lend;
     var totalWealth = preservedPrincipal + spotFV + cumulativeCash;
 
+    // The first year in which a distribution is taxed as a gain (0: none).
+    var gainYear = 0;
+    for (var k = 1; k < yy.rows.length; k++) if (yy.rows[k].taxedAsGain > 0) { gainYear = k; break; }
+
     return {
       allocations: alloc,
-      year1Distributions: year1,
-      year1Pretax: pretax,
-      year1AfterTax: year1AfterTax,
+      year1Distributions: yy.dist,
+      year1Pretax: y1.pretax,
+      year1AfterTax: y1.afterTax,
       cumulativeCashAfterTax: cumulativeCash,
+      basisLeft: yy.rows[s.holdingYears] ? yy.rows[s.holdingYears].basisLeft : yy.rows[1].basisLeft,
+      rocGainYear: gainYear,
       spotFV: spotFV,
       spotAppreciation: spotAppreciation,
       totalWealth: totalWealth
@@ -563,23 +636,12 @@
 
   // ─── Year-by-year wealth trajectories (for the chart) ───
   function calcYieldPortfolioAtYearT(amount, s, t, scenarioOverride){
-    var p = s.portfolio;
-    var allocs = {
-      strc: amount * p.strc/100,
-      sata: amount * p.sata/100,
-      lend: amount * p.lend/100,
-      spot: amount * p.spot/100
-    };
-    var strcDist = allocs.strc * (YIELD_RATES.strc / 100);   // keep in step with calcYieldPortfolio
-    var sataDist = allocs.sata * (YIELD_RATES.sata / 100);
-    var lendDist = allocs.lend * (YIELD_RATES.lending / 100);
-    var pretax = strcDist + sataDist + lendDist;
-    var ordTax = lendDist * (s.federalBracketPct/100);
-    var year1AfterTax = pretax - ordTax;
-    var cumCash = year1AfterTax * t;
+    // In step with calcYieldPortfolio (PR 5a: the ROC basis, state tax).
+    var yy = yieldYears(amount, s, Math.max(1, t));
+    var cumCash = yieldCumCash(yy, t);
     var scenario = scenarioOverride || s.btcScenario;
-    var spotFV = allocs.spot * btcBuyFactor(s) * scenarioGrowthFactor(scenario, t, s.holdingYears);
-    var preserved = allocs.strc + allocs.sata + allocs.lend;
+    var spotFV = yy.alloc.spot * btcBuyFactor(s) * scenarioGrowthFactor(scenario, t, s.holdingYears);
+    var preserved = yy.alloc.strc + yy.alloc.sata + yy.alloc.lend;
     return preserved + spotFV + cumCash;
   }
 
@@ -1080,6 +1142,11 @@
     STATE_PROP_TAX_RATE: STATE_PROP_TAX_RATE,
     federalLTCG: federalLTCG,
     niitApplies: niitApplies,
+    ordinaryRate: ordinaryRate,
+    gainRate: gainRate,
+    recaptureRate: recaptureRate,
+    depreciationPlan: depreciationPlan,
+    yieldYears: yieldYears,
     currentBTCMultiple: currentBTCMultiple,
     scenarioGrowthFactor: scenarioGrowthFactor,
     effectiveCAGR: effectiveCAGR,
