@@ -102,8 +102,44 @@
   // basis): the bracket's LTCG rate plus state and NIIT. Unrecaptured §1250
   // gain: the ordinary rate capped at 25% (IRS Topic 409).
   function ordinaryRate(s){ return s.federalBracketPct / 100 + stateRateOf(s) + (niitApplies(s.federalBracketPct) ? NIIT_RATE : 0); }
-  function gainRate(s){ return federalLTCG(s.federalBracketPct) + stateRateOf(s) + (niitApplies(s.federalBracketPct) ? NIIT_RATE : 0); }
-  function recaptureRate(s){ return Math.min(s.federalBracketPct, 25) / 100; }
+  // "No capital-gains tax" (PR 5b): gains, recapture and distributions
+  // beyond basis are untaxed; income is taxed as before.
+  function noGainTax(s){ return s.taxRegime === 'none'; }
+  function gainRate(s){ return noGainTax(s) ? 0 : federalLTCG(s.federalBracketPct) + stateRateOf(s) + (niitApplies(s.federalBracketPct) ? NIIT_RATE : 0); }
+  function recaptureRate(s){ return noGainTax(s) ? 0 : Math.min(s.federalBracketPct, 25) / 100; }
+
+  // The home-sale exclusion (PR 5b; IRS Topic 701, DATA_AUDIT TX-1): up to
+  // $250,000 of gain ($500,000 filing jointly) on a main home owned and
+  // lived in for 2 of the last 5 years. The pair assumes the house is the
+  // buyer's main home, so it applies from a 2-year hold. Not indexed.
+  var HOME_EXCLUSION = { mfj: 500000, single: 250000, hoh: 250000, mfs: 250000 };
+  // The tax on selling the home: gain = value - selling costs - basis (the
+  // price plus the buyer's closing costs); the exclusion comes off; the rest
+  // at the long-term rate, state and NIIT (excluded gain isn't subject to
+  // NIIT). A loss on a home isn't deductible.
+  //   tp: { taxRegime, filing, federalBracketPct, stateCode }
+  function homeSaleTax(tp, value, sellCosts, basis, years){
+    var gain = value - sellCosts - basis;
+    var eligible = years >= 2;
+    var cap = HOME_EXCLUSION[tp.filing] || HOME_EXCLUSION.mfj;
+    var exclusion = (!noGainTax(tp) && eligible) ? Math.min(Math.max(0, gain), cap) : 0;
+    var taxable = noGainTax(tp) ? 0 : Math.max(0, gain - exclusion);
+    return { gain: gain, exclusion: exclusion, cap: cap, eligible: eligible, taxable: taxable, tax: taxable * gainRate(tp) };
+  }
+  // The tax on selling bitcoin: the gain over its cost basis (what was paid,
+  // costs included), at the long-term rate, state and NIIT. `realized` is
+  // the net gain on bitcoin sold along the way (average cost), due in the
+  // years of those sales; it is added here, at the end, without interest.
+  // A net loss is not credited.
+  function btcSaleTax(tp, proceeds, basis, realized){
+    var gain = proceeds - basis + (realized || 0);
+    return { gain: gain, realized: realized || 0, tax: Math.max(0, gain) * gainRate(tp) };
+  }
+  // BvRE's inputs as a tax profile, with R7's defaults.
+  function bvreTaxProfile(i){
+    return { taxRegime: i.taxRegime || 'us', filing: i.filing || 'mfj',
+             federalBracketPct: numOr(i.taxBracket, 24), stateCode: i.taxState || 'OTHER' };
+  }
 
   // Depreciation on the ORIGINAL building basis (PR 5a, M9; it was 80% of
   // today's value). The reader gives today's adjusted basis A (a share of
@@ -366,9 +402,10 @@
     var unrecaptured = Math.min(accumulatedDep, Math.max(0, taxableGain));
     var recaptureTax = unrecaptured * recaptureRate(s);
     var ltcgBase = Math.max(0, taxableGain - unrecaptured);
-    var ltcgTax = ltcgBase * federalLTCG(s.federalBracketPct);
-    var stateTax = Math.max(0, taxableGain) * stateRateOf(s);
-    var niit = niitApplies(s.federalBracketPct) ? Math.max(0, taxableGain) * NIIT_RATE : 0;
+    var none = noGainTax(s);
+    var ltcgTax = none ? 0 : ltcgBase * federalLTCG(s.federalBracketPct);
+    var stateTax = none ? 0 : Math.max(0, taxableGain) * stateRateOf(s);
+    var niit = (!none && niitApplies(s.federalBracketPct)) ? Math.max(0, taxableGain) * NIIT_RATE : 0;
 
     var totalTax = recaptureTax + ltcgTax + stateTax + niit;
     var netCash = netProceeds - totalTax;
@@ -631,7 +668,54 @@
     else if (s.path === 2) pathResult = calcPath2(s);
     else if (s.path === 3) pathResult = calcPath3(s);
     else pathResult = calcPath4(s);
+    keep.ifSold = rentalIfSold(keep);
+    pathResult.ifSold = pathIfSold(s, pathResult);
     return { keep: keep, path: pathResult };
+  }
+
+  // ─── If sold at year N, before and after tax (PR 5b, M7) ───
+  // Each side is sold at the horizon: the rental with its exit tax
+  // (recapture, the gain, state, NIIT; calcRentalExit), bitcoin with the tax
+  // on its gain over what was paid for it, and the STRC/SATA preferreds at
+  // par with the gain their return of capital left in the lower basis.
+  // Selling costs come off both figures, so the difference between them is
+  // tax alone. `preTax` and `afterTax` are totals comparable with
+  // totalWealth (which stays the Held value, before selling costs and tax).
+  function rentalIfSold(keep){
+    var x = keep.exit;
+    var pre = keep.cumulativeCash + x.netProceeds - keep.mortgageEnd;
+    return { preTax: pre, tax: x.totalTax, afterTax: pre - x.totalTax, rental: x };
+  }
+  function btcSold(s, value, basis){
+    var cost = value * (1 - btcBuyFactor(s));   // the bitcoin transaction cost on the sale
+    var proceeds = value - cost;
+    var gain = proceeds - basis;
+    return { value: value, saleCost: cost, proceeds: proceeds, basis: basis, gain: gain, tax: Math.max(0, gain) * gainRate(s) };
+  }
+  function yieldSold(s, yp){
+    var a = yp.allocations;
+    var prefGain = (a.strc + a.sata) - yp.basisLeft;           // at par, less the reduced basis
+    var spot = btcSold(s, yp.spotFV, a.spot);
+    var prefTax = Math.max(0, prefGain) * gainRate(s);
+    return { preTax: yp.totalWealth - spot.saleCost, tax: prefTax + spot.tax, prefGain: prefGain, prefTax: prefTax, spot: spot };
+  }
+  function pathIfSold(s, r){
+    var pre, tax, parts = {};
+    if (s.path === 1) {
+      var b1 = btcSold(s, r.totalWealth + r.shortfall, r.netCashDeployed);
+      pre = b1.proceeds - r.shortfall; tax = b1.tax; parts.btc = b1;
+    } else if (s.path === 2) {
+      var k2 = rentalIfSold(r.retainedRental), b2 = btcSold(s, r.btcFV, r.helocDraw);
+      pre = k2.preTax + b2.proceeds - r.helocDraw - r.cumulativeCarry;
+      tax = k2.tax + b2.tax; parts.rental = k2; parts.btc = b2;
+    } else if (s.path === 3) {
+      var y3 = yieldSold(s, r.yieldPortfolio), k3 = rentalIfSold(r.retainedRental);
+      pre = y3.preTax + k3.preTax - r.shortfall; tax = y3.tax + k3.tax; parts.yield = y3; parts.rental = k3;
+    } else {
+      var y4 = yieldSold(s, r.yieldPortfolio);
+      pre = y4.preTax - r.shortfall; tax = y4.tax; parts.yield = y4;
+    }
+    return { preTax: pre, tax: tax, afterTax: pre - tax, parts: parts };
   }
 
   // ─── Year-by-year wealth trajectories (for the chart) ───
@@ -844,6 +928,7 @@
     var btcUpfront = upfront * (1 - tx) / entryPrice;
 
     var btc = btcUpfront, bal = loan;
+    var basis = upfront, realized = 0;   // bitcoin's cost basis and the gain on coins sold along the way (PR 5b)
     var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
               invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
     var cumOwner = upfront, cumRenter = upfront;
@@ -873,12 +958,18 @@
       if (invest) {
         if (diff > 0) {
           var b = diff * (1 - tx) / price;
-          btc += b; t.invested += diff; yr.btcBoughtUsd += diff; yr.btcBought += b;
+          btc += b; basis += diff; t.invested += diff; yr.btcBoughtUsd += diff; yr.btcBought += b;
         } else if (diff < 0) {
           var need = -diff, sell = need / (price * (1 - tx));
-          if (sell <= btc) { btc -= sell; t.sold += need; yr.btcSoldUsd += need; yr.btcSold += sell; }
+          if (sell <= btc) {
+            // Average cost (PR 5b): the coins sold take their share of the basis.
+            var out = btc > 0 ? basis * sell / btc : 0;
+            realized += need - out; basis -= out;
+            btc -= sell; t.sold += need; yr.btcSoldUsd += need; yr.btcSold += sell;
+          }
           else {
             var cover = btc * price * (1 - tx);
+            realized += cover - basis; basis = 0;
             t.sold += cover; yr.btcSoldUsd += cover; yr.btcSold += btc;
             sf = need - cover; btc = 0;
             if (!ranOut) ranOut = monthKey(idx);
@@ -929,11 +1020,31 @@
     o.btcValue = btcValue; o.btcSaleCost = btcSaleCost; o.btcIfSold = btcIfSold;
     o.balance = bal; o.sellCosts = sellCosts; o.houseHeld = houseHeld; o.houseIfSold = houseIfSold;
     o.equityPct = homeEnd > 0 ? Math.round((houseHeld / homeEnd) * 100) : 0;
-    o.housesCanBuy = homeEnd > 0 ? Math.max(0, btcIfSold / homeEnd) : 0;
+    exitTaxes(o, i, homeEnd, sellCosts, hs + closing, n / 12, btcIfSold, basis, realized, houseIfSold, null);
     o.totals = t;
     o.cumCashOutOwner = cumOwner; o.cumCashOutRenter = cumRenter;
     o.rows = rows;
     return o;
+  }
+
+  // If sold, after tax (PR 5b, M7, M9): the house less its sale tax (the
+  // exclusion off first), bitcoin less the tax on its gain, including the
+  // gain on coins sold along the way. `real` is the Real view's divisor
+  // (null: the retrospective, which is nominal).
+  function exitTaxes(o, i, homeEnd, sellCosts, homeBasis, years, btcIfSold, btcBasis, realized, houseIfSold, realFn){
+    var tp = bvreTaxProfile(i);
+    var h = homeSaleTax(tp, homeEnd, sellCosts, homeBasis, years);
+    var b = btcSaleTax(tp, btcIfSold, btcBasis, realized);
+    o.taxProfile = tp;
+    o.homeTax = h; o.btcTax = b; o.btcBasis = btcBasis; o.homeBasis = homeBasis;
+    o.houseAfterTax = houseIfSold - h.tax;
+    o.btcAfterTax = btcIfSold - b.tax;
+    // Houses the bitcoin could buy outright: after its tax (PR 5b; was before).
+    o.housesCanBuy = homeEnd > 0 ? Math.max(0, o.btcAfterTax / homeEnd) : 0;
+    if (realFn && o.real) {
+      o.real.houseAfterTax = realFn(o.houseAfterTax); o.real.btcAfterTax = realFn(o.btcAfterTax);
+      o.real.homeTax = realFn(h.tax); o.real.btcTax = realFn(b.tax); o.real.homeExclusion = realFn(h.exclusion);
+    }
   }
 
   // ─── BvRE projection: equal cash out (PR 4b) ─────────────────────────
@@ -1004,6 +1115,7 @@
     var btcUpfront = upfront * (1 - tx) / btcNow;
     var btc = btcUpfront;
     var bal = loan;
+    var basis = upfront, realized = 0;   // bitcoin's cost basis and the gain on coins sold along the way (PR 5b)
     var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
               invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
     var cumOwner = upfront, cumRenter = upfront;
@@ -1033,12 +1145,18 @@
       if (invest) {
         if (diff > 0) {
           var b = diff * (1 - tx) / price;
-          btc += b; t.invested += diff; yr.btcBoughtUsd += diff; yr.btcBought += b;
+          btc += b; basis += diff; t.invested += diff; yr.btcBoughtUsd += diff; yr.btcBought += b;
         } else if (diff < 0) {
           var need = -diff, sell = need / (price * (1 - tx));
-          if (sell <= btc) { btc -= sell; t.sold += need; yr.btcSoldUsd += need; yr.btcSold += sell; }
+          if (sell <= btc) {
+            // Average cost (PR 5b): the coins sold take their share of the basis.
+            var out = btc > 0 ? basis * sell / btc : 0;
+            realized += need - out; basis -= out;
+            btc -= sell; t.sold += need; yr.btcSoldUsd += need; yr.btcSold += sell;
+          }
           else {
             var cover = btc * price * (1 - tx);
+            realized += cover - basis; basis = 0;
             t.sold += cover; yr.btcSoldUsd += cover; yr.btcSold += btc;
             sf = need - cover; btc = 0;
             if (ranOutMonth === null) ranOutMonth = m;
@@ -1096,7 +1214,7 @@
       houseHeld: real(houseHeld), houseIfSold: real(houseIfSold)
     };
     o.deflator = defl;
-    o.housesCanBuy = homeEnd > 0 ? Math.max(0, btcIfSold / homeEnd) : 0;
+    exitTaxes(o, i, homeEnd, sellCosts, homePrice + closing, horizonYrs, btcIfSold, basis, realized, houseIfSold, real);
     o.totals = t;
     o.cumCashOutOwner = cumOwner; o.cumCashOutRenter = cumRenter;
     o.rows = rows;
@@ -1147,6 +1265,11 @@
     recaptureRate: recaptureRate,
     depreciationPlan: depreciationPlan,
     yieldYears: yieldYears,
+    HOME_EXCLUSION: HOME_EXCLUSION,
+    homeSaleTax: homeSaleTax,
+    btcSaleTax: btcSaleTax,
+    rentalIfSold: rentalIfSold,
+    pathIfSold: pathIfSold,
     currentBTCMultiple: currentBTCMultiple,
     scenarioGrowthFactor: scenarioGrowthFactor,
     effectiveCAGR: effectiveCAGR,

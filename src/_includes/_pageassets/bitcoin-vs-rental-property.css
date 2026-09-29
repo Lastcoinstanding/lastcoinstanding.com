@@ -1703,3 +1703,14 @@ html, body {
   .calc-frame-row { justify-content: flex-start; }
   .calc-wrap .calc-deflator-line { margin-left: 0; }
 }
+
+/* PR 5b: the "not tax advice" line in the tax profile. Scoped under
+   .calc-wrap, as the other notes are (`.bvrp-section p` outranks a class). */
+.calc-wrap .calc-tax-note {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  margin: 0.6rem 0 0;
+}

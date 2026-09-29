@@ -4,6 +4,36 @@ const incomeData={1965:6957,1970:9867,1975:13719,1980:21023,1985:23620,1990:2994
     /* btcData: see shared/bvre-annual-data.js (loaded before this script). */
 const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54,2019:3.94,2020:3.11,2021:2.96,2022:5.34,2023:6.81,2024:6.72,2025:6.80};
 
+    // ── Tax on a sale (PR 5b, rulings M7, M9, R7) ──
+    // One tax profile for both calculators, from the "Tax on a sale" block
+    // above them: regime, filing status, federal bracket, state. The engine
+    // (RealEstateModel.bvreRetro / bvreProjection) returns the tax and the
+    // after-tax figures; these helpers read the inputs and word the lines.
+    function reTaxInputs(){
+      function v(id, d){ var el = document.getElementById(id); return el && el.value ? el.value : d; }
+      return { taxRegime: v('reTaxRegime', 'us'), filing: v('reFiling', 'mfj'), taxBracket: +v('reBracket', '24'), taxState: v('reState', 'OTHER') };
+    }
+    // f formats money; conv(x) gives the displayed value of a nominal x.
+    function reBtcTaxLine(R, f, conv){
+      var pre = conv(R.btcIfSold), tax = conv(R.btcTax.tax);
+      if (R.taxProfile.taxRegime === 'none') return 'Before tax the same: no capital-gains tax';
+      if (!(R.btcTax.tax > 0)) return 'Before tax ' + f(pre) + '; no tax: no gain';
+      return 'Before tax ' + f(pre) + '; tax on the gain over what was paid: <span class="negative">\u2212' + f(tax) + '</span>' +
+        (Math.abs(R.btcTax.realized) > 0.5 ? ' <span style="font-size:.78rem;color:var(--text-muted)">(including coins sold along the way, due in the years they were sold)</span>' : '');
+    }
+    function reHouseTaxLine(R, f, conv){
+      var h = R.homeTax, pre = conv(R.houseIfSold), tax = conv(h.tax);
+      var cap = '$' + h.cap.toLocaleString('en-US');
+      if (R.taxProfile.taxRegime === 'none') return 'Before tax the same: no capital-gains tax';
+      if (!(h.gain > 0)) return 'Before tax ' + f(pre) + '; no tax: no gain on the sale';
+      if (!h.eligible) return 'Before tax ' + f(pre) + '; tax on the gain: <span class="negative">\u2212' + f(tax) + '</span> <span style="font-size:.78rem;color:var(--text-muted)">(held under 2 years, so no home-sale exclusion)</span>';
+      // The gain and the exclusion are stated in nominal dollars: the
+      // exclusion is a fixed dollar amount, not indexed.
+      var g = '$' + Math.round(h.gain).toLocaleString('en-US');
+      if (!(h.tax > 0)) return 'Before tax ' + f(pre) + '; no tax: the ' + g + ' gain <span style="font-size:.78rem;color:var(--text-muted)">(nominal)</span> is within the ' + cap + ' home-sale exclusion';
+      return 'Before tax ' + f(pre) + '; tax on the ' + g + ' gain <span style="font-size:.78rem;color:var(--text-muted)">(nominal)</span> above the ' + cap + ' home-sale exclusion: <span class="negative">\u2212' + f(tax) + '</span>';
+    }
+
     const gridColor='rgba(224,148,34,0.06)',tickColor='#6a6256',amber='#e09422',amberLight='rgba(224,148,34,0.15)',red='#c0392b',redLight='rgba(192,57,43,0.15)',textColor='#e8e0d4',greenColor='#27ae60';
     Chart.defaults.font.family="'Inter', -apple-system, sans-serif";Chart.defaults.font.size=12;Chart.defaults.color=tickColor;
     function cso(t){return{grid:{color:gridColor,drawBorder:false},ticks:{color:tickColor,font:{size:11}},title:{display:!!t,text:t,color:tickColor,font:{size:11,weight:400}}}}
@@ -305,10 +335,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const _investEl = document.getElementById('calcInvestDiff');
         const invest = _investEl ? _investEl.checked : true;
         // ── ENGINE: shared/real-estate-model.js (PR 4e) ──
-        const R = RealEstateModel.bvreRetro({ sy: sy, method: cash ? 'cash' : 'mortgage', homePrice: hs, mortRate: rate, dpf: dpf,
+        const R = RealEstateModel.bvreRetro(Object.assign({ sy: sy, method: cash ? 'cash' : 'mortgage', homePrice: hs, mortRate: rate, dpf: dpf,
             rent: _rentValid ? _rentNum : null, investDiff: invest, btcToday: TODAY_PRICE, nowMs: Date.now(),
             closingPct: D.closingPct, propTaxPct: D.propTaxPct, insurancePer400K: D.insurancePer400K,
-            maintPct: D.maintPct, sellPct: D.sellPct, btcTxPct: D.btcTxPct });
+            maintPct: D.maintPct, sellPct: D.sellPct, btcTxPct: D.btcTxPct }, reTaxInputs()));
         // Placeholders name the defaults a blank field falls back to (also
         // when an unoffered year fell back to 2017 above).
         var _cpPh=document.getElementById('customHomePrice');if(_cpPh&&medianHs)_cpPh.placeholder=rFmt(medianHs)+' ('+sy+' median)';
@@ -369,8 +399,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             '<div class="detail-line">' + monthlyLine + '</div>' +
             '<div class="period-divider"></div>' +
             '<div class="period-label">' + endLabel + ' · Today</div>' +
-            '<div class="big-number">' + rFmt(R.btcIfSold) + ' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
-            '<div class="big-number-label">bitcoin, if sold today, before tax</div>' +
+            '<div class="big-number">' + rFmt(R.btcAfterTax) + ' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+            '<div class="big-number-label">bitcoin, if sold today, after tax</div>' +
+            '<div class="detail-line">' + reBtcTaxLine(R, rFmt, function(x){ return x; }) + '</div>' +
             (R.btcHeld > 0 ? reHouseIcons(R.housesCanBuy) : '') +
             '<div class="detail-line">BTC held: ' + R.btcHeld.toFixed(4) + ' <span style="' + mutedS + '">(' + R.btcUpfront.toFixed(4) + ' up front ' + (btcFromMonthly >= 0 ? '+ ' : '− ') + Math.abs(btcFromMonthly).toFixed(4) + ' from the monthly differences)</span></div>' +
             '<div class="detail-line">Bitcoin today: <strong>' + rFmt(R.btcToday) + '</strong><span class="retro-price-src" style="' + mutedS + '">' + srcNote + '</span></div>' +
@@ -395,8 +426,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             '<div class="detail-line">' + ownerMonthly + '</div>' +
             '<div class="period-divider"></div>' +
             '<div class="period-label">' + endLabel + ' · Today</div>' +
-            '<div class="big-number">' + rFmt(R.houseIfSold) + ' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
-            '<div class="big-number-label">the house, if sold today, before tax</div>' +
+            '<div class="big-number">' + rFmt(R.houseAfterTax) + ' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+            '<div class="big-number-label">the house, if sold today, after tax</div>' +
+            '<div class="detail-line">' + reHouseTaxLine(R, rFmt, function(x){ return x; }) + '</div>' +
             reOwnershipVisual(cash, R.equityPct, 'ecRetro') +
             '<div class="detail-line">Home value: ' + rFmt(R.homeEnd) + ' <span style="' + mutedS + '">(Case-Shiller National to ' + houseLabel + ', the latest month: ×' + R.homeGrowth.toFixed(2) + ' since ' + startLabel + ')</span></div>' +
             '<div class="detail-line">Selling costs (' + rPct(D.sellPct) + '): <span class="negative">−' + rFmt(R.sellCosts) + '</span></div>' +
@@ -664,7 +696,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var sellPct = parseRange('fwdSellPct', 0, 10, D.sellPct);
     var btcTxPct = parseRange('fwdBtcTxPct', 0, 2, D.btcTxPct);
     var closingPct = parseRange('fwdClosingPct', 0, 10, D.closingPct);
-    var P = RealEstateModel.bvreProjection({
+    var P = RealEstateModel.bvreProjection(Object.assign({
       method: method, scenario: scenario, horizonYrs: horizonYrs, btcNow: btcNow,
       homePrice: homePrice, homeApprNominal: homeApprNominal, inflRate: inflRate,
       mortRate: mortRate, dpf: dpf,
@@ -675,7 +707,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       insurance: parseOpt('fwdInsurance', 0, 100000),
       maintPct: parseRange('fwdMaintPct', 0, 5, D.maintPct),
       sellPct: sellPct, btcTxPct: btcTxPct, investDiff: invest
-    });
+    }, reTaxInputs()));
+    function conv(x){ return _mode === 'real' ? x / P.deflator : x; }
     // Both paths end on the same day, horizonYrs from today (M10).
     var asOf = new Date(P.endDateMs).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 
@@ -747,8 +780,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="detail-line">'+monthlyLine+'</div>' +
         '<div class="period-divider"></div>' +
         '<div class="period-label">'+asOf+' · Projected ('+modePeriodLabel()+')</div>' +
-        '<div class="big-number">'+fmt(modeVal(R.btcIfSold, P.btcIfSold))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
-        '<div class="big-number-label">'+(_mode === 'real' ? 'bitcoin, if sold, in today’s purchasing power' : 'bitcoin, if sold, in future dollars')+'</div>' +
+        '<div class="big-number">'+fmt(modeVal(R.btcAfterTax, P.btcAfterTax))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+        '<div class="big-number-label">'+(_mode === 'real' ? 'bitcoin, if sold, after tax, in today’s purchasing power' : 'bitcoin, if sold, after tax, in future dollars')+'</div>' +
+        '<div class="detail-line">'+reBtcTaxLine(P, fmt, conv)+'</div>' +
         (P.btcHeld > 0 ? buildHouseIcons(housesCanBuy) : '') +
         '<div class="detail-line">BTC held: '+P.btcHeld.toFixed(4)+' <span style="'+mutedS+'">('+P.btcUpfront.toFixed(4)+' up front '+(btcFromMonthly >= 0 ? '+ ' : '− ')+Math.abs(btcFromMonthly).toFixed(4)+' from the monthly differences)</span></div>' +
         '<div class="detail-line">Projected BTC price: <strong>'+fmt(modeVal(R.priceEnd, P.priceEnd))+'</strong> <span style="'+mutedS+'">'+modeUnit()+'; '+scenarioLabel+'</span></div>' +
@@ -771,8 +805,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="detail-line">'+ownerMonthly+'</div>' +
         '<div class="period-divider"></div>' +
         '<div class="period-label">'+asOf+' · Projected ('+modePeriodLabel()+')</div>' +
-        '<div class="big-number">'+fmt(modeVal(R.houseIfSold, P.houseIfSold))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
-        '<div class="big-number-label">'+(_mode === 'real' ? 'the house, if sold, before tax, in today’s purchasing power' : 'the house, if sold, before tax, in future dollars')+'</div>' +
+        '<div class="big-number">'+fmt(modeVal(R.houseAfterTax, P.houseAfterTax))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+        '<div class="big-number-label">'+(_mode === 'real' ? 'the house, if sold, after tax, in today’s purchasing power' : 'the house, if sold, after tax, in future dollars')+'</div>' +
+        '<div class="detail-line">'+reHouseTaxLine(P, fmt, conv)+'</div>' +
         buildOwnershipVisual() +
         '<div class="detail-line">Home value in '+yrs+' yrs: '+fmt(modeVal(R.homeEnd, P.homeEnd))+' <span style="'+mutedS+'">'+modeUnit()+'; '+houseRateLabel+'</span></div>' +
         '<div class="detail-line">Selling costs ('+pctTxt(sellPct)+'): <span class="negative">−'+fmt(modeVal(R.sellCosts, P.sellCosts))+'</span></div>' +
@@ -862,6 +897,25 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // that preset, so restoring a default never writes a spurious "custom"
   // (the pre-4a trap). (The S&P "go deeper" rate, bound to lcs.realReturns,
   // was retired with the cash-mode leg by M2 in PR 4b.)
+  // The tax profile (PR 5b) re-runs both calculators and names itself in
+  // its collapsed line.
+  (function bindTax(){
+    var names = { us: 'United States', none: 'no capital-gains tax' };
+    var filings = { mfj: 'married filing jointly', single: 'single', hoh: 'head of household', mfs: 'married filing separately' };
+    function hint(){
+      var t = reTaxInputs(), el = document.getElementById('reTaxHint');
+      if (!el) return;
+      var st = document.getElementById('reState');
+      el.textContent = t.taxRegime === 'none' ? names.none
+        : names.us + ' · ' + filings[t.filing] + ' · ' + t.taxBracket + '% bracket · ' + (st ? st.options[st.selectedIndex].text : 'typical state');
+    }
+    ['reTaxRegime', 'reFiling', 'reBracket', 'reState'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('change', function(){ hint(); runFwdCalc(); if (window.runRetroCalc) window.runRetroCalc(); });
+    });
+    hint();
+  })();
+
   var baseline = window.RealEstateBaseline.bind({
     prefix: 'fwd',
     onChange: function(){ runFwdCalc(); },

@@ -210,6 +210,8 @@
     holdingYears: 10,
     stateCode: 'OTHER',          // typical ~5% — user selects their actual state for accuracy
     federalBracketPct: 24,     // 12, 22, 24, 32, 35, 37
+    // PR 5b (rulings M9, R7): 'us' | 'none' (no capital-gains tax).
+    taxRegime: 'us',
     adjustedBasisPct: 60,      // % of current value
     yearsAlreadyHeld: 10,
     // Bitcoin scenario, one set on both pages (rulings M3, PR 4c):
@@ -617,8 +619,13 @@
     var el = document.getElementById('calc-headline');
     if (!el) return;
     // The totals at the horizon in the display frame (PR 4f); nominal as before.
+    // If both are sold at year N, after tax, leads (PR 5b, rulings M7);
+    // the before-tax difference is beside it.
     var real = isReal(), H = s.holdingYears;
-    var delta = inFrame(results.path.totalWealth, H) - inFrame(results.keep.totalWealth, H);
+    var delta = inFrame(results.path.ifSold.afterTax, H) - inFrame(results.keep.ifSold.afterTax, H);
+    var deltaPre = inFrame(results.path.ifSold.preTax, H) - inFrame(results.keep.ifSold.preTax, H);
+    function signed(v){ return (v < 0 ? '\u2212' : '+') + fmtMoney(Math.abs(v)); }
+    var soldAt = ' if both are sold at year ' + H + ', after tax';
     var inToday = real ? ' in today\u2019s dollars' : '';
     var rentalAnn = results.keep.annual.afterTax;
     var bitcoinAnn = results.path.year1CashFlow;
@@ -640,16 +647,16 @@
 
     var verdict, color;
     if (delta > 0) {
-      verdict = '<strong>' + pathName + ' results in ' + fmtMoney(delta) +
-                ' more asset value</strong>' + inToday + ' than keeping the rental over ' + s.holdingYears + ' years';
+      verdict = '<strong>' + pathName + ' leaves ' + fmtMoney(delta) +
+                ' more</strong>' + inToday + ' than keeping the rental,' + soldAt + ' (' + signed(deltaPre) + ' before tax)';
       if (ratio >= 1.3 && bitcoinAnn > 0) {
         verdict += ', with about <strong>' + ratio.toFixed(1) + '&times;</strong> the Year 1 cash flow';
       }
       verdict += '.';
       color = 'positive';
     } else {
-      verdict = '<strong>Keeping the rental produces ' + fmtMoney(-delta) +
-                ' more asset value</strong>' + inToday + ' than ' + pathName + ' under your inputs. Try adjusting the bitcoin scenario, holding period, or path.';
+      verdict = '<strong>Keeping the rental leaves ' + fmtMoney(-delta) +
+                ' more</strong>' + inToday + ' than ' + pathName + ',' + soldAt + ' (' + signed(-deltaPre) + ' before tax). Try adjusting the bitcoin scenario, holding period, or path.';
       color = 'neutral';
     }
     var explainer = '<span class="calc-headline-explainer">' + explainerByPath[s.path] + '</span>';
@@ -669,9 +676,14 @@
     // The totals follow the display frame (PR 4f); the cash flows and the
     // mortgage stay nominal, as paid, and say so in the Real view.
     var real = isReal();
-    var rentalTotal = inFrame(results.keep.totalWealth, s.holdingYears);
-    var bitcoinTotal = inFrame(results.path.totalWealth, s.holdingYears);
-    var winnerClass = bitcoinTotal > rentalTotal ? 'win-bitcoin' : 'win-rental';
+    var H = s.holdingYears;
+    var rentalTotal = inFrame(results.keep.totalWealth, H);
+    var bitcoinTotal = inFrame(results.path.totalWealth, H);
+    // If sold at year N (PR 5b, M7): before tax, the tax, after tax; after
+    // tax decides the winner, as in the headline.
+    var kS = results.keep.ifSold, pS = results.path.ifSold;
+    var winnerClass = inFrame(pS.afterTax, H) > inFrame(kS.afterTax, H) ? 'win-bitcoin' : 'win-rental';
+    var unit = real ? ' (today\u2019s&nbsp;$)' : '';
 
     // The existing mortgage (M8, PR 4d): kept rentals carry it, sales repay it.
     var k0 = results.keep;
@@ -712,9 +724,18 @@
       '<tr><td>Tax treatment</td>' +
         '<td>Depreciation-shielded</td>' +
         '<td>' + (s.path === 1 ? 'LTCG on appreciation only' : 'Tax-deferred (return of capital, expected)') + '</td></tr>' +
-      '<tr class="' + winnerClass + '"><td><strong>' + s.holdingYears + '-year total asset value' + (real ? ' (today\u2019s&nbsp;$)' : '') + '</strong></td>' +
-        '<td class="numeric"><strong>' + fmtMoneyFull(rentalTotal) + '</strong></td>' +
-        '<td class="numeric"><strong>' + fmtMoneyFull(bitcoinTotal) + '</strong></td></tr>';
+      '<tr><td>' + H + '-year total if held' + unit + '</td>' +
+        '<td class="numeric">' + fmtMoneyFull(rentalTotal) + '</td>' +
+        '<td class="numeric">' + fmtMoneyFull(bitcoinTotal) + '</td></tr>' +
+      '<tr><td>If sold at year ' + H + ', before tax' + unit + '</td>' +
+        '<td class="numeric">' + fmtMoneyFull(inFrame(kS.preTax, H)) + '</td>' +
+        '<td class="numeric">' + fmtMoneyFull(inFrame(pS.preTax, H)) + '</td></tr>' +
+      '<tr><td>Tax on the sale' + unit + '</td>' +
+        '<td class="numeric">\u2212' + fmtMoneyFull(inFrame(kS.tax, H)) + '</td>' +
+        '<td class="numeric">\u2212' + fmtMoneyFull(inFrame(pS.tax, H)) + '</td></tr>' +
+      '<tr class="' + winnerClass + '"><td><strong>If sold, after tax' + unit + '</strong></td>' +
+        '<td class="numeric"><strong>' + fmtMoneyFull(inFrame(kS.afterTax, H)) + '</strong></td>' +
+        '<td class="numeric"><strong>' + fmtMoneyFull(inFrame(pS.afterTax, H)) + '</strong></td></tr>';
 
     var headers = document.getElementById('calc-comparison-headers');
     if (headers) {
@@ -723,8 +744,8 @@
     // What the table's dollars are (PR 4f).
     var frame = document.getElementById('calc-comparison-frame');
     if (frame) frame.textContent = real
-      ? ('The ' + s.holdingYears + '-year totals are in today\u2019s dollars, ' + deflatorPhrase() + '. The cash flows and the mortgage are nominal, as paid.')
-      : 'All figures are nominal: future dollars, as paid.';
+      ? ('The ' + s.holdingYears + '-year totals are in today\u2019s dollars, ' + deflatorPhrase() + '. The cash flows and the mortgage are nominal, as paid.' + taxNote(s))
+      : 'All figures are nominal: future dollars, as paid.' + taxNote(s);
   }
 
   // Return of capital, said plainly (PR 5a): tax-deferred, not tax-free.
@@ -735,6 +756,13 @@
       : 'At these rates it is not used up within ' + s.holdingYears + ' year' + (s.holdingYears === 1 ? '' : 's') + '.';
     return '<div class="calc-detail-warn">STRC and SATA pay return of capital: tax-deferred, not tax-free. Each payment lowers your cost basis. ' + when +
       ' The gain left in the lower basis is due when you sell.</div>';
+  }
+
+  // How the If sold rows are taxed (PR 5b).
+  function taxNote(s){
+    return s.taxRegime === 'none'
+      ? ' No capital-gains tax: the sales are untaxed; rent and lending interest are still taxed as income.'
+      : ' If sold: the rental pays depreciation recapture and tax on its gain; bitcoin pays tax on its gain over what was paid for it; STRC and SATA are sold at par, so the return of capital that lowered their basis is taxed as a gain. Selling costs are in both the before- and after-tax rows.';
   }
 
   function renderPathDetail(results, s){
@@ -826,7 +854,8 @@
       var sCopy = Object.assign({}, s, { btcScenario: sc });
       var r = computeAll(sCopy);
       // In the display frame (PR 4f); nominal as before.
-      var delta = inFrame(r.path.totalWealth, s.holdingYears) - inFrame(r.keep.totalWealth, s.holdingYears);
+      // If both are sold at year N, after tax (PR 5b, M7), as the headline.
+      var delta = inFrame(r.path.ifSold.afterTax, s.holdingYears) - inFrame(r.keep.ifSold.afterTax, s.holdingYears);
 
       // Effective CAGR display — derived dynamically from Power Law data
       // and the current holding period, so the number recalibrates as
@@ -941,7 +970,7 @@
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     var cf = document.getElementById('calc-chart-frame');
-    if (cf) cf.textContent = real ? '(real, today\u2019s $)' : '(nominal, future $)';
+    if (cf) cf.textContent = real ? '(held, before tax; real, today\u2019s $)' : '(held, before tax; nominal, future $)';
     var chipsNote = document.getElementById('calc-chips-frame');
     if (chipsNote) chipsNote.hidden = !real;
   }
@@ -1124,6 +1153,7 @@
     });
     bindSelect('calc-state', 'stateCode');
     bindSelect('calc-bracket', 'federalBracketPct');
+    bindSelect('calc-tax-regime', 'taxRegime');   // PR 5b
 
     // Path 2 sliders
     bindSlider('calc-heloc-ltv', 'helocLtv',
