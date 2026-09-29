@@ -1579,3 +1579,29 @@ html, body {
 /* PR 4c (rulings M3): four scenario chips. "Stay at today's multiple"
    wraps at desktop width; keep the help glyph with the last word. */
 .calc-cagr-chip-nowrap { white-space: nowrap; }
+
+/* PR 4d (rulings §7, item 12): the stablecoin-lending rates disclosure
+   under the calculator. Rows come from RealEstateModel.YIELD_RATES. */
+.calc-rates-note {
+  margin-top: 1.6rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border-faint);
+  border-radius: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.calc-rates-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+}
+.calc-rates-note p { margin: 0.5rem 0; }
+.calc-rates-note .bvrp-table-wrap { margin: 0.8rem 0; }
+.calc-rates-table { font-size: 0.8rem; }
+.calc-rates-table th, .calc-rates-table td { padding: 0.45rem 0.6rem; }
+.calc-rates-sub { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.15rem; }

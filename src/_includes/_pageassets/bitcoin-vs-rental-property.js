@@ -127,6 +127,58 @@
   }
 })();
 
+// ─── Rates quoted in the copy (PR 4d; rulings §7, item 12) ───────────
+// One dated object, RealEstateModel.YIELD_RATES, drives the calculator,
+// the rate labels, the $500K example's rate-dependent cells and the
+// stablecoin-lending disclosure, so the monthly refresh is one edit.
+//   data-yr="strc|sata|lending"   the rate, "12%"
+//   data-yr="asof"                the as-of month, "September 2026"
+//   data-yr-ex="…"                a $500K-example figure (see EX below)
+(function(){
+  function render(){
+    var RE = window.RealEstateModel;
+    if (!RE || !RE.YIELD_RATES) return;
+    var R = RE.YIELD_RATES;
+    function pct(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+    function usd(v){ return '$' + Math.round(v).toLocaleString('en-US'); }
+    function near(v, step){ return Math.round(v / step) * step; }
+    document.querySelectorAll('[data-yr]').forEach(function(el){
+      var k = el.getAttribute('data-yr');
+      el.textContent = k === 'asof' ? R.asOf : pct(R[k]);
+    });
+    // The $500K example: one unencumbered $500K rental sold, about $417K
+    // after federal tax (the Path 1 worked example), split 45/30/10/15.
+    var base = 417000;
+    var a = { strc: base * 0.45, sata: base * 0.30, lend: base * 0.10 };
+    var y = { strc: a.strc * R.strc / 100, sata: a.sata * R.sata / 100, lend: a.lend * R.lending / 100 };
+    var total = y.strc + y.sata + y.lend;
+    var EX = {
+      'strc-y1': usd(y.strc), 'sata-y1': usd(y.sata), 'lend-y1': usd(y.lend),
+      'total-y1': '~' + usd(near(total, 100)), 'roc-y1': '~' + usd(near(y.strc + y.sata, 100)),
+      'blended': (total / base * 100).toFixed(1) + '%',
+      'ten-year': '~$' + Math.round(total * 10 / 1000).toLocaleString('en-US') + 'K',
+      'ratio': (total / 22000).toFixed(1)
+    };
+    document.querySelectorAll('[data-yr-ex]').forEach(function(el){
+      var v = EX[el.getAttribute('data-yr-ex')];
+      if (v !== undefined) el.textContent = v;
+    });
+    // The disclosure under the calculator: the verifiable rates this month.
+    var box = document.getElementById('calc-rates-rows');
+    if (box) {
+      box.innerHTML = R.verifiable.map(function(v){
+        return '<tr><td>' + v.name + '<span class="calc-rates-sub">' + v.kind + ' \u00b7 ' + v.source + '</span></td>' +
+               '<td class="numeric">' + Number(v.rate).toFixed(2) + '%</td><td>' + v.us + '</td></tr>';
+      }).join('');
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render);
+  } else {
+    render();
+  }
+})();
+
 // ─── Calculator (Phase 2 v0.1) ───────────────────────────────────────
 // Interactive head-to-head between rental property and bitcoin paths.
 // Replaces the Section 7 "Coming Soon" placeholder.
@@ -165,10 +217,16 @@
     btcScenario: 'stay',
     helocLtv: 80,
     helocRatePct: 9.5,
-    existingMortgage: 200000,
+    // The existing mortgage, per property (PR 4d, rulings M8): every path
+    // now carries or repays it. Defaults: RealEstateModel.RENTAL_DEFAULTS.
+    existingMortgage: window.RealEstateModel.RENTAL_DEFAULTS.existingMortgage,
+    mortgageRatePct: window.RealEstateModel.RENTAL_DEFAULTS.mortgageRatePct,
+    mortgageYearsLeft: window.RealEstateModel.RENTAL_DEFAULTS.mortgageYearsLeft,
     numProperties: 3,
     propertiesRetained: 2,     // derived sold = numProperties - propertiesRetained
-    portfolio: { strc: 45, sata: 30, ledn: 10, spot: 15 },
+    // The third slice was Ledn at 5%; it is now generic stablecoin lending
+    // at the dated rate (PR 4d; rulings §7, item 12).
+    portfolio: { strc: 45, sata: 30, lend: 10, spot: 15 },
     includeSweatEquity: false,
     // Nominal home appreciation, %/yr. The pair's shared input,
     // lcs.homeApprNominal (PR 4a, rulings M1); was a hardcoded 3.0.
@@ -200,6 +258,22 @@
     return (n < 0 ? '-' : '') + '$' + Math.round(abs).toLocaleString();
   }
   function fmtPct(n){ return (n*100).toFixed(1) + '%'; }
+  // The dated rates (PR 4d): the Path 4 rows quote them.
+  var YR = window.RealEstateModel.YIELD_RATES;
+  // Path 1's rows between tax and deployment: the mortgage repayment when
+  // there is one (M8); with none, the rows are as before PR 4d.
+  function repaidRows(netCash, repaid){
+    return repaid > 0
+      ? '<div><span>Net cash after tax</span><strong>' + fmtMoneyFull(netCash) + '</strong></div>' +
+        '<div><span>Existing mortgage repaid</span><strong>-' + fmtMoneyFull(repaid) + '</strong></div>'
+      : '';
+  }
+  // When the sale doesn't cover the mortgage (M8), say so where it happens.
+  function shortfallNote(shortfall){
+    return shortfall > 0
+      ? '<div class="calc-detail-warn">The sale doesn\u2019t cover the mortgage: ' + fmtMoneyFull(shortfall) + ' has to come from other money, so it counts against this path.</div>'
+      : '';
+  }
   function fmtMoneyFull(n){
     if (n === undefined || isNaN(n)) return '—';
     return (n < 0 ? '-' : '') + '$' + Math.round(Math.abs(n)).toLocaleString();
@@ -557,13 +631,36 @@
     var bitcoinTotal = results.path.totalWealth;
     var winnerClass = bitcoinTotal > rentalTotal ? 'win-bitcoin' : 'win-rental';
 
+    // The existing mortgage (M8, PR 4d): kept rentals carry it, sales repay it.
+    var k0 = results.keep;
+    var carried = k0.mortgage0 > 0
+      ? fmtMoneyFull(k0.mortgage0) + ' carried: ' + fmtMoneyFull(k0.mortgagePayment * 12) + ' a year in payments, ' + fmtMoneyFull(k0.mortgageEnd) + ' left after ' + s.holdingYears + ' years'
+      : 'None';
+    var pathMortgage;
+    if (s.path === 2) {
+      var rr = results.path.retainedRental;
+      pathMortgage = rr.mortgage0 > 0 ? fmtMoneyFull(rr.mortgage0) + ' carried, plus the HELOC' : 'The HELOC only';
+    } else if (s.path === 3) {
+      var r3m = results.path;
+      pathMortgage = r3m.mortgageRepaid > 0
+        ? fmtMoneyFull(r3m.mortgageRepaid) + ' repaid from the sale; ' + fmtMoneyFull(r3m.retainedRental.mortgage0) + ' carried on the ' + r3m.retained + ' kept'
+        : 'None';
+    } else {
+      pathMortgage = results.path.mortgageRepaid > 0 ? fmtMoneyFull(results.path.mortgageRepaid) + ' repaid from the sale' : 'None';
+    }
+    var anyMortgage = k0.mortgage0 > 0;
     el.innerHTML = '' +
-      '<tr><td>Year 1 cash flow (after tax)</td>' +
+      '<tr><td>Year 1 cash flow (after tax' + (anyMortgage ? ' and mortgage payments' : '') + ')</td>' +
         '<td class="numeric">' + fmtMoneyFull(rentalY1) + '</td>' +
         '<td class="numeric">' + fmtMoneyFull(bitcoinY1) + '</td></tr>' +
       '<tr><td>' + s.holdingYears + '-year cumulative cash flow</td>' +
         '<td class="numeric">' + fmtMoneyFull(results.keep.cumulativeCash) + '</td>' +
         '<td class="numeric">' + fmtMoneyFull(s.path === 2 ? results.path.retainedRental.cumulativeCash : (results.path.yieldPortfolio ? results.path.yieldPortfolio.cumulativeCashAfterTax : 0)) + '</td></tr>' +
+      (anyMortgage
+        ? '<tr><td>Existing mortgage</td>' +
+            '<td>' + carried + '</td>' +
+            '<td>' + pathMortgage + '</td></tr>'
+        : '') +
       '<tr><td>Operational load</td>' +
         '<td>Tenants, maintenance, turnover</td>' +
         '<td>' + (s.path === 2 ? 'Rental retained; plus HELOC servicing' : 'None' + (s.path === 3 ? ' on the sold portion' : '') + '; issuer-credit and market risk instead') + '</td></tr>' +
@@ -598,10 +695,11 @@
         '<div><span>Federal LTCG</span><strong>-' + fmtMoneyFull(r.ltcgTax) + '</strong></div>' +
         '<div><span>State tax (' + (s.stateCode === 'OTHER' ? 'typical ~5%' : s.stateCode) + ')</span><strong>-' + fmtMoneyFull(r.stateTax) + '</strong></div>' +
         '<div><span>NIIT</span><strong>-' + fmtMoneyFull(r.niit) + '</strong></div>' +
-        '<div class="calc-detail-emphasis"><span>Net cash deployed to bitcoin</span><strong>' + fmtMoneyFull(r.netCash) + '</strong></div>' +
-        '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r.netCash * s.btcTxPct / 100) + '</strong></div>' +
+        repaidRows(r.netCash, results.path.mortgageRepaid) +
+        '<div class="calc-detail-emphasis"><span>Net cash deployed to bitcoin</span><strong>' + fmtMoneyFull(results.path.netCashDeployed) + '</strong></div>' +
+        '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(results.path.netCashDeployed * s.btcTxPct / 100) + '</strong></div>' +
         '<div><span>All-in leakage from gross sale</span><strong>' + fmtPct(r.effectiveLeakagePct) + '</strong></div>' +
-        '</div>';
+        '</div>' + shortfallNote(results.path.shortfall);
     } else if (s.path === 2) {
       var r2 = results.path;
       html = '<div class="calc-detail-title">Path 2 mechanics — HELOC against home, buy bitcoin, retain rental</div>' +
@@ -612,7 +710,7 @@
         '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r2.helocDraw * s.btcTxPct / 100) + '</strong></div>' +
         '<div><span>Bitcoin position FV (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(r2.btcFV) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net gain from leveraged bitcoin</span><strong>' + fmtMoneyFull(r2.netGainFromLeverage) + '</strong></div>' +
-        '<div><span>+ Retained rental wealth at exit</span><strong>' + fmtMoneyFull(r2.retainedRental.totalWealth) + '</strong></div>' +
+        '<div><span>+ Retained rental wealth at exit' + (r2.retainedRental.mortgage0 > 0 ? ' (after its mortgage)' : '') + '</span><strong>' + fmtMoneyFull(r2.retainedRental.totalWealth) + '</strong></div>' +
         '</div>' +
         '<div class="calc-detail-warn">Caveat: HELOC interest used for bitcoin is not tax-deductible (TCJA). Carry must be serviced from personal income through any bitcoin drawdown.</div>';
     } else if (s.path === 3) {
@@ -622,11 +720,11 @@
       html = '<div class="calc-detail-title">Path 3 mechanics &mdash; sell ' + soldCount + ' of ' + s.numProperties + ' properties, redeploy</div>' +
         '<div class="calc-detail-rows">' +
         '<div><span>Sold property value (' + soldCount + ' \u00d7 ' + fmtMoneyFull(s.propertyValue) + ')</span><strong>' + fmtMoneyFull(r3.soldPropertiesValue) + '</strong></div>' +
-        '<div><span>Net cash after sale taxes</span><strong>' + fmtMoneyFull(r3.netCashFromSale) + '</strong></div>' +
+        '<div><span>Net cash after sale taxes' + (r3.mortgageRepaid > 0 ? ' and repaying ' + (soldCount === 1 ? 'its mortgage' : 'their mortgages') + ' (' + fmtMoneyFull(r3.mortgageRepaid) + ')' : '') + '</span><strong>' + fmtMoneyFull(r3.netCashFromSale) + '</strong></div>' +
         '<div><span>Year 1 cash from yield portfolio</span><strong>' + fmtMoneyFull(r3.yieldPortfolio.year1AfterTax) + '</strong></div>' +
         '<div><span>Year 1 cash from ' + retainedCount + ' retained rental' + (retainedCount === 1 ? '' : 's') + '</span><strong>' + fmtMoneyFull(r3.retainedRental.annual.afterTax) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Combined Year 1 cash flow</span><strong>' + fmtMoneyFull(r3.year1CashFlow) + '</strong></div>' +
-        '</div>';
+        '</div>' + shortfallNote(r3.shortfall);
     } else {
       var r4 = results.path;
       var yp = r4.yieldPortfolio;
@@ -634,14 +732,18 @@
       var nc = r4.netCashDeployed;
       html = '<div class="calc-detail-title">Path 4 mechanics — outright sale, deploy to yield portfolio</div>' +
         '<div class="calc-detail-rows">' +
-        '<div><span>Net cash to deploy (after sale taxes)</span><strong>' + fmtMoneyFull(nc) + '</strong></div>' +
-        '</div>' +
+        (r4.mortgageRepaid > 0
+          ? '<div><span>Net cash after sale taxes</span><strong>' + fmtMoneyFull(r4.saleAtYear0.netCash) + '</strong></div>' +
+            '<div><span>Existing mortgage repaid</span><strong>-' + fmtMoneyFull(r4.mortgageRepaid) + '</strong></div>' +
+            '<div class="calc-detail-emphasis"><span>Net cash to deploy</span><strong>' + fmtMoneyFull(nc) + '</strong></div>'
+          : '<div><span>Net cash to deploy (after sale taxes)</span><strong>' + fmtMoneyFull(nc) + '</strong></div>') +
+        '</div>' + shortfallNote(r4.shortfall) +
         '<div class="calc-detail-portfolio">' +
         '<div class="calc-detail-portfolio-title">Year 1 distributions by instrument</div>' +
         '<div class="calc-detail-rows">' +
-        '<div><span>STRC (' + p.strc + '%, ' + fmtMoneyFull(yp.allocations.strc) + ' @ 12.0% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.strc) + '</strong></div>' +
-        '<div><span>SATA (' + p.sata + '%, ' + fmtMoneyFull(yp.allocations.sata) + ' @ 13.0% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.sata) + '</strong></div>' +
-        '<div><span>Ledn (' + p.ledn + '%, ' + fmtMoneyFull(yp.allocations.ledn) + ' @ 5.0% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.ledn) + '</strong></div>' +
+        '<div><span>STRC (' + p.strc + '%, ' + fmtMoneyFull(yp.allocations.strc) + ' @ ' + YR.strc.toFixed(1) + '% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.strc) + '</strong></div>' +
+        '<div><span>SATA (' + p.sata + '%, ' + fmtMoneyFull(yp.allocations.sata) + ' @ ' + YR.sata.toFixed(1) + '% ROC)</span><strong>' + fmtMoneyFull(yp.year1Distributions.sata) + '</strong></div>' +
+        '<div><span>Stablecoin lending (' + p.lend + '%, ' + fmtMoneyFull(yp.allocations.lend) + ' @ ' + YR.lending.toFixed(1) + '% ord.)</span><strong>' + fmtMoneyFull(yp.year1Distributions.lend) + '</strong></div>' +
         '<div><span>Spot BTC (' + p.spot + '%, ' + fmtMoneyFull(yp.allocations.spot) + ', no dist.)</span><strong>—</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Year 1 after-tax total</span><strong>' + fmtMoneyFull(yp.year1AfterTax) + '</strong></div>' +
         '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
@@ -819,8 +921,10 @@
   }
 
   function updatePerPropertyHint(){
-    var hint = document.querySelector('.calc-perprop-hint');
-    if (hint) hint.style.display = state.path === 3 ? 'inline' : 'none';
+    // Property value and, since PR 4d, the existing mortgage are per property.
+    document.querySelectorAll('.calc-perprop-hint').forEach(function(hint){
+      hint.style.display = state.path === 3 ? 'inline' : 'none';
+    });
   }
 
   function bindPathToggle(){
@@ -897,7 +1001,7 @@
 
   function bindPortfolioSliders(){
     // Portfolio composition sliders — must sum to 100
-    var keys = ['strc', 'sata', 'ledn', 'spot'];
+    var keys = ['strc', 'sata', 'lend', 'spot'];
     keys.forEach(function(k){
       var sld = document.getElementById('calc-port-' + k);
       var val = document.getElementById('val-port-' + k);
@@ -950,8 +1054,18 @@
       function(v){ return v + '%'; });
     bindSlider('calc-heloc-rate', 'helocRatePct',
       function(v){ return v.toFixed(1) + '%'; });
+    // The existing mortgage (PR 4d, rulings M8): now on every path, so its
+    // three inputs sit with the property facts. Thumbs from RENTAL_DEFAULTS.
     bindSlider('calc-existing-mortgage', 'existingMortgage',
       function(v){ return fmtMoneyFull(v); });
+    bindSlider('calc-mortgage-rate', 'mortgageRatePct',
+      function(v){ return parseFloat(v.toFixed(2)) + '%'; });
+    bindSlider('calc-mortgage-years', 'mortgageYearsLeft',
+      function(v){ return v + ' yrs'; });
+    [['calc-existing-mortgage', 'existingMortgage'], ['calc-mortgage-rate', 'mortgageRatePct'], ['calc-mortgage-years', 'mortgageYearsLeft']].forEach(function(p){
+      var el = document.getElementById(p[0]);
+      if (el) el.value = String(state[p[1]]);
+    });
 
     // Path 3 sliders — coupled: numProperties drives propertiesRetained's max,
     // and we clamp propertiesRetained if numProperties is dragged below it.
