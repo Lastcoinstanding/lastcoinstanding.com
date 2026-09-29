@@ -642,7 +642,7 @@
       color = 'positive';
     } else {
       verdict = '<strong>Keeping the rental produces ' + fmtMoney(-delta) +
-                ' more asset value</strong>' + inToday + ' than ' + pathName + ' under your inputs. The decision is close &mdash; try adjusting the bitcoin scenario, holding period, or path.';
+                ' more asset value</strong>' + inToday + ' than ' + pathName + ' under your inputs. Try adjusting the bitcoin scenario, holding period, or path.';
       color = 'neutral';
     }
     var explainer = '<span class="calc-headline-explainer">' + explainerByPath[s.path] + '</span>';
