@@ -92,6 +92,14 @@ Citations behind the sitewide modeling-assumption presets. See `STYLE_GUIDE.md �
 | RE-19 | CPI rent of primary residence (`CPI_RENT`), 2014–2015 | 24 months, 2014-01 to 2015-12 (272.317 to 291.204). ZORI begins in 2015, so a 2014 start backcasts it: ZORI(2015-01) × CPI rent(month) ÷ CPI rent(2015-01). Only the 2014 start year uses it | BLS CPI-U, US city average, NSA (FRED `CUUR0000SEHA`) | https://fred.stlouisfed.org/series/CUUR0000SEHA | 2026-09-28 | only if the start range extends before 2014 |
 | RE-20 | Bitcoin prices in the retrospective | **Entry:** the start year's average price, the mean of `PL_DATA`'s samples in that calendar year (a ~12-day grid, close to the daily average): 2014 $524 · 2015 $274 · 2016 $553 · **2017 $3,967** · 2018 $7,599 · 2019 $7,313 · 2020 $10,962 · 2021 $47,158 · 2022 $27,920 · 2023 $28,693 · 2024 $65,153. The page used `btcData` before 4e, the mean of twelve month-end closes, which in 2017 (a ×13 year) is 9.6% higher ($4,348). **Monthly flows:** the price each month opened at, the previous month's close (BTC-M-1), or today's price when that close isn't in the series yet. **End:** today's price (`fetchTodayPrice`, seeded with the latest `PL_DATA` sample) | `shared/power-law-data.js` (PL-1), `shared/btc-monthly-data.js` (BTC-M-1) | — | 2026-09-28 | with PL-1 and BTC-M-1 (automatic) |
 
+
+### Real-estate pair: the Real view (PR 4f)
+
+**Added in PR 4f (2026-09-29; REAL_ESTATE_PAIR_RULINGS M1, P5).** Both pages compute in nominal dollars; the Real view divides a value at year t by (1 + inflation)^t, `RealEstateModel.deflator`, at the sitewide rate (`lcs.inflation`). The rate's presets are the canonical ones; the pair's shared Baseline tooltip (`components/real-estate-baseline.njk`) now quotes them on both pages.
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| RE-21 | The deflator for the Real view, both pages, and the words its tooltip uses for the presets | CPI **3.5%** ("about the long-run official rate") · M2 growth **6.5%**, the default ("about the 50-year growth of the money supply") · Shadow Stats **8%** ("John Williams's reconstruction of the pre-1980 CPI method, which is disputed") · Custom | Canonical: I-1, I-2, I-4 (STYLE_GUIDE §3.5) | n/a (canonical) | 2026-09-29 | with I-1, I-2, I-4 (2026-11-02) |
 ---
 
 ## Existing-page citations
