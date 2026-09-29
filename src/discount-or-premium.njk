@@ -103,7 +103,8 @@ eleventyComputed:
     <!-- Optional holdings. Privacy fence (design doc §9 Phase 2): the value lives
          in a JS variable only — never written to the URL, sessionStorage,
          localStorage, or any network call. The page's only fetch stays the
-         CoinGecko spot. autocomplete=off keeps the browser from remembering it. -->
+         shared live-price request (it carries no reader data). autocomplete=off
+         keeps the browser from remembering it. -->
     <div class="dp-holdings">
       <label class="dp-holdings-label" for="dpStack">Your stack (optional):</label>
       <span class="dp-holdings-field">
@@ -248,7 +249,7 @@ eleventyComputed:
       <li><strong>A model, not destiny.</strong> The Power Law is an empirical regularity that has held across bitcoin&rsquo;s history. It is not a law of nature and it can break. The <a href="/the-power-law#caveats">caveats</a> set out what would falsify it.</li>
       <li><strong>Reversion is your assumption.</strong> Nothing here predicts that price returns to trend, or when. The page computes the arithmetic consequence of a speed <em>you</em> choose, and shows the never-reverts case alongside it at all times.</li>
       <li><strong>Not an entry signal.</strong> A discount is not a buy signal and a premium is not a sell signal. There are no buy zones on this page by design; for the entry question, see <a href="/wait-or-deploy-now">Wait, or Deploy Now?</a></li>
-      <li><strong>Price data.</strong> Live spot from CoinGecko, falling back to the latest monthly sample in the shared series &mdash; labelled as &ldquo;latest monthly data&rdquo; whenever the live fetch does not resolve.</li>
+      <li><strong>Price data.</strong> Live spot from Coinbase (or Kraken, mempool.space or CoinGecko if Coinbase does not answer), falling back to the most recent price in the shared series &mdash; labelled with its date (&ldquo;as of&nbsp;&hellip;&rdquo;) whenever no live price loads.</li>
     </ul>
   </div>
 

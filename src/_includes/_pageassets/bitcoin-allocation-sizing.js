@@ -868,7 +868,7 @@
     if (stack != null) {
       var s = fmtBtcStack(stack);
       // §10.3 rule 5 / principle 3: "at today's price" only when the price is truly live.
-      var pricePhrase = todayPriceIsLive(_priceSource) ? 'at today’s price' : 'at the latest price';
+      var pricePhrase = todayPriceIsLive(_priceSource) ? 'at today’s price' : 'at the ' + lastSampleDateShort() + ' price';
       lines.push('<p class="as-carry-line"><a class="as-carry-link" href="/the-bitcoin-retirement?stack=' + s + '">'
         + 'Carry this into <strong>The Bitcoin Retirement</strong>: your ' + S.allocPct + '% of ' + usd(S.portfolioUSD)
         + ' is about <strong>' + s + ' BTC</strong> ' + pricePhrase + ' — see what it retires. →</a></p>');

@@ -923,8 +923,9 @@
 // a Today marker. Two axis modes — Linear time (default) and Log time —
 // switchable via the .channel-axis-toggle controls. Each band can be
 // individually hidden via .channel-band-toggle checkboxes. Live BTC price
-// is fetched from CoinGecko for the status line; falls back to the most
-// recent PL_DATA sample if the fetch fails.
+// comes from the shared fetch (fetchTodayPrice) for the status line; falls
+// back to the most recent PL_DATA sample, labelled with its date, if no live
+// source answers.
 //
 // Replaces the previous Tool B: Forward Calculator (now lives at
 // /bitcoin-vs-real-estate.html#projection — see commit 0b2d203 and the
@@ -1033,7 +1034,7 @@
   var lastPlX = PL_DATA[PL_DATA.length - 1][0];
   var lastPlY = PL_DATA[PL_DATA.length - 1][1];
 
-  // Live-price seed (mutated by fetchTodayPrice when CoinGecko resolves)
+  // Live-price seed (mutated by fetchTodayPrice when a live source answers)
   var liveTodayPrice = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
     ? TODAY_PRICE
     : lastPlY;
@@ -1334,7 +1335,7 @@
     var word = positionLabelForMultiple(multiplier);
     var col = multiplier < PL_FLOOR ? rust : multiplier >= PL_CEIL ? gold : multiplier >= 1 ? amber : '';
     var bandLabel = col ? '<span style="color:'+col+'">'+word+'</span>' : word;
-    var src = isLive ? '' : ' <span style="opacity:0.6">(latest monthly data)</span>';
+    var src = isLive ? '' : ' <span style="opacity:0.6">(' + todayPriceAsOf() + ')</span>';
     statusEl.innerHTML =
       '<strong>Today&rsquo;s bitcoin price:</strong> <span style="color:var(--amber)">' + fmtUSD(currentPrice) + '</span>' + src +
       ' &middot; <span style="color:var(--amber)">' + multiplier.toFixed(2) + '&times; trend</span>' +

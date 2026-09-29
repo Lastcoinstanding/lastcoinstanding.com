@@ -107,40 +107,130 @@ var TODAY_PRICE = PL_DATA[PL_DATA.length - 1][1];
   }
 })();
 
-// ═══════ HONEST "TODAY" PRICE LABELS (live-price consolidation, 2026-07) ═══════
-// `source` is 'live' ONLY after fetchTodayPrice resolves against the CoinGecko
-// spot. The pre-resolve seed AND the 'fallback' path both show the latest
-// monthly PL_DATA sample — which must NEVER be labelled "live". One helper,
-// consumed by every "today" readout, so the wording can't drift back into a
-// dozen hand-rolled variants. Interplay per MONTHLY_REFRESH_CHECKLIST: the
-// seed's freshness matters MOST precisely when the fetch fails — a stale
+// ═══════ HONEST "TODAY" PRICE LABELS (live-price consolidation, 2026-07; dated 2026-09-29) ═══════
+// `source` is 'live' ONLY after fetchTodayPrice resolves against a live public
+// price source. The pre-resolve seed AND the 'fallback' path both show the
+// latest PL_DATA sample — which must NEVER be labelled "live". One set of
+// helpers, consumed by every "today" readout, so the wording can't drift back
+// into a dozen hand-rolled variants. Interplay per MONTHLY_REFRESH_CHECKLIST:
+// the seed's freshness matters MOST precisely when the fetch fails — a stale
 // monthly refresh degrades this fallback path first.
+//
+// DATED, NOT "latest monthly data" (2026-09-29). The fallback used to read
+// "latest monthly data", which a reader took for an old average rather than one
+// day's price. It now names the day the price is from, in UTC (the series'
+// own clock — the day index counts UTC days from the genesis block), so a US
+// reader in the evening is not shown the previous day: "as of Sep 12". The
+// year is added only when the sample is from an earlier year than today.
+var LCS_MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var LCS_MONTHS_LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function lastSampleUtcDate(){ return new Date((GENESIS_TS + PL_DATA[PL_DATA.length - 1][0] * 86400) * 1000); }
+// "Sep 12" (or "Sep 12, 2025" when the sample is from an earlier year).
+function lastSampleDateShort(){
+  var d = lastSampleUtcDate();
+  var s = LCS_MONTHS_SHORT[d.getUTCMonth()] + ' ' + d.getUTCDate();
+  return (d.getUTCFullYear() === new Date().getUTCFullYear()) ? s : (s + ', ' + d.getUTCFullYear());
+}
+// "September 12, 2026".
+function lastSampleDateLong(){
+  var d = lastSampleUtcDate();
+  return LCS_MONTHS_LONG[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
+}
+// "as of Sep 12" — the fallback register on its own (the ribbon's suffix).
+function todayPriceAsOf(){ return 'as of ' + lastSampleDateShort(); }
 function todayPriceIsLive(source){ return source === 'live'; }
-// Full caption label: "Today (live)" | "Today (latest monthly data)".
-function todayPriceLabel(source){ return 'Today (' + (source === 'live' ? 'live' : 'latest monthly data') + ')'; }
+// Full caption label: "Today (live)" | "Today (price as of Sep 12)".
+function todayPriceLabel(source){ return 'Today (' + (source === 'live' ? 'live' : 'price ' + todayPriceAsOf()) + ')'; }
 // Inline provenance note for readouts whose lead-in isn't "Today (…)":
-// '' when live, ' (latest monthly data)' otherwise.
-function todayPriceNote(source){ return source === 'live' ? '' : ' (latest monthly data)'; }
+// '' when live, ' (as of Sep 12)' otherwise.
+function todayPriceNote(source){ return source === 'live' ? '' : ' (' + todayPriceAsOf() + ')'; }
+// Display name of the source that supplied the live price ('Coinbase', …), or
+// '' when the price is not live. Set by fetchTodayPrice; see LCS_PRICE_SOURCES.
+function todayPriceProviderName(){
+  for (var i = 0; i < LCS_PRICE_SOURCES.length; i++) {
+    if (LCS_PRICE_SOURCES[i].id === TODAY_PRICE_PROVIDER) return LCS_PRICE_SOURCES[i].name;
+  }
+  return '';
+}
 
-// One shared CoinGecko call, consumed by every page. On failure we retry ONCE
-// after ~3s (transient 429s / ad-block races resolve into a live value more
-// often than not) before falling back to the latest PL_DATA sample — always
+// ═══════ LIVE PRICE SOURCES (multi-source, 2026-09-29) ═══════
+// Until 2026-09-29 the site asked one provider, CoinGecko's keyless
+// /simple/price. At 06:42 UTC that day CoinGecko began refusing keyless
+// requests (HTTP 403 "Request blocked" or 429; a browser sees a CORS failure),
+// and every page fell back to the latest PL_DATA sample. One provider was a
+// single point of failure for every "today" on the site.
+//
+// The fetch now walks this ordered list and takes the FIRST sane answer. Every
+// entry is keyless, sends CORS headers a browser accepts from this origin (each
+// was tested from lastcoinstanding.com on 2026-09-29), and quotes BTC in USD:
+//   Coinbase      — spot price (data.amount, a string)
+//   Kraken        — last trade on XBT/USD (result.<pair>.c[0], a string)
+//   mempool.space — its USD price index (USD, a number)
+//   CoinGecko     — kept LAST in case it reopens to keyless requests
+// Tested and NOT usable from a browser (no CORS header or blocked): Bitstamp,
+// CryptoCompare, Bitfinex. Order is reliability first; the sources differ from
+// one another by a few hundredths of a percent, well inside any readout's
+// rounding. A normal page load makes ONE request (Coinbase), and the
+// sessionStorage cache below keeps it to one per 10 minutes per tab.
+var LCS_PRICE_SOURCES = [
+  { id: 'coinbase', name: 'Coinbase',
+    url: 'https://api.coinbase.com/v2/prices/BTC-USD/spot',
+    pick: function(d){ return (d && d.data && d.data.currency === 'USD') ? parseFloat(d.data.amount) : NaN; } },
+  { id: 'kraken', name: 'Kraken',
+    url: 'https://api.kraken.com/0/public/Ticker?pair=XBTUSD',
+    pick: function(d){
+      if (!d || (d.error && d.error.length) || !d.result) return NaN;
+      for (var k in d.result) {
+        var t = d.result[k];
+        if (t && t.c && t.c.length) return parseFloat(t.c[0]);
+      }
+      return NaN;
+    } },
+  { id: 'mempool', name: 'mempool.space',
+    url: 'https://mempool.space/api/v1/prices',
+    pick: function(d){ return d ? d.USD : NaN; } },
+  { id: 'coingecko', name: 'CoinGecko',
+    url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+    pick: function(d){ return d && d.bitcoin ? d.bitcoin.usd : NaN; } }
+];
+// Per-source wait before moving to the next one (a hung request must not hold
+// the page on the fallback). Generous enough for a slow mobile connection.
+var LCS_PRICE_SOURCE_TIMEOUT_MS = 5000;
+// Which source supplied TODAY_PRICE ('coinbase' | 'kraken' | … ; null when the
+// price is the seed or the fallback). Read it through todayPriceProviderName().
+var TODAY_PRICE_PROVIDER = null;
+
+// Sanity bound: a quote is accepted only if it is a finite positive number
+// within 0.1×–10× of the latest PL_DATA sample. That rejects a malformed or
+// mis-scaled answer (cents, sats, zero) while leaving room for any real move
+// between monthly refreshes — bitcoin has never moved 10× in a month.
+function lcsSanePrice(p){
+  var ref = PL_DATA[PL_DATA.length - 1][1];
+  return typeof p === 'number' && isFinite(p) && p > 0 && p >= ref * 0.1 && p <= ref * 10;
+}
+
+// One shared fetch, consumed by every page. It tries each source in order,
+// moving on after an error, a non-OK status, an unparseable body, an insane
+// value or the per-source timeout. If every source fails it waits ~3s and runs
+// the list ONCE more (a network blip at page load resolves into a live value
+// more often than not), then falls back to the latest PL_DATA sample — always
 // fresh after the monthly refresh — rather than a separately-maintained
-// constant that can drift on its own. onResult(price, source) where source is
-// 'live' | 'fallback'; the retry simply calls back late with 'live'.
+// constant that can drift on its own. onResult(price, source, provider) where
+// source is 'live' | 'fallback' and provider is a LCS_PRICE_SOURCES id (null on
+// fallback). Consumers that only read (price, source) are unaffected.
 //
 // ═══ sessionStorage cache + in-flight dedupe (Channel Ribbon rider, 2026-07) ═══
 // The ribbon (base.njk, every page) made the live-price path a per-PAGEVIEW
-// consumer, so a naive site now hits CoinGecko once per page navigation and,
-// on chart pages that ALSO call this from page_scripts, twice per load. Two
-// guards keep the network contract polite without touching the retry/fallback/
-// source semantics above:
-//   1. Cross-page cache (sessionStorage, ~10-min TTL): stores {price,source,ts}.
-//      A FRESH 'live' value short-circuits with zero network — so navigating N
-//      pages in one tab is one fetch. A cached 'fallback' is NEVER short-
-//      circuited: it must not mask a later successful live fetch (QA §3), so an
-//      expired-or-fallback cache always re-attempts the network. An expired
-//      'live' also refetches.
+// consumer, so a naive site would fetch once per page navigation and, on chart
+// pages that ALSO call this from page_scripts, twice per load. Two guards keep
+// the network contract polite without touching the retry/fallback/source
+// semantics above:
+//   1. Cross-page cache (sessionStorage, ~10-min TTL): stores
+//      {price,source,ts,provider}. A FRESH 'live' value short-circuits with zero
+//      network — so navigating N pages in one tab is one fetch. A cached
+//      'fallback' is NEVER short-circuited: it must not mask a later successful
+//      live fetch (QA §3), so an expired-or-fallback cache always re-attempts
+//      the network. An expired 'live' also refetches.
 //   2. Same-page in-flight dedupe (window-scoped queue): the ribbon and a
 //      chart page's own call fire near-simultaneously on first load; both would
 //      miss the not-yet-written cache and each start a request. The queue lets
@@ -152,6 +242,7 @@ function todayPriceNote(source){ return source === 'live' ? '' : ' (latest month
 // Cache key + TTL are documented in SITE_GUIDE's live-price section.
 var LCS_PRICE_CACHE_KEY = 'lcs.todayPrice';
 var LCS_PRICE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+var LCS_PRICE_FALLBACK_MEMO_MS = 60 * 1000; // same-page fallback memo, see (1b)
 
 function lcsReadPriceCache(){
   try {
@@ -165,23 +256,48 @@ function lcsReadPriceCache(){
   } catch (e) { /* private mode / disabled storage — behave as uncached */ }
   return null;
 }
-function lcsWritePriceCache(price, source){
+function lcsWritePriceCache(price, source, provider){
   try {
     sessionStorage.setItem(LCS_PRICE_CACHE_KEY,
-      JSON.stringify({ price: price, source: source, ts: Date.now() }));
+      JSON.stringify({ price: price, source: source, ts: Date.now(), provider: provider || null }));
   } catch (e) { /* storage unavailable — cache is a best-effort optimization */ }
+}
+
+// GET one source as JSON, aborting after `ms`. Resolves with the parsed body;
+// rejects on a network/CORS error, a non-OK status, a bad body or the timeout.
+function lcsFetchJson(url, ms){
+  var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, ms) : null;
+  var opts = ctrl ? { cache: 'no-store', signal: ctrl.signal } : { cache: 'no-store' };
+  return fetch(url, opts)
+    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(d){ if (timer) clearTimeout(timer); return d; },
+          function(e){ if (timer) clearTimeout(timer); throw e; });
 }
 
 function fetchTodayPrice(onResult){
   var fallback = PL_DATA[PL_DATA.length - 1][1];
-  var URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd';
 
   // (1) Fresh 'live' cache → no network. Fallback caches deliberately fall
-  // through so a later live fetch is never masked.
+  // through so a later live fetch is never masked. A cached value that fails
+  // today's sanity bound (a refresh moved the reference) is treated as absent.
   var cached = lcsReadPriceCache();
-  if (cached && cached.source === 'live' && (Date.now() - cached.ts) < LCS_PRICE_TTL_MS) {
+  if (cached && cached.source === 'live' && (Date.now() - cached.ts) < LCS_PRICE_TTL_MS && lcsSanePrice(cached.price)) {
     TODAY_PRICE = cached.price;
-    if (onResult) onResult(cached.price, 'live');
+    TODAY_PRICE_PROVIDER = cached.provider || null;
+    if (onResult) onResult(cached.price, 'live', TODAY_PRICE_PROVIDER);
+    return;
+  }
+
+  // (1b) Same-page fallback memo: if this page load already walked every
+  // source and fell back less than a minute ago, answer with the fallback
+  // again rather than re-walking the list for each lazily-built consumer (the
+  // Gallery builds its charts on scroll; each asks for the price). A new page
+  // load — or a later call on a long-lived page — tries the network again, so
+  // the sessionStorage rule above (a fallback never masks a later live fetch)
+  // still holds across pages.
+  if (window.__lcsPriceFallbackTs && (Date.now() - window.__lcsPriceFallbackTs) < LCS_PRICE_FALLBACK_MEMO_MS) {
+    if (onResult) onResult(fallback, 'fallback', null);
     return;
   }
 
@@ -189,29 +305,44 @@ function fetchTodayPrice(onResult){
   // queue this caller's callback instead of starting a second request.
   if (window.__lcsPriceQueue) { if (onResult) window.__lcsPriceQueue.push(onResult); return; }
   window.__lcsPriceQueue = onResult ? [onResult] : [];
-  function flush(price, source){
+  // Each waiting caller is called in its own try, so one consumer that throws
+  // cannot starve the others (or, as before 2026-09-29, re-enter the fetch).
+  function flush(price, source, provider){
     var q = window.__lcsPriceQueue; window.__lcsPriceQueue = null;
-    if (q) for (var i = 0; i < q.length; i++) { if (q[i]) q[i](price, source); }
+    if (q) for (var i = 0; i < q.length; i++) {
+      if (q[i]) { try { q[i](price, source, provider); } catch (e) { if (window.console) console.error(e); } }
+    }
   }
 
-  function done(retriesLeft){
-    if (retriesLeft > 0) { setTimeout(function(){ attempt(retriesLeft - 1); }, 3000); }
-    else { lcsWritePriceCache(fallback, 'fallback'); flush(fallback, 'fallback'); }
-  }
-  function attempt(retriesLeft){
-    fetch(URL, { cache: 'no-store' })
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        var p = d && d.bitcoin && d.bitcoin.usd;
-        if (typeof p === 'number' && isFinite(p) && p > 0) {
+  // (3) Walk the sources in order; the first sane answer wins.
+  function trySource(i, passesLeft){
+    if (i >= LCS_PRICE_SOURCES.length) {
+      if (passesLeft > 0) { setTimeout(function(){ trySource(0, passesLeft - 1); }, 3000); }
+      else {
+        TODAY_PRICE_PROVIDER = null;
+        window.__lcsPriceFallbackTs = Date.now();
+        lcsWritePriceCache(fallback, 'fallback', null);
+        flush(fallback, 'fallback', null);
+      }
+      return;
+    }
+    var src = LCS_PRICE_SOURCES[i];
+    var next = function(){ trySource(i + 1, passesLeft); };
+    var p;
+    try {
+      lcsFetchJson(src.url, LCS_PRICE_SOURCE_TIMEOUT_MS).then(function(d){
+        try { p = src.pick(d); } catch (e) { p = NaN; }
+        if (lcsSanePrice(p)) {
           TODAY_PRICE = p;
-          lcsWritePriceCache(p, 'live');
-          flush(p, 'live');
-        } else { done(retriesLeft); }
-      })
-      .catch(function(){ done(retriesLeft); });
+          TODAY_PRICE_PROVIDER = src.id;
+          window.__lcsPriceFallbackTs = null;
+          lcsWritePriceCache(p, 'live', src.id);
+          flush(p, 'live', src.id);
+        } else { next(); }
+      }, next);
+    } catch (e) { next(); } // fetch unavailable or threw synchronously
   }
-  attempt(1); // 1 retry: two total attempts, then the honest fallback
+  trySource(0, 1); // one full pass, one retry pass, then the honest fallback
 }
 
 // ═══════ YEAR-ALIGNED TIME AXIS TICKS (shared, 2026-08-22) ═══════

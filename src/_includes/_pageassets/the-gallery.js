@@ -459,7 +459,7 @@
         buildChart();
 
         // First-paint status from seeded TODAY_PRICE (so the live ribbon
-        // is never empty even before the CoinGecko fetch resolves).
+        // is never empty even before the live fetch resolves).
         if (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) {
           updateStatus(TODAY_PRICE, 'seed');
         }
@@ -470,9 +470,12 @@
         // PL_DATA's last sample and today — see buildDatasets which
         // weekly-interpolates the gap so 'index' tooltip mode has a
         // historical value to show at every hover x).
+        // The status label follows the resolved source (2026-09-29: it was
+        // hardwired to 'live', so a failed fetch read "Today (live)" beside
+        // the fallback price).
         if (typeof fetchTodayPrice === 'function') {
-          fetchTodayPrice(function(price /*, source */){
-            updateStatus(price, 'live');
+          fetchTodayPrice(function(price, source){
+            updateStatus(price, source);
             if (!chartInstance || !chartInstance.data) return;
             var todayDs = chartInstance.data.datasets[4];
             if (todayDs && todayDs.data && todayDs.data[0]) {

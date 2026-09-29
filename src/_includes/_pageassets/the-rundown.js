@@ -342,8 +342,12 @@
     // "implications for your situation" leans forward — what the record
     // predicts — and the page's spine is what a position HAS MEANT. Past
     // tense, second person, no forward claim.
+    // On fallback the price is the latest sample's, not today's, so the lead
+    // names that price rather than dating the sentence today (2026-09-29).
+    var lead = todayPriceIsLive(priceSource) ? ('As of ' + houseDate())
+                                             : ('At its ' + lastSampleDateLong() + ' price');
     setHTML('rdStandfirst',
-      '<span>As of ' + houseDate() + ', bitcoin is at <strong>' + mult.toFixed(2) + '&times;</strong> its long-run trend. ' +
+      '<span>' + lead + ', bitcoin is at <strong>' + mult.toFixed(2) + '&times;</strong> its long-run trend. ' +
       'What has a position like this meant for <em>your</em> situation?</span>');
   }
 
@@ -356,7 +360,7 @@
 
     // ── Cards 1 and 2 — the pair, so the multiple is checkable by eye.
     setHTML('rdHdrPrice', fmtUSD(spot));
-    setText('rdHdrPriceSub', todayPriceIsLive(priceSource) ? 'live' : 'latest monthly data');
+    setText('rdHdrPriceSub', todayPriceIsLive(priceSource) ? 'live' : todayPriceAsOf());
     setHTML('rdHdrTrend', fmtUSD(plPrice(TODAY_DAYS)));
 
     // ── Card 3 — position, with the gap spelled out in the reader's terms.
@@ -410,7 +414,8 @@
     // The date replaces "Today" for the same reason it does in the standfirst:
     // a screenshot of "Today (live)" carries no information about when.
     setHTML('rdProv',
-      houseDate() + ' (' + (todayPriceIsLive(priceSource) ? 'live' : 'latest monthly data') + ')' +
+      (todayPriceIsLive(priceSource) ? houseDate() + ' (live)'
+                                     : 'Price as of ' + lastSampleDateLong() + ' (live price unavailable)') +
       ' &middot; trend from the shared ' +
       '<a href="/the-power-law">Power Law module</a>' +
       '<span class="help-tip" tabindex="0">?<span class="tip-content">' +

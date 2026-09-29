@@ -172,7 +172,7 @@
     var ddEl = document.getElementById('bbLiveDD');
     if (ddEl) ddEl.textContent = sgnPct(fromPeakPct);
     var priceEl = document.getElementById('bbLivePrice');
-    if (priceEl) priceEl.innerHTML = 'now ' + usd(price) + ' vs ' + usdK(peak) + ' peak' + (todayPriceIsLive(source) ? '' : ' <span style="opacity:.7">(latest monthly data)</span>');
+    if (priceEl) priceEl.innerHTML = 'now ' + usd(price) + ' vs ' + usdK(peak) + ' peak' + (todayPriceIsLive(source) ? '' : ' <span style="opacity:.7">(' + todayPriceAsOf() + ')</span>');
 
     var daysEl = document.getElementById('bbLiveDays');
     if (daysEl) daysEl.textContent = Math.round(daysIn);

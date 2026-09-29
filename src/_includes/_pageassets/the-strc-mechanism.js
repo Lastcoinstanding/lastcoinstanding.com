@@ -11,7 +11,7 @@
    Data architecture — two freshness classes (design doc §data):
      • LIVE-COMPUTED from bitcoin spot: the three coverage ratios and
        their breakevens, and the bitcoin-reversion overlay. Bitcoin
-       spot comes from the shared CoinGecko fetch (fetchTodayPrice /
+       spot comes from the shared live-price fetch (fetchTodayPrice /
        todayPriceIsLive, shared/power-law-data.js), the same one every
        chart page uses.
      • DATED CONSTANTS: the single STRC_DATA object below, refreshed on
@@ -19,8 +19,8 @@
        as-of badge; nothing dated is presented as live.
 
    STRC price is a DATED CONSTANT (last close), reader-adjustable in the
-   lens — it is NOT the CoinGecko value. Bitcoin spot (CoinGecko) drives
-   coverage and the bitcoin overlay only. The two prices never mix.
+   lens — it is NOT a live quote. Bitcoin spot (the shared live fetch)
+   drives coverage and the bitcoin overlay only. The two prices never mix.
 
    Guardrails (design doc §5, structural not cosmetic):
      • "Estimated:" on every projected figure; no buy zones, no verdicts.
@@ -238,7 +238,7 @@
     var dot = document.getElementById('sbLiveDot');
     if (dot) dot.hidden = !live;
     var spot = (btcSpot != null ? btcSpot : TODAY_PRICE);
-    setHTML('sbStatusMeta', (live ? 'Bitcoin spot (live): ' : 'Bitcoin spot (latest monthly data): ')
+    setHTML('sbStatusMeta', (live ? 'Bitcoin spot (live): ' : 'Bitcoin spot (' + todayPriceAsOf() + '): ')
       + moneyK(spot) + ' · STRC at ' + money2(p) + ' is ' + (p < PAR ? 'a ' + Math.round((1 - p / PAR) * 100) + '% discount to par' : p > PAR ? 'a ' + Math.round((p / PAR - 1) * 100) + '% premium to par' : 'at par') + '. Coverage recomputed every load.');
   }
 

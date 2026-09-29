@@ -1482,12 +1482,16 @@
         pctEl.textContent = Math.round(pct) + '%';
       }
     }
-    if (source === 'fallback') {
-      priceEl.title = 'Live price fetch failed; showing fallback value.';
-    }
+    // Dated provenance beside the price when it is not live (2026-09-29: the
+    // line read "Today: $X" on a fallback price, with only a hover title).
+    var noteEl = document.getElementById('statusPriceNote');
+    if (noteEl) noteEl.textContent = todayPriceNote(source);
+    priceEl.title = (source === 'live')
+      ? ''
+      : 'Live price unavailable \u2014 showing the most recent price in the site\u2019s data (' + lastSampleDateLong() + ').';
   }
   function fetchLiveBtcPrice() {
-    // Shared helper: one CoinGecko call + consistent fallback site-wide.
+    // Shared helper: one live fetch + consistent fallback site-wide.
     fetchTodayPrice(function(price, source){
       updateStatusLine(price, source);
       scheduleRender();

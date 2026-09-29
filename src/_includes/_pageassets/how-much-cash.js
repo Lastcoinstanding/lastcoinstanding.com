@@ -539,7 +539,7 @@
   function renderPos(c) {
     var el = document.getElementById('hcPosReadout'); if (!el) return;
     el.innerHTML = '<strong>' + c.mult.toFixed(2) + '×</strong> trend · <em>' + positionLabel(c.pos) + '</em> · ' +
-      (c.isToday ? 'today' + todayPriceNote(_priceSource) : 'at this position') + ' · ' + usdFull(c.P);
+      (c.isToday ? (todayPriceIsLive(_priceSource) ? 'today' : 'at the ' + lastSampleDateShort() + ' price') : 'at this position') + ' · ' + usdFull(c.P);
   }
 
   // Provenance caption beneath the card row.
@@ -568,7 +568,7 @@
     var lp = livePos(), ty = curveYAt(lp, c);
     if (ty == null) { el.innerHTML = 'Median bitcoin back per bitcoin sold, by channel position, after ' + c.tax + '% tax.'; return; }
     var live = todayPriceIsLive(_priceSource);
-    el.innerHTML = (live ? 'The glowing point is <strong>today</strong>' : 'The dot is <strong>today</strong> (latest monthly data)') +
+    el.innerHTML = (live ? 'The glowing point is <strong>today</strong>' : 'The dot is <strong>today&rsquo;s position</strong> at the ' + lastSampleDateShort() + ' price') +
       ' &mdash; ' + ratioOf(lp).toFixed(2) + '× trend · ' + positionLabel(lp) + ', where the median round trip returns about <strong>' +
       ty.toFixed(2) + '×</strong> per bitcoin sold after ' + c.tax + '% tax. Above the breakeven line the trim earns bitcoin; below it, it costs it.';
   }

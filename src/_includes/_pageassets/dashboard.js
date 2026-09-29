@@ -136,9 +136,12 @@
   var trendTick = $('dashPosTrendTick'); if (trendTick) trendTick.style.left = posTrendPct + '%';
   var trendLab = document.querySelector('.dash-posbar-lab-trend'); if (trendLab) trendLab.style.left = posTrendPct + '%';
 
-  // Last PL_DATA sample date — the fallback provenance for the price tile.
-  var lastSampleDate = fmtMonthYear(PL_DATA[PL_DATA.length - 1][0]);
-  try { lastSampleDate = new Date((GENESIS_TS + PL_DATA[PL_DATA.length - 1][0] * 86400) * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) {}
+  // Last PL_DATA sample date — the fallback provenance for the price tile. In
+  // UTC, from the shared helper: the day index counts UTC days, so a local-time
+  // format showed a US reader the day before (2026-09-29: "September 11" for
+  // the 12 September sample).
+  var lastSampleDate = (typeof lastSampleDateLong === 'function') ? lastSampleDateLong() : fmtMonthYear(PL_DATA[PL_DATA.length - 1][0]);
+  var lastSampleShort = (typeof lastSampleDateShort === 'function') ? lastSampleDateShort() : lastSampleDate;
 
   // ── IMPLIED REVERSION RATE — reads shared/reversion-durations.js, the same
   //    scan Discount-or-Premium and the Rundown use, on the EPISODE basis. ──
@@ -284,12 +287,19 @@
   function render(price, source) {
     var live = (typeof todayPriceIsLive === 'function') ? todayPriceIsLive(source) : (source === 'live');
 
-    // PRICE — badge (canon: date always; "(live)" only on a real fetch) + dynamic derivation line
+    // PRICE — badge (canon: date always, and it is the date of the price shown;
+    // "(live)" only on a real fetch) + dynamic derivation line naming the source.
     setText('dashPrice', usd0(price));
-    var badge = (typeof todayPriceLabel === 'function') ? todayPriceLabel(source) : (live ? 'Today (live)' : 'Today (latest monthly data)');
-    var today = ''; try { today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) {}
-    setText('dashPriceLabel', today ? (badge + ' · ' + today) : badge);
-    setText('dashPriceDeriv', live ? 'Fetched live on page load.' : ('Live fetch unavailable — showing the latest sample (' + lastSampleDate + ').'));
+    if (live) {
+      var today = ''; try { today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) {}
+      var badge = (typeof todayPriceLabel === 'function') ? todayPriceLabel(source) : 'Today (live)';
+      setText('dashPriceLabel', today ? (badge + ' · ' + today) : badge);
+      var prov = (typeof todayPriceProviderName === 'function') ? todayPriceProviderName() : '';
+      setText('dashPriceDeriv', 'Live price' + (prov ? ' from ' + prov : '') + ', fetched within the last 10 minutes.');
+    } else {
+      setText('dashPriceLabel', 'Price as of ' + lastSampleDate);
+      setText('dashPriceDeriv', 'Live price unavailable — showing the most recent price in the site’s data. Reload to try again.');
+    }
     var priceTile = $('dashPriceTile'); if (priceTile) priceTile.classList.toggle('is-live', !!live);
 
     if (price > 0) {
@@ -337,13 +347,13 @@
       setText('dashMult', mult.toFixed(2));
       if (typeof positionLabel === 'function') setText('dashZone', positionLabel(pos));
       var marker = $('dashPosMarker'); if (marker) marker.style.left = (clamp01(pos) * 100) + '%';
-      setText('dashPosProv', (live ? 'live spot' : 'latest sample') + ' ÷ trend');
+      setText('dashPosProv', (live ? 'live price' : lastSampleShort + ' price') + ' ÷ trend');
       var posTile = $('dashPosTile'); if (posTile) posTile.classList.toggle('is-live', !!live);
       carryPos(pos);
     }
   }
 
-  // First paint from the seeded TODAY_PRICE (latest sample → not live), then the live fetch.
+  // First paint from the seeded TODAY_PRICE (the latest sample → not live), then the live fetch.
   if (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) render(TODAY_PRICE, 'fallback');
   if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function (p, source) { render(p, source); });
 })();

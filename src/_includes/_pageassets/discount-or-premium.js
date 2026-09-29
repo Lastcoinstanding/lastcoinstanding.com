@@ -26,7 +26,8 @@
        row reads ~0 rather than manufacturing drama at the boundary.
      • The at-the-floor line renders only while m <= PL_FLOOR*1.05 and
        removes itself when the state changes.
-     • Fallback prices are labelled "latest monthly data", never "live".
+     • Fallback prices are labelled with their date ("as of Sep 12"), never
+       "live" (dated 2026-09-29; it read "latest monthly data" before).
    ============================================================= */
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
@@ -130,7 +131,7 @@
       elPriceSub.textContent = hypothetical() ? 'A position you supplied — not the market price today.'
         : todayPriceIsLive(liveSource)
         ? 'Live spot price.'
-        : 'Latest monthly data — the live fetch did not resolve.';
+        : 'Price as of ' + lastSampleDateShort() + ' — the live price did not load.';
     }
 
     if (elMultSub) {
@@ -167,7 +168,7 @@
     }
 
     if (elMeta) {
-      elMeta.textContent = (hypothetical() ? 'Hypothetical: ' : todayPriceIsLive(liveSource) ? 'Live: ' : 'Latest monthly data: ')
+      elMeta.textContent = (hypothetical() ? 'Hypothetical: ' : todayPriceIsLive(liveSource) ? 'Live: ' : 'As of ' + lastSampleDateShort() + ': ')
         + moneyFull(p) + ' · ' + m.toFixed(2) + '× trend · recomputed every page load.';
     }
 

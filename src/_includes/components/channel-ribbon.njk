@@ -11,7 +11,8 @@
   — a pulse dot (live-gated), the live trend multiple, the canonical channel
   zone word (positionLabel), and the spot price, closing with a "see the
   dashboard →" call to action. On live-fetch fallback the dot goes static and a
-  register suffix " · latest monthly data" is appended.
+  dated register suffix (" · as of Sep 12" — the day the fallback price is from)
+  is appended.
 
   TWO LINKS (dual-link refinement 2026-08-11). The data + primary CTA form one
   link to /dashboard — the destination-grade version of this read (the ribbon IS
@@ -50,10 +51,12 @@
     <span class="cr-metric cr-zone">&mdash;</span>
     <span class="cr-sep" aria-hidden="true">&middot;</span>
     <span class="cr-metric cr-price">&mdash;</span>
-    {#- Register suffix shown only on live-fetch fallback; JS toggles [hidden].
-        Wording matches the shared todayPriceLabel/todayPriceNote helpers'
-        "latest monthly data" so the ribbon can't drift from the page readouts. -#}
-    <span class="cr-register" hidden>&nbsp;&middot; latest monthly data</span>
+    {#- Register suffix shown only on live-fetch fallback; JS toggles [hidden]
+        and writes the text from the shared todayPriceAsOf() helper (" · as of
+        Sep 12"), the same date the todayPriceLabel/todayPriceNote helpers use,
+        so the ribbon can't drift from the page readouts. The static text below
+        is only a placeholder for the moment before the script runs. -#}
+    <span class="cr-register" hidden>&nbsp;&middot; not live</span>
     {#- Zone divider — the quiet wall between the DATA zone and the LINK zone.
         Replaces the middot that used to sit here: a middot read as "another
         item in the list", which is exactly wrong now that what follows is a
