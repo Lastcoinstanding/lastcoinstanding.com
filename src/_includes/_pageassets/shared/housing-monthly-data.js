@@ -7,7 +7,7 @@
    two-month lag), and each series carries its latest value forward until
    the next refresh appends a month.
 
-   CS_NATIONAL   S&P CoreLogic Case-Shiller U.S. National Home Price Index,
+   CS_NATIONAL   S&P Cotality Case-Shiller U.S. National Home Price Index,
                  NSA, monthly (FRED CSUSHPINSA). The house grows by this index
                  from the start year's median price (M11).
    ZORI_US       Zillow Observed Rent Index, United States, all homes plus
