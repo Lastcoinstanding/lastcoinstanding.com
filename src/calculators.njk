@@ -79,9 +79,8 @@ eleventyComputed:
                    of the block = tile rendered here.
 
    ─── Tech debt ─────────────────────────────────────────────────────
-   - SP500_TR_DATA is duplicated between calculators-minis.js and
-     bitcoin-vs-the-stock-market.js. Marked 'TR-SYNC' in both files.
-     Future cleanup: extract to shared/comparator-data.js.
+   - (Resolved 2026-09-16) SP500_TR_DATA and NDQ_TR_DATA now live once, in
+     shared/tr-comparator-data.js; refresh that file only (MONTHLY_REFRESH_CHECKLIST §1).
 ═══════════════════════════════════════════════════════════════════ #}
 
 <main class="calculators-page">

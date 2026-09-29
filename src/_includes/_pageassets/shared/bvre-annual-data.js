@@ -28,7 +28,7 @@
    Annual refresh: at year-end, append the new year's median home
    price to homeData and the year's BTC average to btcData. This is
    the ONLY place either value lives. MONTHLY_REFRESH_CHECKLIST.md
-   §7 documents the annual cadence.
+   §11 (Annual — January) documents the annual cadence.
 
    Naming: lowercase `homeData` / `btcData` preserves BvRE's
    existing convention (the original site of both arrays). The

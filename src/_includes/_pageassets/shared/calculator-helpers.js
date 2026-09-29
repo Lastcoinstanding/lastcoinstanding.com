@@ -113,16 +113,18 @@
    * ──────────────────────────────────────────────────────────────────────
    * Precomputed sorted distribution of (price ÷ Power-Law-trend-price) ratios
    * across BTC's daily-close history (12-day-spaced sample, 477 points,
-   * spanning days 592 → 6304 since Genesis ≈ 2010-08 → 2026-05). Sampled at
+   * spanning days 592 → 6304 since Genesis ≈ 2010-08-18 → 2026-04-08). Sampled at
    * every 2nd percentile for compactness. Used by the Bitcoin Retirement
    * status line to surface where current price sits in the historical
    * distribution.
    *
-   * Regenerate when PL_DATA in the-power-law.js changes:
+   * Regenerate when PL_DATA (shared/power-law-data.js) gains samples —
+   * MONTHLY_REFRESH_CHECKLIST §9.8; scripts/data-freshness.py reads the
+   * "spanning days" line above, so keep its last day current:
    *   var ratios = PL_DATA.map(d => d[1] / (1.6e-17 * Math.pow(d[0], 5.77)));
    *   ratios.sort((a,b) => a-b);
    *   for (var p = 0; p <= 100; p += 2) {
-   *     emit [p, ratios[Math.floor(ratios.length * p / 100)].toFixed(4)];
+   *     emit [p, ratios[Math.min(ratios.length - 1, Math.floor(ratios.length * p / 100))].toFixed(4)];
    *   }
    *
    * Format: [percentile (0-100), ratio_value_at_that_percentile].

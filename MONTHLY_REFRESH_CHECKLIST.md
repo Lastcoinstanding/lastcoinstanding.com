@@ -1,19 +1,108 @@
 # Monthly Refresh Checklist — Last Coin Standing
 
 A list of values, strings, and data points that go stale over time and need
-periodic refresh. The site does not auto-fetch live market data today (a
-deliberate choice — see "Why not live fetch" below); these values live as
-hardcoded constants and date strings across the codebase. Running this
-checklist once a month keeps pages internally consistent with the actual
-market state and the as-of dates the page presents to the reader.
+periodic refresh. The bitcoin price is fetched live at page load (see "Live BTC
+price fetch" near the end); everything else here is stored in the source, as
+data series, dated constants and date strings, and goes stale unless someone
+updates it. Running this checklist once a month keeps pages internally
+consistent with the actual market state and the as-of dates the page presents
+to the reader.
 
-Most items are monthly. A few are **per-commit** (Recent Updates strip
-on the homepage) or **annual** (Demographia dataset) — the relevant cadence
-is flagged in each section header.
+**§0 is the complete inventory**, by cadence: monthly, quarterly, semiannual,
+annual and event-driven. Start there, and start each refresh by running
+`python3 scripts/data-freshness.py`. The numbered sections below it hold the
+method for each item.
 
 This list will grow over time as the site adds pages with time-sensitive
-content. When you add a new page that bakes in a TODAY constant or an
-as-of date string, add it here in the same commit.
+content. When you add a new page that bakes in a data series, a dated figure or
+an as-of date string, add its row to §0 (and a section if the method isn't
+obvious) in the same commit.
+
+---
+
+## 0. Refresh inventory: everything that goes out of date, and when
+
+_Added 2026-09-29 after a full-site audit (58 pages; the record is TECH_DEBT "Refresh audit 2026-09-29")._ The Is Bitcoin a Bubble? chart went six months without an update because no section listed it. This inventory is the complete list, so nothing depends on memory. Each row points to the section with the method. **When you add a page, a data series or a dated figure, add its row here in the same commit.**
+
+**Start every refresh with the report:**
+
+```bash
+python3 scripts/data-freshness.py            # or: ... 2026-10-15 to run as if on that date
+```
+
+It reads every data series, dated block and dated string straight from the source and marks each one OK, DUE or OVERDUE against its cadence. It covers what can be checked mechanically. The rows below marked *(judgement)* are not in the report: prose that describes the present, legal status, and event-driven copy.
+
+### 0.1 Monthly
+
+| What | Where | Source | § |
+|---|---|---|---|
+| Power Law price series `PL_DATA` (also the live-price fallback) | `shared/power-law-data.js` | daily close | §1 |
+| Equity comparators `SP500_TR_DATA`, `NDQ_TR_DATA` (Day-28 rows) | `shared/tr-comparator-data.js` | Yahoo `^SP500TR`, QQQ adjusted close | §1 |
+| Bitcoin month-end closes `BTC_MONTHLY` | `shared/btc-monthly-data.js` | Yahoo BTC-USD | §1 |
+| Values computed once from `PL_DATA` and stored: `TREND_RATIO_PERCENTILES`; Disciplined Rebalancing's percentile table; What Daily Conviction Bought's FAQ and meta figures; the hurdle-rate meta line; Allocation Sizing's "about 0.44× today" tooltip | several | recompute from `PL_DATA` | §9.8 |
+| As-of callouts, captions and hand-typed callout values (Bitcoin vs. the Stock Market §1/§3 and its "Through August 2026" returns; the Horizon's "through August 2026") | several `.njk` | recompute | §3, §4 |
+| Case-Shiller, Zillow rents and values | `shared/housing-monthly-data.js` | FRED, Zillow | §9.4 |
+| Is Bitcoin a Bubble? weekly line `BTC_DATA_2014` | `not-a-bubble.js` | Yahoo, Sunday closes | §9.7 |
+| Strategy at a glance (Fixed Income Tab II) | `bitcoin-fixed-income.njk` / `.js` | 8-K | §7 |
+| Fixed Income beyond the card: Tab III "Where we are now", every STRC rate mention, path rates, the Tab II table, runway and reserve | `bitcoin-fixed-income.njk` / `.js` | 8-K, Strategy IR | §7.1 |
+| `STRC_DATA`, the reserve's months-of-dividends figure, the episode decision | `the-strc-mechanism.js` / `.njk` | 8-K | §7.5 |
+| STRC daily close (automatic; check the Action ran) | `src/_data/strcClose.json` | GitHub Action | §7.6 |
+| `YIELD_RATES` and the rental page's dated rates | `shared/real-estate-model.js`, `bitcoin-vs-rental-property.njk` | FRED, DefiLlama, issuers | §9.3a |
+| Metcalfe ETF-era figures | `bitcoin-and-metcalfes-law.njk` | ETF trackers, Coin Metrics | §9 |
+| Regulatory status lines (CLARITY Act etc.) on Bull & Bear and Bitcoin as Collateral *(judgement)* | `.njk` | Congress.gov, press | §2, §3 |
+| How Much Bitcoin? risk-free rate (move it at ±50bp) | `how-much-bitcoin.njk` / `.js` | FRED `DTB3` | §3 |
+| Bitcoin as Collateral loan table and its "as of" | `bitcoin-as-collateral.njk` | lender pages | §3, §8.6 |
+| Cross-page agreement: Strategy's BTC count, the STRC rate, reserve figures | BFI, STRC page, rental page | 8-K | §0.7 |
+| The live price loads | `/dashboard` | — | §5 step 7 |
+| Product-forward OG cards | `scripts/build-og-images.py` | — | §6 |
+| Search Console sweep; GA4 notes | — | — | §9.5, §9.6 |
+| Claude project mirror | project docs | repo | §10 |
+
+### 0.2 Quarterly
+
+| What | Where | § |
+|---|---|---|
+| Institutional guidance citations (How Much Bitcoin?) | `how-much-bitcoin.njk` | §8 |
+| Copy-tell drift re-grep | site-wide | §8.5 |
+| Bitcoin as Collateral: the record | `bitcoin-as-collateral.njk` | §8.6 |
+| Metcalfe pinned weekly series `METCALFE_SERIES` | `bitcoin-and-metcalfes-law-data.js` | §9 |
+| The Doubling Ladder series (`DEVIATION`, `MONTHLY_HIGH`, rung crossings) and the checksum figures in its text | `the-doubling-ladder.js` / `.njk` | §9.9 |
+| Rates, fees and product terms quoted in prose (lenders, cards, mortgages, savings rates, the rental page's reference rates) *(judgement)* | several | §9.10 |
+| Market-structure facts quoted in prose (custody shares, ETF counts, holdings, pool concentration, national debt) *(judgement)* | several | §9.10 |
+
+### 0.3 Semiannual
+
+| What | Where | § |
+|---|---|---|
+| Legal and tax status statements, plus dated deadlines (next: the broker-relief notice ends **2026-12-31**; review Spend and Replace by early December) *(judgement)* | several | §9.11 |
+| DATA_AUDIT rows whose "Next due" has arrived (the report lists them, and those due within 30 days as SOON) | `DATA_AUDIT.md` | the row |
+| Real-estate price, rent and cost defaults | `bitcoin-vs-real-estate.*`, `bitcoin-vs-rental-property.*` | §9.3 |
+
+### 0.4 Annual
+
+| When | What | § |
+|---|---|---|
+| January | Annual data (`homeData`, `btcData`, `csData`, `incomeData`, `mortgageRates`) and every year-bounded figure, range, input minimum, axis label and age string (the full list is in §11) | §11 |
+| February | Strategy's return-of-capital classification for the prior year | §7.5 step 6 |
+| May | Demographia affordability (both copies) | Annual: Demographia |
+| November | Power Law exponent survey, with the PL-1 recheck | §1 |
+
+### 0.5 Event-driven
+
+When one of these happens, run its list in §12: a **new all-time high**; the **bear market ends** (a cycle low is confirmed); the **halving** (next about April 2028); a **Strategy capital event** or STRC rate change; **legislation** passing or failing (CLARITY, PARITY, Lummis); a **standing claim** ("never", "every", "no window") that the latest data could falsify, checked at every refresh.
+
+### 0.6 Nothing to refresh (computed at load)
+
+The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, The Bitcoin Floor (its QA is §5.1), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
+
+### 0.7 Cross-page agreement (monthly)
+
+The same fact appears on several pages; after each refresh they must agree:
+
+- **Strategy's bitcoin count:** `BTC_HELD` (`bitcoin-fixed-income.js`) and the Tab II card, `STRC_DATA.btcHoldings`, and the rental page's treasury line and sources list. (On 2026-09-29 they read 845,050, 843,775 and 846,000.)
+- **The STRC dividend rate:** `YIELD_RATES.strc`, `STRC_DATA.rateAnnualPct`, and every rate on Bitcoin Fixed Income (§7.1).
+- **Strategy's USD reserve and dividend bill:** `STRC_DATA.usdReserveB`, Fixed Income Tab III, the rental page's sources.
+- **Standing modelling figures quoted in prose:** the dollar's purchasing-power half-life and M2 growth (The Half-Life, The Fixed Pie, The Bitcoin Migration, What Money Has to Be, Money Trees' `data.json`) should use one set of numbers (TECH_DEBT "Refresh audit 2026-09-29" lists the current disagreement).
 
 ---
 
@@ -289,8 +378,15 @@ stale strings undermine the editorial discipline of the page.
 Grep across the repo to find every instance:
 
 ```bash
-grep -rn "AS OF\|as of\|through mid-\|through late-\|through early-" src/
+grep -rni "as of\|through mid-\|through late-\|through early-\|through [a-z]* 20[0-9][0-9]" src/*.njk
 ```
+
+Case-insensitive on purpose: the case-sensitive version of this grep missed
+"Through August 2026" on Bitcoin vs. the Stock Market (found 2026-09-29).
+`scripts/data-freshness.py` lists every dated string with its age, which is the
+quicker way to see which ones are due. Bitcoin vs. the Stock Market's §1 and §3
+callouts also carry **hand-typed values** (the multiple, the floor and trend
+prices): recompute those, don't just re-date them.
 
 Known patterns to expect:
 
@@ -589,7 +685,7 @@ For each value, verify against the source listed and update in the BFI files as 
 
 | Field | Where it lives | Source to verify against |
 |---|---|---|
-| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,050` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845050`) | CoinGecko `/api/v3/companies/public_treasury/bitcoin` (find Strategy entry by `symbol: "MSTR.US"`). Cross-check against Saylor's latest tweet or Strategy IR page. |
+| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,050` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845050`) | The latest Strategy 8-K (primary). CoinGecko's `/api/v3/companies/public_treasury/bitcoin` was the old shortcut, but CoinGecko began refusing keyless requests on 2026-09-29; use the 8-K and cross-check bitcointreasuries.net or Strategy IR. |
 | **mNAV** | `.njk` (`~0.8&amp;times;`) | SaylorTracker.com headline mNAV figure. Or compute: (MSTR price &times; shares outstanding) &divide; (BTC count &times; BTC price). |
 | **Shares outstanding** | `.njk` (`~384M`) | Latest 10-Q "Diluted shares outstanding" or Yahoo Finance MSTR Statistics page. Basic, all classes. |
 | **ATM issuance** | `.njk` (`Active` value cell + sub-text) | Latest 10-Q ATM disclosures + 8-K announcements for new facilities. Phrase as `Active` or `Paused` with a brief structural note. |
@@ -613,6 +709,19 @@ For each value, verify against the source listed and update in the BFI files as 
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 
+## 7.1. Bitcoin Fixed Income beyond the Tab II card (MONTHLY, from 2026-09-29)
+
+§7 covers the "Strategy at a glance" card only. The rest of the page quotes the same company's figures in about a dozen other places, and on 2026-09-29 they had drifted: Tab III still read June 6 and contradicted the card (it said the ATM was paused, cash ~$900M; the card said Active, ~0.8× mNAV and the reserve was $5.04B), and the page presented STRC at 11.5% after the rate had moved to 12%. Refresh these with §7, from the same filings, in the same commit. Line numbers are as of 2026-09-29.
+
+- **Tab III "Where we are now"** (`bitcoin-fixed-income.njk` ~484–517). It is dated ("As of Friday, June 6, 2026. This snapshot is refreshed monthly") and carries the bitcoin price and its distance from the high, STRC's price and implied yield, SATA's price and rate, the mNAV reading, cash and months of runway, dividend arrears, ATM status and the month's actions. Rewrite it from the latest 8-K and check the weekday matches the date (June 6, 2026 was a Saturday). `scripts/data-freshness.py` reads this date.
+- **Every STRC rate on the page.** The card "11.5–13%" (njk ~87), the table's "Current dividend rate" (~218), the prose at ~160, 172, 245, 373, 388–389 and 773, and `PATHS` in `bitcoin-fixed-income.js` (~76–80; the path buttons are at njk ~604–607). They must equal `YIELD_RATES.strc` and `STRC_DATA.rateAnnualPct` (§0.7). Check the payment frequency wording (monthly or semi-monthly) at ~160, 219 and 235 at the same time.
+- **The Tab II capital-stack table** (njk ~218–227, 243): $7.98B, ~$35.6B, 2.93×, ~44 years, $44–62B, ~$1.08B, 843,738 BTC, and Strive's count.
+- **"As of Q1 2026" capital structure** (njk ~285–361): move to the latest 10-Q when it lands.
+- **Reserve, runway and dividend-bill prose** (njk ~363, 439, 453, 781, 799, 803, 815): these quote a ~$900M reserve and 6.75 months of runway; use the figures in `STRC_DATA` (§7.5).
+- **Present-tense state statements** (njk ~476, 785 "ATM channel has frozen", 795 "has not" crossed 1.0×): rewrite whenever the state they describe changes.
+
+The page's path reference rates (Treasury 4.3%, investment grade 5.5%, M2 6.5%, trend CAGR ~28%; njk ~72–116, 146, 383–390, 773) move slowly; check them quarterly under §9.10.
+
 ## 7.5. The STRC Mechanism — the `STRC_DATA` block (`/the-strc-mechanism.html`)
 
 This page is **deliberately episodic** (design doc `STRC_BELOW_PAR_DESIGN.md` §7; aging-policy comment at the top of `src/the-strc-mechanism.njk`). It examines a live episode — STRC trading below its $100 par — and the monthly refresh does more than update constants: it **decides whether the episode is still live**.
@@ -627,11 +736,12 @@ Each month:
    - `rateAnnualPct` + append any new `rateHistory` row (one row per change; the latest gets the "latest" badge automatically).
    - `priorMonthVWAP` — **populate this.** While `null`, the bracket dial honestly shows "populate at monthly refresh"; once set, the dial computes framework-recommended vs board-did vs posture.
    - `sharesOutstanding` — from the latest 8-K (net of buybacks). The page derives STRC notional from `sharesOutstanding × par` (single source of truth) and cross-checks the filed `claimStack.strcNotionalB`; keep both current so the console reconciliation gap stays small.
-   - `claimStack` (converts, STRF, STRC notional), `btcHoldings`, `usdReserveB` (**the USD reserve** — drives the ~25-months-of-dividends figure), `authRemaining`, and **operating cash flow** if/when it is displayed in the gauge — from the latest balance-sheet filing. These are the fuel-gauge constants and each visibly inherits the on-page "as of" badge, so refresh them **together** and bump `asOf` in the same edit; a stale reserve or op-cashflow figure is the drift JM flagged.
+   - `claimStack` (converts, STRF, STRC notional), `btcHoldings`, `usdReserveB` (**the USD reserve**), `authRemaining`, and **operating cash flow** if/when it is displayed in the gauge — from the latest balance-sheet filing. These are the fuel-gauge constants and each visibly inherits the on-page "as of" badge, so refresh them **together** and bump `asOf` in the same edit; a stale reserve or op-cashflow figure is the drift JM flagged.
    - Append rows to `buybackLog`, `supplyLog`, `fuelLog` for any new disclosed action (append-only; newest last).
+   - **The months-of-dividends figure is typed, not computed** (corrected 2026-09-29; this list used to say `usdReserveB` drives it). "≈ 25 months" appears in `the-strc-mechanism.js` (~56, 349, 351) and the page text (njk ~377, 383), and `RESERVE_IMPLIED_TOTAL_BILL_B` divides the reserve by that same 25 (js ~137). Updating the reserve alone therefore makes the "total preferred bill" grow with the reserve, which is wrong. When the reserve changes, take the annual bill from the filing, recompute months = reserve ÷ (bill ÷ 12), and update the divisor and every "25 months" together. (At the $5.04B reserve of 20 September 2026 and the $1.703B annual interest-plus-dividend bill of 23 August, it is about 35 months; preferred dividends alone would give more.)
 2. **Re-verify the rate** and the dividend mechanics against the 424B5/CoD if anything changed (rate-setting mechanics are load-bearing for the rate lever).
 3. **Re-run the build-verify reconciliation** (design §5): confirm `sharesOutstanding × $100 ≈ strcNotionalB`; recompute the STRC dividend bill from float × rate (do NOT inherit any "$1.2B"/"$1.8B" figure); confirm anything not independently reconciled still carries a visible `verify` badge (currently: the reserve-implied total preferred bill, and the company BTC-breakeven-ARR figure). The console logs the notional gap, the bills, and the coverage breakevens on load — glance at them.
-4. **Decide the episode state** (design §7):
+4. **Decide the episode state** (design §7). The page's own description of the episode is typed into the intro (njk ~20 "persistent 12% discount", ~24 "recently traded below par", ~28 "13.9%"): check it against the latest close in `src/_data/strcClose.json` ($99.10 on 2026-09-28) whichever way you decide.
    - **Ongoing** → the live numbers carry it; leave the nav entry and this block in place.
    - **Resolved** (par regained, or a dividend action taken) → convert the page to a **post-mortem**, **retire the `explorations.json` entry** (nav sunset — reachability reverts to the parent + related links), and mark this block "resolved, post-mortem" here.
 5. **GSC glance** — confirm `/the-strc-mechanism` is still indexed (indexed-count didn't drop); the URL is in `sitemap.xml` at weekly changefreq. (The old `/strc-below-par` 301s to it via `_redirects`.)
@@ -850,6 +960,63 @@ at 2026-03-15 — six months short of the chart's "today" point, with a visible 
 - **Verify:** load `/not-a-bubble`; the line should end within a week of the today
   point, and the ATH annotation (`2025 ATH $123,513`) should not move.
 
+## 9.8. Values computed once from `PL_DATA` and stored (MONTHLY, with §1)
+
+Some figures were computed from the price series once and written into the source. They don't move when `PL_DATA` does, so after each §1 append, recompute them:
+
+- **`TREND_RATIO_PERCENTILES`** (`shared/calculator-helpers.js`). The Bitcoin Retirement's status line reads it ("historically, BTC has traded below this trend level N% of its history"). Rebuild from every `PL_DATA` sample: the ratio `price ÷ (PL_A · day^PL_B)`, sorted, one row at every second percentile from 0 to 100. Update the header's "spanning days 592 → N" (the freshness report reads it). On 2026-09-29 it stopped at day 6304 (2026-04-08), six samples short. The header's note to regenerate "when PL_DATA in the-power-law.js changes" is out of date: `PL_DATA` lives in `shared/power-law-data.js`. Computing the table at load would retire this item (TECH_DEBT).
+- **Disciplined Rebalancing's reference thresholds** (`disciplined-rebalancing.njk` ~376–396 and the chart lines in `disciplined-rebalancing.js` ~75–78). The page says they are "computed against current PL_DATA"; recompute the percentile multiples and fix the sample count ("~5,500+ samples"; the series has about 480).
+- **What Daily Conviction Bought**: the FAQ answer (njk ~16), the drawdown figure (~20, 165) and the head meta (`what-daily-conviction-bought-head.html` ~7, 15). Recompute with the page's own tool at the default settings ($30 a day from 2017-01-01).
+- **The Bitcoin Hurdle Rate**: the head meta ("near 30% over ten years"; it falls about a point a year) and the forty-year figure (njk ~24).
+- **Allocation Sizing**: the tooltip "about 0.44× today" (njk ~70). Prefer rewriting it without a number, since the live figure is on the page.
+- **Anything else in prose that states today's multiple or growth rate**: `grep -rni "× today\|currently ~\|currently about\|currently below trend" src/*.njk`.
+
+## 9.9. The Doubling Ladder: its own series (QUARTERLY, from 2026-09-29)
+
+`the-doubling-ladder.js` embeds three arrays computed offline from blockchain.info daily closes (method in the file header): `LADDER` (each doubling rung and the first daily close at or above it), `DEVIATION` (month-end ln(actual ÷ trend)) and `MONTHLY_HIGH`. The page uses its own coefficients (`DL_A`, `DL_B`), not the shared ones, by design (DATA_AUDIT PL-3). On 2026-09-29 the arrays ended in June 2026.
+
+Each quarter:
+1. Append the months since the last point with the same method and coefficients.
+2. Record any rung crossing in `LADDER` (first daily close at or above the level).
+3. Restate the checksum the page prints (months, mean ln-deviation, months above and below trend with their shares, the date span): the file header, and the text at njk ~86–90 and 112–114 ("mid-2010 to mid-2026", 41.9% / 58.1%, 80 / 111).
+4. The page's cycle peaks and troughs (js ~271–272, njk ~92) stop at 2021–22. The 2025 peak and the next trough belong there when confirmed (§12).
+
+`scripts/data-freshness.py` reports the last point of `DEVIATION` and `MONTHLY_HIGH`.
+
+## 9.10. Rates, terms and market facts quoted in prose (QUARTERLY, judgement)
+
+These are typed into the copy, not computed. Re-read each against its source every quarter; the quoted examples show what to look for, and line numbers are as of 2026-09-29.
+
+**Rates, fees and product terms**
+- **Borrowing Against Your Stack**: lender list and terms (njk ~130–139, 167–193, 263), APR and LTV bands (~377–408, 485 "as of mid-2026"), provider APRs (js ~560, 613–636) and the chart's rate bands (js ~1347–1400). The opening example (njk ~76–86) says "Bitcoin is now near $110,000"; that sentence needs rewriting (TECH_DEBT), not refreshing.
+- **Living on Bitcoin**: the tools survey (fees, APYs such as "currently ~3.8% APY", card terms; njk ~65–186, 280) and Lightning's capacity ("$1.17B, November 2025", ~185).
+- **Bitcoin-Backed Mortgages**: product terms (LTV, rate premiums, delinquency triggers) and rates (30-year default 7%, multisig 12–16%, Strike 7.5–10.5%).
+- **Bitcoin vs. Rental Property**: vacancy (7.3%, Q2 2026), FHFA, 30-year fixed, Prime and HELOC rates (njk ~100–103, 374, 782, 792, 884, 887) and the YBTC figure (~323, 906).
+- **Bitcoin Fixed Income**: the path reference rates (Treasury 4.3%, investment grade 5.5%, M2 6.5%, trend CAGR ~28%; §7.1).
+- **The Bitcoin Hurdle Rate** presets: money-market ~4.3%, savings ~4%, mortgage ~6%, WACC ~9%, rental ~8%, and S&P total return 10.86%, which has no source on the page.
+
+**Market-structure facts**
+- **Paper Bitcoin**: custody concentration (Coinbase ">80%" of ETF coin), the ETF count, the lost-coin range, the France abduction figures.
+- **Bitcoin vs. the Stock Market**: ETPs holding 6.4% of supply, "49+ companies", "23 states", MVRV ~2.0× (njk ~75, 366).
+- **Trilemma**: "~400,000 transactions per day"; Fedwire volumes.
+- **Risks to Bitcoin**: the top three pools' share (~60%) and China's hash share.
+- **The Bitcoin Migration**: the national debt ("past $36 trillion") and its servicing cost (njk ~221).
+- **Bull & Bear Cycles**: "~$2 trillion asset" (njk ~141).
+- **What Bitcoin Is** and **Money Trees** keep their copy in `concepts.json` and `data.json` at the repo root: counts such as "~180 currencies", "~4 billion unbanked", "over 16 years".
+
+## 9.11. Legal and tax status (SEMIANNUAL, plus dated deadlines)
+
+Pages that state what the law is, or what is pending, go stale when a bill passes, a notice expires or a court rules. Read each against its source twice a year, and on the deadlines below. A change on one page usually means a change on the others.
+
+- **Spend and Replace** (US tax, "as of mid-2026"; njk ~300 says "Last updated: May 2026", so update the two together). Check each rule it states: Notice 2014-21, the FIFO default, Rev. Proc. 2024-28 wallet-by-wallet tracking, the 1099-DA phase-in, §1091 and wash sales, the rate tables, the donation thresholds; the case law it cites; and the pending bills (PARITY, Lummis–Gillibrand). **Deadline: the Notice 2025-7 relief, extended by Notice 2026-20, ends 2026-12-31** (njk ~177–186, 220, 260–272). Review in early December and again in January.
+- **Living on Bitcoin**: tax notes (njk ~66, 87–88, 171, 290, 332, 433, 442; the $200 threshold in js ~231–234) and the CLARITY Act status (~88).
+- **Borrowing Against Your Stack**: DFAL and the state count (njk ~131), §1259, step-up basis, the capital-gains rates. njk ~151 says "The PARITY Act of 2026 confirmed §1259 applies to digital assets", but Spend and Replace and Living on Bitcoin say PARITY has not passed. Resolve that (TECH_DEBT).
+- **Bitcoin-Backed Mortgages**: the QM prepayment cap, the GENIUS Act, capital-gains rates, §1259, Fannie Mae's conservatorship.
+- **Paper Bitcoin**: the IBIT prospectus terms, in-kind redemption, SIPC, retirement-account access.
+- **Bitcoin vs. Rental Property**: California AB 1154 (njk ~151).
+- **Risks to Bitcoin**: China's rounds of restriction (Circular 42, Feb 2026).
+- **Bull & Bear Cycles and Bitcoin as Collateral**: the CLARITY Act status is a monthly check (§2, §3); this is the full re-read.
+
 ## 10. Claude project mirror refresh
 
 **Last mirror refresh: 2026-09-17** (update this line BEFORE exporting,
@@ -1001,3 +1168,47 @@ this set of markets and the depth we need. It is published once a year.
 Sub-annual updates from other sources (national stats agencies, BIS,
 OECD) would introduce methodology mixing and aren't worth the editorial
 inconsistency.
+
+## 11. Annual — January (from 2026-09-29)
+
+In January, once the prior year's data is complete. `scripts/data-freshness.py` flags the annual series, the © year and year inputs whose minimum has passed; the rest is a read-through.
+
+1. **Annual data.** `homeData`, `btcData`, `csData` in `shared/bvre-annual-data.js`: `btcData` is the mean of the year's `BTC_MONTHLY` closes and `csData` the mean of the year's `CS_NATIONAL` months, so both can be computed rather than looked up. Also `incomeData` and `mortgageRates` in `bitcoin-vs-real-estate.js`. Bitcoin vs. Real Estate hard-codes the last full year (2025 in njk ~68–463 and js ~12–207). The Gallery reads the same series: chart 3's projection years and cutoff (`the-gallery.js` ~716–773), chart 7's end year (~1381), and the figures its copy quotes (`the-gallery.njk` ~137–265). The 2025 `btcData` value is already in question (TECH_DEBT: the annual-series refresh).
+2. **Year bounds.** Retirement-year minimums (`the-bitcoin-retirement.njk` ~317 and js ~1513; `shared/retirement-engine.js` ~317; the Stress Test njk ~70, 121 and `RETIRE_YEARS` js ~333); Escape Velocity's "2026–2055" (njk ~101, 103, 231); The Power Law's "today" column label and slider minimum (njk ~269, 287; js ~652) and year buttons (njk ~621–622); the calculator tiles' axis labels (`calculators-minis.js` ~270–272); the Metcalfe page's era end and axis year (js ~46, 49; njk ~26, 55, 78, 190, 213).
+3. **Completed windows.** The Fixed Pie's `historicalCagrs` (January to January, js ~302–313) and the average its prose quotes (njk ~193); the four-year windows in `lump-sum-or-ladder-in.js` (~123) and `your-deployment-plan.js` (~400), which gain a window only when one completes (next: 2027–30).
+4. **Age strings.** `grep -rni "fifteen years\|sixteen years\|seventeen years\|years old" src/*.njk`, plus Risks to Bitcoin's opening (§2).
+5. **The footer's © year** (`layouts/base.njk`).
+6. **The Gallery's BTC-per-house line** ("20 / 1.4 / 0.23 / 0.06 BTC", `the-gallery.njk` ~236) changes on 1 January.
+
+## 12. Event-driven triggers (from 2026-09-29)
+
+Not on a calendar: when one of these happens, run its list.
+
+**A new all-time high** (a daily close above the prior record)
+- Is Bitcoin a Bubble?: the ATH annotation ("2025 ATH $123,513", `MILESTONES` in `not-a-bubble.js`) and the "~310×" insight card (njk ~86–89).
+- Bitcoin vs. the Stock Market `TOPS` (js ~75–81) and its preset (njk ~139); the Heatmap preset (njk ~174); Discount or Premium's "Oct 2025 ATH" (js ~939).
+- Bull & Bear Cycles: `CYCLES` and the live-status copy (§2).
+- The Power Law's cycle list (njk ~549–551) and "$100,000… In progress" (~173).
+- The Doubling Ladder: a rung crossing (§9.9).
+- The Dashboard's ATH tile computes from `PL_DATA`; nothing to do.
+
+**The bear market ends** (a cycle low is confirmed)
+- Bull & Bear Cycles (§2): the trough, "the ongoing bear", and the analyst-bottom paragraph (njk ~237).
+- Allocation Sizing's crash presets and "modern default" (njk ~92–101); the Stress Test's presets (njk ~22, 136–138); the Hurdle Rate's "−73% drawdown" (njk ~20, 221; js ~351); Bitcoin as Collateral's "2026 bear market" (njk ~224); the Horizon's "only one still open" (njk ~121); the Doubling Ladder's cycle list (§9.9).
+
+**The halving** (next about April 2028)
+- The Melting Ice Cube's issuance rate and epoch labels (js ~265–280); What Money Has to Be's "Current issuance rate is 0.8%" (js ~7); any block-subsidy figure.
+
+**A Strategy capital event or an STRC rate change**
+- §7, §7.1, §7.5, `YIELD_RATES` (§9.3a), and the rental page's Strategy lines (§0.7).
+
+**Legislation passes or fails** (CLARITY, PARITY, Lummis–Gillibrand, state DFAL-type laws)
+- The §9.11 pages, and the CLARITY lines on Bull & Bear and Bitcoin as Collateral (§2, §3).
+
+**Standing claims** (re-verify at every refresh; one more month of data can falsify them)
+- The Gallery: "no historical 5-year window in which a bitcoin holder failed to outperform the S&P 500" (njk ~306). False on 2026-09 data (TECH_DEBT).
+- Lump Sum or Ladder In: every entry, "even the literal worst tops", has recovered (njk ~40). False while the October 2025 top is underwater.
+- The Fixed Pie: no negative four-year window (njk ~142, 153). The Melting Ice Cube: no four-year window below its starting price (njk ~277).
+- The Horizon: the worst case "at three years and beyond stays positive" (njk ~130; the margin was 1.6% at 36 months on 2026-09 data) and "64 months" (njk ~117–119, 218; js ~245 hard-codes 64).
+- Disciplined Rebalancing: the floor has "never sustained a daily close below" (njk ~92).
+- Is Bitcoin a Bubble?: "crashed over 80% three times (2011, 2018, 2022)". The 2022 drawdown was about 77% (TECH_DEBT).

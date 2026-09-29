@@ -1323,10 +1323,10 @@ var chartInstance = null;
 // materially-above-equity-comparators) is exactly what the Power Law
 // model in Chart 2 projects on the prospective side.
 //
-// SP500_TR_DATA and NDQ_TR_DATA arrays inlined below, mirroring the
-// same arrays in calculators-minis.js — accepted duplication per
-// Commit A's strategy. Both arrays refresh monthly per MONTHLY_REFRESH_
-// CHECKLIST; updates need to land in both files.
+// SP500_TR_DATA and NDQ_TR_DATA come from shared/tr-comparator-data.js
+// (one copy site-wide since 2026-09-16; the inline copies this comment used
+// to describe are gone). Refresh the shared file only: MONTHLY_REFRESH_
+// CHECKLIST §1.
 (function(){
   var canvas = document.getElementById('galleryBvsmChart');
   if (!canvas) return;
@@ -1335,8 +1335,8 @@ var chartInstance = null;
   var chartInstance = null;
   var hasInited = false;
 
-  // Total-return monthly samples — mirrors calculators-minis.js (see
-  // header comment). Each entry is [date-ISO, level]. Refresh monthly.
+  // Total-return monthly samples from the shared file (see the header
+  // comment). Each entry is [date-ISO, level].
   /* SP500_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
   /* NDQ_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
   // ── Bitcoin annual averages (mirrors bitcoin-vs-real-estate.js
@@ -1539,16 +1539,14 @@ var chartInstance = null;
 // horizons) at init; static after that. Performance is fine; the SVG
 // renders in <50ms.
 //
-// SP500_TR_DATA needed — duplicated inline (third copy in the file
-// after Chart 7's and the source-of-truth elsewhere). Accepted as
-// drift-risk per spec; refactor candidate for TECH_DEBT.
+// Reads SP500_TR_DATA from shared/tr-comparator-data.js (no inline copy
+// since 2026-09-16).
 (function(){
   var host = document.getElementById('galleryHeatmap');
   if (!host) return;
   if (typeof PL_DATA === 'undefined') return;
 
-  // Inlined SP500 TR data — same as Chart 7. Refresh monthly per
-  // MONTHLY_REFRESH_CHECKLIST in both places.
+  // SP500 TR data: the shared file, as Chart 7 (MONTHLY_REFRESH_CHECKLIST §1).
   // Color tiers per outperformance multiple — same as renderMiniHeatmap
   function tierFor(outperf) {
     if (outperf <= 0.5) return '#BE3A30';
@@ -1889,10 +1887,10 @@ var chartInstance = null;
 //
 // Floating-bar chart of rolling CAGR statistics (min, median, max)
 // for bitcoin and the S&P 500 across holding horizons 1/2/3/4/5/10y.
-// Bitcoin stats computed from inlined btcMonthly data (mirrors the
-// /the-bitcoin-horizon page exactly). S&P 500 stats are reference
-// values from long-run historical CAGR analyses (Schiller / NYU
-// Stern data), same as the source page.
+// Both assets' stats are computed from the shared monthly series
+// (BTC_MONTHLY and SP500_TR_DATA) over the same 2015+ window, as on
+// /the-bitcoin-horizon. (Until the comparator rebuild the S&P side used
+// long-run reference values from Shiller / NYU Stern; it no longer does.)
 //
 // Each asset renders as a translucent floating bar (representing the
 // min→max range) plus a solid scatter point at the median. Range
@@ -1902,8 +1900,7 @@ var chartInstance = null;
   if (!canvas) return;
   if (typeof Chart === 'undefined') return;
 
-  // Bitcoin monthly close data — mirrors the-bitcoin-horizon.js's btcMonthly
-  // array. Refresh monthly per MONTHLY_REFRESH_CHECKLIST in both places.
+  // Bitcoin monthly closes: the shared BTC_MONTHLY (MONTHLY_REFRESH_CHECKLIST §1).
   /* BTC_MONTHLY: see shared/btc-monthly-data.js (loaded before this script). */
   // ────────────────────────────────────────────────────────────────
   // CONSERVATIVE-DATA WINDOW
@@ -1920,10 +1917,7 @@ var chartInstance = null;
   // time period (rather than 11-year BTC vs. multi-decade SP500).
   var STATS_START_KEY = '2015-01';
 
-  // S&P 500 total-return monthly data — 3rd inline copy in this file
-  // (also in Chart 7 IIFE and Chart 8 IIFE). Refactor to shared/tr-
-  // comparator-data.js is overdue (now 5-6 copies site-wide); see
-  // TECH_DEBT_26.md. Refresh monthly per MONTHLY_REFRESH_CHECKLIST.
+  // S&P 500 total-return monthly data: the shared file (§1).
   /* SP500_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
   // Generic rolling-CAGR stats. Walks a [['YYYY-MM', price], …] series
   // from the conservative-window start key, building every rolling

@@ -262,6 +262,25 @@ Items deferred to later phases. Trigger criteria already documented; no schedule
 
 ## 8. Audit gaps (process improvements)
 
+- [ ] **Refresh audit 2026-09-29: content that is stale or wrong now.** JM asked for every periodically changing item to be in the refresh guidance. A full-site audit (58 pages) produced MONTHLY_REFRESH_CHECKLIST §0, the new sections §7.1, §9.8–9.11, §11 and §12, and `scripts/data-freshness.py`. It also found the items below, which need fixing rather than just listing. Line numbers are as of 2026-09-29; close each sub-item with its commit.
+  - [ ] **Claims the data no longer supports (fix first).**
+    - The Gallery (njk ~306): "there is no historical 5-year window in which a bitcoin holder failed to outperform the S&P 500". False: on month-end data, seven 5-year windows trail the S&P, from starts in 2017-12 (0.76×) and 2021-02 to 2021-08 (worst 0.67×).
+    - Lump Sum or Ladder In (njk ~40): every entry, "even the literal worst tops", has recovered. The October 2025 top has not.
+    - Is Bitcoin a Bubble? (insight card): "crashed over 80% three times (2011, 2018, 2022)". 2022 was 76.6% close to close (77.3% intraday), and 2014–15 (~85%) is left out. The count "three" is also in the intro and the chart box; wording is JM's call.
+    - Borrowing Against Your Stack (njk ~76–86): "Bitcoin is now near $110,000", and the worked examples built on it.
+    - Bull & Bear Cycles (njk ~237): "Today's price sits near the shallow end" of the $54–68K camp; price is about $83K.
+    - Allocation Sizing (njk ~70): "about 0.44× today"; the live multiple is about 0.53×.
+    - The Melting Ice Cube (njk ~281): trend growth "currently ~42%/yr"; the model gives about 37% (and the page says ~36% elsewhere).
+    - Bitcoin Fixed Income: Tab III "Where we are now" (June 6, 2026, a Saturday) contradicts the Tab II card; STRC appears at 11.5% across the page (now 12%); reserve and runway prose quotes ~$900M and 6.75 months against $5.04B (§7.1).
+    - Borrowing Against Your Stack (njk ~151): "The PARITY Act of 2026 confirmed §1259 applies to digital assets". Spend and Replace and Living on Bitcoin say PARITY has not been enacted.
+    - The Bitcoin Migration (njk ~88, ~116): Executive Order 6102 dated 1934. It was April 1933.
+    - The STRC Mechanism: the reserve's "25 months" is typed, and the total bill is derived from it (§7.5); at $5.04B it is about 35 months. The intro's "persistent 12% discount" and "recently traded below par" need checking against the $99.10 close.
+  - [ ] **Overdue refreshes** (all in the freshness report or §0): `STRC_DATA` (as of 2026-07-28); Demographia (the 2026 edition is not in, in either file); the Metcalfe series (pulled 2026-06-20; quarterly); the Doubling Ladder series (June 2026); `TREND_RATIO_PERCENTILES` (through 2026-04-08); Disciplined Rebalancing's threshold table; What Daily Conviction Bought's FAQ and meta figures (the July 31 sample); the CLARITY Act lines on Bull & Bear and Bitcoin as Collateral (the "15 September" cloture date has passed); The Power Law's slider minimum (2025); Bitcoin vs. the Stock Market (njk ~195) "as of this writing in mid-2026 … less than a year", false after 6 October.
+  - [ ] **Deadline.** Spend and Replace: the Notice 2025-7 / 2026-20 relief ends 2026-12-31. Review in early December (§9.11).
+  - [ ] **The same fact, different figures.** Strategy's BTC count (845,050 on Fixed Income, 843,775 in `STRC_DATA`, 846,000 on the rental page); the dollar's purchasing-power half-life (~11 years on The Half-Life, ~6 on The Bitcoin Migration, 7–10 in Money Trees, "<10" on What Money Has to Be); M2 growth (6.5% and ~7%). §0.7 now checks these monthly.
+  - **Tracked elsewhere:** `btcData` (the annual-series item below). The audit adds 2024: 62,682 against 67,744, the mean of `BTC_MONTHLY`'s 2024 closes; the refresh PR should settle which average the series uses.
+  - **Would retire refresh items:** compute `TREND_RATIO_PERCENTILES` and Disciplined Rebalancing's thresholds at load from `PL_DATA`; derive What Daily Conviction Bought's meta figures at build; a scheduled Action (like `strc-daily-close`) could append the bubble chart's weekly point.
+
 - [x] **Phase 5 §5.7 audit was incomplete — Real Estate-only fix.** The prior session's "all 10 anti-patterns resolved" status missed Not-a-Bubble — DM Sans was still being loaded and used as `--font-body` site-wide on that page. Caught and fixed in commit `89011ea`. Process implication: when running anti-pattern audits, grep all `_pageassets/*-head.html` AND all `_pageassets/*.css` for the offending pattern, not just the page where the issue was first noticed.
 
 - [x] **§5.7 sweep — closed via split decision (commit `6c6c7c2`).** Site-wide grep on 2026-04-27 found 4 pages with non-canonical sans-serifs. Resolution split along page-character lines rather than uniform consolidation:

@@ -25,20 +25,14 @@
    Data layer:
    - PL_DATA, GENESIS_TS, PL_A, PL_B, PL_FLOOR, PL_CEIL, plPrice():
      globals from shared/power-law-data.js
-   - SP500_TR_DATA, NDQ_TR_DATA: inlined below (TR-SYNC marker).
-     Canonical source is bvsm.js. When the BvSM page updates its
-     comparator data, this file must update too. Future cleanup:
-     extract both to shared/comparator-data.js the same way
-     PL_DATA was promoted (third-consumer trigger).
+   - SP500_TR_DATA, NDQ_TR_DATA: globals from shared/tr-comparator-data.js
+     (extracted 2026-09-16; refresh that file only, MONTHLY_REFRESH_CHECKLIST §1).
    ============================================================ */
 
 (function() {
   'use strict';
 
-  /* ═══════ TR-SYNC: SP500 + NDQ comparator data ═══════ */
-  /* Canonical copies live in bitcoin-vs-the-stock-market.js.   */
-  /* Marker comment also in that file. When updating monthly    */
-  /* values, change BOTH files. ~10KB total.                    */
+  /* ═══════ SP500 + NDQ comparator data: shared/tr-comparator-data.js ═══════ */
   /* SP500_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
   /* NDQ_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
   /* ═══════════════════════════════════════════════════════════

@@ -55,11 +55,9 @@ function btcCAGRStats(months) {
   return { min: cagrs[0], median, max: cagrs[cagrs.length - 1] };
 }
 
-// S&P 500 total-return monthly data — inline (now 6th copy site-wide).
-// Refactor to shared/tr-comparator-data.js is overdue; see TECH_DEBT_26.md.
-// Refresh monthly per MONTHLY_REFRESH_CHECKLIST in lockstep with the other
-// copies (calculators-minis.js, bitcoin-vs-the-stock-market.js, the-gallery.js
-// Charts 7, 8, 10).
+// S&P 500 total-return monthly data comes from shared/tr-comparator-data.js
+// (one copy site-wide since 2026-09-16). Refresh that file only:
+// MONTHLY_REFRESH_CHECKLIST §1.
 /* SP500_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
 // S&P 500 rolling CAGR stats — same 2015+ window as BTC, computed from
 // SP500_TR_DATA (monthly closes). Previously a hardcoded multi-decade
