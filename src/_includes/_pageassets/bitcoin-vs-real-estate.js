@@ -498,7 +498,6 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // corrected before the first calc render.
   var scenario = 'stay';   // M3 (PR 4c): the default is Stay at today's multiple
   var method = 'mortgage';
-  var LIVE_BTC_FALLBACK = 84000;
 
   // ── Populate time horizon based on current year ──
   var NOW_YEAR = new Date().getFullYear();
@@ -511,23 +510,32 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     horizonSel.appendChild(opt);
   });
 
-  // ── Live BTC price fetch (CoinGecko; same as Is Bitcoin a Bubble tool) ──
+  // ── Today's BTC price: the shared fetcher (power-law-data.js) ──
+  // One quote for both calculators on the page (PR 4e: the retrospective
+  // runs to today, P8), cached and deduplicated sitewide. The field starts
+  // at the latest PL_DATA sample, so the results render at once (a value the
+  // browser restored from an earlier visit is stale, so it is replaced), and
+  // the status stays "loading" until the quote lands (rePairQA waits on it).
+  // The quote replaces the sample unless the reader has typed in the field
+  // since, in which case the price is theirs and the status says nothing.
+  // If CoinGecko is unreachable the sample stands (was a hardcoded $84,000).
   function fetchLiveBtcPrice(){
     var input = document.getElementById('fwdBtcNow');
     var status = document.getElementById('fwdBtcPriceStatus');
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', {cache:'no-store'})
-      .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
-      .then(function(d){
-        var p = Math.round(d.bitcoin.usd);
-        input.value = '$' + p.toLocaleString();
-        if(status) status.textContent = '(live)';
-        runFwdCalc();
-      })
-      .catch(function(){
-        input.value = '$' + LIVE_BTC_FALLBACK.toLocaleString();
-        if(status) status.textContent = '(fallback)';
-        runFwdCalc();
-      });
+    var typed = false;
+    input.addEventListener('input', function(e){
+      if(!e.isTrusted) return;                 // scripts (links, rePairQA) are not the reader typing
+      typed = true;
+      if(status) status.textContent = '';
+    });
+    input.value = '$' + Math.round(TODAY_PRICE).toLocaleString();
+    runFwdCalc();
+    fetchTodayPrice(function(p, source){
+      if(typed) return;
+      input.value = '$' + Math.round(p).toLocaleString();
+      if(status) status.textContent = source === 'live' ? '(live)' : todayPriceNote(source).trim();   // "(latest monthly data)", as on the retrospective
+      runFwdCalc();
+    });
   }
 
   // ── Power Law scenario buttons ──
@@ -951,7 +959,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
   // ── Initial setup ──
   syncFwdHomeApprFromCanonical();
-  fetchLiveBtcPrice(); // runs runFwdCalc on completion
+  fetchLiveBtcPrice(); // renders at the latest data sample, then at the quote
 
   // Expose for the calc-mode toggle handler (allows safety re-trigger
   // if initial run happened while #calc-mode-projection was hidden).
