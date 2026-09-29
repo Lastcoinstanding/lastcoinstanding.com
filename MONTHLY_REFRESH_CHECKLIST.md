@@ -786,15 +786,17 @@ _Added 2026-09-28 (PR 4d; rulings §7 item 12; DATA_AUDIT BvRP-5, BvRP-14, BvRP-
 - **`asOf`:** the month of the refresh.
 - **Verify:** open the page with `?qa` and run `await rePairQA.run()`; the S-bvrp and yield-portfolio hashes move, which is expected. Record the new digests in the refresh commit.
 
-## 9.4. Case-Shiller National — the retrospective's house end point (MONTHLY, from PR 6)
+## 9.4. The retrospective's monthly series: Case-Shiller, Zillow rents and values (MONTHLY, from PR 4e)
 
-_Added 2026-09-27 (`REAL_ESTATE_PAIR_DESIGN.md` v1.2, ruling P8). **Not on the page yet:** this applies once PR 6 of the real-estate pair ships the retrospective-to-today end point. Until then there is nothing to refresh._
+_Added 2026-09-27 as a placeholder (design v1.2, ruling P8); **live since PR 4e** (2026-09-28; DATA_AUDIT RE-16–RE-20)._ `/bitcoin-vs-real-estate`'s retrospective runs month by month from July of the start year to **today**: bitcoin at today's price (the shared `fetchTodayPrice`), the house at the **latest published month** of Case-Shiller, and rent, mortgage and equal-cash-out flows through the current month. Its series live in **`src/_includes/_pageassets/shared/housing-monthly-data.js`**, one `['YYYY-MM', value]` pair per month. The flows run to the current month by the clock; the house's month ("June 2026" on the cards) comes from the data, so **the refresh is appending months; no label is edited by hand.**
 
-`/bitcoin-vs-real-estate`'s retrospective calculator grows the house from the start year to the **latest published month** of the S&P CoreLogic Case-Shiller U.S. National Home Price Index (NSA; FRED `CSUSHPINSA`, https://fred.stlouisfed.org/series/CSUSHPINSA). The index publishes on the last Tuesday of each month, with about a two-month lag.
-- Each month, append the newest month's value to the page's Case-Shiller series (location set by PR 4/6), and update the month label shown on the retrospective cards and the ledger's "to date" row.
-- Check the value against FRED (the index is revised; take the current vintage for recent months).
-- Update the DATA_AUDIT row that PR 6 adds for it (value, month, last audited, next due).
-- The static exhibits stay on annual data through the latest full year. Roll them forward once a year, with the January refresh.
+- **`CS_NATIONAL`** (RE-16): FRED `CSUSHPINSA`, https://fred.stlouisfed.org/series/CSUSHPINSA. Publishes on the last Tuesday of each month with a two-month lag (late September brings July). Append each new month to 3 dp. The index is revised: compare the last three stored months with FRED's current vintage and update them if they moved.
+- **`ZORI_US`** (RE-17) and **`ZHVI_US`** (RE-18): Zillow Research, https://www.zillow.com/research/data/: the metro files `Metro_zori_uc_sfrcondomfr_sm_month.csv` and `Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv`, row `United States` (the same files as RE-7, so do this with §9.3's price-to-rent check). Append each new month, ZORI to 2 dp and ZHVI to the dollar. Zillow revises its smoothed series; if the last months moved by more than rounding, update them. A new **July** of ZORI is what resets every start year's rent, so check it lands.
+- **`CPI_RENT`** (RE-19): 2014–2015 only. Nothing to refresh unless the start range moves before 2014.
+- **Bitcoin** (RE-20): nothing here. The start-year averages come from `PL_DATA` (§1) and the monthly flows from `BTC_MONTHLY` (§1, BTC-M-1). A month whose previous month's close isn't in `BTC_MONTHLY` yet trades at today's price, so a late §1 refresh degrades gently rather than breaking.
+- **`csData`** (RE-16, in `shared/bvre-annual-data.js`): the annual averages behind the growth-of-$1 and every-starting-year exhibits and The Gallery's chart 4. Append the new full year each January, when `homeData` and `btcData` roll forward (the annual step in that file's header; it has no section here yet, see TECH_DEBT), not monthly.
+- **Start years:** the select offers 2014–2024. Add a year to it (and the URL notes in `bitcoin-vs-real-estate.js`) only once that calendar year is complete in `ZHVI_US`, `ZORI_US` and `PL_DATA` (the engine returns nothing for a year without them, and the page says the data isn't complete) and `homeData` and `mortgageRates` carry a sourced full-year value for it (the 2025 values are due a check first; see TECH_DEBT).
+- **Verify:** open `/bitcoin-vs-real-estate?qa` and run `await rePairQA.run()` and `rePairQA.ledgerCheck()`. A new Case-Shiller month moves every retrospective hash (E1–E5, E20, E21), which is expected; a new ZORI or ZHVI month moves them only when it lands in a July or in a start year. Record the new digest in the refresh commit.
 
 ## 9.5. Search Console indexing sweep (MONTHLY)
 
