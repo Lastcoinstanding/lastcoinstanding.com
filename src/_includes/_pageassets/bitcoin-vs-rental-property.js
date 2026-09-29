@@ -329,13 +329,20 @@
   // Colors for the five datasets, distinguishable on dark. Upper uses a
   // distinct hue and is dashed (a stress test, never sustained in the
   // record); Floor is a muted grey, dotted, and faint unless selected.
+  // Distinct hues (JM, 2026-09-29: the amber rental and the brown Stay line
+  // read as one colour). Checked with the dataviz validator on the dark
+  // surface: every set of lines drawn together by default (keep rental, the
+  // selected scenario, the Floor) clears the colour-blind and normal-vision
+  // floors. The rental is the one blue line, the bitcoin scenarios are warm or
+  // green, and the Floor is a light neutral reference; dash patterns (rental
+  // and Upper dashed, Floor dotted) and the legend carry identity too.
   var CHART_COLORS = {
-    rental:    '#e09422',  // amber, dashed
-    stay:      '#b87a4a',  // warm brown (the default)
-    trend:     '#5a8a3a',  // canonical site green
-    upper:     '#5fa8d8',  // cool blue, dashed
-    floor:     '#9d958a',  // muted grey, dotted
-    floorFaint: 'rgba(157,149,138,0.55)'
+    rental:    '#3987e5',  // blue, dashed
+    stay:      '#e8801c',  // bitcoin orange (the default)
+    trend:     '#199e70',  // green
+    upper:     '#d55181',  // magenta, dashed
+    floor:     '#d4cdc0',  // light neutral, dotted
+    floorFaint: 'rgba(212,205,192,0.5)'
   };
 
   function renderChart(s){
