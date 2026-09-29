@@ -3,7 +3,7 @@
     "display": "9/29/26",
     "date": "2026-09-29",
     "page": "/bitcoin-vs-rental-property",
-    "summary": "Bitcoin vs. Rental Property: results now show in today's dollars by default, with a Real / Nominal toggle as on Bitcoin vs. Real Estate. Home appreciation and the inflation rate sit in one Baseline assumptions block shared by both pages."
+    "summary": "Bitcoin vs. Rental Property: results now show in today's dollars by default, with a Real / Nominal toggle as on Bitcoin vs. Real Estate, and a line under it explaining the difference. Home appreciation and the inflation rate are set in Baseline assumptions, and a change on either page carries to the other."
   },
   {
     "display": "9/29/26",
@@ -21,13 +21,13 @@
     "display": "9/28/26",
     "date": "2026-09-28",
     "page": "/bitcoin-vs-real-estate",
-    "summary": "Bitcoin vs. Real Estate, rebuilt: the look-back now runs month by month to today, with the house on the Case-Shiller index and rent at market rates. Both calculators give the renter and the buyer the same cash out each month, use sourced costs and show results as if sold. The projection now defaults to bitcoin staying at today's multiple of trend."
+    "summary": "Bitcoin vs. Real Estate, rebuilt: the look-back now runs month by month to today, with the house on the Case-Shiller index and rent at market rates. By default the look-back and the projection give the renter and the buyer the same cash out each month; both use sourced costs and show results as if sold. The projection now defaults to bitcoin staying at today's multiple of trend."
   },
   {
     "display": "9/28/26",
     "date": "2026-09-28",
     "page": "/bitcoin-vs-rental-property",
-    "summary": "Bitcoin vs. Rental Property: your existing mortgage now counts on every path. A sale repays it first, and a kept rental carries its payments. Lending is now generic stablecoin lending at 4%, and states with no capital-gains tax are no longer charged 5% on the sale."
+    "summary": "Bitcoin vs. Rental Property: your existing mortgage now counts on every path: a sale repays it first, and a kept rental carries its payments. Home appreciation now uses the sitewide nominal rate (4.68% a year by default, was a fixed 3%), and selling costs are 6.6% (was 8%). Lending is now generic stablecoin lending at 4%, and states with no capital-gains tax are no longer charged 5% on the sale."
   },
   {
     "display": "9/20/26",
