@@ -910,10 +910,14 @@
   }
 
   // The frame's labels outside the result blocks (PR 4f): the toggle, the
-  // chart's title, and the note under the scenario chips (their growth
-  // rates are nominal in both views; their differences follow the frame).
+  // frame line under it (the shared binder writes it: which view is
+  // showing, and what Real means next to Nominal), the chart's title, and
+  // the note under the scenario chips (their growth rates are nominal in
+  // both views; their differences follow the frame).
+  var baselineCtl = null;
   function renderFrameUI(){
     var real = isReal();
+    if (baselineCtl) baselineCtl.renderFrame();
     document.querySelectorAll('.calc-frame-btn').forEach(function(b){
       var on = b.dataset.mode === state.displayMode;
       b.classList.toggle('active', on);
@@ -936,17 +940,7 @@
         rerender();
       });
     });
-    // "Change it" under the toggle: open Baseline assumptions at the
-    // deflator. Without script the link still jumps to the block.
-    var change = document.getElementById('rpDeflatorChange');
-    if (change) change.addEventListener('click', function(e){
-      var box = document.getElementById('rpBaseline');
-      if (!box) return;
-      e.preventDefault();
-      box.open = true;
-      var target = document.getElementById('rpInflPresets') || box;
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+    // "Change it" beside the frame line is bound by the shared binder.
   }
 
   function renderSpecificCallout(s){
@@ -1048,8 +1042,9 @@
   function bindBaseline(){
     var MA = window.ModelingAssumptions;
     if (!MA || !window.RealEstateBaseline) return;
-    window.RealEstateBaseline.bind({
+    baselineCtl = window.RealEstateBaseline.bind({
       prefix: 'rp',
+      displayMode: function(){ return state.displayMode; },
       onInput: function(dim, v){
         if (dim !== 'homeApprNominal') return;
         state.appreciationPct = v;

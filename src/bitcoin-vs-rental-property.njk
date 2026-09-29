@@ -582,20 +582,25 @@ eleventyComputed:
 
     </div>
 
-    <!-- Display frame (PR 4f; design §7, rulings M1, P5): the same toggle and
-         Real label as Bitcoin vs. Real Estate. Everything is computed in
-         nominal dollars; Real divides each year's value by that year's
-         inflation factor, the deflator set in Baseline assumptions. -->
+    <!-- Display frame (PR 4f; design §7, rulings M1, P5): the same toggle, help
+         tip and frame line as Bitcoin vs. Real Estate, from
+         components/real-estate-baseline.njk and shared/real-estate-baseline.js.
+         Everything is computed in nominal dollars; Real divides each year's
+         value by that year's factor at the deflator set in Baseline
+         assumptions. The frame line says which view is showing and what Real
+         means next to Nominal (JM, 2026-09-29); the binder rewrites it from
+         the live deflator, so the words here are first paint only. -->
+    {% import 'components/real-estate-baseline.njk' as reb %}
     <div class="calc-frame-row">
       <span class="calc-frame-label">Display values in
-        <span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Real</strong> shows each year&rsquo;s value in today&rsquo;s purchasing power, deflated at the rate named below (set it in Baseline assumptions, at the foot of the calculator). Every figure for the same year is divided by the same factor, so the Real view never changes which path is ahead. <strong>Nominal</strong> shows future dollars, as they&rsquo;d appear on a future statement. Cash flows and the sale mechanics stay in nominal dollars, as paid, in both views.</span></span>
+        {{ reb.frameTip('bvrp') }}
       </span>
       <div class="calc-frame-toggle" role="group" aria-label="Display values in">
         <button type="button" class="calc-frame-btn active" data-mode="real" aria-pressed="true">Real (today&rsquo;s $)</button>
         <button type="button" class="calc-frame-btn" data-mode="nominal" aria-pressed="false">Nominal (future $)</button>
       </div>
     </div>
-    <p class="calc-deflator-line"><span id="rpDeflatorLine">Real: today&rsquo;s dollars, deflated at 6.5% a year (M2 growth).</span> <a href="#rpBaseline" class="calc-deflator-change" id="rpDeflatorChange">Change it</a></p>
+    <p class="calc-deflator-line"><span id="rpDeflatorLine">Showing <strong>Real</strong> values: today&rsquo;s dollars, deflated at 6.5% a year (M2 growth). At that rate, $100,000 ten years from now buys what $53,273 buys today, so Real shows $53,273 where Nominal shows $100,000.</span> <a href="#rpBaseline" class="calc-deflator-change" id="rpDeflatorChange">Change it</a></p>
 
     <!-- Bitcoin scenario picker (chips above chart). One set on both pages
          (rulings M3, PR 4c): Floor · Stay at today's multiple (default) ·
@@ -687,8 +692,8 @@ eleventyComputed:
     <!-- Baseline assumptions (collapsible — set once, ignore) — moved to the very bottom per TBR pattern.
          The first two groups are the pair's shared, sitewide part (PR 4f; design §7, rulings M1, P5):
          their words and presets come from components/real-estate-baseline.njk and
-         shared/real-estate-baseline.js binds them, as on Bitcoin vs. Real Estate. -->
-    {% import 'components/real-estate-baseline.njk' as reb %}
+         shared/real-estate-baseline.js binds them, as on Bitcoin vs. Real Estate
+         (the macros are imported above the display frame). -->
     <details class="calc-baseline" id="rpBaseline">
       <summary>
         <span class="calc-baseline-summary-label">Baseline assumptions</span>

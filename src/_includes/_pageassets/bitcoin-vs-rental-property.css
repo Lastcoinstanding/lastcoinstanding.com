@@ -1657,15 +1657,21 @@ html, body {
   font-weight: 600;
 }
 /* These notes are <p>s, and `.bvrp-section p` outranks a single class, so
-   they are scoped under .calc-wrap, as the appreciation notice is. */
+   they are scoped under .calc-wrap, as the appreciation notice is. The
+   frame line says which view is showing and what Real means next to
+   Nominal (JM, 2026-09-29): two sentences, so they are set left in a box
+   that sits under the right-hand toggle. */
 .calc-wrap .calc-deflator-line {
   font-family: var(--font-body);
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   line-height: 1.5;
   color: var(--ink-dim);
-  text-align: right;
-  margin: 0 0 0.2rem;
+  text-align: left;
+  width: fit-content;
+  max-width: 40rem;
+  margin: 0 0 0.2rem auto;
 }
+.calc-wrap .calc-deflator-line strong { color: var(--ink); font-weight: 600; }
 .calc-deflator-change {
   color: var(--amber);
   text-decoration: none;
@@ -1695,5 +1701,5 @@ html, body {
 .calc-detail-frame { margin-top: 0.9rem; }
 @media (max-width: 600px) {
   .calc-frame-row { justify-content: flex-start; }
-  .calc-wrap .calc-deflator-line { text-align: left; }
+  .calc-wrap .calc-deflator-line { margin-left: 0; }
 }

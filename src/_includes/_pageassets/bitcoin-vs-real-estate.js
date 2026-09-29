@@ -566,6 +566,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     btn.addEventListener('click', function(){
       document.querySelectorAll('.display-mode-btn').forEach(function(b){b.classList.remove('active')});
       btn.classList.add('active');
+      if (baseline) baseline.renderFrame();   // the frame line under the toggle (PR 4f)
       runFwdCalc();
     });
   });
@@ -854,7 +855,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // Real view: P5) are bound by shared/real-estate-baseline.js, the binder
   // Bitcoin vs. Rental Property uses too, so the two pages can't disagree
   // about either. It keeps the preset buttons, the two fields, the notice,
-  // the Real label under the toggle and the collapsed block's summary in
+  // the frame line under the toggle (which view is showing, and what Real
+  // means next to Nominal) and the collapsed block's summary in
   // step with ModelingAssumptions (across tabs too), and re-runs the
   // projection when either changes. A typed value equal to a preset selects
   // that preset, so restoring a default never writes a spurious "custom"
@@ -863,6 +865,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   var baseline = window.RealEstateBaseline.bind({
     prefix: 'fwd',
     onChange: function(){ runFwdCalc(); },
+    displayMode: _displayMode,
     // The URL writer (below) listens on the field, so a preset button
     // fires 'input' there for it to record the value.
     inputEventOnPreset: true

@@ -21,8 +21,12 @@
                         link in the older format)
      <p>InflPresets     preset buttons for the deflator
      <p>Inflation       text input, % a year
-     <p>DeflatorLine    the Real label: "Real: today's dollars, deflated at
-                        6.5% a year (M2 growth)." (P5)
+     <p>DeflatorLine    the line under the Real / Nominal toggle: which frame
+                        is showing, what Real means and how it differs from
+                        Nominal, with a worked example at the deflator in
+                        force (P5; frameLine() below)
+     <p>DeflatorChange  "Change it" beside that line: opens <p>Baseline (the
+                        <details> block) at the deflator's presets
      <p>BaselineHint    the collapsed block's one-line summary
    Any of them may be absent.
 
@@ -36,7 +40,7 @@
      - every change goes through ModelingAssumptions, whose subscription
        re-syncs both pages (and other tabs) and calls opts.onChange.
 
-   bind(opts) → { sync(), setLegacyNote(msg) }
+   bind(opts) → { sync(), renderFrame(), setLegacyNote(msg) }
      opts.prefix          id prefix (required)
      opts.onChange(dim)   the page re-renders ('homeApprNominal',
                           'inflation' or '*')
@@ -44,6 +48,9 @@
      opts.inputEventOnPreset  BvRE: fire 'input' on the field after a
                           preset button, so the page's URL writer, which
                           listens there, records the value
+     opts.displayMode()   the page's frame, 'real' or 'nominal' (default
+                          'real'); the page calls renderFrame() when its
+                          toggle changes
    ============================================================ */
 (function(){
   'use strict';
@@ -61,7 +68,31 @@
     var i = MA.get('inflation');
     return 'deflated at ' + pct2(i.value) + ' a year (' + INFL_NAMES[i.preset] + ')';
   }
-  function realLabel(){ return 'Real: today’s dollars, ' + deflatorPhrase() + '.'; }
+  // The line under the Real / Nominal toggle (P5; JM 2026-09-29): it says
+  // which frame is showing, what Real means and how it differs from
+  // Nominal, with a worked example at the deflator in force. It is built
+  // here, from the live value, so the static copy beside it (the toggle's
+  // help tip, components/real-estate-baseline.njk) states no figure
+  // (STYLE_GUIDE §10.8). The same words on both pages: rePairQA's E24 and
+  // P25 capture it, and their hashes must be equal.
+  function money(v){ return '$' + Math.round(v).toLocaleString('en-US'); }
+  function frameLine(mode){
+    var i = MA.get('inflation'), RE = window.RealEstateModel;
+    var factor = RE && RE.deflator ? RE.deflator(i.value, 10) : Math.pow(1 + i.value / 100, 10);
+    var later = money(100000), now = money(100000 / factor), same = now === later;
+    if (mode === 'nominal') {
+      return 'Showing <strong>Nominal</strong> values: future dollars, with nothing taken off for inflation. ' +
+        (same
+          ? 'The deflator is ' + pct2(i.value) + ' (' + INFL_NAMES[i.preset] + '), so Real is the same.'
+          : 'At the deflator, ' + pct2(i.value) + ' a year (' + INFL_NAMES[i.preset] + '), ' + later + ' ten years from now buys what ' +
+            now + ' buys today, so Real would show ' + now + ' where Nominal shows ' + later + '.');
+    }
+    return 'Showing <strong>Real</strong> values: today’s dollars, ' + deflatorPhrase() + '. ' +
+      (same
+        ? 'At that rate, Real and Nominal are the same.'
+        : 'At that rate, ' + later + ' ten years from now buys what ' + now + ' buys today, so Real shows ' + now +
+          ' where Nominal shows ' + later + '.');
+  }
   function summary(){
     var a = MA.get('homeApprNominal'), i = MA.get('inflation');
     return 'home prices ' + pct2(a.value) + ' a year nominal (' + APPR_NAMES[a.preset] + ') · Real view deflated at ' +
@@ -103,8 +134,12 @@
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
     }
+    function renderFrame(){
+      var line = $('DeflatorLine');
+      if (line) line.innerHTML = frameLine(opts.displayMode ? opts.displayMode() : 'real');
+    }
     function syncText(){
-      var line = $('DeflatorLine'); if (line) line.textContent = realLabel();
+      renderFrame();
       var hint = $('BaselineHint'); if (hint) hint.textContent = summary();
       var note = $('ApprNotice');
       if (note) {
@@ -159,6 +194,21 @@
       });
     });
 
+    // "Change it" beside the frame line: open Baseline assumptions at the
+    // deflator, and put the focus on its selected preset. Without script the
+    // link still jumps to the block.
+    var change = $('DeflatorChange');
+    if (change) change.addEventListener('click', function(e){
+      var box = $('Baseline');
+      if (!box) return;
+      e.preventDefault();
+      box.open = true;
+      var target = $('InflPresets') || box;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var btn = target.querySelector('[data-preset].active') || target.querySelector('button');
+      if (btn) btn.focus({ preventScroll: true });
+    });
+
     MA.subscribe(function(dim){
       if (dim !== '*' && dim !== 'homeApprNominal' && dim !== 'inflation') return;
       sync();
@@ -167,6 +217,7 @@
     sync();
 
     ctl.sync = sync;
+    ctl.renderFrame = renderFrame;
     ctl.setLegacyNote = function(msg){ ctl.legacyNote = msg || ''; syncText(); };
     return ctl;
   }
@@ -174,7 +225,7 @@
   window.RealEstateBaseline = {
     bind: bind,
     deflatorPhrase: deflatorPhrase,
-    realLabel: realLabel,
+    frameLine: frameLine,
     summary: summary,
     INFL_NAMES: INFL_NAMES,
     APPR_NAMES: APPR_NAMES

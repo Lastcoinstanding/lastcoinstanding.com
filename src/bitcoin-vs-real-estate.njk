@@ -350,13 +350,17 @@ eleventyComputed:
 
                     <!-- Display mode toggle: Real (today's purchasing power) vs Nominal (future dollars).
                          Default is Real — matches the editorial convention used in 'How this works' and
-                         in retrospective. Persisted via URL/storage SCHEMA. -->
+                         in retrospective. Persisted via URL/storage SCHEMA. The help tip and the frame line
+                         under the toggle are the pair's shared ones (PR 4f;
+                         components/real-estate-baseline.njk, shared/real-estate-baseline.js): the line says
+                         which view is showing and what Real means next to Nominal (JM, 2026-09-29), and the
+                         binder rewrites it from the live deflator, so the words here are first paint only. -->
                     <div class="display-mode-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.6rem;margin:0.4rem 0 0.4rem;justify-content:flex-end">
-                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)">Display values in:<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Real</strong> shows projected values deflated to today&rsquo;s purchasing power at the deflator named below (set it in Baseline assumptions). Every figure is divided by the same factor, so the Real view never changes which path is ahead. <strong>Nominal</strong> shows the future dollar amounts as they&rsquo;d appear on a future statement.</span></span></span>
+                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)">Display values in:{{ reb.frameTip('bvre') }}</span>
                         <button class="display-mode-btn toggle-btn active" data-mode="real" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
                         <button class="display-mode-btn toggle-btn" data-mode="nominal" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
                     </div>
-                    <div class="re-deflator-line" id="fwdDeflatorLine">Real: today&rsquo;s dollars, deflated at 6.5% a year (M2 growth).</div>
+                    <div class="re-deflator-line"><span id="fwdDeflatorLine">Showing <strong>Real</strong> values: today&rsquo;s dollars, deflated at 6.5% a year (M2 growth). At that rate, $100,000 ten years from now buys what $53,273 buys today, so Real shows $53,273 where Nominal shows $100,000.</span></div>
 
                     <!-- Results -->
                     <div id="fwdResults"></div>
