@@ -22,7 +22,8 @@
      - Date.now → 2026-09-27T12:00Z; BTC → $100,000 (fwdBtcNow and, for
        the retrospective, TODAY_PRICE on BvRE; TODAY_PRICE on BvRP);
        ModelingAssumptions → inflation
-       m2-growth, homeApprNominal since-2000, realReturns diversified;
+       m2-growth, homeApprNominal since-2000, realReturns diversified (on
+       BvRP too since PR 4f, whose Real view reads the inflation);
      - captures result-container innerHTML and Chart.js dataset arrays
        (labels, data at full precision, hidden flags);
      - hashes each vector's capture (FNV-1a 32) and all of them
@@ -96,6 +97,12 @@
        presets. BvRP's appreciation field is `rpHomeAppreciation` (was
        `calc-appreciation`). New parityCheck(): the engine's house-side
        figures for the same shared inputs, as each page computes them.
+       Then BvRP gains the Real view, whose default is Real (BvRE's is too).
+       RP_BASE pins the Nominal display and the deflator, so P1–P16 are
+       byte-comparable with 4e: the Nominal view renders exactly as before.
+       New: P17–P24, the Real view (defaults; Paths 1, 2 and 3; a CPI
+       deflator; a custom 0% deflator, which must equal Nominal in every
+       figure; a 30-year hold; the first-3-years chart).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -228,7 +235,7 @@
   var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
                   props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5',
-                  mortRate: '4.4', mortYears: '20' };
+                  mortRate: '4.4', mortYears: '20', display: 'nominal', infl: 'm2-growth', zoom: 'full' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -250,11 +257,23 @@
     { id: 'P13', desc: 'Path 1 at the pre-4b costs (selling 8%, no bitcoin cost)', path: '1', sell: '8', btctx: '0' },
     { id: 'P14', desc: 'Path 4, no existing mortgage', mortgage: '0' },
     { id: 'P15', desc: 'Path 4, mortgage with 5 years left', mortYears: '5' },
-    { id: 'P16', desc: "Path 1, $450K mortgage the sale doesn't cover", path: '1', mortgage: '450000' }
+    { id: 'P16', desc: "Path 1, $450K mortgage the sale doesn't cover", path: '1', mortgage: '450000' },
+    { id: 'P17', desc: 'Real view: defaults (Path 4, stay), M2 growth 6.5% (PR 4f)', display: 'real' },
+    { id: 'P18', desc: 'Real view: Path 1', display: 'real', path: '1' },
+    { id: 'P19', desc: 'Real view: Path 2', display: 'real', path: '2' },
+    { id: 'P20', desc: 'Real view: Path 3', display: 'real', path: '3' },
+    { id: 'P21', desc: 'Real view: CPI deflator 3.5%', display: 'real', infl: 'cpi-official' },
+    { id: 'P22', desc: 'Real view: custom deflator 0% (every figure = Nominal)', display: 'real', infl: 'custom', inflVal: 0 },
+    { id: 'P23', desc: 'Real view: Path 1, hold 30y', display: 'real', path: '1', hold: '30' },
+    { id: 'P24', desc: 'Real view: first 3 years of the chart', display: 'real', zoom: 'first3' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
+    // The sitewide values first: a change there re-renders from the store.
+    setInfl(x);
     if (window.ModelingAssumptions) window.ModelingAssumptions.set('homeApprNominal', 'since-2000');
+    click('.calc-frame-btn[data-mode="' + x.display + '"]');   // PR 4f
+    click('.calc-chart-zoom-btn[data-zoom="' + x.zoom + '"]');
     click('.calc-path-btn[data-path="' + x.path + '"]');
     setVal('rpHomeAppreciation', x.appr);                     // input only, as on BvRE
     setVal('calc-sell-cost', x.sell); setVal('calc-btc-tx', x.btctx);
@@ -268,10 +287,20 @@
     click('.calc-cagr-chip[data-scenario="' + x.scenario + '"]');
   }
   function captureRp(){
-    return { headline: html('calc-headline'), compHead: html('calc-comparison-headers'), comp: html('calc-comparison-body'),
+    var c = { headline: html('calc-headline'), compHead: html('calc-comparison-headers'), comp: html('calc-comparison-body'),
              detail: html('calc-path-detail'), callout: html('calc-specific-callout'), desc: html('calc-path-description'),
              chips: html('calc-cagr-chips'), multiple: html('calc-current-multiple'), chart: chartData('calc-chart') };
+    // The Real view's own labels (PR 4f). Captured in the Real view only, so
+    // a Nominal capture is the same object as before 4f and P1–P16 stay
+    // byte-comparable.
+    if (state_display() === 'real') {
+      var q = function(id){ var n = el(id); return n ? n.textContent : null; };
+      c.frame = { line: q('rpDeflatorLine'), chart: q('calc-chart-frame'), table: q('calc-comparison-frame'),
+                  chips: el('calc-chips-frame') ? !el('calc-chips-frame').hidden : null };
+    }
+    return c;
   }
+  function state_display(){ var b = document.querySelector('.calc-frame-btn.active'); return b ? b.getAttribute('data-mode') : null; }
   function captureRpStatic(){
     var q = function(sel){ return Array.prototype.map.call(document.querySelectorAll(sel), function(n){ return n.textContent; }); };
     return { plCagr: q('[data-pl-cagr]'), plStay: q('[data-pl-stay-fv]'),
@@ -295,7 +324,7 @@
 
     // Save state
     var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE,
-                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null };
+                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null, display: state_display() };
     try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
     if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
 
@@ -326,6 +355,7 @@
         rows.push({ id: 'S-bvrp', desc: 'Power Law copy spans', hash: fnv(s0), len: s0.length }); all.push(s0);
         RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
         applyRp({});
+        if (saved.display) click('.calc-frame-btn[data-mode="' + saved.display + '"]');   // the reader's frame (PR 4f)
       }
     } finally {
       Date.now = saved.now;
