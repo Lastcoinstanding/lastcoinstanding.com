@@ -295,7 +295,7 @@ Sitewide values used by every calculator. The site has a single point of view on
 
 Calculator pages organize their inputs into two visually distinct zones:
 
-- **Baseline assumptions zone** — at the top of the inputs section. Slow-changing, sitewide-sticky, rarely revisited after first selection. Inflation, real return, real estate appreciation, growth model selections live here.
+- **Baseline assumptions zone** — at the top of the inputs section. Slow-changing, sitewide-sticky, rarely revisited after first selection. Inflation, real return, home appreciation (nominal), growth model selections live here.
 - **Active variables zone** — inline below. Page-specific, never sticky, never sitewide. The user iteratively plays with these. Bitcoin holdings, contribution amounts, retirement age, target lifestyle expenses, etc. live here.
 
 The two zones are visually distinct (different backgrounds or borders, clear separation) so the user understands at a glance which inputs are world-shape assumptions vs. specific-question variables.
@@ -338,25 +338,28 @@ Three-card picker, no Custom field. Default = 5% (diversified portfolio).
 
 **localStorage key:** `lcs.realReturns.preset` (string: `conservative` | `diversified` | `sp500-historical`).
 
-### Real estate appreciation
+### Real estate appreciation (nominal)
 
-Four-card picker including Custom. Default = 3.5% real (Recent decades). All values in **real** terms; UI shows nominal-equivalent based on the selected inflation rate.
+**Nominal since PR 4a (2026-09-28; REAL_ESTATE_PAIR_RULINGS M1, C7).** Four-card picker including Custom. Default = **4.68% nominal (Since 2000)**. Home appreciation is quoted the way house prices and mortgage rates are, in nominal terms; inflation only deflates a calculator's Real view, dividing both paths by the same factor, so the inflation preset can never change which path is ahead.
 
 | # | Value | Label | Framing |
 |---|---|---|---|
-| 1 | 1% real | Long-run real | Case-Shiller's century-long real home appreciation. Homes have rarely been a real-return investment in their own right; wealth-building reputation comes from leverage, tax advantages, and forced savings. |
-| 2 | **3.5% real** *(default)* | Recent decades | Real appreciation since 2000, driven by falling rates, monetary expansion, supply constraints. Historically anomalous. |
-| 3 | 5.5% real | Optimistic / continued boom | Top-end forecast assuming continued monetary expansion, supply constraints, rate suppression. Bull-case housing thesis. |
-| 4 | user-input | Custom rate | For other markets, down-market scenarios (negative values for stress-testing), or your own assumptions. |
+| 1 | 3.41% nominal | Long run | Shiller's US series from 1890, chained to Case-Shiller National from 2022, to 2025. About 0.6% a year above CPI over 1890–2022: homes have rarely been a real-return investment in their own right; the wealth-building reputation comes from leverage, tax advantages and forced savings. |
+| 2 | 4.23% nominal | Since 1990 | Case-Shiller National, 1990–2025. |
+| 3 | **4.68% nominal** *(default)* | Since 2000 | Case-Shiller National, 2000–2025: the highest of the three recorded windows, so the default leans against bitcoin's case (rulings §0). Carried by falling rates (Fed funds 6%→0%) and supply constraints. |
+| 4 | user-input | Custom rate | Other markets, down-market scenarios (negative values for stress-testing), a higher-inflation future, or your own assumptions. |
 
-**Component decomposition:**
+**Component decomposition** (annual averages of monthly data; end point = latest full year; figures, method and primaries in `REAL_ESTATE_PAIR_PR4_SOURCES.md`, DATA_AUDIT RE-1–RE-5, reproducible with `scripts/verify-real-estate-sources.py`):
 
-- **Long-run 1%** — Case-Shiller US National HPI real terms 1890–2024 ~0.4%, rounded up to 1% for a slightly more generous baseline. At 6.5% M2 inflation, equivalent to ~7.5% nominal.
-- **Recent decades 3.5%** — Case-Shiller 2000–2024 real ~3.7%, rounded to 3.5%. At 6.5% M2 inflation, ~10% nominal — close to the 2000–2024 actual nominal experience. Driven by falling rates (Fed funds 6%→0%) and supply constraints; unlikely to persist if rates normalize.
-- **Optimistic 5.5%** — Best 25-yr Case-Shiller real return windows reach ~5%, e.g. 1997–2022; 5.5% as bull-case extrapolation. At 6.5% inflation, ~12% nominal — aggressive but not unprecedented in specific markets.
-- **Custom** — Local market data (Zillow / Redfin), market-correction scenarios (−5% to 0% real), non-US markets (Tokyo flat since 1990; UK ~3% real; emerging markets vary widely).
+- **Long run 3.41%** — Shiller 1890–2022 chained to FRED `CSUSHPINSA` for 2022–2025: ×92.41 over 135 years. The splice is checked, not assumed: over 1990–2022 the two series agree to within 0.06%.
+- **Since 1990 4.23%** — Case-Shiller National 1990–2025, ×4.270 over 35 years.
+- **Since 2000 4.68%** — Case-Shiller National 2000–2025, ×3.135 over 25 years. (Phase 0's ~4.8% ended in 2024; 2025 was a soft year.)
+- **Real equivalents**, for reference only (CPI-U, FRED `CPIAUCNS`): about 0.6% a year for 1890–2022, 1.58% since 1990 and 2.09% since 2000.
+- **Custom** — Local market data (Zillow / Redfin), market-correction scenarios, non-US markets (Tokyo flat since 1990), or a higher-inflation future. *"When inflation runs higher, home prices tend to rise in nominal terms while a fixed-rate loan balance doesn't. That is the fixed-rate borrower's inflation benefit. To model a higher-inflation future, raise nominal appreciation."*
 
-**localStorage keys:** `lcs.realEstate.preset`, `lcs.realEstate.customValue`.
+**Why it changed.** The dimension used to hold **real** rates (1 / 3.5 / 5.5, default 3.5), which calculators re-inflated at the sitewide inflation default. At M2 growth (6.5%) that put the default house at ~10.2% a year nominal, about twice the recorded ~4.7–4.8%: a CPI-real rate re-inflated at M2. The old decomposition's "~3.7% real, 2000–2024" didn't reproduce either (the primary gives 2.19%). **Refresh:** annually, when the latest full year's Case-Shiller average is in; update the three values here, in `shared/modeling-assumptions.js` and in DATA_AUDIT RE-3–RE-5.
+
+**localStorage keys:** `lcs.homeApprNominal.preset` (`long-run` | `since-1990` | `since-2000` | `custom`), `lcs.homeApprNominal.customValue`, and `lcs.homeApprNominal.migratedFrom` (a one-time note). The old `lcs.realEstate.*` keys are migrated once and deleted by `migrateRealEstate()`: a deliberate custom real value converts to nominal at the sitewide inflation, and the page says so in one line; a stored value equal to an old preset (1 / 3.5 / 5.5) is dropped, because BvRE's storage restore used to write the default back as "custom" on every return visit. **Consumers:** `/bitcoin-vs-real-estate` (projection) and `/bitcoin-vs-rental-property`; the setting is shared, so changing it on one changes it on the other.
 
 ### Active variables — never sticky
 

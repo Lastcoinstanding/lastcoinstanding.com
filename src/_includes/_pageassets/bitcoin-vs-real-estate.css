@@ -243,13 +243,6 @@
 .purchase-btn:first-child { border-radius: 4px 0 0 4px; }
 .purchase-btn:last-child { border-radius: 0 4px 4px 0; }
 .purchase-btn.active { background: rgba(224,148,34,0.1); color: var(--amber); border-color: rgba(247,147,26,0.3); font-weight: 600; }
-.advanced-section { border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-top: 1.5rem; }
-.advanced-toggle-label { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.88rem; color: var(--text-dim); margin-bottom: 1rem; flex-wrap: wrap; }
-.advanced-toggle-label input[type=checkbox] { accent-color: var(--amber); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
-.advanced-toggle-label input[type=text] { height: 30px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 0.85rem; padding: 0 0.5rem; width: 60px; border-radius: 3px; }
-.advanced-toggle-label strong { color: var(--amber); font-weight: 500; }
-.advanced-note { font-size: 0.78rem; color: var(--text-muted); line-height: 1.7; padding: 1rem; background: rgba(224,148,34,0.04); border-radius: 6px; margin-bottom: 1.2rem; }
-.advanced-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .footnote-date { font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-top: 0.6rem; line-height: 1.5; }
 
 /* Mobile: collapse calc-grid to single column */
@@ -258,7 +251,6 @@
     .calc-section { padding: 1.4rem 1.2rem; }
     .scenario-btn { padding: 0.6rem 0.4rem; font-size: 0.74rem; }
     .purchase-btn { padding: 0.65rem 0.5rem; font-size: 0.72rem; }
-    .advanced-grid { grid-template-columns: 1fr; gap: 1rem; }
 }
 
 /* ───────────────────────────────────────────────
@@ -474,4 +466,62 @@
     color: var(--amber);
     border-color: rgba(247,147,26,0.3);
     font-weight: 600;
+}
+
+/* ─── Baseline assumptions (PR 4a; rulings M1, P5, design §7) ───
+   BvRP's two-tier pattern (set once, then ignore), in this page's own
+   tokens. Home appreciation (nominal) and the Real-view deflator live
+   here; PR 4b adds the cost and rent inputs. */
+.re-baseline { margin: 0.4rem 0 1.2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.re-baseline summary { cursor: pointer; list-style: none; padding: 0.7rem 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.6rem; user-select: none; }
+.re-baseline summary::-webkit-details-marker { display: none; }
+.re-baseline summary::before { content: '\25B8'; color: var(--amber); font-size: 0.85rem; transition: transform 0.2s; display: inline-block; }
+.re-baseline[open] summary::before { transform: rotate(90deg); }
+.re-baseline-label { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text); }
+.re-baseline summary:hover .re-baseline-label { color: var(--amber); }
+.re-baseline-hint { font-size: 0.78rem; color: var(--text-dim); font-style: italic; }
+.re-baseline-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem 1.6rem; padding: 0.4rem 0 1.2rem; }
+.re-baseline-group-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 0.5rem; }
+.re-baseline-group-label .opt { font-size: 0.7rem; text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 0.3rem; }
+.re-preset-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 0.6rem; }
+.re-preset-btn { padding: 0.5rem 0.3rem; font-family: 'Inter', -apple-system, sans-serif; font-size: 0.74rem; font-weight: 500; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; transition: all 0.2s; text-align: center; line-height: 1.3; }
+.re-preset-btn:first-child { border-radius: 4px 0 0 4px; }
+.re-preset-btn:last-child { border-radius: 0 4px 4px 0; }
+.re-preset-btn:hover { color: var(--text); }
+.re-preset-btn.active { background: rgba(224,148,34,0.1); color: var(--amber); border-color: rgba(247,147,26,0.3); font-weight: 600; }
+.re-preset-val { display: block; font-size: 0.68rem; font-weight: 400; opacity: 0.8; }
+.re-baseline-input { max-width: 160px; }
+.re-baseline-input[hidden] { display: none; }  /* .calc-field's display:flex would otherwise override [hidden] */
+.re-baseline-note { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; margin: 0.5rem 0 0; }
+.re-deflator-line { font-size: 0.74rem; color: var(--text-muted); text-align: right; margin: 0 0 1rem; }
+@media (max-width: 480px) {
+  .re-preset-btn { font-size: 0.7rem; padding: 0.45rem 0.15rem; }
+  .re-deflator-line { text-align: left; }
+}
+/* PR 4b: rent and cost inputs in the Baseline assumptions block, and the
+   equal-cash-out toggle that sits with the results (rulings M2, P6). */
+.re-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem 1rem; }
+.re-field-grid .calc-field { min-width: 0; }
+.re-field-grid .calc-field input { height: 40px; }
+.re-invest-row { margin: 1.2rem 0 0.4rem; padding: 0.9rem 1.1rem; border: 1px solid var(--border); border-radius: 6px; background: rgba(255,255,255,0.015); }
+.re-invest-toggle { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; color: var(--text); font-weight: 500; }
+.re-invest-toggle input { width: 16px; height: 16px; accent-color: var(--amber); cursor: pointer; }
+.re-cashout-line { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; margin: 0.6rem 0 0; }
+@media (max-width: 480px) {
+  .re-field-grid { grid-template-columns: 1fr; }
+}
+/* PR 4c: the bitcoin scenario set (rulings M3). Four buttons, and the
+   selected scenario's implied growth directly under them. Below 720px the
+   four buttons sit two by two. */
+.scenario-btns-4 { margin-bottom: 0.6rem; }
+.scenario-sub { font-size: 0.7rem; font-weight: 400; opacity: 0.75; }
+.scenario-growth { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+.scenario-growth strong { color: var(--text); font-weight: 600; }
+@media (max-width: 720px) {
+  .scenario-btns-4 { flex-wrap: wrap; }
+  .scenario-btns-4 .scenario-btn { flex: 1 1 50%; }
+  .scenario-btns-4 .scenario-btn:nth-child(1) { border-radius: 4px 0 0 0; }
+  .scenario-btns-4 .scenario-btn:nth-child(2) { border-radius: 0 4px 0 0; }
+  .scenario-btns-4 .scenario-btn:nth-child(3) { border-radius: 0 0 0 4px; }
+  .scenario-btns-4 .scenario-btn:nth-child(4) { border-radius: 0 0 4px 0; }
 }

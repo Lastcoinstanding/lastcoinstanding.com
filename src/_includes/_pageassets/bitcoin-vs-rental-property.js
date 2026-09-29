@@ -105,7 +105,8 @@
   function render(){
     if (typeof plPrice !== 'function' || typeof GENESIS_TS !== 'number') return;
     var d = (Date.now() / 1000 - GENESIS_TS) / 86400;
-    function factor(a, b){ return plPrice(d + b * 365) / plPrice(d + a * 365); }
+    // 365.25-day years, as in the shared engine (M10, PR 4a).
+    function factor(a, b){ return plPrice(d + b * 365.25) / plPrice(d + a * 365.25); }
     document.querySelectorAll('[data-pl-cagr]').forEach(function(el){
       var p = el.getAttribute('data-pl-cagr').split(',');
       var a = Number(p[0]), b = Number(p[1]);
@@ -158,7 +159,10 @@
     federalBracketPct: 24,     // 12, 22, 24, 32, 35, 37
     adjustedBasisPct: 60,      // % of current value
     yearsAlreadyHeld: 10,
-    btcScenario: 'trend',      // 'stay' | 'trend' | 'upper' — Power Law-anchored
+    // Bitcoin scenario, one set on both pages (rulings M3, PR 4c):
+    // 'floor' | 'stay' | 'trend' | 'upper'. Default Stay at today's multiple
+    // (was 'trend'); the markup's active chip must match.
+    btcScenario: 'stay',
     helocLtv: 80,
     helocRatePct: 9.5,
     existingMortgage: 200000,
@@ -166,7 +170,14 @@
     propertiesRetained: 2,     // derived sold = numProperties - propertiesRetained
     portfolio: { strc: 45, sata: 30, ledn: 10, spot: 15 },
     includeSweatEquity: false,
-    appreciationPct: 3.0       // RE annual appreciation
+    // Nominal home appreciation, %/yr. The pair's shared input,
+    // lcs.homeApprNominal (PR 4a, rulings M1); was a hardcoded 3.0.
+    // bindAppreciation() sets it from ModelingAssumptions before first render.
+    appreciationPct: 4.68,
+    // PR 4b (rulings M6): selling costs, one default on both pages (was a
+    // hardcoded 8%), and the cost of each bitcoin purchase (was free).
+    sellCostPct: window.RealEstateModel.PAIR_DEFAULTS.sellPct,
+    btcTxPct: window.RealEstateModel.PAIR_DEFAULTS.btcTxPct
   };
 
   // ─── Engine: shared/real-estate-model.js ───
@@ -197,33 +208,34 @@
   // ─── Renderers ───
 
   // ─── Chart.js rendering ───
-  // Four datasets, dataset indices stable (legendVisibility maps to these):
+  // Five datasets, dataset indices stable (legendVisibility maps to these):
   //   0 = Keep rental (amber dashed)
-  //   1 = Bitcoin: Stay at current multiple
-  //   2 = Bitcoin: Revert to trend
-  //   3 = Bitcoin: Reach upper channel
+  //   1 = Bitcoin: Stay at today's multiple
+  //   2 = Bitcoin: Trend
+  //   3 = Bitcoin: Upper
+  //   4 = Bitcoin: Floor (PR 4c; drawn faintly unless it is the selection)
   // The chip selection (state.btcScenario) determines which line is the
   // "primary" (bold) and which scenario drives the headline / table /
-  // path-detail numbers. All four lines are simultaneously visible by
-  // default; user can toggle individual lines via the custom legend.
+  // path-detail numbers. The user can toggle individual lines via the
+  // custom legend.
   var chartInstance = null;
-  // Legend visibility defaults: keep-rental + the default-primary
-  // scenario (trend) visible; other two scenarios hidden but
-  // toggleable. User clicking a different chip auto-hides the old
-  // primary and shows the new one; manual toggles on the other two
-  // persist across chip switches.
-  var legendVisibility = { 0: true, 1: false, 2: true, 3: false };
+  // Legend visibility defaults: keep-rental, the default-primary scenario
+  // (Stay) and Floor, which M3 draws faintly on every chart. Clicking a
+  // different chip auto-hides the old primary (never Floor) and shows the
+  // new one; manual toggles on the others persist across chip switches.
+  var legendVisibility = { 0: true, 1: true, 2: false, 3: false, 4: true };
   var chartZoom = 'full';  // 'full' | 'first3' — toggleable via UI above the chart
 
-  // Colors for the four datasets — distinguishable on dark, semantically
-  // ordered (rental amber → bear brown → trend green → upper cyan).
-  // Upper channel uses a distinct hue (not another green) and is dashed
-  // to reinforce its "less certain / less sustained" character.
+  // Colors for the five datasets, distinguishable on dark. Upper uses a
+  // distinct hue and is dashed (a stress test, never sustained in the
+  // record); Floor is a muted grey, dotted, and faint unless selected.
   var CHART_COLORS = {
     rental:    '#e09422',  // amber, dashed
-    stay:      '#b87a4a',  // warm brown — bear/no-reversion
-    trend:     '#5a8a3a',  // canonical site green — central/default
-    upper:     '#5fa8d8'   // cool blue — upper channel, also dashed
+    stay:      '#b87a4a',  // warm brown (the default)
+    trend:     '#5a8a3a',  // canonical site green
+    upper:     '#5fa8d8',  // cool blue, dashed
+    floor:     '#9d958a',  // muted grey, dotted
+    floorFaint: 'rgba(157,149,138,0.55)'
   };
 
   function renderChart(s){
@@ -233,6 +245,7 @@
     var trajStay  = calcWealthTrajectory(s, 'stay');
     var trajTrend = calcWealthTrajectory(s, 'trend');
     var trajUpper = calcWealthTrajectory(s, 'upper');
+    var trajFloor = calcWealthTrajectory(s, 'floor');
 
     // Zoom: if 'first3', slice to the first 4 years (Y0..Y3) so the
     // short-term tax-leakage dip is visible. Auto-scaling y-axis will
@@ -246,6 +259,7 @@
     var pathStay  = slice(trajStay).map(function(r){ return r.wealthPath; });
     var pathTrend = slice(trajTrend).map(function(r){ return r.wealthPath; });
     var pathUpper = slice(trajUpper).map(function(r){ return r.wealthPath; });
+    var pathFloor = slice(trajFloor).map(function(r){ return r.wealthPath; });
 
     function primary(scenario){ return scenario === s.btcScenario; }
 
@@ -265,7 +279,7 @@
         hidden: !legendVisibility[0]
       },
       {
-        label: 'Bitcoin · Stay at current trend multiple',
+        label: 'Bitcoin · Stay at today\u2019s multiple',
         data: pathStay,
         borderColor: CHART_COLORS.stay,
         backgroundColor: CHART_COLORS.stay,
@@ -278,7 +292,7 @@
         hidden: !legendVisibility[1]
       },
       {
-        label: 'Bitcoin · Revert to Power Law trend',
+        label: 'Bitcoin · Trend',
         data: pathTrend,
         borderColor: CHART_COLORS.trend,
         backgroundColor: CHART_COLORS.trend,
@@ -291,7 +305,7 @@
         hidden: !legendVisibility[2]
       },
       {
-        label: 'Bitcoin · Reach Power Law upper channel',
+        label: 'Bitcoin · Upper',
         data: pathUpper,
         borderColor: CHART_COLORS.upper,
         backgroundColor: CHART_COLORS.upper,
@@ -303,6 +317,21 @@
         tension: 0.18,
         order: primary('upper') ? 1 : 4,
         hidden: !legendVisibility[3]
+      },
+      {
+        // Floor (M3): drawn faintly on every chart; bold when selected.
+        label: 'Bitcoin · Floor',
+        data: pathFloor,
+        borderColor: primary('floor') ? CHART_COLORS.floor : CHART_COLORS.floorFaint,
+        backgroundColor: primary('floor') ? CHART_COLORS.floor : CHART_COLORS.floorFaint,
+        borderWidth: primary('floor') ? 2.75 : 1.25,
+        borderDash: [2, 3],
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.18,
+        order: primary('floor') ? 1 : 5,
+        hidden: !legendVisibility[4]
       }
     ];
 
@@ -358,27 +387,30 @@
     });
   }
 
-  // Per-scenario tooltip content — DRY across chip help-tips and legend
-  // help-tips. Caller may pass scenario codes 'stay' | 'trend' | 'upper'.
-  // 'stay' is conditional on current multiple: below trend → bear /
-  // no-reversion case; above trend → bull / no-correction case;
-  // within ±5% of 1.0× → neutral.
+  // Per-scenario tooltip content, shared by the chip help-tips and the
+  // legend help-tips. The set and wording follow rulings M3 (PR 4c): Trend
+  // carries the ruled sentence verbatim; Stay is worded for bitcoin's
+  // position without judging it; Upper's record is computed from the price
+  // data (RealEstateModel.upperRecordText), so it can't go stale.
   function scenarioTipHTML(scenario){
     if (scenario === 'stay') {
       var mult = currentBTCMultiple();
-      if (mult < 0.95) {
-        return 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never reverting up to trend. The bear / no-reversion case &mdash; you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver.';
-      }
-      if (mult > 1.05) {
-        return 'Bitcoin grows at the Power Law trend rate from today\u2019s price, never correcting down to trend. The bull / no-correction case &mdash; you keep the premium permanently and avoid the downside risk of mean reversion.';
-      }
-      return 'Bitcoin grows at the Power Law trend rate from today\u2019s price (which is currently at trend). At ~1\u00d7 trend, this case is roughly equivalent to Revert to trend.';
+      var base = 'Bitcoin keeps today\u2019s multiple of the Power Law trend (' + mult.toFixed(2) + '\u00d7), so it grows at the trend\u2019s own rate from today\u2019s price. No reversion is assumed in either direction. This is the default.';
+      if (mult < 0.95) return base + ' Bitcoin is below trend today, so this assumes the gap stays open; Trend assumes it closes.';
+      if (mult > 1.05) return base + ' Bitcoin is above trend today, so this assumes the premium persists; Trend assumes it closes.';
+      return base + ' Bitcoin is close to trend today, so this and Trend give similar results.';
     }
     if (scenario === 'trend') {
-      return 'Bitcoin moves from today\u2019s multiple back to 1.0\u00d7 the Power Law trend linearly over the holding period. The central case &mdash; assumes today\u2019s discount-or-premium-to-trend closes over time.';
+      return 'Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing.';
+    }
+    if (scenario === 'floor') {
+      return 'Bitcoin\u2019s multiple moves in a straight line from today\u2019s to 0.42\u00d7 the Power Law trend, the channel\u2019s lower bound, by the end of the holding period. Price has approached the floor three times since the genesis era and gone below it by 5.1% at most (2015), and each time it moved back above; the one deep breach, 42.6% below, was in 2010, in the genesis era (<a href="/the-bitcoin-floor">see The Floor</a>). Drawn faintly on the chart whichever scenario you pick.';
     }
     if (scenario === 'upper') {
-      return 'Bitcoin drifts toward 2.5\u00d7 trend (the historical above-cycle peak) over the holding period. <strong>Not a trendline expectation</strong> &mdash; rather a recognition that bitcoin has historically <em>spiked</em> to ~2.5\u00d7 trend in cycle peaks, and that such spikes have <em>never been sustained</em>. Worth modeling as a potential window for disciplined rebalancing or partial divestment &mdash; see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
+      var rec = window.RealEstateModel.upperRecordText();
+      return 'Bitcoin\u2019s multiple moves in a straight line from today\u2019s to 2.5\u00d7 the Power Law trend by the end of the holding period: a stress test, not a forecast.' +
+             (rec ? ' For scale, ' + rec + '.' : '') +
+             ' Worth modeling as a possible window for disciplined rebalancing or partial divestment: see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
     }
     return '';
   }
@@ -393,11 +425,13 @@
     var rows = [
       { idx: 0, label: 'Keep rental', color: CHART_COLORS.rental, dashed: true,
         tip: 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Mark-to-market &mdash; the property\u2019s market value is included without applying the exit tax that would arise on sale.' },
-      { idx: 1, label: 'Bitcoin \u00b7 Stay at current trend multiple', color: CHART_COLORS.stay,
+      { idx: 4, label: 'Bitcoin \u00b7 Floor', color: CHART_COLORS.floor, dashed: true,  // dotted on the chart
+        tip: scenarioTipHTML('floor') },
+      { idx: 1, label: 'Bitcoin \u00b7 Stay at today\u2019s multiple', color: CHART_COLORS.stay,
         tip: scenarioTipHTML('stay') },
-      { idx: 2, label: 'Bitcoin \u00b7 Revert to Power Law trend', color: CHART_COLORS.trend,
+      { idx: 2, label: 'Bitcoin \u00b7 Trend', color: CHART_COLORS.trend,
         tip: scenarioTipHTML('trend') },
-      { idx: 3, label: 'Bitcoin \u00b7 Reach Power Law upper channel', color: CHART_COLORS.upper,
+      { idx: 3, label: 'Bitcoin \u00b7 Upper', color: CHART_COLORS.upper,
         dashed: true,  // visually less confident — matches dashed chart line
         tip: scenarioTipHTML('upper') }
     ];
@@ -446,9 +480,10 @@
   }
 
   function scenarioLabel(scenario){
-    if (scenario === 'stay')  return 'Stay at current trend multiple';
-    if (scenario === 'upper') return 'Reach Power Law upper channel';
-    return 'Revert to Power Law trend';
+    if (scenario === 'floor') return 'Floor';
+    if (scenario === 'trend') return 'Trend';
+    if (scenario === 'upper') return 'Upper';
+    return 'Stay at today\u2019s multiple';
   }
 
   // Path-specific plain-English description rendered below the path
@@ -557,13 +592,14 @@
       html = '<div class="calc-detail-title">Path 1 mechanics — outright sale, redeploy to spot bitcoin</div>' +
         '<div class="calc-detail-rows">' +
         '<div><span>Gross sale</span><strong>' + fmtMoneyFull(r.grossSale) + '</strong></div>' +
-        '<div><span>Transaction costs (8%)</span><strong>-' + fmtMoneyFull(r.transactionCosts) + '</strong></div>' +
+        '<div><span>Selling costs (' + parseFloat(s.sellCostPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r.transactionCosts) + '</strong></div>' +
         '<div><span>Net proceeds</span><strong>' + fmtMoneyFull(r.netProceeds) + '</strong></div>' +
         '<div><span>Depreciation recapture (25%)</span><strong>-' + fmtMoneyFull(r.recaptureTax) + '</strong></div>' +
         '<div><span>Federal LTCG</span><strong>-' + fmtMoneyFull(r.ltcgTax) + '</strong></div>' +
         '<div><span>State tax (' + (s.stateCode === 'OTHER' ? 'typical ~5%' : s.stateCode) + ')</span><strong>-' + fmtMoneyFull(r.stateTax) + '</strong></div>' +
         '<div><span>NIIT</span><strong>-' + fmtMoneyFull(r.niit) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net cash deployed to bitcoin</span><strong>' + fmtMoneyFull(r.netCash) + '</strong></div>' +
+        '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r.netCash * s.btcTxPct / 100) + '</strong></div>' +
         '<div><span>All-in leakage from gross sale</span><strong>' + fmtPct(r.effectiveLeakagePct) + '</strong></div>' +
         '</div>';
     } else if (s.path === 2) {
@@ -573,6 +609,7 @@
         '<div><span>HELOC draw available</span><strong>' + fmtMoneyFull(r2.helocDraw) + '</strong></div>' +
         '<div><span>Annual interest carry</span><strong>' + fmtMoneyFull(r2.annualCarry) + '/yr</strong></div>' +
         '<div><span>Cumulative carry (' + s.holdingYears + ' yrs)</span><strong>' + fmtMoneyFull(r2.cumulativeCarry) + '</strong></div>' +
+        '<div><span>Bitcoin purchase cost (' + parseFloat(s.btcTxPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r2.helocDraw * s.btcTxPct / 100) + '</strong></div>' +
         '<div><span>Bitcoin position FV (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(r2.btcFV) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Net gain from leveraged bitcoin</span><strong>' + fmtMoneyFull(r2.netGainFromLeverage) + '</strong></div>' +
         '<div><span>+ Retained rental wealth at exit</span><strong>' + fmtMoneyFull(r2.retainedRental.totalWealth) + '</strong></div>' +
@@ -614,7 +651,7 @@
   }
 
   function renderCAGRChips(s){
-    var scenarios = ['stay', 'trend', 'upper'];
+    var scenarios = ['floor', 'stay', 'trend', 'upper'];
     scenarios.forEach(function(sc){
       var chip = document.querySelector('.calc-cagr-chip[data-scenario="' + sc + '"]');
       if (!chip) return;
@@ -657,7 +694,7 @@
 
   function bindCAGRChips(){
     // Scenario code → dataset index in the chart (and in legendVisibility)
-    var SCENARIO_IDX = { stay: 1, trend: 2, upper: 3 };
+    var SCENARIO_IDX = { stay: 1, trend: 2, upper: 3, floor: 4 };
 
     document.querySelectorAll('.calc-cagr-chip').forEach(function(chip){
       chip.addEventListener('click', function(){
@@ -668,8 +705,9 @@
         // Auto-swap visibility: hide the previously-primary scenario,
         // show the newly-selected. Other scenarios retain their manual
         // toggle state — so a user who turned 'Stay' on for comparison
-        // keeps it on when switching primary from Trend to Upper.
-        if (SCENARIO_IDX[oldScenario] !== undefined) {
+        // keeps it on when switching primary from Trend to Upper. Floor is
+        // never auto-hidden: M3 draws it faintly on every chart.
+        if (SCENARIO_IDX[oldScenario] !== undefined && oldScenario !== 'floor') {
           legendVisibility[SCENARIO_IDX[oldScenario]] = false;
         }
         legendVisibility[SCENARIO_IDX[newScenario]] = true;
@@ -802,6 +840,61 @@
     });
   }
 
+  // Home appreciation (PR 4a): chips + a typed value, both writing the
+  // shared nominal dimension. A typed value equal to a preset selects the
+  // preset. The one-line notice shows a pre-4a real value's conversion
+  // (ModelingAssumptions.migrationNote) until the reader next changes it.
+  function bindAppreciation(){
+    var MA = window.ModelingAssumptions;
+    var input = document.getElementById('calc-appreciation');
+    if (!MA || !input) return;
+    function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+    function sync(){
+      var a = MA.get('homeApprNominal');
+      state.appreciationPct = a.value;
+      if (document.activeElement !== input) input.value = pct2(a.value);
+      document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
+        b.classList.toggle('active', b.dataset.preset === a.preset);
+      });
+      var note = document.getElementById('calc-appr-notice');
+      var n = MA.migrationNote && MA.migrationNote();
+      if (note) {
+        note.textContent = n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '';
+        note.hidden = !n;
+      }
+    }
+    function commit(v){
+      var pre = MA.presetFor('homeApprNominal', v);
+      if (MA.clearMigrationNote) MA.clearMigrationNote();
+      if (pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
+    }
+    input.addEventListener('input', function(){
+      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
+      if (isFinite(v)) { state.appreciationPct = v; rerender(); }
+    });
+    input.addEventListener('change', function(){
+      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
+      if (isFinite(v)) commit(v);
+      input.value = pct2(state.appreciationPct);
+    });
+    document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
+      b.addEventListener('click', function(){
+        var pre = b.dataset.preset;
+        if (MA.clearMigrationNote) MA.clearMigrationNote();
+        if (pre === 'custom') {
+          MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
+          input.focus(); if (input.select) input.select();
+        } else {
+          MA.set('homeApprNominal', pre);
+        }
+      });
+    });
+    MA.subscribe(function(dim){
+      if (dim === 'homeApprNominal' || dim === '*') { sync(); rerender(); }
+    });
+    sync();
+  }
+
   function bindPortfolioSliders(){
     // Portfolio composition sliders — must sum to 100
     var keys = ['strc', 'sata', 'ledn', 'spot'];
@@ -838,6 +931,17 @@
       function(v){ return v + '%'; });
     bindSlider('calc-years-held', 'yearsAlreadyHeld',
       function(v){ return v + ' yrs'; });
+    // PR 4b (M6): selling costs and the bitcoin purchase cost.
+    bindSlider('calc-sell-cost', 'sellCostPct',
+      function(v){ return parseFloat(v.toFixed(2)) + '%'; });
+    bindSlider('calc-btc-tx', 'btcTxPct',
+      function(v){ return parseFloat(v.toFixed(2)) + '%'; });
+    // Their defaults come from RealEstateModel.PAIR_DEFAULTS via `state`;
+    // put the thumbs there too, so a refresh edits one place.
+    ['calc-sell-cost', 'calc-btc-tx'].forEach(function(id, i){
+      var el = document.getElementById(id);
+      if (el) el.value = String(i === 0 ? state.sellCostPct : state.btcTxPct);
+    });
     bindSelect('calc-state', 'stateCode');
     bindSelect('calc-bracket', 'federalBracketPct');
 
@@ -873,6 +977,7 @@
     bindPathToggle();
     bindCAGRChips();
     bindZoomToggle();
+    bindAppreciation();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){

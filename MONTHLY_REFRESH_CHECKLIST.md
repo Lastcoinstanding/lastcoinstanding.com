@@ -763,6 +763,20 @@ for a page making a structural (not real-time) argument. If the page ever
 quotes a "today" figure prominently, consider a quarterly re-fit of the era
 exponents too, since the ETF-era window lengthens.
 
+## 9.3. Real-estate pair: price, rent and cost defaults (SEMIANNUAL and ANNUAL, from PR 4b)
+
+_Added 2026-09-28 (PR 4b; DATA_AUDIT RE-3–RE-13)._ Every sourced default for `/bitcoin-vs-real-estate` and `/bitcoin-vs-rental-property` lives in **one object**, `PAIR_DEFAULTS`, at the top of `src/_includes/_pageassets/shared/real-estate-model.js`. BvRE writes it into its inputs and link defaults on load; BvRP's `state` and sliders read it. So a refresh edits the object, then the tooltip prose that quotes the number, then the DATA_AUDIT row. Returning readers pick up a new default automatically: BvRE's settings storage (`lcs.bvre.calc.v2`) keeps only values a reader changed.
+
+- **Semiannual (next ≈ March 2027): price-to-rent (RE-7).** Run `python3 scripts/verify-real-estate-sources.py` and read the M4 section. If the latest ratio differs from `priceToRent` by more than 0.1, update `priceToRent` and `priceToRentAsOf`, and the rent tooltip in `src/bitcoin-vs-real-estate.njk` ("15.77", "August 2026", "$2,193"). The rent default follows the price automatically.
+- **Annual, each spring, with the latest full year:**
+  - `homePrice` (RE-6): the new year's average of FRED `MSPUS`, rounded to the nearest $5,000, and the home-price tooltip ("2025", "$415,000"). Keep it a *new-house* median, and say so.
+  - The three home-appreciation presets (RE-3–RE-5): see STYLE_GUIDE §3.5; they live in `shared/modeling-assumptions.js`, not in `PAIR_DEFAULTS`.
+  - `closingPct` (RE-8) when LodeStar's annual report lands (late April): its "% of the home sales price" figure, and the closing-costs tooltip.
+  - `propTaxPct` (RE-9) when ATTOM's annual property-tax analysis lands (April): the national effective rate on single-family homes, and the property-tax tooltip.
+  - `insurancePer400K` (RE-10) from NerdWallet's average-cost page (keep the $400K dwelling-coverage basis), and BvRE's insurance tooltip.
+  - `sellPct` (RE-12) from Clever's latest agent surveys (midpoint of the most recent two) + the 1% estimate, and the selling-costs tooltips on **both** pages.
+- **Verify after any change:** open each page with `?qa` and run `await rePairQA.run()`; the hashes move, which is expected. Record the new digests in the refresh commit.
+
 ## 9.4. Case-Shiller National — the retrospective's house end point (MONTHLY, from PR 6)
 
 _Added 2026-09-27 (`REAL_ESTATE_PAIR_DESIGN.md` v1.2, ruling P8). **Not on the page yet:** this applies once PR 6 of the real-estate pair ships the retrospective-to-today end point. Until then there is nothing to refresh._

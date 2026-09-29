@@ -480,7 +480,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // Belt-and-suspenders DOM-sync at end of init() force-syncs these
   // regardless, so a future drift in any of the three defaults gets
   // corrected before the first calc render.
-  var scenario = 'trend';
+  var scenario = 'stay';   // M3 (PR 4c): the default is Stay at today's multiple
   var method = 'mortgage';
   var LIVE_BTC_FALLBACK = 84000;
 
@@ -515,6 +515,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   }
 
   // ── Power Law scenario buttons ──
+  // Upper's caveat is the cycle-peak record, computed from the price data
+  // (RealEstateModel.upperRecordText) so it can't go stale; the markup
+  // carries the same sentence as its no-script fallback.
+  var _upperRecord = RealEstateModel.upperRecordText();
+  if(_upperRecord) document.querySelectorAll('[data-upper-record]').forEach(function(el){ el.textContent = _upperRecord; });
   document.querySelectorAll('.scenario-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('.scenario-btn').forEach(function(b){b.classList.remove('active')});
@@ -542,16 +547,28 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     return b ? b.getAttribute('data-mode') : 'real';
   }
 
+  // ── Sourced defaults: one source of truth (PR 4b) ──
+  // RealEstateModel.PAIR_DEFAULTS holds every sourced default; the markup
+  // carries the same numbers only for first paint. Writing them in here,
+  // before storage or a link restores any choice, means a refresh edits
+  // PAIR_DEFAULTS (and the tooltip prose), not three places.
+  (function applyPairDefaults(){
+    var D = RealEstateModel.PAIR_DEFAULTS;
+    function set(id, v){ var el = document.getElementById(id); if(el) el.value = v; }
+    set('fwdHomePrice', '$' + D.homePrice.toLocaleString());
+    set('fwdClosingPct', D.closingPct + '%');
+    set('fwdPropTaxPct', D.propTaxPct + '%');
+    set('fwdMaintPct', D.maintPct + '%');
+    set('fwdSellPct', D.sellPct + '%');
+    set('fwdBtcTxPct', D.btcTxPct + '%');
+  })();
+
   // ── Purchase method buttons ──
   document.querySelectorAll('.purchase-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('.purchase-btn').forEach(function(b){b.classList.remove('active')});
       btn.classList.add('active');
       method = btn.dataset.method;
-      // Reset the advanced toggle when switching methods (the toggle means different things in each)
-      var check = document.getElementById('fwdAdvancedCheck');
-      if(check) check.checked = false;
-      updateAdvancedToggleLabel();
       runFwdCalc();
     });
   });
@@ -561,56 +578,54 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     if(!el) return 0;
     return parseFloat(el.value.replace(/[$,%\s]/g,'')) || 0;
   }
+  // An optional input: its number, or null when blank or out of range, so
+  // the engine falls back to the sourced default (PR 4b).
+  function parseOpt(id, lo, hi){
+    var el = document.getElementById(id);
+    if(!el) return null;
+    var raw = String(el.value || '').replace(/[$,%\s]/g, '');
+    if(raw === '') return null;
+    var v = parseFloat(raw);
+    return (isFinite(v) && v >= lo && v <= hi) ? v : null;
+  }
+  function parseRange(id, lo, hi, def){ var v = parseOpt(id, lo, hi); return v === null ? def : v; }
   function fmt(v){ return '$'+Math.round(v).toLocaleString(); }
+  function fmtSigned(v){ return (v < 0 ? '−' : '+') + fmt(Math.abs(v)); }
+  function pctTxt(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+  function setPlaceholder(id, text){ var el = document.getElementById(id); if(el && el.placeholder !== text) el.placeholder = text; }
 
-  function updateAdvancedToggleLabel(){
-    var text = document.getElementById('fwdAdvancedText');
-    var rateWrap = document.getElementById('fwdAdvancedRateWrap');
-    if(method === 'mortgage'){
-      text.innerHTML = '<strong>Go deeper:</strong> DCA the rent-vs-mortgage savings into bitcoin each month?';
-      rateWrap.style.display = 'none';
-    } else {
-      text.innerHTML = '<strong>Go deeper:</strong> Invest imputed rent savings (what the cash buyer isn\u2019t paying) in the S&amp;P 500';
-      rateWrap.style.display = 'inline-flex';
-    }
+  // House icons for "how many houses the bitcoin side could buy".
+  function buildHouseIcons(n){
+    var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+    var pI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.45"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
+    var fH = Math.floor(n), pt = n - fH, ic = '';
+    for(var i = 0; i < Math.min(fH, 15); i++) ic += fI;
+    if(pt > 0.05) ic += pI;
+    if(fH === 0 && pt <= 0.05) ic += pI;
+    var ov = fH > 15 ? '<span style="font-size:.8rem;color:var(--amber);margin-left:.4rem;align-self:center">+'+(fH-15)+' more</span>' : '';
+    return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:.6rem 0 .8rem">' + ic + ov + '</div>';
   }
 
-  // Compute DCA accumulation for the projection. Returns null when DCA
-  // doesn't apply (cash method, or no positive monthly savings, or invalid
-  // BTC price inputs). Used by runFwdCalc to drive the Total Comparison
-  // visibility + augmented totals, and by renderAdvanced to populate the
-  // DCA card in the "go deeper" panel. Single source of truth so the two
-  // surfaces can't drift apart.
-  // Projection DCA — moved to shared/real-estate-model.js (PR 3, verbatim).
-  // Single source of truth for the Total Comparison and renderAdvanced.
-  function computeProjectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs){
-    return RealEstateModel.projectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs);
-  }
-
+  // ── The projection (PR 4b: equal cash out, market rent, sourced costs) ──
+  // All math is in RealEstateModel.bvreProjection; the page parses inputs
+  // and renders. Big numbers follow the Real/Nominal toggle; monthly
+  // amounts and totals are nominal, as quoted.
   function runFwdCalc(){
-    // Display-mode helpers (Real vs Nominal toggle). Read once per render
-    // and use throughout to pick which value/label to emit. modeVal picks
-    // between two pre-computed values; modeUnit / modePeriodLabel /
-    // modeBigNumberLabel return the human-readable annotation that
-    // accompanies the value.
     var _mode = _displayMode();
     function modeVal(realV, nomV){ return _mode === 'real' ? realV : nomV; }
-    function modeUnit(){ return _mode === 'real' ? "in today\u2019s $" : "nominal"; }
-    function modePeriodLabel(){ return _mode === 'real' ? 'real, today\u2019s $' : 'nominal, future $'; }
-    function modeBigLabel(metric){ return _mode === 'real' ? ('projected ' + metric + ' in today\u2019s purchasing power') : ('projected ' + metric + ' in future dollars'); }
+    function modeUnit(){ return _mode === 'real' ? "in today’s $" : "nominal"; }
+    function modePeriodLabel(){ return _mode === 'real' ? 'real, today’s $' : 'nominal, future $'; }
     var horizonYrs = parseInt(horizonSel.value);
     var btcNow = parseNum('fwdBtcNow');
     var homePrice = parseNum('fwdHomePrice');
-    // Home appreciation input is now in REAL terms (per canonical §3.5).
-    // Combine with sitewide inflation to get nominal rate for the math below,
-    // which produces nominal future values.
-    var homeApprReal = parseNum('fwdHomeAppreciation');
+    // Home appreciation is NOMINAL, like the mortgage rate (rulings M1,
+    // PR 4a). Inflation only deflates the Real view, both paths by the
+    // same factor, so the deflator can't change which path is ahead.
+    var homeApprNominal = parseNum('fwdHomeAppreciation');
     var inflRate = window.ModelingAssumptions.get('inflation').value;
     var mortRate = parseNum('fwdMortgageRate');
-    // Optional down payment % (default 20 → identity with prior behavior).
-    // Bounds 3–95, same rationale as retrospective. Drives the up-front
-    // amount, the financed loan, the monthly payment, and (through it) the
-    // 75%-of-mortgage default rent.
+    // Down payment % (default 20). Bounds 3–95, same rationale as the
+    // retrospective.
     var _fdpNum = parseNum('fwdDownPct');
     var _fdpValid = isFinite(_fdpNum) && _fdpNum >= 3 && _fdpNum <= 95;
     var downPct = _fdpValid ? _fdpNum : 20;
@@ -621,75 +636,61 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
     if(btcNow <= 0 || homePrice <= 0) return;
 
-    // ── Stage 5b helpers — real-terms display layer ──
-    // Math throughout this function continues to produce NOMINAL future values
-    // (the existing calculations are unchanged). At display time we deflate
-    // those values to today's purchasing power using the sitewide inflation
-    // rate, and present real as primary with nominal as secondary.
-    function toReal(nominalFutureValue) {
-      return window.CalcHelpers.deflateToToday(nominalFutureValue, inflRate, horizonYrs);
-    }
-    // Format a value pair for real-primary display: real value as primary,
-    // nominal-equivalent shown in a smaller dim secondary line below.
-    function fmtDual(nominalValue, realValueOpt) {
-      var real = (realValueOpt !== undefined) ? realValueOpt : toReal(nominalValue);
-      return '<span class="dual-real">'+fmt(real)+'</span>' +
-             '<span class="dual-nominal" style="display:block;font-size:.7rem;color:var(--text-muted);font-weight:400;letter-spacing:0;text-transform:none">'+fmt(nominalValue)+' nominal</span>';
-    }
-    // Inline variant for use inside detail-line prose where the dual treatment
-    // should be compact (real (nominal nominal)).
-    function fmtDualInline(nominalValue, realValueOpt) {
-      var real = (realValueOpt !== undefined) ? realValueOpt : toReal(nominalValue);
-      return fmt(real) + ' <span style="font-size:.78rem;color:var(--text-muted)">('+fmt(nominalValue)+' nominal)</span>';
-    }
-
+    var D = RealEstateModel.PAIR_DEFAULTS;
     var startYear = NOW_YEAR;
     var endYear = startYear + horizonYrs;
-    var asOf = 'Jan 1, ' + endYear;
-
-    // ── ENGINE: shared/real-estate-model.js (PR 3) ──
-    // All projection math; the page parses inputs and renders.
-    var _fwdRentEl = document.getElementById('fwdMonthlyRent');
-    var _fwdRentRaw = _fwdRentEl ? (_fwdRentEl.value || '').replace(/[$,\s]/g, '') : '';
-    var _fwdRentNum = parseFloat(_fwdRentRaw);
-    var _fwdRentValid = isFinite(_fwdRentNum) && _fwdRentNum >= 100 && _fwdRentNum <= 50000;
+    var investEl = document.getElementById('fwdInvestDiff');
+    var invest = investEl ? investEl.checked : true;
+    var sellPct = parseRange('fwdSellPct', 0, 10, D.sellPct);
+    var btcTxPct = parseRange('fwdBtcTxPct', 0, 2, D.btcTxPct);
+    var closingPct = parseRange('fwdClosingPct', 0, 10, D.closingPct);
     var P = RealEstateModel.bvreProjection({
       method: method, scenario: scenario, horizonYrs: horizonYrs, btcNow: btcNow,
-      homePrice: homePrice, homeApprReal: homeApprReal, inflRate: inflRate,
-      mortRate: mortRate, dpf: dpf, rentOverride: _fwdRentValid ? _fwdRentNum : null,
-      endYear: endYear
+      homePrice: homePrice, homeApprNominal: homeApprNominal, inflRate: inflRate,
+      mortRate: mortRate, dpf: dpf,
+      rent: parseOpt('fwdMonthlyRent', 100, 50000),
+      rentGrowth: parseOpt('fwdRentGrowth', -10, 25),
+      closingPct: closingPct,
+      propTaxPct: parseRange('fwdPropTaxPct', 0, 5, D.propTaxPct),
+      insurance: parseOpt('fwdInsurance', 0, 100000),
+      maintPct: parseRange('fwdMaintPct', 0, 5, D.maintPct),
+      sellPct: sellPct, btcTxPct: btcTxPct, investDiff: invest
     });
-    var homeApprNominalPct = P.homeApprNominalPct, homeAppr = P.homeAppr;
-    var amount = P.amount, loanAmt = P.loanAmt, mr = P.mr, nPayments = P.nPayments;
-    var monthlyMort = P.monthlyMort, impliedRent = P.impliedRent, totalRentPaid = P.totalRentPaid;
-    // Update placeholder to reflect the live default
-    if (_fwdRentEl && !_fwdRentValid) {
-      _fwdRentEl.placeholder = '$' + Math.round(monthlyMort * 0.75).toLocaleString() + ' (75% of mortgage)';
-    }
-    var btcBought = P.btcBought, futureDays = P.futureDays, futureTrend = P.futureTrend;
-    var futureFloor = P.futureFloor, futureCeil = P.futureCeil, futurePrice = P.futurePrice;
-    var scenarioLabel;
-    if(scenario === 'floor'){ scenarioLabel = 'Floor (conservative)'; }
-    else if(scenario === 'trend'){ scenarioLabel = 'Trend (fair value)'; }
-    else { scenarioLabel = 'Upper (cycle peak)'; }
-    var btcValue = P.btcValue, btcNet = P.btcNet, btcValueReal = P.btcValueReal;
-    var futurePriceReal = P.futurePriceReal, btcNetReal = P.btcNetReal;
-    var btcReturn = P.btcReturn, btcCAGR = P.btcCAGR;
-    var futureHomeValue = P.futureHomeValue, futureHomeValueReal = P.futureHomeValueReal;
-    var bal = P.bal, equity = P.equity, interestPaid = P.interestPaid, totalMortPaid = P.totalMortPaid;
-    var equityReal = P.equityReal;
-    var propTax = P.propTax, insurance = P.insurance, maintenance = P.maintenance;
-    var totalHouseCost = P.totalHouseCost;
-    // House CAGR: real appreciation rate is exactly the canonical homeApprReal
-    // input (the user picked it). Display that directly rather than recomputing.
-    var houseCAGR = homeApprReal.toFixed(1);
-    var housesCanBuy = P.housesCanBuy;
-    var equityPct = P.equityPct;
+    // Both paths end on the same day, horizonYrs from today (M10).
+    var asOf = new Date(P.endDateMs).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 
-    // ── House-ownership visual (single house icon, mirrors retrospective pattern) ──
-    // Mortgage: red outline with amber fill-overlay scaled to equity %
+    // Placeholders show the live defaults a blank field falls back to.
+    // ("default" keeps them short enough for the field; each tooltip gives
+    // the basis: market rent, home appreciation, $2,490 per $400K.)
+    setPlaceholder('fwdMonthlyRent', fmt(P.rentDefault) + ' default');
+    setPlaceholder('fwdRentGrowth', pctTxt(homeApprNominal) + ' default');
+    setPlaceholder('fwdInsurance', fmt(P.insuranceDefault) + ' default');
+
+    var SCEN_NAMES = { floor: 'Floor', stay: 'Stay at today\u2019s multiple', trend: 'Trend', upper: 'Upper' };
+    var scenarioLabel = SCEN_NAMES[scenario] || 'Stay at today\u2019s multiple';
+    // M3: today's multiple on the Stay button, and the selected scenario's
+    // implied growth beside the selector (nominal, today → horizon end).
+    var stayMultEl = document.getElementById('fwdStayMult');
+    if(stayMultEl) stayMultEl.textContent = P.mult0.toFixed(2) + '\u00d7';
+    var growthEl = document.getElementById('fwdScenarioGrowth');
+    if(growthEl){
+      var g = P.impliedGrowthPct;
+      growthEl.innerHTML = scenarioLabel + ': bitcoin ' + (g < 0 ? 'falls' : 'grows') + ' <strong>' + Math.abs(g).toFixed(1) + '% a year</strong>, from ' +
+        fmt(btcNow) + ' (' + P.mult0.toFixed(2) + '\u00d7 trend) to ' + fmt(P.priceEnd) + ' (' + P.targetMult.toFixed(2) + '\u00d7) by ' + asOf + ', in nominal dollars.';
+    }
+    var houseRateLabel = _mode === 'real'
+      ? (P.homeApprRealPct.toFixed(1).replace('-', '\u2212') + '%/yr real')
+      : (pctTxt(homeApprNominal) + '/yr nominal');
+    var housesCanBuy = P.housesCanBuy;
+    var R = P.real;
+    var cash = method === 'cash';
+    var yrs = horizonYrs;
+    var f1 = P.first, fN = P.last;
+    var mutedS = 'font-size:.78rem;color:var(--text-muted)';
+
+    // Ownership visual (single house, filled to the equity share)
     function buildOwnershipVisual(){
-      if(method === 'cash'){
+      if(cash){
         return '<div style="display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .9rem">' +
           '<svg viewBox="0 0 24 24" width="32" height="32">' +
             '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="var(--amber)" fill-opacity="0.18" stroke="#e09422" stroke-width="1.7" stroke-linejoin="round"/>' +
@@ -697,6 +698,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           '<span style="font-size:.9rem;color:var(--text)">1 house, outright</span>' +
         '</div>';
       }
+      var equityPct = P.equityPct;
       var _fh = Math.max(0, Math.min(20, equityPct * 0.20));
       var outlineColor = equityPct >= 100 ? '#e09422' : '#c0392b';
       var label = equityPct < 0 ? '<span style="color:var(--red)">Underwater</span>' : equityPct + '% owned';
@@ -709,284 +711,84 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<span style="font-size:.9rem;color:var(--text)">'+label+'</span>' +
       '</div>';
     }
-    var ownershipVisual = buildOwnershipVisual();
 
-    // House-icon visualization (mirrors retrospective pattern)
-    function buildHouseIcons(n){
-      var fI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round"/></svg>';
-      var pI = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.45"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
-      var fH = Math.floor(n), pt = n - fH, ic = '';
-      for(var i = 0; i < Math.min(fH, 15); i++) ic += fI;
-      if(pt > 0.05) ic += pI;
-      if(fH === 0 && pt <= 0.05) ic += pI;
-      var ov = fH > 15 ? '<span style="font-size:.8rem;color:var(--amber);margin-left:.4rem;align-self:center">+'+(fH-15)+' more</span>' : '';
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:.6rem 0 .8rem">' + ic + ov + '</div>';
+    // What the renter does each month, in words.
+    var monthlyLine;
+    if(!invest){
+      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and spends the difference from the owner’s cost instead of investing it.';
+    } else if(f1.diff >= 0 && fN.diff >= 0){
+      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and invests what the owner pays beyond it: <span class="highlight">' + fmtSigned(f1.diff) + '/mo</span> in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.';
+    } else if(f1.diff < 0 && fN.diff < 0){
+      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1), which costs more than the owner pays, and sells bitcoin to cover it: <span class="negative">' + fmtSigned(f1.diff) + '/mo</span> in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.';
+    } else {
+      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and invests the difference from the owner’s cost, ' + fmtSigned(f1.diff) + '/mo in year 1; by the last month rent costs more and it sells bitcoin instead (' + fmtSigned(fN.diff) + '/mo).';
     }
-    var houseIconsHtml = buildHouseIcons(housesCanBuy);
+    var btcFromMonthly = P.btcHeld - P.btcUpfront;
+    var monthlyTotals = invest
+      ? ('Invested monthly: ' + fmt(P.totals.invested) + ' · sold to cover rent: ' + fmt(P.totals.sold) + (P.totals.shortfall > 0.5 ? ' · <span class="negative">not covered (bitcoin ran out): ' + fmt(P.totals.shortfall) + '</span>' : '') + ' <span style="' + mutedS + '">(nominal sums)</span>')
+      : ('Monthly differences not invested: ' + fmt(P.totals.spent) + ' spent' + (P.totals.fromIncome > 0.5 ? ', ' + fmt(P.totals.fromIncome) + ' of rent above the owner’s cost paid from income' : '') + ' <span style="' + mutedS + '">(nominal sums)</span>');
 
-    // ── RENDER: BITCOIN CARD (left) ──
+    // ── BITCOIN CARD (left) ──
     var btcHtml =
       '<div class="calc-card bitcoin">' +
-        '<h4>&#8383; Bought Bitcoin + Rented ('+startYear+')</h4>' +
-        '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-        '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong></div>' +
+        '<h4>&#8383; Rented, invested in bitcoin</h4>' +
+        '<div class="period-label">'+startYear+' · Today</div>' +
+        '<div class="invested-line">Invested <strong>'+fmt(P.upfront)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(the buyer’s up-front cash)</span></div>' +
+        '<div class="detail-line">'+P.btcUpfront.toFixed(4)+' BTC at '+fmt(btcNow)+' <span style="'+mutedS+'">after '+pctTxt(btcTxPct)+' costs</span></div>' +
+        '<div class="detail-line">'+monthlyLine+'</div>' +
         '<div class="period-divider"></div>' +
-        '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
-        '<div class="big-number">'+fmt(modeVal(btcNetReal, btcNet))+' <span style="font-size:.8rem;color:var(--text-muted)">net</span></div>' +
-        '<div class="big-number-label">'+modeBigLabel('net position')+'</div>' +
-        houseIconsHtml +
-        '<div class="detail-line">BTC purchased: '+btcBought.toFixed(4)+' @ '+fmt(btcNow)+'/BTC</div>' +
-        '<div class="detail-line">Projected BTC price: <strong>'+fmt(modeVal(futurePriceReal, futurePrice))+'</strong> <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'</span></div>' +
-        '<div class="detail-line">Gross BTC value:<span class="help-tip" tabindex="0">?<span class="tip-content">Value of your BTC holdings at the projected future market price, before subtracting rent paid during the holding period.</span></span> '+fmt(modeVal(btcValueReal, btcValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'</span></div>' +
-        '<div class="detail-line">Est. monthly rent: '+fmt(impliedRent)+'/mo <span style="font-size:.78rem;color:var(--text-muted)">(75% of equivalent mortgage)</span></div>' +
-        '<div class="detail-line">Total rent paid: <span class="negative">'+fmt(totalRentPaid)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-        '<div class="detail-line">Total real return: <span class="highlight">'+btcReturn+'%</span> <span style="font-size:.72rem;color:var(--text-muted)">in purchasing-power terms</span></div>' +
-        (btcCAGR !== '—' ? '<div class="detail-line">Implied real CAGR: <span class="highlight">'+btcCAGR+'%</span></div>' : '') +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">\u2014 projected home value '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>' +
-        '<div class="detail-line" style="margin-top:.6rem;font-size:.78rem;color:var(--text-muted)">No mortgage, property tax or maintenance on this side; rent is the housing cost.</div>' +
+        '<div class="period-label">'+asOf+' · Projected ('+modePeriodLabel()+')</div>' +
+        '<div class="big-number">'+fmt(modeVal(R.btcIfSold, P.btcIfSold))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+        '<div class="big-number-label">'+(_mode === 'real' ? 'bitcoin, if sold, in today’s purchasing power' : 'bitcoin, if sold, in future dollars')+'</div>' +
+        buildHouseIcons(housesCanBuy) +
+        '<div class="detail-line">BTC held: '+P.btcHeld.toFixed(4)+' <span style="'+mutedS+'">('+P.btcUpfront.toFixed(4)+' up front '+(btcFromMonthly >= 0 ? '+ ' : '− ')+Math.abs(btcFromMonthly).toFixed(4)+' from the monthly differences)</span></div>' +
+        '<div class="detail-line">Projected BTC price: <strong>'+fmt(modeVal(R.priceEnd, P.priceEnd))+'</strong> <span style="'+mutedS+'">'+modeUnit()+'; '+scenarioLabel+'</span></div>' +
+        '<div class="detail-line">Value: '+fmt(modeVal(R.btcValue, P.btcValue))+'; sale costs ('+pctTxt(btcTxPct)+'): <span class="negative">−'+fmt(modeVal(R.btcSaleCost, P.btcSaleCost))+'</span></div>' +
+        '<div class="detail-line">'+monthlyTotals+'</div>' +
+        '<div class="detail-line">Rent paid: '+fmt(P.totals.rent)+' <span style="'+mutedS+'">over '+yrs+' years, from income, like the owner’s costs</span></div>' +
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">— projected home value '+fmt(modeVal(R.homeEnd, P.homeEnd))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>' +
       '</div>';
 
-    // ── RENDER: HOUSE CARD (right) ──
-    var houseHtml;
-    if(method === 'mortgage'){
-      houseHtml =
-        '<div class="calc-card house">' +
-          '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
-          '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">('+_fdpLabel+'% down of '+fmt(homePrice)+')</span></div>' +
-          '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
-          '<div class="big-number">'+fmt(modeVal(equityReal, equity))+'</div>' +
-          '<div class="big-number-label">'+modeBigLabel('equity')+'</div>' +
-          ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
-          '<div class="detail-line">Monthly mortgage: '+fmt(monthlyMort)+'/mo at '+mortRate+'%</div>' +
-          '<div class="detail-line">Interest paid: <span class="negative">'+fmt(interestPaid)+'</span> <span style="font-size:.78rem;color:var(--text-muted)">(accumulated; not recovered at sale)</span></div>' +
-          '<div class="detail-line">Remaining loan: '+(bal > 0 ? '<span class="negative">'+fmt(bal)+'</span>' : 'Paid off')+'</div>' +
-          '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
-          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-        '</div>';
-    } else {
-      houseHtml =
-        '<div class="calc-card house">' +
-          '<h4>&#127968; Bought the House ('+startYear+')</h4>' +
-          '<div class="period-label">'+startYear+' \u00b7 Today</div>' +
-          '<div class="invested-line">Invested <strong>'+fmt(amount)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(cash, paid in full)</span></div>' +
-          '<div class="period-divider"></div>' +
-          '<div class="period-label">'+endYear+' \u00b7 Projected ('+modePeriodLabel()+')</div>' +
-          '<div class="big-number">'+fmt(modeVal(futureHomeValueReal, futureHomeValue))+'</div>' +
-          '<div class="big-number-label">'+modeBigLabel('home value')+'</div>' +
-          ownershipVisual +
-          '<div class="detail-line">Home value in '+horizonYrs+' yrs: '+fmt(modeVal(futureHomeValueReal, futureHomeValue))+' <span style="font-size:.78rem;color:var(--text-muted)">'+modeUnit()+'; '+houseCAGR+'%/yr real</span></div>' +
-          '<div class="detail-line">Mortgage: $0 <span style="font-size:.78rem;color:var(--text-muted)">(no debt)</span></div>' +
-          '<div class="detail-line">Interest paid: $0</div>' +
-          '<div class="detail-line">Rent paid: $0 <span style="font-size:.78rem;color:var(--text-muted)">(you live in it)</span></div>' +
-          '<div class="detail-line">Total cost of ownership: <span class="negative">'+fmt(totalHouseCost)+'</span> <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Cash buyer avoids rent \u2014 a real benefit not captured in projected value. Toggle "Go deeper" below to model it.</div>' +
-        '</div>';
-    }
+    // ── HOUSE CARD (right) ──
+    var ownerMonthly = cash
+      ? ('Each month: '+fmt(f1.owner)+' in year 1 <span style="'+mutedS+'">(property tax '+fmt(f1.tax)+' + insurance '+fmt(f1.ins)+' + maintenance '+fmt(f1.maint)+'), rising with the home’s value</span>')
+      : ('Each month: '+fmt(f1.owner)+' in year 1 <span style="'+mutedS+'">(mortgage '+fmt(f1.pi)+' + property tax '+fmt(f1.tax)+' + insurance '+fmt(f1.ins)+' + maintenance '+fmt(f1.maint)+'); the mortgage payment is fixed, the rest rises with the home’s value</span>');
+    var houseHtml =
+      '<div class="calc-card house">' +
+        '<h4>&#127968; Bought the house</h4>' +
+        '<div class="period-label">'+startYear+' · Today</div>' +
+        '<div class="invested-line">Invested <strong>'+fmt(P.upfront)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">('+(cash ? 'the full price' : _fdpLabel+'% down')+' of '+fmt(homePrice)+' + '+fmt(P.closing)+' closing costs)</span></div>' +
+        '<div class="detail-line">'+ownerMonthly+'</div>' +
+        '<div class="period-divider"></div>' +
+        '<div class="period-label">'+asOf+' · Projected ('+modePeriodLabel()+')</div>' +
+        '<div class="big-number">'+fmt(modeVal(R.houseIfSold, P.houseIfSold))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
+        '<div class="big-number-label">'+(_mode === 'real' ? 'the house, if sold, before tax, in today’s purchasing power' : 'the house, if sold, before tax, in future dollars')+'</div>' +
+        buildOwnershipVisual() +
+        '<div class="detail-line">Home value in '+yrs+' yrs: '+fmt(modeVal(R.homeEnd, P.homeEnd))+' <span style="'+mutedS+'">'+modeUnit()+'; '+houseRateLabel+'</span></div>' +
+        '<div class="detail-line">Selling costs ('+pctTxt(sellPct)+'): <span class="negative">−'+fmt(modeVal(R.sellCosts, P.sellCosts))+'</span></div>' +
+        (cash ? '' : '<div class="detail-line">Remaining loan: '+(P.balance > 0 ? '<span class="negative">−'+fmt(modeVal(R.balance, P.balance))+'</span>' : 'paid off')+'</div>') +
+        '<div class="detail-line">If held instead of sold: '+fmt(modeVal(R.houseHeld, P.houseHeld))+' <span style="'+mutedS+'">(value less '+(cash ? 'nothing owed' : 'the loan')+')</span></div>' +
+        (cash ? '' : '<div class="detail-line">Interest paid: <span class="negative">'+fmt(P.totals.interest)+'</span> <span style="'+mutedS+'">(nominal sum; not recovered at sale)</span></div>') +
+        '<div class="detail-line">Tax, insurance and maintenance: '+fmt(P.totals.tax + P.totals.ins + P.totals.maint)+' <span style="'+mutedS+'">(nominal sum)</span></div>' +
+      '</div>';
 
     resultsEl.innerHTML =
       '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>';
 
-    // ── TOTAL COMPARISON (parity with retrospective) ───────────────────
-    // Mirrors retrospective behavior: only renders when the user toggles
-    // "go deeper" (DCA the rent-vs-mortgage savings into bitcoin). Without
-    // DCA, the headline cards above already surface the lump-sum position
-    // and the Total Comparison would just restate them — same logic that
-    // gates the retrospective's wrapper on its dca flag. When DCA is
-    // active, the BTC card here aggregates the lump-sum BTC position with
-    // the BTC accumulated by DCA'ing monthly savings (single source of
-    // truth: computeProjectionDca helper, also used by renderAdvanced).
-    // The augmented figures are meaningfully different from the headline
-    // cards — that delta IS the point of showing this section.
-    var fwdTotalWrapper = document.getElementById('fwdTotalSummaryWrapper');
-    var fwdTotalSummary = document.getElementById('fwdTotalSummary');
-    if(fwdTotalWrapper && fwdTotalSummary){
-      var advancedCheck = document.getElementById('fwdAdvancedCheck');
-      var dcaResult = computeProjectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs);
-      var dcaActive = !!(advancedCheck && advancedCheck.checked && dcaResult);
-      if(!dcaActive){
-        fwdTotalWrapper.style.display = 'none';
-        fwdTotalSummary.innerHTML = '';
-      } else {
-        // ── DCA-augmented BTC position ────────────────────────────────
-        // Lump-sum BTC + DCA-accumulated BTC, valued at the projected
-        // future BTC price. Outflow = down payment + DCA cash + rent paid.
-        // dcaActive guarantees method === 'mortgage' (computeProjectionDca
-        // returns null for cash), so debt-related lines can assume mortgage.
-        var totalBtcBought = btcBought + dcaResult.dcaBtc;
-        var totalBtcValueNominal = totalBtcBought * futurePrice;
-        var totalBtcValueReal = toReal(totalBtcValueNominal);
-        // Component breakdown for the inline math sub-line. The headline
-        // totalBtcNetReal equals btcLumpReal + dcaValueReal − totalRentPaid
-        // (totalRentPaid stays nominal per the established convention for
-        // accumulated payment streams; same mixing used in retrospective).
-        var btcLumpReal = toReal(btcBought * futurePrice);
-        var dcaValueReal = toReal(dcaResult.dcaBtc * futurePrice);
-        var totalBtcNetReal = totalBtcValueReal - totalRentPaid;
-        var totalBtcNetNominal = totalBtcValueNominal - totalRentPaid;
-        var totalInvestedCash = amount + dcaResult.dcaInvested;
-        var btcOutflowAugmented = totalInvestedCash + totalRentPaid;
-        var housesCanBuyAugmented = Math.max(0, totalBtcNetReal / futureHomeValueReal);
-        var mortgageEndYear = startYear + 30;
-        var debtFreeLabel = (endYear >= mortgageEndYear ? 'before horizon' : (mortgageEndYear + ' (' + (mortgageEndYear - endYear) + ' yrs past horizon)'));
-        var ls = 'font-size:0.88rem;line-height:2.2;';
-        var lm = 'color:var(--text-muted)';
-        var lr = 'color:var(--red)';
-        var la = 'color:var(--amber)';
-        var bhVisual = (function(){
-          var hf = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linejoin="round"/></svg>';
-          var hp = '<svg viewBox="0 0 24 24" width="32" height="32" style="margin:1px;opacity:0.3"><path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.5" stroke-dasharray="2 2" stroke-linejoin="round"/></svg>';
-          var lh = Math.max(0, housesCanBuyAugmented);
-          var fH = Math.floor(lh);
-          var pt = lh - fH;
-          var ic = '';
-          for(var i = 0; i < Math.min(fH, 15); i++) ic += hf;
-          if(pt > 0.05) ic += hp;
-          if(fH === 0 && pt <= 0.05) ic += hp;
-          var ov = fH > 15 ? ('<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+' + (fH - 15) + ' more</span>') : '';
-          return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:0.4rem 0 0.6rem">' + ic + ov + '</div>';
-        })();
-        var equityVisual = (function(){
-          var fh = Math.max(0, Math.min(20, equityPct * 0.20));
-          var st = equityPct >= 100 ? '#e09422' : '#c0392b';
-          var clipId = 'fwdTlc';
-          return '<div style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 0.6rem"><svg viewBox="0 0 24 24" width="32" height="32"><defs><clipPath id="' + clipId + '"><rect x="0" y="' + (24 - fh) + '" width="24" height="' + fh + '"/></clipPath></defs>'
-            + '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="' + st + '" stroke-width="1.5" stroke-linejoin="round"/>'
-            + '<path d="M3 13l9-9 9 9M5 12v8h14v-8M10 20v-5h4v5" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linejoin="round" clip-path="url(#' + clipId + ')"/></svg>'
-            + '<span style="font-size:0.85rem;color:var(--text-muted)">' + (equityPct >= 100 ? 'fully owned' : equityPct + '% owned') + '</span></div>';
-        })();
-        var extraHouses = Math.max(0, housesCanBuyAugmented - 1);
-        var canBuyOutright = housesCanBuyAugmented >= 1;
-        fwdTotalWrapper.style.display = 'block';
-        fwdTotalSummary.innerHTML =
-          '<div style="background:var(--bg-card);border:1px solid var(--amber-dim);border-radius:8px;padding:1.5rem 2rem">'
-          + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);margin-bottom:0.5rem">\u20BF Bitcoin \u2014 Total Position</div>'
-          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--amber);margin-bottom:0.15rem;line-height:1.1">' + fmt(modeVal(totalBtcNetReal, totalBtcNetNominal)) + ' <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400">net</span></div>'
-          + '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;font-style:italic">= ' + fmt(modeVal(btcLumpReal, btcBought*futurePrice)) + ' gross BTC + ' + fmt(modeVal(dcaValueReal, dcaResult.dcaBtc*futurePrice)) + ' DCA \u2212 ' + fmt(totalRentPaid) + ' rent <span style="font-size:0.72rem">(' + modeUnit() + ')</span></div>'
-          + bhVisual
-          + '<div style="font-size:0.78rem;color:var(--amber-dim);margin-bottom:0.6rem">projected to ' + asOf + ' \u2014 ' + scenarioLabel + ' \u00b7 lump sum + DCA</div>'
-          + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
-            + (canBuyOutright
-                ? '<div style="' + ls + la + '">You could buy <strong>the house, outright</strong></div>'
-                : '<div style="' + ls + la + '">You could buy <strong>' + (housesCanBuyAugmented * 100).toFixed(0) + '%</strong> of the house outright</div>')
-            + '<div style="' + ls + la + '">Debt outstanding: $0</div>'
-            + '<div style="' + ls + la + '">Interest paid: $0</div>'
-            + '<div style="' + ls + la + '">Debt-free: <strong>always</strong></div>'
-            + (canBuyOutright && extraHouses > 0.05
-                ? '<div style="' + ls + la + ';font-weight:600">You could buy ' + extraHouses.toFixed(1) + ' additional house' + (extraHouses >= 1.05 ? 's' : '') + ', also outright <span style="color:var(--text-muted);font-weight:400;font-size:0.82rem">(' + housesCanBuyAugmented.toFixed(1) + ' total)</span></div>'
-                : '')
-            + '<div style="' + ls + 'color:var(--text-dim)">Rent paid: ' + fmt(totalRentPaid) + '</div>'
-            + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(btcOutflowAugmented) + '</div>'
-          + '</div>'
-        + '</div>'
-        + '<div style="background:var(--bg-card);border:1px solid var(--red-dim);border-radius:8px;padding:1.5rem 2rem">'
-          + '<div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:0.5rem">\uD83C\uDFE0 House \u2014 Total Position</div>'
-          + '<div style="font-family:Cormorant Garamond,serif;font-size:1.8rem;font-weight:600;color:var(--text-dim);margin-bottom:0.5rem;line-height:1.1">' + fmt(modeVal(equityReal, equity)) + '</div>'
-          + equityVisual
-          + '<div style="font-size:0.78rem;' + lm + ';margin-bottom:0.6rem">projected to ' + asOf + '</div>'
-          + '<div style="border-top:1px solid var(--border);padding-top:0.6rem">'
-            + '<div style="' + ls + lm + '">Ownership: <span style="color:var(--text)">' + equityPct + '% of 1 home</span></div>'
-            + '<div style="' + ls + lr + '">Debt outstanding: ' + fmt(Math.round(bal)) + '</div>'
-            + '<div style="' + ls + lr + '">Interest paid: ' + fmt(Math.round(interestPaid)) + ' <span style="' + lm + ';font-size:0.78rem">(not recovered at sale)</span></div>'
-            + '<div style="' + ls + lr + '">Debt-free: ' + debtFreeLabel + '</div>'
-            + '<div style="' + ls + lm + '">Rent paid: $0 <span style="font-size:0.78rem">(you live in it)</span></div>'
-            + '<div style="' + ls + 'color:var(--text);border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;font-weight:500">Total outflow: ' + fmt(Math.round(totalHouseCost)) + '</div>'
-          + '</div>'
-        + '</div>';
-      }
-    }
-
-    // ── ADVANCED SECTION ──
-    renderAdvanced({
-      method: method, amount: amount, horizonYrs: horizonYrs, inflRate: inflRate,
-      startYear: startYear, endYear: endYear,
-      monthlyMort: monthlyMort, impliedRent: impliedRent, totalRentPaid: totalRentPaid,
-      btcNow: btcNow, futurePrice: futurePrice, btcValue: btcValue, btcBought: btcBought,
-      futureHomeValue: futureHomeValue, scenarioLabel: scenarioLabel, equity: equity, btcNet: btcNet
-    });
-  }
-
-  function renderAdvanced(s){
-    var check = document.getElementById('fwdAdvancedCheck');
-    var content = document.getElementById('fwdAdvancedContent');
-    var note = document.getElementById('fwdAdvancedNote');
-    var leftEl = document.getElementById('fwdAdvancedLeft');
-    var rightEl = document.getElementById('fwdAdvancedRight');
-    if(!check.checked){
-      content.style.display = 'none';
-      return;
-    }
-    content.style.display = 'block';
-
-    // Local helper for deflating the advanced section's future values to today's $
-    function toReal(nominalFutureValue) {
-      return window.CalcHelpers.deflateToToday(nominalFutureValue, s.inflRate, s.horizonYrs);
-    }
-
-    // Display mode helpers (mirror runFwdCalc — read live from DOM so the
-    // advanced section honors the same Real/Nominal toggle as the main
-    // result cards).
-    var _mode = _displayMode();
-    function modeVal(realV, nomV){ return _mode === 'real' ? realV : nomV; }
-    function modeUnit(){ return _mode === 'real' ? "in today\u2019s $" : "nominal"; }
-    function modeBigLabel(metric){ return _mode === 'real' ? ('projected ' + metric + ' in today\u2019s purchasing power') : ('projected ' + metric + ' in future dollars'); }
-
-    if(s.method === 'mortgage'){
-      // DCA the rent-vs-mortgage savings into BTC. Math lives in
-      // computeProjectionDca (single source of truth, also used by the
-      // Total Comparison block in runFwdCalc).
-      var dcaR = computeProjectionDca(s.method, s.btcNow, s.futurePrice, s.monthlyMort, s.impliedRent, s.horizonYrs);
-      var monthlySavings = dcaR ? dcaR.monthlySavings : Math.max(0, s.monthlyMort - s.impliedRent);
-      var dcaBtc = dcaR ? dcaR.dcaBtc : 0;
-      var totalMonths = s.horizonYrs * 12;
-      var dcaValue = dcaBtc * s.futurePrice;
-      var dcaValueReal = toReal(dcaValue);
-      var dcaTotalInvested = dcaR ? dcaR.dcaInvested : monthlySavings * totalMonths;
-      note.innerHTML = 'If you rent instead of buying, your monthly housing cost is ~75% of a mortgage payment. The difference \u2014 <strong>'+fmt(monthlySavings)+'/mo</strong> \u2014 is invested in bitcoin each month and added to the bitcoin side.';
-      leftEl.innerHTML =
-        '<div class="calc-card bitcoin" style="border-style:dashed">' +
-          '<h4>&#8383; Monthly DCA \u2014 Rent vs. Mortgage Savings</h4>' +
-          '<div class="big-number">'+fmt(modeVal(dcaValueReal, dcaValue))+'</div>' +
-          '<div class="big-number-label">'+modeBigLabel('DCA value')+' ('+s.endYear+')</div>' +
-          '<div class="detail-line">Est. mortgage: '+fmt(s.monthlyMort)+'/mo</div>' +
-          '<div class="detail-line">Est. rent: '+fmt(s.impliedRent)+'/mo</div>' +
-          '<div class="detail-line">Monthly DCA into BTC: <span class="highlight">'+fmt(monthlySavings)+'/mo</span></div>' +
-          '<div class="detail-line">BTC accumulated: '+dcaBtc.toFixed(4)+' BTC</div>' +
-          '<div class="detail-line">Total invested via DCA: '+fmt(dcaTotalInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated (\u2248'+fmt(monthlySavings)+'/mo \u00d7 '+totalMonths+' months)</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">DCA assumes BTC price follows a smooth geometric path from today\u2019s price to the projected endpoint (itself derived from the <a href="/the-power-law" style="color:var(--amber)">Power Law</a> scenario above).</div>' +
-        '</div>';
-      rightEl.innerHTML = '';
-    } else {
-      // Cash: S&P investment of imputed rent savings.
-      // Input is REAL return per canonical §3.5; convert to nominal for math.
-      var spReal = parseNum('fwdAdvancedRate');
-      if(spReal <= 0) spReal = 7;
-      var inflForSp = window.ModelingAssumptions.get('inflation').value;
-      var rate = window.CalcHelpers.realToNominal(spReal, inflForSp) / 100;
-      var months = s.horizonYrs * 12;
-      var spFV = RealEstateModel.imputedRentFV(s.impliedRent, rate, months);
-      var spFVReal = toReal(spFV);
-      var spInvested = s.impliedRent * months;
-      note.innerHTML = 'As a cash buyer, you avoid paying rent \u2014 a real benefit worth roughly <strong>'+fmt(s.impliedRent)+'/mo</strong> (75% of an equivalent mortgage). If invested monthly at '+spReal.toFixed(1)+'%/yr real (sitewide real-return assumption; ~'+(rate*100).toFixed(1)+'%/yr nominal at today\u2019s inflation), those savings compound into:';
-      leftEl.innerHTML = '';
-      rightEl.innerHTML =
-        '<div class="calc-card house" style="border-style:dashed">' +
-          '<h4>&#128200; Imputed Rent &rarr; S&amp;P 500</h4>' +
-          '<div class="big-number">'+fmt(modeVal(spFVReal, spFV))+'</div>' +
-          '<div class="big-number-label">'+modeBigLabel('portfolio')+' ('+s.endYear+')</div>' +
-          '<div class="detail-line">Rent avoided: '+fmt(s.impliedRent)+'/mo</div>' +
-          '<div class="detail-line">Invested monthly at: <span class="highlight">'+spReal.toFixed(1)+'%/yr real</span></div>' +
-          '<div class="detail-line">Total invested: '+fmt(spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">accumulated</span></div>' +
-          '<div class="detail-line">Total real gains: '+fmt(spFVReal - spInvested)+' <span style="font-size:.72rem;color:var(--text-muted)">in today\u2019s purchasing power</span></div>' +
-          '<div class="detail-line" style="margin-top:.8rem;font-size:.78rem;color:var(--text-muted);font-style:italic">Default rate is the sitewide real-return assumption (5% diversified portfolio). 7% S&amp;P historical and 3% conservative are also valid choices; preference syncs across calculators on this site.</div>' +
-        '</div>';
+    // Equal cash out, stated with its number (M2).
+    var eq = document.getElementById('fwdCashOutLine');
+    if(eq){
+      eq.innerHTML = invest
+        ? ('Both households paid out <strong>'+fmt(P.cumCashOutOwner)+'</strong> over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: '+fmt(P.upfront)+' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'
+            + (P.totals.shortfall > 0.5 ? ' <span class="negative">The renter’s bitcoin ran out, so '+fmt(P.totals.shortfall)+' of rent came from income.</span>' : ''))
+        : ('The owner paid out '+fmt(P.cumCashOutOwner)+' and the renter '+fmt(P.cumCashOutRenter)+' over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: with the toggle off, only the up-front sum goes into bitcoin.');
     }
   }
 
   // ── Event listeners ──
-  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdAdvancedRate','fwdMonthlyRent','fwdDownPct'].forEach(function(id){
+  // PR 4b adds the cost and rent inputs of the Baseline assumptions block.
+  ['fwdBtcNow','fwdHomePrice','fwdHomeAppreciation','fwdMortgageRate','fwdMonthlyRent','fwdDownPct',
+   'fwdRentGrowth','fwdClosingPct','fwdPropTaxPct','fwdInsurance','fwdMaintPct','fwdSellPct','fwdBtcTxPct'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener('input', runFwdCalc);
   });
@@ -1007,9 +809,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         el.value = '$' + Math.round(n).toLocaleString();
       });
     }
-    function bindPercent(id){
+    function bindPercent(id, dp){
       var el = document.getElementById(id);
       if(!el) return;
+      var f = Math.pow(10, dp || 1);
       el.addEventListener('blur', function(){
         var raw = (el.value || '').replace(/[^0-9.\-]/g, '');
         if(!raw){ el.value = ''; return; }
@@ -1017,80 +820,149 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         if(!isFinite(n)){ el.value = ''; return; }
         // One decimal place — matches the rate-style convention used
         // for retrospective's custom-rate input and the canonical inputs.
-        el.value = (Math.round(n * 10) / 10) + '%';
+        // Home appreciation keeps two (its presets are 3.41 / 4.23 / 4.68).
+        el.value = (Math.round(n * f) / f) + '%';
       });
     }
     bindMoney('fwdHomePrice');
     bindMoney('fwdBtcNow');
     bindMoney('fwdMonthlyRent');
-    bindPercent('fwdHomeAppreciation');
+    bindMoney('fwdInsurance');
+    bindPercent('fwdHomeAppreciation', 2);
     bindPercent('fwdMortgageRate');
-    bindPercent('fwdAdvancedRate');
     bindPercent('fwdDownPct');
+    bindPercent('fwdInflCustom', 2);
+    ['fwdRentGrowth','fwdClosingPct','fwdPropTaxPct','fwdMaintPct','fwdSellPct','fwdBtcTxPct'].forEach(function(id){ bindPercent(id, 2); });
   })();
   horizonSel.addEventListener('change', runFwdCalc);
-  document.getElementById('fwdAdvancedCheck').addEventListener('change', runFwdCalc);
+  // "The renter invests the difference" (M2; sits with the results, P6).
+  var _investEl = document.getElementById('fwdInvestDiff');
+  if(_investEl) _investEl.addEventListener('change', runFwdCalc);
 
   // ── Canonical integration (per STYLE_GUIDE §3.5) ──
-  // Real estate appreciation input is bound to lcs.realEstate canonical.
-  // S&P advanced rate input is bound to lcs.realReturns canonical.
-  // Both are REAL terms; the math above converts to nominal for the existing
-  // calc (Stage 5b will convert outputs to real-primary display).
+  // Home appreciation is bound to lcs.homeApprNominal (NOMINAL, PR 4a /
+  // rulings M1); the preset chips in the Baseline assumptions block pick
+  // it, and a typed value selects the matching preset or Custom. The
+  // deflator chips there pick lcs.inflation, which drives only the Real
+  // view (P5). (The S&P "go deeper" rate, bound to lcs.realReturns, was
+  // retired with the cash-mode leg by M2 in PR 4b.)
+  var MA = window.ModelingAssumptions;
+  var INFL_NAMES = { 'cpi-official': 'CPI', 'm2-growth': 'M2 growth', 'shadow-stats': 'Shadow Stats', 'custom': 'custom' };
+  var APPR_NAMES = { 'long-run': 'long run, since 1890', 'since-1990': 'since 1990', 'since-2000': 'since 2000', 'custom': 'custom' };
+  function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
 
   function syncFwdHomeApprFromCanonical(){
-    var current = window.ModelingAssumptions.get('realEstate');
+    var current = MA.get('homeApprNominal');
     var input = document.getElementById('fwdHomeAppreciation');
     if(input && parseFloat(input.value) !== current.value) {
-      // Apply % format to match the blur formatter (consistent appearance
-      // whether the value comes from canonical, URL/storage, or user edit).
-      input.value = (Math.round(current.value * 10) / 10) + '%';
+      // Two decimals: the presets are 3.41 / 4.23 / 4.68.
+      input.value = pct2(current.value);
+    }
+    syncBaselineChips();
+  }
+
+  // Chips, the Real label and the collapsed block's one-line summary all
+  // read the canonical state, so they can't disagree with the numbers.
+  function syncBaselineChips(){
+    var appr = MA.get('homeApprNominal'), infl = MA.get('inflation');
+    document.querySelectorAll('#fwdApprPresets .re-preset-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-preset') === appr.preset);
+    });
+    document.querySelectorAll('#fwdInflPresets .re-preset-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-preset') === infl.preset);
+    });
+    var customRow = document.getElementById('fwdInflCustomRow');
+    if(customRow) customRow.hidden = infl.preset !== 'custom';
+    var customIn = document.getElementById('fwdInflCustom');
+    if(customIn && infl.preset === 'custom' && document.activeElement !== customIn) customIn.value = pct2(infl.value);
+    var deflLine = document.getElementById('fwdDeflatorLine');
+    if(deflLine) deflLine.textContent = 'Real: today’s dollars, deflated at ' + pct2(infl.value) + ' a year (' + INFL_NAMES[infl.preset] + ').';
+    var hint = document.getElementById('fwdBaselineHint');
+    if(hint) hint.textContent = 'home prices ' + pct2(appr.value) + ' a year nominal (' + APPR_NAMES[appr.preset] + ') · Real view deflated at ' + pct2(infl.value) + ' (' + INFL_NAMES[infl.preset] + ')';
+    var note = document.getElementById('fwdApprNotice');
+    if(note){
+      var n = MA.migrationNote && MA.migrationNote();
+      var msg = legacyLinkNote || (n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '');
+      note.textContent = msg;
+      note.hidden = !msg;
     }
   }
-  function syncFwdAdvancedRateFromCanonical(){
-    var current = window.ModelingAssumptions.get('realReturns');
-    var input = document.getElementById('fwdAdvancedRate');
-    if(input && parseFloat(input.value) !== current.value) {
-      input.value = (Math.round(current.value * 10) / 10) + '%';
-    }
+  // Set by the URL reader when a link carried the pre-4a real `appr`.
+  var legacyLinkNote = '';
+  window._bvreLegacyApprNote = function(msg){ legacyLinkNote = msg; syncBaselineChips(); };
+  function clearApprNotes(){
+    legacyLinkNote = '';
+    if(MA.clearMigrationNote) MA.clearMigrationNote();
   }
 
   var apprInput = document.getElementById('fwdHomeAppreciation');
   if(apprInput){
     apprInput.addEventListener('change', function(){
-      var v = parseFloat(apprInput.value);
+      var v = parseFloat(String(apprInput.value).replace(/[%\s]/g, ''));
       if(isFinite(v)) {
-        window.ModelingAssumptions.set('realEstate', 'custom', v);
+        // A value equal to a preset selects that preset, so restoring a
+        // default never writes a spurious "custom" (the pre-4a trap).
+        var pre = MA.presetFor('homeApprNominal', v);
+        var cur = MA.get('homeApprNominal');
+        if(pre !== cur.preset || (pre === 'custom' && v !== cur.value)) {
+          clearApprNotes();
+          if(pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
+        }
       }
     });
   }
-  var advInput = document.getElementById('fwdAdvancedRate');
-  if(advInput){
-    advInput.addEventListener('change', function(){
-      // realReturns has no Custom field per canonical, but we still let users
-      // type a value here; we map it to the closest preset by rounding.
-      // For Stage 1 simplicity, just write the typed value to the canonical
-      // by treating as "diversified" preset override via the preset value
-      // mechanism. Stage 2's rich UI will replace this with proper preset
-      // selection.
-      // For now, we just don't write (canonical drives the input on load,
-      // user override stays local to the input).
+  document.querySelectorAll('#fwdApprPresets .re-preset-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pre = b.getAttribute('data-preset');
+      clearApprNotes();
+      if(pre === 'custom'){
+        // Keep the current value as the custom starting point, then let
+        // the reader type over it.
+        MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
+        if(apprInput){ apprInput.focus(); apprInput.select && apprInput.select(); }
+      } else {
+        MA.set('homeApprNominal', pre);
+      }
+      // The subscription has already written the value into the input;
+      // this lets the URL writer (which listens on the input) record it.
+      if(apprInput) apprInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+  document.querySelectorAll('#fwdInflPresets .re-preset-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pre = b.getAttribute('data-preset');
+      if(pre === 'custom'){
+        MA.set('inflation', 'custom', MA.get('inflation').value);
+        var ci = document.getElementById('fwdInflCustom');
+        syncBaselineChips();
+        if(ci){ ci.focus(); ci.select && ci.select(); }
+      } else {
+        MA.set('inflation', pre);
+      }
+    });
+  });
+  var inflCustomIn = document.getElementById('fwdInflCustom');
+  if(inflCustomIn){
+    inflCustomIn.addEventListener('change', function(){
+      var v = parseFloat(String(inflCustomIn.value).replace(/[%\s]/g, ''));
+      if(isFinite(v)){
+        var pre = MA.presetFor('inflation', v);
+        if(pre === 'custom') MA.set('inflation', 'custom', v); else MA.set('inflation', pre);
+      }
     });
   }
 
   // Subscribe to canonical changes (cross-tab, reset events)
   if(window.ModelingAssumptions && window.ModelingAssumptions.subscribe){
     window.ModelingAssumptions.subscribe(function(dim){
-      if(dim === 'realEstate' || dim === '*') syncFwdHomeApprFromCanonical();
-      if(dim === 'realReturns' || dim === '*') syncFwdAdvancedRateFromCanonical();
-      if(dim === 'inflation' || dim === '*') runFwdCalc();
+      if(dim === 'homeApprNominal' || dim === '*') syncFwdHomeApprFromCanonical();
+      if(dim === 'inflation' || dim === '*') syncBaselineChips();
       runFwdCalc();
     });
   }
 
   // ── Initial setup ──
   syncFwdHomeApprFromCanonical();
-  syncFwdAdvancedRateFromCanonical();
-  updateAdvancedToggleLabel();
   fetchLiveBtcPrice(); // runs runFwdCalc on completion
 
   // Expose for the calc-mode toggle handler (allows safety re-trigger
@@ -1188,13 +1060,27 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 //   Projection:
 //     home       integer (USD)            default 420000
 //     horizon    integer 5|10|15|20       default 10
-//     appr       decimal (home appr %)    default 3.5
+//     happr      decimal (NOMINAL home appreciation %, 2dp)  default = the
+//                reader's lcs.homeApprNominal value (4.68 unless changed);
+//                not stored in lcs.bvre.calc.v1 (PR 4a)
+//     appr       legacy, pre-4a REAL rate: read once, converted, never written
 //     mortgage   decimal (mortgage %)     default 6.8
 //     down       decimal (down payment %) default 20
 //     method     'cash' | 'mortgage'      default 'mortgage'
-//     pscenario  'floor'|'trend'|'upper'  default 'trend'
-//     advanced   '1' if checked           omit otherwise
-//     advrate    decimal (investment %)   default 7
+//     pscenario  'floor'|'stay'|'trend'|'upper'  default 'stay' (M3, PR 4c;
+//                was 'trend', and 'upper' now means 2.5× trend, was 3×)
+//   PR 4b (rulings M2, M4, M5, M6; blank = the sourced default):
+//     rent       integer (first-year rent, $/mo)   blank = market rent
+//     rentg      decimal (rent growth %/yr)        blank = home appreciation
+//     close      decimal (buyer closing %)         default 1.04
+//     ptax       decimal (property tax %)          default 0.9
+//     ins        integer (insurance $/yr, year 1)  blank = $2,490 per $400K
+//     maint      decimal (maintenance %)           default 1
+//     sell       decimal (selling costs %)         default 6.6
+//     btctx      decimal (bitcoin cost % per trade) default 0.5
+//     inv        '0' when "the renter invests the difference" is off
+//   Retired in PR 4b, dropped from links on load: advanced, advrate (the
+//   "go deeper" DCA and S&P leg, replaced by M2).
 //
 // fwdBtcNow is intentionally NOT in the URL — it's a live-fetched
 // value that goes stale within hours, so a shared link should let the
@@ -1221,21 +1107,30 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   var SCHEMA = {
     year:      { elId: 'calcYear',             type: 'int',       def: 2017,    evt: 'change' },
     dca:       { elId: 'calcDCA',              type: 'bool',                    evt: 'change' },
-    home:      { elId: 'fwdHomePrice',         type: 'thousands', def: 420000,  evt: 'input'  },
+    home:      { elId: 'fwdHomePrice',         type: 'thousands', def: 415000,  evt: 'input'  },
     horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change' },
-    appr:      { elId: 'fwdHomeAppreciation',  type: 'float',     def: 3.5,     evt: 'input'  },
+    // Nominal home appreciation (PR 4a, rulings M1/P3): a NEW name, because
+    // the quantity is new. The pre-4a `appr` was real; init() reads a legacy
+    // `appr` once, converts it, and never writes it. Not persisted here:
+    // lcs.homeApprNominal (ModelingAssumptions) is its storage, and `def`
+    // is set from it in init().
+    happr:     { elId: 'fwdHomeAppreciation',  type: 'float',     def: 4.68,    evt: 'input', dp: 2, persist: false },
     mortgage:  { elId: 'fwdMortgageRate',      type: 'float',     def: 6.8,     evt: 'input'  },
     down:      { elId: 'fwdDownPct',           type: 'float',     def: 20,      evt: 'input'  },
-    advanced:  { elId: 'fwdAdvancedCheck',     type: 'bool',                    evt: 'change' },
-    // `def` is a placeholder — the real default is the canonical realReturns
-    // assumption, and init() overwrites this from ModelingAssumptions before any
-    // write can happen. Hardcoding it here is what produced `?advrate=5` on a bare
-    // load: markup ships value="7%", this said 7, but the canonical 'diversified'
-    // preset (5) overwrites the input on load, so the writer saw 5 !== 7 and
-    // serialized a value nobody chose.
-    advrate:   { elId: 'fwdAdvancedRate',      type: 'float',     def: 7,       evt: 'input'  },
+    // PR 4b: the Baseline assumptions block's rent and cost inputs, and the
+    // M2 toggle. Blank rent / rent growth / insurance mean "the sourced
+    // default" and are omitted, like any default.
+    rent:      { elId: 'fwdMonthlyRent',       type: 'thousands', def: NaN,     evt: 'input'  },
+    rentg:     { elId: 'fwdRentGrowth',        type: 'float',     def: NaN,     evt: 'input', dp: 2 },
+    close:     { elId: 'fwdClosingPct',        type: 'float',     def: 1.04,    evt: 'input', dp: 2 },
+    ptax:      { elId: 'fwdPropTaxPct',        type: 'float',     def: 0.9,     evt: 'input', dp: 2 },
+    ins:       { elId: 'fwdInsurance',         type: 'thousands', def: NaN,     evt: 'input'  },
+    maint:     { elId: 'fwdMaintPct',          type: 'float',     def: 1,       evt: 'input', dp: 2 },
+    sell:      { elId: 'fwdSellPct',           type: 'float',     def: 6.6,     evt: 'input', dp: 2 },
+    btctx:     { elId: 'fwdBtcTxPct',          type: 'float',     def: 0.5,     evt: 'input', dp: 2 },
+    inv:       { elId: 'fwdInvestDiff',        type: 'bool-on',                 evt: 'change' },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
-    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend',    persist: false },
+    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'stay',     persist: false },
     displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false }
   };
 
@@ -1260,10 +1155,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     }
     var el = document.getElementById(spec.elId);
     if (!el) return undefined;
-    if (spec.type === 'bool') return el.checked ? 1 : 0;
+    if (spec.type === 'bool' || spec.type === 'bool-on') return el.checked ? 1 : 0;
     if (spec.type === 'thousands') return parseThousands(el.value);
     if (spec.type === 'int')   return parseInt(el.value, 10);
-    if (spec.type === 'float') return parseFloat(el.value);
+    if (spec.type === 'float') return parseFloat(String(el.value).replace(/[%\s]/g, ''));
     return el.value;
   }
 
@@ -1276,8 +1171,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     }
     var el = document.getElementById(spec.elId);
     if (!el) return;
-    if (spec.type === 'bool') {
-      var want = raw === '1' || raw === 'true';
+    if (spec.type === 'bool' || spec.type === 'bool-on') {
+      // bool: on only for '1'. bool-on (default on): off only for '0'.
+      var want = spec.type === 'bool-on' ? !(raw === '0' || raw === 0 || raw === 'false')
+                                         : (raw === '1' || raw === 1 || raw === 'true');
       if (el.checked !== want) {
         el.checked = want;
         el.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1299,7 +1196,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       if (!isFinite(f)) return;
       // Apply % suffix on rehydration — matches the blur formatter, so
       // first-load appearance is consistent with edited appearance.
-      el.value = (Math.round(f * 10) / 10) + '%';
+      var _p = Math.pow(10, spec.dp || 1);
+      el.value = (Math.round(f * _p) / _p) + '%';
     } else {
       el.value = String(raw);
     }
@@ -1331,7 +1229,41 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // staleness reasoning as its exclusion from the URL schema). Wrapped
   // in try/catch for environments with disabled storage (Safari private
   // mode, browser settings, quota errors); failure is silent.
-  var STORAGE_KEY = 'lcs.bvre.calc.v1';
+  //
+  // v2 (PR 4b) stores ONLY values that differ from the default. v1 stored
+  // every value, defaults included, so a changed default (the $415K home
+  // price, M4) never reached a returning reader: their stored 420000
+  // looked like a choice. migrateV1() carries a v1 value over only when it
+  // differs from the v1-era default, drops keys that no longer exist
+  // (appr, advanced, advrate), and deletes v1.
+  var STORAGE_KEY = 'lcs.bvre.calc.v2';
+  var V1_KEY = 'lcs.bvre.calc.v1';
+  var V1_DEFAULTS = { year: 2017, dca: 0, home: 420000, horizon: 10, mortgage: 6.8, down: 20, method: 'mortgage' };
+  function migrateV1() {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      var raw = localStorage.getItem(V1_KEY);
+      if (raw === null) return;
+      if (localStorage.getItem(STORAGE_KEY) === null) {
+        var v1 = JSON.parse(raw) || {}, v2 = {};
+        Object.keys(v1).forEach(function(k){
+          if (!SCHEMA[k] || SCHEMA[k].persist === false) return;
+          if (v1[k] === null || v1[k] === undefined) return;
+          if (Object.prototype.hasOwnProperty.call(V1_DEFAULTS, k) && v1[k] === V1_DEFAULTS[k]) return;
+          v2[k] = v1[k];
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(v2));
+      }
+      localStorage.removeItem(V1_KEY);
+    } catch (e) { /* storage disabled or corrupt: nothing to carry */ }
+  }
+  function isDefaultValue(key, val) {
+    var spec = SCHEMA[key];
+    if (spec.type === 'bool') return val === 0;
+    if (spec.type === 'bool-on') return val === 1;
+    if (typeof val === 'number' && !isFinite(val)) return true;   // blank = default
+    return val === spec.def;
+  }
 
   function readStorageIntoInputs() {
     if (typeof localStorage === 'undefined') return;
@@ -1367,6 +1299,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       if (SCHEMA[key].persist === false) return;
       var val = readValue(key);
       if (val === undefined) return;
+      if (isDefaultValue(key, val)) return;   // v2: only choices are stored
       data[key] = val;
     });
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) { /* quota or disabled */ }
@@ -1390,6 +1323,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       // Booleans: omit when false; serialize as '1' when true
       if (spec.type === 'bool') {
         if (val === 1) params.set(key, '1');
+        else params.delete(key);
+        return;
+      }
+      // Default-on booleans: omit when on; '0' when off
+      if (spec.type === 'bool-on') {
+        if (val === 0) params.set(key, '0');
         else params.delete(key);
         return;
       }
@@ -1443,28 +1382,67 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     });
   }
 
+  // A link made before PR 4a may carry `appr`, a REAL rate. Read it once:
+  // convert to nominal at the sitewide inflation, apply it as `happr`,
+  // say so in one line, and drop `appr` from the address bar (P3). Links
+  // made before PR 4b may carry `advanced` / `advrate` (the retired "go
+  // deeper" DCA and S&P leg); they no longer mean anything and are dropped.
+  function readLegacyAppr() {
+    var params = new URLSearchParams(window.location.search);
+    var had = params.has('appr') || params.has('advanced') || params.has('advrate');
+    if (!had) return;
+    params.delete('advanced'); params.delete('advrate');
+    var real = params.has('appr') ? parseFloat(params.get('appr')) : NaN;
+    params.delete('appr');
+    if (isFinite(real) && !params.has('happr') && window.ModelingAssumptions) {
+      var infl = window.ModelingAssumptions.get('inflation').value;
+      var nominal = Math.round(((1 + real / 100) * (1 + infl / 100) - 1) * 10000) / 100;
+      _suppressWriter = true;
+      try { applyValue('happr', nominal); } finally { _suppressWriter = false; }
+      var r2 = function(v){ return parseFloat(Number(v).toFixed(2)) + '%'; };
+      if (window._bvreLegacyApprNote) window._bvreLegacyApprNote('This link used an older format: its ' + r2(real) + ' a year real home appreciation was converted to ' + r2(nominal) + ' nominal at the ' + r2(infl) + ' inflation assumption.');
+    }
+    if (window.history && window.history.replaceState) {
+      var qs = params.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+    }
+  }
+
   function init() {
-    // Single-source the advrate default from the canonical assumption that
-    // actually drives the input, so the writer can recognise an untouched value.
+    // Link defaults for the sourced figures come from the same object as
+    // the inputs (PR 4b), so the writer omits an untouched default.
     try {
-      var _rr = window.ModelingAssumptions && window.ModelingAssumptions.get('realReturns');
-      if (_rr && isFinite(_rr.value)) SCHEMA.advrate.def = _rr.value;
+      var _D = window.RealEstateModel && window.RealEstateModel.PAIR_DEFAULTS;
+      if (_D) {
+        SCHEMA.home.def = _D.homePrice; SCHEMA.close.def = _D.closingPct; SCHEMA.ptax.def = _D.propTaxPct;
+        SCHEMA.maint.def = _D.maintPct; SCHEMA.sell.def = _D.sellPct; SCHEMA.btctx.def = _D.btcTxPct;
+      }
+    } catch (e) { /* model absent: the SCHEMA literals stand */ }
+    // happr: omitted from links when it equals the reader's own canonical
+    // value, so the writer can recognise an untouched value.
+    try {
+      var _ha = window.ModelingAssumptions && window.ModelingAssumptions.get('homeApprNominal');
+      if (_ha && isFinite(_ha.value)) SCHEMA.happr.def = _ha.value;
     } catch (e) { /* shared module absent — markup default stands */ }
 
     // Read order matters: storage is the base layer, URL overrides
     // per-key when present. So a shared link with ?home=420000 wins
     // for that param but leaves storage-restored year/horizon/etc.
-    // intact for any param the URL didn't specify.
+    // intact for any param the URL didn't specify. A stored pre-4a `appr`
+    // (real) is simply not in SCHEMA any more, so it is never read, and the
+    // next syncStorage() writes the blob without it.
+    migrateV1();
     readStorageIntoInputs();
     readUrlIntoInputs();
+    readLegacyAppr();
 
     // ── DOM-sync of JS state from active buttons ─────────────────────
     // applyValue() skips btn.click() when the target button is already
     // active (line ~1285), which means JS variables `scenario` and
     // `method` can desync from the visual state when the rehydrated
     // value happens to match the markup default. E.g.: markup has
-    // Trend active, user lands on the page with no URL/storage params,
-    // the SCHEMA default is also 'trend' so applyValue is never even
+    // Stay active, user lands on the page with no URL/storage params,
+    // the SCHEMA default is also 'stay' so applyValue is never even
     // called for that key — but the module-init JS variable could be
     // stale. Force-syncing from the DOM here guarantees the calc uses
     // whatever the user actually sees highlighted.

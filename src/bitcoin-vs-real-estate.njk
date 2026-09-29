@@ -234,14 +234,19 @@ eleventyComputed:
                 <p class="annotation" style="font-size:.85rem;color:var(--text-muted);font-style:italic;margin:0 0 2rem;line-height:1.7">This calculator uses the <a href="/the-power-law" style="color:var(--amber)">Power Law model</a> as its bitcoin price assumption. The Power Law is an empirical observation with a 95%+ R&sup2; fit, not a guarantee. This is not investment advice.</p>
 
                 <div class="calc-section">
-                    <!-- Power Law Scenario Selection -->
-                    <div style="margin-bottom:1rem">
-                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Which line of the Power Law band to use for projecting BTC&rsquo;s future price. <strong>Floor</strong> is the conservative lower bound (R&sup2; &gt; 0.99). Price has approached it three times since the genesis era and gone below it by 5.1% at most (2015), and each time it moved back above; the one deep breach, 42.6% below, was in 2010, in the genesis era (<a href="/the-bitcoin-floor" style="color:var(--amber)">see The Floor</a>). <strong>Trend</strong> is the fair-value center line (R&sup2; &asymp; 0.95) &mdash; closest to a &ldquo;middle estimate.&rdquo; <strong>Upper</strong> is the extreme <em>ceiling</em> of the band &mdash; roughly 3&times; the Trend value. BTC has touched this line only briefly at major cycle peaks (2013, 2017, 2021) before mean-reverting; it&rsquo;s a cyclical extreme, <strong>not a sustained trend or fair-value forecast</strong>. Use Upper to stress-test the bull-case ceiling &mdash; <a href="/the-power-law" style="color:var(--amber)">see Power Law</a> for the band&rsquo;s historical behavior.</span></span> <a href="/the-power-law" style="color:var(--amber);text-transform:none;font-size:0.72rem;letter-spacing:0;margin-left:0.4rem;text-decoration:none;border-bottom:1px dotted var(--amber-dim)">learn more &rarr;</a></label>
-                        <div class="scenario-btns">
-                            <button class="scenario-btn" data-scenario="floor">Floor (Conservative)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &gt; 0.99</span></button>
-                            <button class="scenario-btn active" data-scenario="trend">Trend (Fair Value)<br><span style="font-size:.7rem;opacity:.7">R&sup2; &asymp; 0.95</span></button>
-                            <button class="scenario-btn" data-scenario="upper">Upper (Cycle Peak)<br><span style="font-size:.7rem;opacity:.7">&asymp;3&times; trend &middot; brief peaks</span></button>
+                    <!-- Bitcoin scenario (rulings M3, PR 4c): one set on both pages.
+                         Each moves bitcoin's multiple of the Power Law trend in a straight
+                         line from today's to a target at the horizon end
+                         (RealEstateModel.scenarioMultiple). Default: Stay at today's multiple. -->
+                    <div style="margin-bottom:1.5rem">
+                        <label style="font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);display:block;margin-bottom:.5rem">Power Law Scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Each scenario moves bitcoin&rsquo;s multiple of the Power Law trend in a straight line from today&rsquo;s to a target at the horizon end. <strong>Stay at today&rsquo;s multiple</strong> (the default) keeps today&rsquo;s multiple: bitcoin grows at the trend&rsquo;s own rate, with no reversion either way. <strong>Trend.</strong> Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing. <strong>Floor</strong> ends at 0.42&times;, the channel&rsquo;s lower bound. Since the genesis era, price has gone below it by 5.1% at most (2015); the one deep breach, 42.6%, was in 2010 (<a href="/the-bitcoin-floor" style="color:var(--amber)">see The Floor</a>). <strong>Upper</strong> ends at 2.5&times;, a stress test, not a forecast: <span data-upper-record>past cycle peaks reached at least 12&times; trend (2013), 5.4&times; (2017) and 3.2&times; (2021), each lower than the last and none sustained; the peak so far in this cycle is 1.2&times; (December 2024)</span>. All four scenarios assume the Power Law trend itself continues (<a href="/the-power-law" style="color:var(--amber)">see Power Law</a>).</span></span> <a href="/the-power-law" style="color:var(--amber);text-transform:none;font-size:0.72rem;letter-spacing:0;margin-left:0.4rem;text-decoration:none;border-bottom:1px dotted var(--amber-dim)">learn more &rarr;</a></label>
+                        <div class="scenario-btns scenario-btns-4">
+                            <button class="scenario-btn" data-scenario="floor">Floor<br><span class="scenario-sub">ends at 0.42&times;</span></button>
+                            <button class="scenario-btn active" data-scenario="stay">Stay at today&rsquo;s multiple<br><span class="scenario-sub">stays at <span id="fwdStayMult">today&rsquo;s</span></span></button>
+                            <button class="scenario-btn" data-scenario="trend">Trend<br><span class="scenario-sub">ends at 1&times;</span></button>
+                            <button class="scenario-btn" data-scenario="upper">Upper<br><span class="scenario-sub">ends at 2.5&times;</span></button>
                         </div>
+                        <p class="scenario-growth" id="fwdScenarioGrowth" aria-live="polite"></p>
                     </div>
 
                     <!-- Purchase Method Selection -->
@@ -253,19 +258,11 @@ eleventyComputed:
                         </div>
                     </div>
 
-                    <!-- Down payment % — parameterizes the "X% Down + Mortgage" method (ignored in cash mode) -->
-                    <div id="fwdDownPctRow" style="margin-bottom:1.2rem;max-width:280px">
-                        <div class="calc-field">
-                            <label>Down Payment <span class="opt">(%)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Share of the home price paid up front; the remainder is financed over a 30-year fixed mortgage. Default 20%. A smaller down payment means more leverage &mdash; a smaller up-front bitcoin-equivalent, but a larger loan and monthly payment; a larger one means less. The default rent estimate (75% of the mortgage payment) tracks this. Range 3&ndash;95%.</span></span></label>
-                            <input type="text" id="fwdDownPct" value="20%" inputmode="decimal">
-                        </div>
-                    </div>
-
                     <!-- Primary Inputs -->
                     <div class="calc-grid">
                         <div class="calc-field">
-                            <label>Home Price Today</label>
-                            <input type="text" id="fwdHomePrice" value="$420,000" inputmode="numeric">
+                            <label>Home Price Today<span class="help-tip" tabindex="0">?<span class="tip-content">The default, $415,000, is the 2025 median price of <strong>new</strong> houses sold in the US (Census/HUD, FRED <em>MSPUS</em>), rounded. Enter your own.</span></span></label>
+                            <input type="text" id="fwdHomePrice" value="$415,000" inputmode="numeric">
                         </div>
                         <div class="calc-field">
                             <label>Time Horizon<span class="help-tip" tabindex="0">?<span class="tip-content">How far into the future to project. Longer horizons give the Power Law model more compounding to work with &mdash; and more uncertainty. Both paths (bitcoin and house) are evaluated at the same future date so the comparison is apples-to-apples.</span></span></label>
@@ -276,60 +273,122 @@ eleventyComputed:
                             <input type="text" id="fwdBtcNow" value="" inputmode="numeric" placeholder="fetching live price&hellip;">
                         </div>
                     </div>
-                    <div class="calc-grid">
-                        <div class="calc-field">
-                            <label>Expected Home Appreciation <span class="opt">(real / yr)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual home price growth in <strong>real</strong> terms (after inflation). Long-run US median has been roughly 0&ndash;1% real &mdash; the default 3.5% is generous. Sitewide inflation (~6.5% M2 growth) is layered on top internally to drive the nominal home value path.</span></span></label>
-                            <input type="text" id="fwdHomeAppreciation" value="3.5%" inputmode="decimal">
-                        </div>
-                        <div class="calc-field" id="fwdMortgageRateField">
-                            <label>Mortgage Rate <span class="opt">(nominal)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual interest rate on a 30-year fixed mortgage, in <strong>nominal</strong> terms (as quoted by lenders). The calculator assumes a 30-year fixed-rate amortization. The default 6.8% tracks recent US averages; check current quotes for your situation.</span></span></label>
-                            <input type="text" id="fwdMortgageRate" value="6.8%" inputmode="decimal">
-                        </div>
-                        <div class="calc-field" id="fwdMonthlyRentField">
-                            <label>Your Monthly Rent <span class="opt">(optional)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Override the default rent assumption (75% of an equivalent mortgage payment). Leave blank to use the default &mdash; the default updates live as you change home price and mortgage rate. Used to compute &ldquo;total rent paid&rdquo; over the projection horizon for the bitcoin + rent path.</span></span></label>
-                            <input type="text" id="fwdMonthlyRent" value="" inputmode="numeric" placeholder="$3,150 (75% of mortgage)">
-                        </div>
-                    </div>
+                    <div class="footnote-date" id="fwdInvestmentFootnote">Both households pay the same: the buyer&rsquo;s up-front cash goes into bitcoin for the renter, and each month the renter matches the owner&rsquo;s costs with rent plus bitcoin (details under the results). Prices, rates, rent and costs are nominal, as quoted; inflation only converts the results to today&rsquo;s dollars in the Real view. Both paths run the same horizon from today.</div>
 
-                    <div class="footnote-date" id="fwdInvestmentFootnote">Home appreciation is in real (inflation-adjusted) terms; mortgage rate is nominal as written. Sitewide inflation rate (currently 6.5% M2-growth default; see Half-Life or Melting Ice Cube) is used internally to reconcile the two. Your up-front investment is derived from the home price and purchase method. Projections anchored to January 1 of the selected year.</div>
+                    <!-- Baseline assumptions (PR 4a/4b; rulings M1, M4-M6, P5, design §7).
+                         BvRP's two-tier pattern: set once, then ignore. Blank fields use the
+                         sourced default shown as their placeholder (RealEstateModel.PAIR_DEFAULTS). -->
+                    <details class="re-baseline" id="fwdBaseline">
+                        <summary><span class="re-baseline-label">Baseline assumptions</span> <span class="re-baseline-hint" id="fwdBaselineHint">home prices 4.68% a year nominal (since 2000) &middot; Real view deflated at 6.5% (M2 growth)</span></summary>
+                        <div class="re-baseline-body">
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">Home appreciation <span class="opt">(nominal / yr)</span><span class="help-tip" tabindex="0">?<span class="tip-content">How fast home prices rise, in <strong>nominal</strong> terms, the way house prices and mortgage rates are quoted. The presets are the recorded US rate to 2025: <strong>Since 2000</strong> 4.68% a year (S&amp;P CoreLogic Case-Shiller National; the default, and the highest of the three windows), <strong>Since 1990</strong> 4.23%, and <strong>Long run</strong> 3.41% (Shiller&rsquo;s series from 1890, chained to Case-Shiller). When inflation runs higher, home prices tend to rise in nominal terms while a fixed-rate loan balance doesn&rsquo;t. That is the fixed-rate borrower&rsquo;s inflation benefit. To model a higher-inflation future, raise nominal appreciation.</span></span></div>
+                                <div class="re-preset-btns" id="fwdApprPresets" role="group" aria-label="Home appreciation presets">
+                                    <button type="button" class="re-preset-btn" data-preset="long-run">Long run<span class="re-preset-val">3.41%</span></button>
+                                    <button type="button" class="re-preset-btn" data-preset="since-1990">Since 1990<span class="re-preset-val">4.23%</span></button>
+                                    <button type="button" class="re-preset-btn active" data-preset="since-2000">Since 2000<span class="re-preset-val">4.68%</span></button>
+                                    <button type="button" class="re-preset-btn" data-preset="custom">Custom<span class="re-preset-val">your own</span></button>
+                                </div>
+                                <div class="calc-field re-baseline-input"><input type="text" id="fwdHomeAppreciation" value="4.68%" inputmode="decimal" aria-label="Home appreciation, nominal percent a year"></div>
+                                <p class="re-baseline-note" id="fwdApprNotice" hidden></p>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">Deflator for the Real view<span class="help-tip" tabindex="0">?<span class="tip-content">The inflation rate the <strong>Real</strong> view uses to turn future dollars into today&rsquo;s. It scales both paths by the same factor, so it never changes which one comes out ahead. It is the sitewide setting: changing it here changes it on The Half-Life and every other calculator that uses it.</span></span></div>
+                                <div class="re-preset-btns" id="fwdInflPresets" role="group" aria-label="Deflator presets">
+                                    <button type="button" class="re-preset-btn" data-preset="cpi-official">CPI<span class="re-preset-val">3.5%</span></button>
+                                    <button type="button" class="re-preset-btn active" data-preset="m2-growth">M2 growth<span class="re-preset-val">6.5%</span></button>
+                                    <button type="button" class="re-preset-btn" data-preset="shadow-stats">Shadow Stats<span class="re-preset-val">8%</span></button>
+                                    <button type="button" class="re-preset-btn" data-preset="custom">Custom<span class="re-preset-val">your own</span></button>
+                                </div>
+                                <div class="calc-field re-baseline-input" id="fwdInflCustomRow" hidden><input type="text" id="fwdInflCustom" inputmode="decimal" aria-label="Custom inflation, percent a year"></div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">The mortgage</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field" id="fwdDownPctRow">
+                                        <label for="fwdDownPct">Down payment <span class="opt">(%)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Share of the price paid up front; the rest is a 30-year fixed mortgage. Default 20%. The renter puts the same up-front cash (down payment plus closing costs) into bitcoin. Range 3&ndash;95%.</span></span></label>
+                                        <input type="text" id="fwdDownPct" value="20%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field" id="fwdMortgageRateField">
+                                        <label for="fwdMortgageRate">Mortgage rate <span class="opt">(nominal)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Annual rate on a 30-year fixed mortgage, as lenders quote it. The default 6.8% tracks recent US averages; check current quotes for your situation.</span></span></label>
+                                        <input type="text" id="fwdMortgageRate" value="6.8%" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">Rent</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field" id="fwdMonthlyRentField">
+                                        <label for="fwdMonthlyRent">Monthly rent <span class="opt">(year 1)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Blank uses <strong>market rent</strong> for this price: price &divide; 12 &divide; 15.77, the US price-to-rent ratio from Zillow&rsquo;s typical home value (ZHVI) and rent index (ZORI), August 2026. On $415,000 that is $2,193 a month. Enter your own rent to override it.</span></span></label>
+                                        <input type="text" id="fwdMonthlyRent" value="" inputmode="numeric" placeholder="$2,193 default">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdRentGrowth">Rent growth <span class="opt">(nominal / yr)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Blank grows rent at the home appreciation rate, so the price-to-rent ratio stays constant. Historically rents have grown more slowly than prices, so this leans against the bitcoin side. Rent steps up once a year.</span></span></label>
+                                        <input type="text" id="fwdRentGrowth" value="" inputmode="decimal" placeholder="4.68% default">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">The owner&rsquo;s costs</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field">
+                                        <label for="fwdClosingPct">Closing costs <span class="opt">(% of price)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Paid by the buyer at purchase. Default 1.04%: LodeStar&rsquo;s national average for 2025 purchase mortgages ($4,528, including recording fees and transfer taxes). The renter invests the same sum.</span></span></label>
+                                        <input type="text" id="fwdClosingPct" value="1.04%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdPropTaxPct">Property tax <span class="opt">(% of value / yr)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Default 0.9% of the home&rsquo;s current value: ATTOM&rsquo;s national effective rate on single-family homes in 2025. It varies a great deal by state and county.</span></span></label>
+                                        <input type="text" id="fwdPropTaxPct" value="0.9%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdInsurance">Insurance <span class="opt">($ / yr, year 1)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Blank scales NerdWallet&rsquo;s national average (Quadrant Information Services, May 2026: about $2,490 a year for $400,000 of dwelling coverage) to the home&rsquo;s price. It grows with the home&rsquo;s value.</span></span></label>
+                                        <input type="text" id="fwdInsurance" value="" inputmode="numeric" placeholder="$2,583 default">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdMaintPct">Maintenance <span class="opt">(% of value / yr)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Default 1% of the home&rsquo;s current value a year. A rule of thumb: there is no national primary source for it.</span></span></label>
+                                        <input type="text" id="fwdMaintPct" value="1%" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="re-baseline-group">
+                                <div class="re-baseline-group-label">Selling and trading</div>
+                                <div class="re-field-grid">
+                                    <div class="calc-field">
+                                        <label for="fwdSellPct">Selling costs <span class="opt">(% of price)</span><span class="help-tip" tabindex="0">?<span class="tip-content">Applied when the house is sold at the end. Default 6.6%: a 5.6% agent commission (the midpoint of Clever Real Estate&rsquo;s two 2026 surveys, 5.70% and 5.46%) plus 1% of other seller closing costs, an estimate: there is no national figure, and state transfer taxes dominate it. Range 0&ndash;10%.</span></span></label>
+                                        <input type="text" id="fwdSellPct" value="6.6%" inputmode="decimal">
+                                    </div>
+                                    <div class="calc-field">
+                                        <label for="fwdBtcTxPct">Bitcoin costs <span class="opt">(% per trade)</span><span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Spread and fees on every bitcoin purchase and sale, so the house isn&rsquo;t the only side paying to trade. Default 0.5%, an estimate. Range 0&ndash;2%.</span></span></label>
+                                        <input type="text" id="fwdBtcTxPct" value="0.5%" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
 
                     <!-- Display mode toggle: Real (today's purchasing power) vs Nominal (future dollars).
                          Default is Real — matches the editorial convention used in 'How this works' and
                          in retrospective. Persisted via URL/storage SCHEMA. -->
-                    <div class="display-mode-row" style="display:flex;align-items:center;gap:0.6rem;margin:0.4rem 0 1rem;justify-content:flex-end">
-                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)">Display values in:<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Real</strong> shows projected values deflated to today&rsquo;s purchasing power, using the sitewide inflation assumption (currently 6.5% M2 growth; same reference used across all calculators &mdash; see Half-Life or Melting Ice Cube). <strong>Nominal</strong> shows the actual future dollar amounts as they&rsquo;d appear on a future statement &mdash; these include both real growth and inflation, so they look larger but buy the same things.</span></span></span>
+                    <div class="display-mode-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.6rem;margin:0.4rem 0 0.4rem;justify-content:flex-end">
+                        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted)">Display values in:<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Real</strong> shows projected values deflated to today&rsquo;s purchasing power at the deflator named below (set it in Baseline assumptions). Every figure is divided by the same factor, so the Real view never changes which path is ahead. <strong>Nominal</strong> shows the future dollar amounts as they&rsquo;d appear on a future statement.</span></span></span>
                         <button class="display-mode-btn toggle-btn active" data-mode="real" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Real (today's $)</button>
                         <button class="display-mode-btn toggle-btn" data-mode="nominal" style="flex:0 0 auto;min-width:120px;padding:0.4rem 0.8rem;font-size:0.78rem">Nominal (future $)</button>
                     </div>
+                    <div class="re-deflator-line" id="fwdDeflatorLine">Real: today&rsquo;s dollars, deflated at 6.5% a year (M2 growth).</div>
 
                     <!-- Results -->
                     <div id="fwdResults"></div>
 
-                    <!-- Advanced toggle (DCA or S&P) -->
-                    <div class="advanced-section">
-                        <label class="advanced-toggle-label">
-                            <input type="checkbox" id="fwdAdvancedCheck">
-                            <span id="fwdAdvancedText"></span>
-                            <span id="fwdAdvancedRateWrap" style="display:none">at <input type="text" id="fwdAdvancedRate" value="7%" inputmode="decimal"> real / yr</span>
-                        </label>
-                        <div id="fwdAdvancedContent" style="display:none">
-                            <div class="advanced-note" id="fwdAdvancedNote"></div>
-                            <div class="advanced-grid">
-                                <div id="fwdAdvancedLeft"></div>
-                                <div id="fwdAdvancedRight"></div>
-                            </div>
-                        </div>
+                    <!-- Equal cash out (PR 4b, rulings M2, P6): the toggle sits with the
+                         results. Replaces the "Go deeper" DCA / S&P panel and the Total
+                         Comparison block, which the cards above now cover. -->
+                    <div class="re-invest-row">
+                        <label class="re-invest-toggle"><input type="checkbox" id="fwdInvestDiff" checked> <span>The renter invests the difference</span></label><span class="help-tip" tabindex="0">?<span class="tip-content">On (the like-for-like case): both households spend the same every month. The owner pays the mortgage, property tax, insurance and maintenance; the renter pays rent and buys bitcoin with what&rsquo;s left, or sells bitcoin to cover rent when rent costs more. Off: only the up-front sum goes into bitcoin, and the monthly difference is spent, or paid from income when rent costs more. The off setting tests the objection that a mortgage forces saving and renters don&rsquo;t save.</span></span>
+                        <p class="re-cashout-line" id="fwdCashOutLine"></p>
                     </div>
                 </div>
 
-                <!-- Total Comparison — mirrors retrospective layout. Populated by runFwdCalc. -->
-                <div class="calculator" id="fwdTotalSummaryWrapper" style="display:none;margin-top:0;border-top:none;border-radius:0 0 8px 8px;padding:1.5rem 2rem">
-                    <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:1rem;text-align:center">Total Comparison</div>
-                    <div id="fwdTotalSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem"></div>
-                </div>
-
                 <div class="annotation" style="margin-top:1rem;font-size:.85rem;color:var(--text-muted);line-height:1.7">
-                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is in real (inflation-adjusted) terms; the calculator combines it internally with the sitewide inflation rate to drive the nominal home value path. Mortgage assumes your chosen down payment (default 20%), 30-year fixed; mortgage rate is nominal as written. Property taxes at 1.2% annually, insurance ~$150/mo, maintenance at 1% of home value annually. Rent in the bitcoin + rent path is estimated at 75% of an equivalent mortgage payment. <em>Projected dollar amounts render in your chosen frame &mdash; Real (today&rsquo;s purchasing power) or Nominal (future dollars) &mdash; via the toggle above the results. Real is the default. Returns and CAGRs are computed on the real values regardless of toggle. Accumulated payment streams (rent, interest, total cost of ownership) are shown as their nominal sum.</em>
+                    <strong style="color:var(--text-dim)">How this works:</strong> The bitcoin projection uses the <a href="/the-power-law" style="color:var(--amber)">Power Law model</a> (Porkopolis coefficients). Home appreciation is nominal, like the mortgage rate: the default is the recorded US rate since 2000 (Case-Shiller National, 4.68% a year to 2025), with since-1990 and long-run presets in Baseline assumptions. Mortgage assumes your chosen down payment (default 20%), 30-year fixed. Both paths run the same number of years from today. <strong style="color:var(--text-dim)">Equal cash out:</strong> the renter puts the buyer&rsquo;s up-front cash (down payment plus closing costs) into bitcoin, then each month pays rent and invests the owner&rsquo;s cost minus rent, or sells bitcoin when rent costs more; the owner&rsquo;s cost is the mortgage payment plus property tax (0.9%), insurance and maintenance (1%), the last three following the home&rsquo;s value. Rent defaults to market rent for the price (Zillow&rsquo;s price-to-rent ratio, 15.77) and grows with home prices. Bitcoin&rsquo;s price moves month by month from today&rsquo;s multiple of the Power Law trend to the scenario&rsquo;s target at the horizon; the default, Stay at today&rsquo;s multiple, keeps today&rsquo;s multiple, so no reversion to trend is assumed. Each purchase and sale pays 0.5%. Results are shown <em>if sold</em>, before tax: the house less 6.6% selling costs and the loan, bitcoin less its 0.5% sale cost. Every default is in Baseline assumptions, with its source. <em>Projected dollar amounts render in your chosen frame &mdash; Real (today&rsquo;s purchasing power) or Nominal (future dollars) &mdash; via the toggle above the results. Every end value is divided by the same inflation factor in the Real view, so it never changes which path is ahead. Monthly amounts and totals are shown nominal, as paid.</em>
                 </div>
 
             </div><!-- /calc-mode-projection -->

@@ -997,7 +997,7 @@ html, body {
 }
 .calc-cagr-chips {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);  /* four scenarios (PR 4c, rulings M3) */
   gap: 0.6rem;
 }
 .calc-cagr-chip {
@@ -1530,3 +1530,52 @@ html, body {
   /* Slightly less width so it doesn't visually dominate the chip column */
   width: 220px;
 }
+
+/* ─── Home appreciation control (PR 4a; rulings M1) ───
+   Shared nominal input with Bitcoin vs. Real Estate (lcs.homeApprNominal). */
+.calc-appr-input {
+  width: 5.5rem;
+  background: #1a1817;
+  border: 1px solid var(--border-faint);
+  border-radius: 0.3rem;
+  color: var(--amber);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  padding: 0.3rem 0.5rem;
+}
+.calc-appr-input:focus { border-color: var(--amber); outline: none; }
+.calc-appr-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  margin: 0.5rem 0 0.2rem;
+}
+.calc-appr-preset {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-faint);
+  border-radius: 0.3rem;
+  color: var(--ink-dim);
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  line-height: 1.3;
+  padding: 0.4rem 0.2rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.calc-appr-preset span { display: block; font-size: 0.68rem; opacity: 0.8; }
+.calc-appr-preset:hover { color: var(--ink-bright); }
+.calc-appr-preset.active { border-color: var(--amber); color: var(--amber); font-weight: 600; }
+.calc-appr-notice {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+}
+
+/* PR 4c (rulings M3): four scenario chips. "Stay at today's multiple"
+   wraps at desktop width; keep the help glyph with the last word. */
+.calc-cagr-chip-nowrap { white-space: nowrap; }

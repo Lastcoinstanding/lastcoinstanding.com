@@ -1006,7 +1006,7 @@ field and a `fwd*` projection field):
 - **Projection:** `#fwdDownPct`, a compact field placed directly under the
   Purchase Method buttons (it parameterizes the "X% Down + Mortgage" method;
   ignored in cash mode). Carries a URL param + localStorage via the projection
-  SCHEMA (`down`, `type:'float'`, `def:20`), same as `mortgage`/`appr`. Value
+  SCHEMA (`down`, `type:'float'`, `def:20`), same as `mortgage`/`happr`. Value
   `20%` in markup.
 
 **Bounds: 3–95% (inclusive), default 20.** Documented choice: 100% is the cash-
@@ -1231,16 +1231,27 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 |---|---|---|---|---|
 | `year` | integer | retro | `#calcYear` | 2014–2021, default 2017 |
 | `dca` | bool | retro | `#calcDCA` | `'1'` if checked, omitted otherwise |
-| `home` | integer | proj | `#fwdHomePrice` | comma-formatted in DOM; URL strips commas; default 420000 |
+| `home` | integer | proj | `#fwdHomePrice` | comma-formatted in DOM; URL strips commas; default 415000 (PR 4b; `PAIR_DEFAULTS.homePrice`) |
 | `horizon` | integer | proj | `#fwdHorizon` | one of `5`/`10`/`15`/`20`, default 10 |
-| `appr` | decimal | proj | `#fwdHomeAppreciation` | real %/yr, default 3.5 |
+| `happr` | decimal | proj | `#fwdHomeAppreciation` | **nominal** %/yr, 2 dp (PR 4a, rulings M1/P3). Omitted when it equals the reader's own `lcs.homeApprNominal` value (4.68 unless changed); a value equal to a preset selects that preset. Not stored in `lcs.bvre.calc.v1`: the sitewide dimension is its storage |
+| `appr` | decimal | proj | — | **legacy, read once.** The pre-4a *real* rate. On load it is converted to nominal at the sitewide inflation, applied as `happr`, announced in one line under the appreciation control, and deleted from the address bar; it is never written. A stored `appr` in `lcs.bvre.calc.v1` is ignored (it was almost always the old default, 3.5) |
 | `mortgage` | decimal | proj | `#fwdMortgageRate` | nominal %, default 6.8 |
 | `method` | enum | proj | `.purchase-btn.active` | `'cash'` or `'mortgage'` (default) |
-| `pscenario` | enum | proj | `.scenario-btn.active` | `'floor'` (default), `'trend'`, or `'upper'` |
-| `advanced` | bool | proj | `#fwdAdvancedCheck` | `'1'` if checked, omitted otherwise |
-| `advrate` | decimal | proj | `#fwdAdvancedRate` | real %/yr, default 7 |
+| `pscenario` | enum | proj | `.scenario-btn.active` | `'stay'` (default), `'floor'`, `'trend'` or `'upper'` (PR 4c, rulings M3; the default was `'trend'`). Each moves bitcoin's multiple of the Power Law trend in a straight line from today's to a target at the horizon end: `floor` 0.42×, `stay` today's multiple, `trend` 1×, `upper` 2.5× (was 3× on this page before 4c). Legacy links carry `floor`, `trend` or `upper`, which keep their keys (P3). Not stored (`persist: false`) |
+| `rent` | integer | proj | `#fwdMonthlyRent` | year-1 rent, $/mo; omitted when blank (blank = market rent, price ÷ 12 ÷ 15.77). PR 4b |
+| `rentg` | decimal | proj | `#fwdRentGrowth` | rent growth, nominal %/yr; omitted when blank (blank = home appreciation). PR 4b |
+| `close` | decimal | proj | `#fwdClosingPct` | buyer closing costs, % of price; default 1.04. PR 4b |
+| `ptax` | decimal | proj | `#fwdPropTaxPct` | property tax, % of current value; default 0.9. PR 4b |
+| `ins` | integer | proj | `#fwdInsurance` | insurance, $/yr in year 1; omitted when blank (blank = $2,490 per $400K of price). PR 4b |
+| `maint` | decimal | proj | `#fwdMaintPct` | maintenance, % of current value; default 1. PR 4b |
+| `sell` | decimal | proj | `#fwdSellPct` | selling costs, % of price; default 6.6. PR 4b |
+| `btctx` | decimal | proj | `#fwdBtcTxPct` | bitcoin cost per purchase or sale, %; default 0.5. PR 4b |
+| `inv` | bool, default on | proj | `#fwdInvestDiff` | `'0'` when "The renter invests the difference" is off; omitted when on. PR 4b |
+| `advanced`, `advrate` | — | — | — | **retired in PR 4b** with the "Go deeper" DCA and S&P leg (replaced by equal cash out, M2); dropped from the address bar on load |
 
 `fwdBtcNow` (current BTC price) is intentionally NOT in the URL — it's a live-fetched value that goes stale within hours, so a shared link lets the receiver's calculator pull fresh price rather than pin a past value.
+
+**Storage (PR 4b): `lcs.bvre.calc.v2` keeps only values that differ from the default.** Defaults for the sourced figures come from `RealEstateModel.PAIR_DEFAULTS` (the same object that fills the inputs), so a refreshed default reaches returning readers. `lcs.bvre.calc.v1` stored every value, defaults included, which froze a returning reader on the old defaults; on first load `migrateV1()` carries a v1 value over only if it differs from the v1-era default (`home` 420000, `horizon` 10, `mortgage` 6.8, `down` 20, `year` 2017, `method` mortgage, `dca` off), drops keys that no longer exist (`appr`, `advanced`, `advrate`) and deletes v1.
 
 For purchase-method and Power Law scenario (which are button groups, not form inputs), the reader programmatically `.click()`s the matching button so the existing handlers (which trigger `runFwdCalc`) run. Button-group changes also fire the URL writer via direct `click` listeners.
 
@@ -1702,7 +1713,7 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 
 - **The Tab IV reframing.** Title is *"Where the income path actually wins — bitcoin-backed preferreds as bear-case insurance"* — not "wealth maximization." This was the single most consequential editorial decision. Under base-case bitcoin growth, just holding bitcoin wins on terminal wealth, comfortably, at any reasonable Power Law assumption. The honest case for the instruments isn't beating bitcoin; it's: bear-case insurance, volatility elimination, and tax-efficient cashflow *today*. The intro prose, the chip framing, and the dynamic verdict logic all align to this thesis.
 - **Bitcoin winter not crypto winter.** Site-wide convention avoids the word "crypto" because it tends to legitimize the broader crypto space. Stress preset display name + Tab V prose both use "Bitcoin winter"; internal `data-preset="winter"` key unchanged for forward-compat.
-- **Verbatim BvRP growth-scenario language.** The three growth chips (Stay at current trend multiple / Revert to Power Law trend / Reach Power Law upper channel) carry the exact tooltip text used by Bitcoin vs Rental Property. Same Power Law model + same canonical phrasing = cross-page consistency.
+- **Verbatim BvRP growth-scenario language.** The three growth chips (Stay at current trend multiple / Revert to Power Law trend / Reach Power Law upper channel) carry the exact tooltip text used by Bitcoin vs Rental Property. Same Power Law model + same canonical phrasing = cross-page consistency. **No longer matched since PR 4c (2026-09-28):** BvRP moved to the pair's M3 set (Floor · Stay at today's multiple · Trend · Upper, default Stay); BFI keeps the three chips above with Trend as default. Whether BFI follows is an open decision (TECH_DEBT §5, *Bitcoin scenario vocabulary*).
 
 ### Calculator architecture
 

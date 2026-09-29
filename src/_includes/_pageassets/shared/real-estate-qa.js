@@ -19,16 +19,47 @@
    and hashes the rendered output:
      - Date.now → 2026-09-27T12:00Z; BTC → $100,000 (fwdBtcNow on
        BvRE, TODAY_PRICE on BvRP); ModelingAssumptions → inflation
-       m2-growth, realEstate recent-decades, realReturns diversified;
+       m2-growth, homeApprNominal since-2000, realReturns diversified;
      - captures result-container innerHTML and Chart.js dataset arrays
        (labels, data at full precision, hidden flags);
      - hashes each vector's capture (FNV-1a 32) and all of them
        together (digest).
-   State it touches (inputs, MA presets, URL, lcs.bvre.calc.v1,
+   State it touches (inputs, MA presets, URL, lcs.bvre.calc.v2,
    Date.now, TODAY_PRICE) is saved and restored at the end.
 
    The same file is pasted into the console on the pre-refactor page
    to produce the "before" hashes; the refactor PR records both.
+
+   Vector mapping across PRs (a figure-changing PR compares like with
+   like by vector ID; where a control's meaning changes, it is noted here):
+     PR 4a (M1, M10) — `appr` is now NOMINAL home appreciation. The pinned
+       dimension is homeApprNominal (was the real `realEstate`). E6–E11 and
+       E13 carry the new default, 4.68 (was 3.5 real, 10.23% nominal at
+       M2); E12 keeps its number, 1.0, now nominal. BvRP vectors gain
+       `appr` 4.68 (was a hardcoded 3.0).
+     PR 4b (M2, M4–M6) — the projection's cards are rebuilt for equal
+       cash out and the "Go deeper" panel and Total Comparison are gone, so
+       captureProj() captures the cards and the cash-out line. The default
+       home price is 415000 (was 420000); rent blank = market rent. The
+       `advanced` flag is retired: E10 (was cash + S&P leg) and E11 (was
+       mortgage + DCA, rent 1,500) keep their other inputs and run with
+       the difference invested, the new default. New: E14 (difference not
+       invested), E15 (no closing, selling or bitcoin costs), E16 (rent
+       growth 2%), E17 (the pre-4b tax and insurance: 1.2%, $1,800/yr).
+       BvRP vectors gain `sell` 6.6 (was a hardcoded 8) and `btctx` 0.5;
+       new P13 runs Path 1 at the old 8% and no bitcoin cost.
+     PR 4c (M3) — one scenario set on both pages (floor, stay, trend, upper),
+       each moving the multiple of trend in a straight line to its target at
+       the horizon end. The default is `stay` (was `trend`), and BvRE's upper
+       target is 2.5× (was 3×; BvRP's already was). BvRE: PROJ_BASE moves to
+       `stay`, so every projection vector that doesn't name a scenario now
+       runs under Stay. Like with like against 4b: new E18 (trend) is 4b's
+       E6; E8a (floor) is unchanged; E8b (upper) moves to 2.5×. New E19
+       captures the scenario line and the Stay button under each scenario.
+       BvRP: RP_BASE moves to `stay`; P5a is now trend (it was stay, which
+       is now P1); new P5c is floor. BvRP captures include the chips and the
+       chart, which gain Floor, so no BvRP vector is byte-comparable with
+       4b: compare the tables.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -74,19 +105,26 @@
     { id: 'E4', desc: 'retro 2021, rate 3%, rent $2,000, 10% down', year: '2021', rate: '3', rent: '2000', down: '10' },
     { id: 'E5', desc: 'retro 2019, home $750,000, DCA on', year: '2019', home: '750000', dca: true }
   ];
-  var PROJ_BASE = { scenario: 'trend', method: 'mortgage', down: '20', home: '420000', horizon: '10',
-                    appr: '3.5', rate: '6.8', rent: '', advanced: false, display: 'real', infl: 'm2-growth' };
+  var PROJ_BASE = { scenario: 'stay', method: 'mortgage', down: '20', home: '415000', horizon: '10',
+                    appr: '4.68', rate: '6.8', rent: '', rentg: '', close: '1.04', ptax: '0.9', ins: '',
+                    maint: '1', sell: '6.6', btctx: '0.5', invest: true, display: 'real', infl: 'm2-growth' };
   var PROJ = [
-    { id: 'E6',  desc: 'proj defaults ($420K, 10y, trend, mortgage 20%, Real)' },
+    { id: 'E6',  desc: 'proj defaults ($415K, 10y, stay, mortgage 20%, Real)' },
     { id: 'E7',  desc: 'proj defaults, Nominal display', display: 'nominal' },
     { id: 'E8a', desc: 'proj floor', scenario: 'floor' },
-    { id: 'E8b', desc: 'proj upper', scenario: 'upper' },
-    { id: 'E9a', desc: 'proj 5y, trend', horizon: '5' },
-    { id: 'E9b', desc: 'proj 20y, trend', horizon: '20' },
-    { id: 'E10', desc: 'proj cash, advanced (index fund at 5%)', method: 'cash', advanced: true },
-    { id: 'E11', desc: 'proj mortgage, advanced DCA, rent $1,500', advanced: true, rent: '1500' },
+    { id: 'E8b', desc: 'proj upper (2.5× from 4c)', scenario: 'upper' },
+    { id: 'E9a', desc: 'proj 5y, stay', horizon: '5' },
+    { id: 'E9b', desc: 'proj 20y, stay', horizon: '20' },
+    { id: 'E10', desc: 'proj cash purchase', method: 'cash' },
+    { id: 'E11', desc: 'proj mortgage, rent $1,500', rent: '1500' },
     { id: 'E12', desc: 'proj down 3.5%, rate 7.5%, appr 1.0', down: '3.5', rate: '7.5', appr: '1.0' },
-    { id: 'E13', desc: 'proj inflation cpi-official (3.5)', infl: 'cpi-official' }
+    { id: 'E13', desc: 'proj inflation cpi-official (3.5)', infl: 'cpi-official' },
+    { id: 'E14', desc: 'proj, difference not invested', invest: false },
+    { id: 'E15', desc: 'proj, no closing, selling or bitcoin costs', close: '0', sell: '0', btctx: '0' },
+    { id: 'E16', desc: 'proj, rent growth 2%', rentg: '2' },
+    { id: 'E17', desc: 'proj, pre-4b tax 1.2% and insurance $1,800/yr', ptax: '1.2', ins: '1800' },
+    { id: 'E18', desc: 'proj trend (the pre-4c default)', scenario: 'trend' },
+    { id: 'E19', desc: 'scenario line and Stay button, each scenario at defaults', growth: true }
   ];
 
   function applyRetro(v){
@@ -106,7 +144,7 @@
   function applyProj(v){
     var x = Object.assign({}, PROJ_BASE, v);
     var MA = window.ModelingAssumptions;
-    MA.set('inflation', x.infl); MA.set('realEstate', 'recent-decades'); MA.set('realReturns', 'diversified');
+    MA.set('inflation', x.infl); MA.set('homeApprNominal', 'since-2000'); MA.set('realReturns', 'diversified');
     click('.purchase-btn[data-method="' + x.method + '"]');   // also resets the advanced box
     click('.scenario-btn[data-scenario="' + x.scenario + '"]');
     click('.display-mode-btn[data-mode="' + x.display + '"]');
@@ -117,20 +155,20 @@
     setVal('fwdHomeAppreciation', x.appr);                    // input only: 'change' would write the MA custom value
     setVal('fwdMortgageRate', x.rate);
     setVal('fwdMonthlyRent', x.rent);
-    var a = el('fwdAdvancedCheck');
-    a.checked = x.advanced; fire(a, 'change');
+    setVal('fwdRentGrowth', x.rentg); setVal('fwdClosingPct', x.close); setVal('fwdPropTaxPct', x.ptax);
+    setVal('fwdInsurance', x.ins); setVal('fwdMaintPct', x.maint); setVal('fwdSellPct', x.sell); setVal('fwdBtcTxPct', x.btctx);
+    var inv = el('fwdInvestDiff');
+    if (inv) { inv.checked = x.invest; fire(inv, 'change'); }
   }
   function captureProj(){
-    // The advanced panel is hidden, not cleared, when "Go deeper" is off,
-    // so its innerHTML is only captured while it is shown; otherwise the
-    // hash would depend on what an earlier vector left behind.
-    var advShown = el('fwdAdvancedContent').style.display;
-    var adv = advShown === 'none' ? null
-      : { note: html('fwdAdvancedNote'), left: html('fwdAdvancedLeft'), right: html('fwdAdvancedRight') };
-    var totShown = el('fwdTotalSummaryWrapper').style.display;
-    return { results: html('fwdResults'), totalShown: totShown,
-             total: totShown === 'none' ? null : html('fwdTotalSummary'),
-             advShown: advShown, adv: adv };
+    return { results: html('fwdResults'), cashOut: html('fwdCashOutLine') };
+  }
+  function captureGrowth(){
+    var up = document.querySelector('[data-upper-record]');
+    return ['floor', 'stay', 'trend', 'upper'].map(function(sc){
+      applyProj({ scenario: sc });
+      return { scenario: sc, line: html('fwdScenarioGrowth'), stay: html('fwdStayMult'), upper: up ? up.textContent : null };
+    });
   }
   function captureBvreStatic(){
     return { houses: html('housesVisual'), returnTable: html('returnTable'), returnEnd: html('returnTableEndPrices'),
@@ -139,16 +177,17 @@
   }
 
   // ─── BvRP ──────────────────────────────────────────────────────────
-  var RP_BASE = { path: '4', scenario: 'trend', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
+  var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
-                  props: '3', retained: '2', port: [45, 30, 10, 15] };
+                  props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5' };
   var RP = [
-    { id: 'P1',  desc: 'defaults (Path 4, trend, $500K, 4.4%, 10y, OTHER, 24%)' },
+    { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
     { id: 'P3',  desc: 'Path 2', path: '2' },
     { id: 'P4',  desc: 'Path 3', path: '3' },
-    { id: 'P5a', desc: 'Path 4, stay', scenario: 'stay' },
+    { id: 'P5a', desc: 'Path 4, trend (the pre-4c default)', scenario: 'trend' },
     { id: 'P5b', desc: 'Path 4, upper', scenario: 'upper' },
+    { id: 'P5c', desc: 'Path 4, floor', scenario: 'floor' },
     { id: 'P6a', desc: 'Path 1, hold 1y', path: '1', hold: '1' },
     { id: 'P6b', desc: 'Path 1, hold 30y', path: '1', hold: '30' },
     { id: 'P7',  desc: 'Path 1, CA, 37%', path: '1', state: 'CA', bracket: '37' },
@@ -158,11 +197,15 @@
     { id: 'P11a', desc: 'Path 4, portfolio 100/0/0/0', port: [100, 0, 0, 0] },
     { id: 'P11b', desc: 'Path 4, portfolio 0/0/0/100', port: [0, 0, 0, 100] },
     { id: 'P11c', desc: 'Path 4, portfolio 50/30/10/20 (sums to 110)', port: [50, 30, 10, 20] },
-    { id: 'P12', desc: 'basis 20%, held 27y (depreciation cap)', basis: '20', held: '27' }
+    { id: 'P12', desc: 'basis 20%, held 27y (depreciation cap)', basis: '20', held: '27' },
+    { id: 'P13', desc: 'Path 1 at the pre-4b costs (selling 8%, no bitcoin cost)', path: '1', sell: '8', btctx: '0' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
+    if (window.ModelingAssumptions) window.ModelingAssumptions.set('homeApprNominal', 'since-2000');
     click('.calc-path-btn[data-path="' + x.path + '"]');
+    setVal('calc-appreciation', x.appr);                      // input only, as on BvRE
+    setVal('calc-sell-cost', x.sell); setVal('calc-btc-tx', x.btctx);
     setVal('calc-property-value', x.value); setVal('calc-net-yield', x.yld); setVal('calc-holding-years', x.hold);
     setVal('calc-adjusted-basis', x.basis); setVal('calc-years-held', x.held);
     setVal('calc-state', x.state, ['change']); setVal('calc-bracket', x.bracket, ['change']);
@@ -196,8 +239,8 @@
 
     // Save state
     var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE };
-    try { saved.store = localStorage.getItem('lcs.bvre.calc.v1'); } catch (e) {}
-    if (window.ModelingAssumptions) ['inflation', 'realEstate', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
+    try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
+    if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
 
     Date.now = function(){ return FIXED_NOW; };
     var rows = [], all = [];
@@ -209,7 +252,12 @@
         click('.calc-mode-label[data-mode="retrospective"]');
         RETRO.forEach(function(v){ applyRetro(v); var s = JSON.stringify(captureRetro()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
         click('.calc-mode-label[data-mode="projection"]');
-        PROJ.forEach(function(v){ applyProj(v); var s = JSON.stringify(captureProj()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
+        PROJ.forEach(function(v){
+          var s;
+          if (v.growth) s = JSON.stringify(captureGrowth());
+          else { applyProj(v); s = JSON.stringify(captureProj()); }
+          rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s);
+        });
         applyRetro({}); applyProj({});
         click('.calc-mode-label[data-mode="retrospective"]');
       } else {
@@ -228,7 +276,7 @@
         var m = saved.ma[d]; if (m && m.preset === 'custom') window.ModelingAssumptions.set(d, 'custom', m.value); else if (m) window.ModelingAssumptions.set(d, m.preset);
       });
       await sleep(400);                                       // let the debounced URL/storage writer run, then restore
-      try { if (saved.store === null) localStorage.removeItem('lcs.bvre.calc.v1'); else localStorage.setItem('lcs.bvre.calc.v1', saved.store); } catch (e) {}
+      try { if (saved.store === null) localStorage.removeItem('lcs.bvre.calc.v2'); else localStorage.setItem('lcs.bvre.calc.v2', saved.store); } catch (e) {}
       history.replaceState(null, '', saved.url);
     }
 
