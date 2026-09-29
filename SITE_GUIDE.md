@@ -1237,7 +1237,7 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 | `appr` | decimal | proj | — | **legacy, read once.** The pre-4a *real* rate. On load it is converted to nominal at the sitewide inflation, applied as `happr`, announced in one line under the appreciation control, and deleted from the address bar; it is never written. A stored `appr` in `lcs.bvre.calc.v1` is ignored (it was almost always the old default, 3.5) |
 | `mortgage` | decimal | proj | `#fwdMortgageRate` | nominal %, default 6.8 |
 | `method` | enum | proj | `.purchase-btn.active` | `'cash'` or `'mortgage'` (default) |
-| `pscenario` | enum | proj | `.scenario-btn.active` | `'floor'` (default), `'trend'`, or `'upper'` |
+| `pscenario` | enum | proj | `.scenario-btn.active` | `'stay'` (default), `'floor'`, `'trend'` or `'upper'` (PR 4c, rulings M3; the default was `'trend'`). Each moves bitcoin's multiple of the Power Law trend in a straight line from today's to a target at the horizon end: `floor` 0.42×, `stay` today's multiple, `trend` 1×, `upper` 2.5× (was 3× on this page before 4c). Legacy links carry `floor`, `trend` or `upper`, which keep their keys (P3). Not stored (`persist: false`) |
 | `rent` | integer | proj | `#fwdMonthlyRent` | year-1 rent, $/mo; omitted when blank (blank = market rent, price ÷ 12 ÷ 15.77). PR 4b |
 | `rentg` | decimal | proj | `#fwdRentGrowth` | rent growth, nominal %/yr; omitted when blank (blank = home appreciation). PR 4b |
 | `close` | decimal | proj | `#fwdClosingPct` | buyer closing costs, % of price; default 1.04. PR 4b |
@@ -1713,7 +1713,7 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 
 - **The Tab IV reframing.** Title is *"Where the income path actually wins — bitcoin-backed preferreds as bear-case insurance"* — not "wealth maximization." This was the single most consequential editorial decision. Under base-case bitcoin growth, just holding bitcoin wins on terminal wealth, comfortably, at any reasonable Power Law assumption. The honest case for the instruments isn't beating bitcoin; it's: bear-case insurance, volatility elimination, and tax-efficient cashflow *today*. The intro prose, the chip framing, and the dynamic verdict logic all align to this thesis.
 - **Bitcoin winter not crypto winter.** Site-wide convention avoids the word "crypto" because it tends to legitimize the broader crypto space. Stress preset display name + Tab V prose both use "Bitcoin winter"; internal `data-preset="winter"` key unchanged for forward-compat.
-- **Verbatim BvRP growth-scenario language.** The three growth chips (Stay at current trend multiple / Revert to Power Law trend / Reach Power Law upper channel) carry the exact tooltip text used by Bitcoin vs Rental Property. Same Power Law model + same canonical phrasing = cross-page consistency.
+- **Verbatim BvRP growth-scenario language.** The three growth chips (Stay at current trend multiple / Revert to Power Law trend / Reach Power Law upper channel) carry the exact tooltip text used by Bitcoin vs Rental Property. Same Power Law model + same canonical phrasing = cross-page consistency. **No longer matched since PR 4c (2026-09-28):** BvRP moved to the pair's M3 set (Floor · Stay at today's multiple · Trend · Upper, default Stay); BFI keeps the three chips above with Trend as default. Whether BFI follows is an open decision (TECH_DEBT §5, *Bitcoin scenario vocabulary*).
 
 ### Calculator architecture
 

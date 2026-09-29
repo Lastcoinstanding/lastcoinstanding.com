@@ -71,6 +71,15 @@ Citations behind the sitewide modeling-assumption presets. See `STYLE_GUIDE.md �
 
 **Sourcing corrections made while implementing (2026-09-28).** `REAL_ESTATE_PAIR_PR4_SOURCES.md` had (1) LodeStar's $4,661 as "2025, likely excluding transfer taxes": it was the *2025 report* on calendar-2024 data, and it **includes** transfer taxes; the 2026 report (calendar 2025) gives 1.04% of price, which replaces the ruled 1.1% (lower and better sourced, so it also leans against the thesis). (2) FastExpert's "5.57%, early 2025": its page reports "roughly 5.5%" from a **2022** survey, before the rule change, so it is dropped; Clever's two 2026 surveys still put the commission midpoint at 5.6%, so the ruled 6.6% stands.
 
+### Real-estate pair: bitcoin scenarios
+
+**Added in PR 4c (2026-09-28; REAL_ESTATE_PAIR_RULINGS M3).** One scenario set on both pages, in `shared/real-estate-model.js` (`scenarioTarget`, `scenarioMultiple`): bitcoin's multiple of the Power Law trend moves in a straight line from today's to a target at the horizon end. Coefficients and the floor multiple are inherited from PL-1.
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| RE-14 | Scenario targets (multiple of trend at the horizon end) | Floor **0.42×** (`PL_FLOOR`, PL-1) · Stay **today's multiple** (the default) · Trend **1×** · Upper **2.5×** (`UPPER_TARGET`, a stated stress-test level, not a channel line; BvRE used the 3× ceiling before 4c, BvRP already used 2.5×). The engine reads the constants; the button and chip labels and the tooltips state them in copy, so a change to either constant is a copy change too | Rulings M3; Floor from PL-1 | — | 2026-09-28 | with PL-1 |
+| RE-15 | Cycle-peak multiples quoted in Upper's tooltip (both pages) | **Computed at load** by `cyclePeakMultiples()` from `PL_DATA` ÷ `plPrice`: at this audit 11.99× (30 Nov 2013), 5.41× (15 Dec 2017), 3.19× (21 Feb 2021) and 1.19× (14 Dec 2024, the cycle to date). `PL_DATA` is sampled about every 12 days, so peaks between samples are missed; the copy says "at least" | `shared/power-law-data.js` (PL-1) | — | 2026-09-28 | with the monthly PL_DATA refresh (automatic) |
+
 ---
 
 ## Existing-page citations
