@@ -17,8 +17,9 @@
    It drives the page's own controls (so the real call paths run,
    not just the engine), pins everything that varies between loads,
    and hashes the rendered output:
-     - Date.now → 2026-09-27T12:00Z; BTC → $100,000 (fwdBtcNow on
-       BvRE, TODAY_PRICE on BvRP); ModelingAssumptions → inflation
+     - Date.now → 2026-09-27T12:00Z; BTC → $100,000 (fwdBtcNow and, for
+       the retrospective, TODAY_PRICE on BvRE; TODAY_PRICE on BvRP);
+       ModelingAssumptions → inflation
        m2-growth, homeApprNominal since-2000, realReturns diversified;
      - captures result-container innerHTML and Chart.js dataset arrays
        (labels, data at full precision, hidden flags);
@@ -71,6 +72,20 @@
        doesn't cover). A fix in the same PR: states with no tax on the gain
        (TX, FL, NV, WA, TN, NH, AK, WY, SD) were charged the 5% typical rate
        on the sale; only P8 (TX) moves.
+     PR 4e (M11, M4, M2, M6, P8; BvRE only) — the retrospective is rebuilt:
+       monthly from July of the start year to today, the house on Case-Shiller,
+       market rent from Zillow, equal cash out, the M6 costs; its cards take
+       the projection's layout. BvRE's end price is now pinned too:
+       TODAY_PRICE → $100,000, as on BvRP, and captureRetro() drops the
+       price-source note ("live" or not), which depends on the network. The
+       "Go deeper" DCA is retired: E2 (was DCA on) is now the difference not
+       invested, the M2 toggle off; E5 drops its DCA. captureRetro() captures
+       the assumptions, the cards and the cash-out line. New: E20 (a 2024
+       start, one of the years 4e adds) and E21 (rent $4,000 on a 2021
+       start: the renter's bitcoin runs out in 2023). No retrospective vector
+       is comparable with 4d. S-bvre moves because the growth-of-$1 and
+       every-starting-year exhibits now grow housing by Case-Shiller (M11).
+       ledgerCheck() is rebuilt for the monthly rows. BvRP is unchanged.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -108,13 +123,15 @@
   }
 
   // ─── BvRE ──────────────────────────────────────────────────────────
-  var RETRO_BASE = { year: '2017', mode: 'leverage', dca: false, home: '', rent: '', rate: '', down: '' };
+  var RETRO_BASE = { year: '2017', mode: 'leverage', invest: true, home: '', rent: '', rate: '', down: '' };
   var RETRO = [
-    { id: 'E1', desc: 'retro 2017, leverage, 20% down, no DCA' },
-    { id: 'E2', desc: 'retro 2017, leverage, DCA on', dca: true },
+    { id: 'E1', desc: 'retro 2017, leverage, 20% down' },
+    { id: 'E2', desc: 'retro 2017, difference not invested (was DCA on)', invest: false },
     { id: 'E3', desc: 'retro 2014, cash', year: '2014', mode: 'cash' },
     { id: 'E4', desc: 'retro 2021, rate 3%, rent $2,000, 10% down', year: '2021', rate: '3', rent: '2000', down: '10' },
-    { id: 'E5', desc: 'retro 2019, home $750,000, DCA on', year: '2019', home: '750000', dca: true }
+    { id: 'E5', desc: 'retro 2019, home $750,000 (was + DCA on)', year: '2019', home: '750000' },
+    { id: 'E20', desc: 'retro 2024 (a start year added in 4e)', year: '2024' },
+    { id: 'E21', desc: 'retro 2021, rent $4,000 (the bitcoin runs out)', year: '2021', rent: '4000' }
   ];
   var PROJ_BASE = { scenario: 'stay', method: 'mortgage', down: '20', home: '415000', horizon: '10',
                     appr: '4.68', rate: '6.8', rent: '', rentg: '', close: '1.04', ptax: '0.9', ins: '',
@@ -142,15 +159,17 @@
     var x = Object.assign({}, RETRO_BASE, v);
     click('.toggle-group .toggle-btn[data-mode="' + x.mode + '"]');
     setVal('calcYear', x.year, ['change']);            // clears the custom inputs
-    var d = el('calcDCA');
-    if (d.checked !== x.dca) { d.checked = x.dca; fire(d, 'change'); }
+    var d = el('calcInvestDiff');
+    if (d.checked !== x.invest) { d.checked = x.invest; fire(d, 'change'); }
     setVal('customHomePrice', x.home); setVal('customRent', x.rent);
     setVal('customRate', x.rate); setVal('customDownPct', x.down);
   }
+  // The price-source note ("(live)" or not) depends on the network, so it
+  // is dropped before hashing; the pinned price itself is captured.
   function captureRetro(){
-    return { assumptions: html('calcAssumptions'), cards: html('calcResultsContainer'),
-             dca: html('dcaResultContainer'), total: html('totalSummary'),
-             totalShown: el('totalSummaryWrapper').style.display };
+    var cards = html('calcResultsContainer');
+    if (cards) cards = cards.replace(/(<span class="retro-price-src"[^>]*>)[^<]*(<\/span>)/g, '$1$2');
+    return { assumptions: html('calcAssumptions'), cards: cards, cashOut: html('calcCashOutLine') };
   }
   function applyProj(v){
     var x = Object.assign({}, PROJ_BASE, v);
@@ -247,15 +266,18 @@
     var p = page();
     if (!p) { console.error('rePairQA: not on a real-estate pair page'); return null; }
 
-    // Let live fetches settle so they can't overwrite a pinned value mid-run.
+    // Let live fetches settle so they can't overwrite a pinned value mid-run:
+    // the projection's status, and the shared fetcher's in-flight queue
+    // (power-law-data.js), which the retrospective waits on (PR 4e).
     if (p === 'bvre') {
-      for (var w = 0; w < 40 && /loading/i.test((el('fwdBtcPriceStatus') || {}).textContent || ''); w++) await sleep(250);
+      for (var w = 0; w < 120 && (/loading/i.test((el('fwdBtcPriceStatus') || {}).textContent || '') || window.__lcsPriceQueue); w++) await sleep(250);
     } else {
       await sleep(opts.settleMs || 3000);
     }
 
     // Save state
-    var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE };
+    var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE,
+                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null };
     try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
     if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
 
@@ -263,6 +285,7 @@
     var rows = [], all = [];
     try {
       if (p === 'bvre') {
+        window.TODAY_PRICE = FIXED_BTC;                         // the retrospective's end price (PR 4e)
         click('.tab-btn[data-tab="calculator"]');
         var st = JSON.stringify(captureBvreStatic());
         rows.push({ id: 'S-bvre', desc: 'static exhibits (tabs I, II, IV)', hash: fnv(st), len: st.length }); all.push(st);
@@ -288,7 +311,11 @@
       }
     } finally {
       Date.now = saved.now;
-      if (p === 'bvrp') window.TODAY_PRICE = saved.today;
+      window.TODAY_PRICE = saved.today;
+      if (p === 'bvre') {
+        if (saved.btcNow !== null) setVal('fwdBtcNow', saved.btcNow);   // the projection's price, as the reader had it
+        if (window.runRetroCalc) window.runRetroCalc();
+      }
       if (window.ModelingAssumptions) Object.keys(saved.ma).forEach(function(d){
         var m = saved.ma[d]; if (m && m.preset === 'custom') window.ModelingAssumptions.set(d, 'custom', m.value); else if (m) window.ModelingAssumptions.set(d, m.preset);
       });
@@ -314,27 +341,34 @@
              pass: opts.expect ? fails.length === 0 : null, fails: fails, rows: rows };
   }
 
-  // Ledger final row = the card figures (post-refactor only; needs the module).
+  // Ledger final row = the card figures, and the rows add up to the totals
+  // (PR 4e: the retrospective's monthly engine). Runs the engine directly
+  // with the harness pins and each vector's inputs, parsed as the page does.
   function ledgerCheck(){
     var RE = window.RealEstateModel;
-    if (!RE || typeof homeData === 'undefined') { console.error('rePairQA.ledgerCheck: needs RealEstateModel on BvRE'); return null; }
-    var out = [], fails = [];
+    if (!RE || typeof homeData === 'undefined' || typeof CS_NATIONAL === 'undefined') { console.error('rePairQA.ledgerCheck: needs RealEstateModel on BvRE'); return null; }
+    var D = RE.PAIR_DEFAULTS, out = [], fails = [];
+    function near(a, b){ return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b)); }
     RETRO.forEach(function(v){
-      var x = Object.assign({}, RETRO_BASE, v);
-      var sy = +x.year, ey = 2025;
-      var hsNum = x.home ? +x.home : null;
-      var hs = hsNum || homeData[sy], he = hsNum ? Math.round(hsNum * (homeData[ey] / homeData[sy])) : homeData[ey];
-      var inp = { sy: sy, ey: ey, mode: x.mode, hs: hs, he: he, bs: btcData[sy], be: btcData[ey],
-                  rate: x.rate ? +x.rate : mortgageRates[sy], dpf: (x.down ? +x.down : 20) / 100,
-                  rentOverride: x.rent ? +x.rent : null, btcData: btcData, homeData: homeData };
-      var L = RE.ledgerRetro(inp), last = L.rows[L.rows.length - 1], c = L.cards;
+      var x = Object.assign({}, RETRO_BASE, v), sy = +x.year;
+      var L = RE.ledgerRetro({ sy: sy, method: x.mode === 'cash' ? 'cash' : 'mortgage', homePrice: x.home ? +x.home : homeData[sy],
+        mortRate: x.rate ? +x.rate : mortgageRates[sy], dpf: (x.down ? +x.down : 20) / 100, rent: x.rent ? +x.rent : null,
+        investDiff: x.invest, btcToday: FIXED_BTC, nowMs: FIXED_NOW, closingPct: D.closingPct, propTaxPct: D.propTaxPct,
+        insurancePer400K: D.insurancePer400K, maintPct: D.maintPct, sellPct: D.sellPct, btcTxPct: D.btcTxPct });
+      var c = L.cards, last = L.rows[L.rows.length - 1];
+      var sum = function(k){ return L.rows.reduce(function(a, r){ return a + r[k]; }, 0); };
       var checks = {
-        btcNet: last.btc.net === c.lumpNet,
-        btcValue: last.btc.value === c.lumpValue,
-        houseEquity: last.house.equity === c.houseEquity,
-        cashOutHouse: last.house.cashOut === c.houseTotalSpent,
-        dcaBtc: last.btc.dcaBtc === c.dcaBtc,
-        rent: last.btc.rentPaid === c.totalRentPaid
+        lastIsToDate: last.toDate === true && L.rows.filter(function(r){ return r.toDate; }).length === 1,
+        months: sum('months') === c.months,
+        homeValue: last.homeValue === c.homeEnd,
+        balance: last.balance === c.balance,
+        btcHeld: last.btcHeld === c.btcHeld,
+        btcValue: last.btcValue === c.btcValue,
+        cashOut: last.cumCashOutOwner === c.cumCashOutOwner && last.cumCashOutRenter === c.cumCashOutRenter,
+        equalCashOut: !x.invest || c.totals.shortfall > 0 || near(c.cumCashOutOwner, c.cumCashOutRenter),
+        rent: near(sum('rent'), c.totals.rent),
+        ownerCosts: near(sum('owner'), c.totals.owner),
+        interest: near(sum('interest'), c.totals.interest)
       };
       var ok = Object.keys(checks).every(function(k){ return checks[k]; });
       if (!ok) fails.push(v.id);

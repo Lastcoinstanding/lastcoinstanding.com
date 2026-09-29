@@ -873,8 +873,10 @@ var chartInstance = null;
     var idxBtc  = visYrs.map(function(y){
       return +((btcData[y]  / btcData[currentStartYear])  * 100).toFixed(1);
     });
+    // Housing grows by Case-Shiller National (csData, shared with Bitcoin vs.
+    // Real Estate's growth-of-$1 chart), not the new-house median (M11).
     var idxHome = visYrs.map(function(y){
-      return +((homeData[y] / homeData[currentStartYear]) * 100).toFixed(1);
+      return +((csData[y] / csData[currentStartYear]) * 100).toFixed(1);
     });
 
     chartInstance = new Chart(canvas.getContext('2d'), {
@@ -910,9 +912,10 @@ var chartInstance = null;
                 var pct = (c.parsed.y - 100).toFixed(0);
                 var sign = pct >= 0 ? '+' : '';
                 var yr = visYrs[c.dataIndex];
-                var actual = c.dataset.label === 'Bitcoin' ? btcData[yr] : homeData[yr];
-                var priceFmt = '$' + actual.toLocaleString();
-                return c.dataset.label + ': ' + sign + Number(pct).toLocaleString() + '% since ' + currentStartYear + ' (' + priceFmt + ')';
+                // Housing quotes the index it grows by (Case-Shiller, M11), so
+                // the percentage and the figure beside it agree.
+                var ref = c.dataset.label === 'Bitcoin' ? ('$' + btcData[yr].toLocaleString()) : ('Case-Shiller ' + csData[yr]);
+                return c.dataset.label + ': ' + sign + Number(pct).toLocaleString() + '% since ' + currentStartYear + ' (' + ref + ')';
               }
             }
           }

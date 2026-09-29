@@ -1229,8 +1229,14 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 
 | Param | Type | Mode | Source input | Notes |
 |---|---|---|---|---|
-| `year` | integer | retro | `#calcYear` | 2014–2021, default 2017 |
-| `dca` | bool | retro | `#calcDCA` | `'1'` if checked, omitted otherwise |
+| `year` | integer | retro | `#calcYear` | 2014–2024, default 2017 (2014–2021 before PR 4e). A year the select doesn't offer falls back to 2017 |
+| `rinv` | bool, default on | retro | `#calcInvestDiff` | `'0'` when the retrospective's "The renter invests the difference" is off; omitted when on. PR 4e (M2) |
+| `rmethod` | enum | retro | `.toggle-group .toggle-btn.active` | `'leverage'` (default) or `'cash'`. PR 4e: before it, a shared link lost the cash toggle. Links only, not stored (`persist: false`), like the four below |
+| `rhome` | integer | retro | `#customHomePrice` | the reader's home price; omitted when blank (blank = the start year's median new-house price). PR 4e |
+| `rrent` | integer | retro | `#customRent` | the reader's rent in July of the start year, $/mo; omitted when blank (blank = market rent). It resets each July with market rents, like the default. PR 4e |
+| `rrate` | decimal | retro | `#customRate` | the reader's mortgage rate, %, 2 dp; omitted when blank (blank = the start year's average). PR 4e |
+| `rdown` | decimal | retro | `#customDownPct` | the reader's down payment, %; omitted when blank (blank = 20). PR 4e |
+| `dca` | — | — | — | **retired in PR 4e** with the retrospective's "Go deeper" checkbox (replaced by equal cash out and `rinv`, on by default); dropped from the address bar on load, and from storage at the next write |
 | `home` | integer | proj | `#fwdHomePrice` | comma-formatted in DOM; URL strips commas; default 415000 (PR 4b; `PAIR_DEFAULTS.homePrice`) |
 | `horizon` | integer | proj | `#fwdHorizon` | one of `5`/`10`/`15`/`20`, default 10 |
 | `happr` | decimal | proj | `#fwdHomeAppreciation` | **nominal** %/yr, 2 dp (PR 4a, rulings M1/P3). Omitted when it equals the reader's own `lcs.homeApprNominal` value (4.68 unless changed); a value equal to a preset selects that preset. Not stored in `lcs.bvre.calc.v1`: the sitewide dimension is its storage |
@@ -1249,9 +1255,9 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 | `inv` | bool, default on | proj | `#fwdInvestDiff` | `'0'` when "The renter invests the difference" is off; omitted when on. PR 4b |
 | `advanced`, `advrate` | — | — | — | **retired in PR 4b** with the "Go deeper" DCA and S&P leg (replaced by equal cash out, M2); dropped from the address bar on load |
 
-`fwdBtcNow` (current BTC price) is intentionally NOT in the URL — it's a live-fetched value that goes stale within hours, so a shared link lets the receiver's calculator pull fresh price rather than pin a past value.
+`fwdBtcNow` (current BTC price) is intentionally NOT in the URL — it's a live-fetched value that goes stale within hours, so a shared link lets the receiver's calculator pull fresh price rather than pin a past value. The same holds for the retrospective's end price (PR 4e): both calculators take today's price from the shared `fetchTodayPrice` (one request, cached sitewide), start from the latest `PL_DATA` sample so they render at once, and fall back to it if CoinGecko is unreachable. The retrospective's own inputs follow `year` in the schema, because a change of year clears the price, rent and rate: a link sets the year, then them. They travel in links only (`persist: false`), as before 4e they were never stored: a stored set would mix with a link's, and a link's `year` would wipe it.
 
-**Storage (PR 4b): `lcs.bvre.calc.v2` keeps only values that differ from the default.** Defaults for the sourced figures come from `RealEstateModel.PAIR_DEFAULTS` (the same object that fills the inputs), so a refreshed default reaches returning readers. `lcs.bvre.calc.v1` stored every value, defaults included, which froze a returning reader on the old defaults; on first load `migrateV1()` carries a v1 value over only if it differs from the v1-era default (`home` 420000, `horizon` 10, `mortgage` 6.8, `down` 20, `year` 2017, `method` mortgage, `dca` off), drops keys that no longer exist (`appr`, `advanced`, `advrate`) and deletes v1.
+**Storage (PR 4b): `lcs.bvre.calc.v2` keeps only values that differ from the default.** Defaults for the sourced figures come from `RealEstateModel.PAIR_DEFAULTS` (the same object that fills the inputs), so a refreshed default reaches returning readers. `lcs.bvre.calc.v1` stored every value, defaults included, which froze a returning reader on the old defaults; on first load `migrateV1()` carries a v1 value over only if it differs from the v1-era default (`home` 420000, `horizon` 10, `mortgage` 6.8, `down` 20, `year` 2017, `method` mortgage), drops keys that no longer exist (`appr`, `advanced`, `advrate`, and since PR 4e `dca`) and deletes v1. A v2 blob holding `dca` loses it at the next write (readers skip keys not in the schema).
 
 For purchase-method and Power Law scenario (which are button groups, not form inputs), the reader programmatically `.click()`s the matching button so the existing handlers (which trigger `runFwdCalc`) run. Button-group changes also fire the URL writer via direct `click` listeners.
 

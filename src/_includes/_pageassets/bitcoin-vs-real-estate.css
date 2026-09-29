@@ -85,23 +85,6 @@
         .toggle-group{display:flex;gap:0;border-radius:6px;overflow:hidden;border:1px solid var(--border);margin-bottom:1.5rem}
         .toggle-btn{font-family:'Inter', -apple-system, sans-serif;font-size:0.82rem;text-transform:uppercase;letter-spacing:1px;padding:0.7rem 1.2rem;background:var(--bg);color:var(--text-muted);border:none;cursor:pointer;transition:all 0.3s;flex:1;text-align:center;min-height:48px}
         .toggle-btn.active{background:var(--amber);color:var(--bg)}
-        .calc-results{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem}
-        .calc-result-card{border-radius:8px;padding:1.5rem;border:1px solid var(--border)}
-        .calc-result-card.house{background:linear-gradient(135deg,rgba(192,57,43,0.08),transparent);border-color:var(--red-dim)}
-        .calc-result-card.bitcoin{background:linear-gradient(135deg,var(--amber-glow),transparent);border-color:var(--amber-dim)}
-        .calc-result-card h4{font-size:0.82rem;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.8rem}
-        .calc-result-card.house h4{color:var(--red)}
-        .calc-result-card.bitcoin h4{color:var(--amber)}
-        .calc-result-card .result-value{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;margin-bottom:0.5rem}
-        .calc-result-card.house .result-value{color:var(--text-dim)}
-        .calc-result-card.bitcoin .result-value{color:var(--amber)}
-        .calc-result-card .invested-line{font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.3rem}
-        .calc-result-card .invested-line strong{color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:0.92rem}
-        .calc-result-card .invested-line .note{text-transform:none;letter-spacing:0;font-size:0.75rem;color:var(--text-muted)}
-        .calc-result-card .period-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--text-muted);font-weight:500;margin-bottom:0.5rem;opacity:0.85}
-        .calc-result-card .period-divider{border-top:2px dashed rgba(255,255,255,0.12);margin:1rem 0 0.9rem}
-        .calc-result-card .result-detail{font-size:0.9rem;color:var(--text-muted);line-height:1.7}
-        .calc-result-card .result-detail span{color:var(--text-dim)}
         .page-footer{position:relative;z-index:1;text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
         .page-footer p{font-size:0.85rem;color:var(--text-muted);line-height:1.8}
         .page-footer a{color:var(--amber-dim);text-decoration:none}
@@ -110,7 +93,7 @@
 .mobile-overlay a.active { color: var(--amber); background: rgba(224,148,34,0.08); font-weight: 600; }
 
         @media(max-width:768px){
-    #customInputsRow{grid-template-columns:1fr !important;}.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{flex:0 0 auto;padding:0.7rem 0.9rem;min-height:52px}.tab-btn .tab-title{font-size:0.85rem;white-space:nowrap}.calc-results{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#totalSummary{grid-template-columns:1fr!important}#dcaResultContainer{margin-left:0}.dca-grid{grid-template-columns:1fr!important}#customInputsRow{grid-template-columns:1fr!important}#scenarioControlRow{grid-template-columns:1fr!important;gap:1rem!important}.toggle-btn{font-size:0.72rem!important;padding:0.7rem 0.5rem!important}}
+    #customInputsRow{grid-template-columns:1fr !important;}.hero{padding:6rem 1.5rem 3rem}.content-area{padding:0 1rem 4rem}.chart-container{padding:1.2rem}.chart-wrapper{height:280px}.tab-btn{flex:0 0 auto;padding:0.7rem 0.9rem;min-height:52px}.tab-btn .tab-title{font-size:0.85rem;white-space:nowrap}.stats-row{grid-template-columns:1fr 1fr}.site-nav .nav-links{display:none}.hamburger{display:block}.era-block{grid-template-columns:100px 1fr 60px;gap:0.8rem;padding:1rem}.era-ratio .ratio-value{font-size:1.4rem}.era-desc{font-size:0.8rem}.tab-nav{position:relative;mask-image:linear-gradient(90deg,#000 85%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}#customInputsRow{grid-template-columns:1fr!important}#scenarioControlRow{grid-template-columns:1fr!important;gap:1rem!important}.toggle-btn{font-size:0.72rem!important;padding:0.7rem 0.5rem!important}}
         @media(max-width:480px){
     #customInputsRow{grid-template-columns:1fr !important;}.chart-wrapper{height:240px}.stats-row{grid-template-columns:1fr}.stat-card .stat-value{font-size:1.8rem}.era-block{grid-template-columns:80px 1fr 55px}.section-intro p{font-size:0.95rem}.narrative p{font-size:0.95rem}}
     
@@ -254,17 +237,13 @@
 }
 
 /* ───────────────────────────────────────────────
-   PROJECTION CARD STYLING — matches retrospective fidelity
-   The migrated forward-calculator JS (from /the-power-law.js)
-   emits these legacy class names: .calc-results-grid, .calc-card.bitcoin
-   /.house, .big-number, .detail-line, .highlight, .negative. The
-   retrospective calculator uses parallel-but-different names
-   (.calc-results, .calc-result-card, .result-value, .result-detail) —
-   to keep the JS faithful to the original Power Law version, we add
-   matching styles here with the same visual language as retrospective.
-   Fixed 2026-05-07: prior migration (commit 0b2d203) ported only the
-   scaffolding selectors and missed the card presentation; result was
-   plain-text rendering inside the projection mode.
+   RESULT CARDS — both calculators (projection and, since PR 4e, the
+   retrospective): .calc-results-grid, .calc-card.bitcoin/.house,
+   .big-number, .detail-line, .highlight, .negative. The names came with
+   the forward calculator from /the-power-law.js (fixed 2026-05-07: the
+   migration in commit 0b2d203 ported only the scaffolding selectors).
+   The retrospective's own .calc-results / .calc-result-card rules were
+   retired when it moved to these cards.
    ─────────────────────────────────────────────── */
 .calc-results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
 .calc-card { border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; background: rgba(255,255,255,0.01); }
@@ -507,6 +486,7 @@
 .re-invest-toggle { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; color: var(--text); font-weight: 500; }
 .re-invest-toggle input { width: 16px; height: 16px; accent-color: var(--amber); cursor: pointer; }
 .re-cashout-line { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; margin: 0.6rem 0 0; }
+.re-cashout-line .negative { color: var(--red); }
 @media (max-width: 480px) {
   .re-field-grid { grid-template-columns: 1fr; }
 }

@@ -44,6 +44,15 @@ var homeData = {
     1965:20000,1970:23400,1975:39300,1980:64600,1985:82800,1990:122900,1995:133900,2000:169000,2005:240900,2010:222900,2013:268900,2014:282800,2015:294000,2016:306200,2017:323500,2018:326400,2019:321500,2020:336900,2021:401700,2022:454900,2023:426100,2024:420300,2025:416900
 };
 
+// Case-Shiller National, annual average of the monthly NSA index (FRED
+// CSUSHPINSA; the same series as CS_NATIONAL in housing-monthly-data.js).
+// The growth-of-$1 and every-starting-year exhibits grow housing by this
+// index rather than by the new-house median, whose mix shifts (rulings M11,
+// PR 4e). Latest full year only; roll forward each January with homeData.
+var csData = {
+    2013:154.51,2014:164.67,2015:172.15,2016:180.89,2017:191.35,2018:202.43,2019:209.4,2020:222.06,2021:259.96,2022:298.32,2023:305.73,2024:321.35,2025:328.52
+};
+
 var btcData = {
     2013:732,2014:530,2015:272,2016:567,2017:4348,2018:7565,2019:7362,2020:11072,2021:47458,2022:19657,2023:28233,2024:62682,2025:88000
 };
