@@ -841,7 +841,6 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     bindPercent('fwdHomeAppreciation', 2);
     bindPercent('fwdMortgageRate');
     bindPercent('fwdDownPct');
-    bindPercent('fwdInflCustom', 2);
     ['fwdRentGrowth','fwdClosingPct','fwdPropTaxPct','fwdMaintPct','fwdSellPct','fwdBtcTxPct'].forEach(function(id){ bindPercent(id, 2); });
   })();
   horizonSel.addEventListener('change', runFwdCalc);
@@ -849,130 +848,29 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   var _investEl = document.getElementById('fwdInvestDiff');
   if(_investEl) _investEl.addEventListener('change', runFwdCalc);
 
-  // ── Canonical integration (per STYLE_GUIDE §3.5) ──
-  // Home appreciation is bound to lcs.homeApprNominal (NOMINAL, PR 4a /
-  // rulings M1); the preset chips in the Baseline assumptions block pick
-  // it, and a typed value selects the matching preset or Custom. The
-  // deflator chips there pick lcs.inflation, which drives only the Real
-  // view (P5). (The S&P "go deeper" rate, bound to lcs.realReturns, was
-  // retired with the cash-mode leg by M2 in PR 4b.)
-  var MA = window.ModelingAssumptions;
-  var INFL_NAMES = { 'cpi-official': 'CPI', 'm2-growth': 'M2 growth', 'shadow-stats': 'Shadow Stats', 'custom': 'custom' };
-  var APPR_NAMES = { 'long-run': 'long run, since 1890', 'since-1990': 'since 1990', 'since-2000': 'since 2000', 'custom': 'custom' };
-  function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
-
-  function syncFwdHomeApprFromCanonical(){
-    var current = MA.get('homeApprNominal');
-    var input = document.getElementById('fwdHomeAppreciation');
-    if(input && parseFloat(input.value) !== current.value) {
-      // Two decimals: the presets are 3.41 / 4.23 / 4.68.
-      input.value = pct2(current.value);
-    }
-    syncBaselineChips();
-  }
-
-  // Chips, the Real label and the collapsed block's one-line summary all
-  // read the canonical state, so they can't disagree with the numbers.
-  function syncBaselineChips(){
-    var appr = MA.get('homeApprNominal'), infl = MA.get('inflation');
-    document.querySelectorAll('#fwdApprPresets .re-preset-btn').forEach(function(b){
-      b.classList.toggle('active', b.getAttribute('data-preset') === appr.preset);
-    });
-    document.querySelectorAll('#fwdInflPresets .re-preset-btn').forEach(function(b){
-      b.classList.toggle('active', b.getAttribute('data-preset') === infl.preset);
-    });
-    var customRow = document.getElementById('fwdInflCustomRow');
-    if(customRow) customRow.hidden = infl.preset !== 'custom';
-    var customIn = document.getElementById('fwdInflCustom');
-    if(customIn && infl.preset === 'custom' && document.activeElement !== customIn) customIn.value = pct2(infl.value);
-    var deflLine = document.getElementById('fwdDeflatorLine');
-    if(deflLine) deflLine.textContent = 'Real: today’s dollars, deflated at ' + pct2(infl.value) + ' a year (' + INFL_NAMES[infl.preset] + ').';
-    var hint = document.getElementById('fwdBaselineHint');
-    if(hint) hint.textContent = 'home prices ' + pct2(appr.value) + ' a year nominal (' + APPR_NAMES[appr.preset] + ') · Real view deflated at ' + pct2(infl.value) + ' (' + INFL_NAMES[infl.preset] + ')';
-    var note = document.getElementById('fwdApprNotice');
-    if(note){
-      var n = MA.migrationNote && MA.migrationNote();
-      var msg = legacyLinkNote || (n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '');
-      note.textContent = msg;
-      note.hidden = !msg;
-    }
-  }
+  // ── The shared Baseline assumptions (PR 4f; design §7, rulings M1, P5) ──
+  // Home appreciation (lcs.homeApprNominal, NOMINAL: PR 4a, rulings M1) and
+  // the deflator for the Real view (lcs.inflation, which drives only the
+  // Real view: P5) are bound by shared/real-estate-baseline.js, the binder
+  // Bitcoin vs. Rental Property uses too, so the two pages can't disagree
+  // about either. It keeps the preset buttons, the two fields, the notice,
+  // the Real label under the toggle and the collapsed block's summary in
+  // step with ModelingAssumptions (across tabs too), and re-runs the
+  // projection when either changes. A typed value equal to a preset selects
+  // that preset, so restoring a default never writes a spurious "custom"
+  // (the pre-4a trap). (The S&P "go deeper" rate, bound to lcs.realReturns,
+  // was retired with the cash-mode leg by M2 in PR 4b.)
+  var baseline = window.RealEstateBaseline.bind({
+    prefix: 'fwd',
+    onChange: function(){ runFwdCalc(); },
+    // The URL writer (below) listens on the field, so a preset button
+    // fires 'input' there for it to record the value.
+    inputEventOnPreset: true
+  });
   // Set by the URL reader when a link carried the pre-4a real `appr`.
-  var legacyLinkNote = '';
-  window._bvreLegacyApprNote = function(msg){ legacyLinkNote = msg; syncBaselineChips(); };
-  function clearApprNotes(){
-    legacyLinkNote = '';
-    if(MA.clearMigrationNote) MA.clearMigrationNote();
-  }
-
-  var apprInput = document.getElementById('fwdHomeAppreciation');
-  if(apprInput){
-    apprInput.addEventListener('change', function(){
-      var v = parseFloat(String(apprInput.value).replace(/[%\s]/g, ''));
-      if(isFinite(v)) {
-        // A value equal to a preset selects that preset, so restoring a
-        // default never writes a spurious "custom" (the pre-4a trap).
-        var pre = MA.presetFor('homeApprNominal', v);
-        var cur = MA.get('homeApprNominal');
-        if(pre !== cur.preset || (pre === 'custom' && v !== cur.value)) {
-          clearApprNotes();
-          if(pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
-        }
-      }
-    });
-  }
-  document.querySelectorAll('#fwdApprPresets .re-preset-btn').forEach(function(b){
-    b.addEventListener('click', function(){
-      var pre = b.getAttribute('data-preset');
-      clearApprNotes();
-      if(pre === 'custom'){
-        // Keep the current value as the custom starting point, then let
-        // the reader type over it.
-        MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
-        if(apprInput){ apprInput.focus(); apprInput.select && apprInput.select(); }
-      } else {
-        MA.set('homeApprNominal', pre);
-      }
-      // The subscription has already written the value into the input;
-      // this lets the URL writer (which listens on the input) record it.
-      if(apprInput) apprInput.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-  });
-  document.querySelectorAll('#fwdInflPresets .re-preset-btn').forEach(function(b){
-    b.addEventListener('click', function(){
-      var pre = b.getAttribute('data-preset');
-      if(pre === 'custom'){
-        MA.set('inflation', 'custom', MA.get('inflation').value);
-        var ci = document.getElementById('fwdInflCustom');
-        syncBaselineChips();
-        if(ci){ ci.focus(); ci.select && ci.select(); }
-      } else {
-        MA.set('inflation', pre);
-      }
-    });
-  });
-  var inflCustomIn = document.getElementById('fwdInflCustom');
-  if(inflCustomIn){
-    inflCustomIn.addEventListener('change', function(){
-      var v = parseFloat(String(inflCustomIn.value).replace(/[%\s]/g, ''));
-      if(isFinite(v)){
-        var pre = MA.presetFor('inflation', v);
-        if(pre === 'custom') MA.set('inflation', 'custom', v); else MA.set('inflation', pre);
-      }
-    });
-  }
-
-  // Subscribe to canonical changes (cross-tab, reset events)
-  if(window.ModelingAssumptions && window.ModelingAssumptions.subscribe){
-    window.ModelingAssumptions.subscribe(function(dim){
-      if(dim === 'homeApprNominal' || dim === '*') syncFwdHomeApprFromCanonical();
-      if(dim === 'inflation' || dim === '*') syncBaselineChips();
-      runFwdCalc();
-    });
-  }
+  window._bvreLegacyApprNote = function(msg){ baseline.setLegacyNote(msg); };
 
   // ── Initial setup ──
-  syncFwdHomeApprFromCanonical();
   fetchLiveBtcPrice(); // renders at the latest data sample, then at the quote
 
   // Expose for the calc-mode toggle handler (allows safety re-trigger

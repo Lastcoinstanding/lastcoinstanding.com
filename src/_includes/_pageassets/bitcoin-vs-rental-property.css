@@ -1575,6 +1575,9 @@ html, body {
   line-height: 1.5;
   margin: 0.5rem 0 0;
 }
+/* PR 4f: `.bvrp-section p` (1.02rem, 0 0 1.1rem) outranks a single class,
+   so the notice was set at body size. Scoped under .calc-wrap. */
+.calc-wrap .calc-appr-notice { font-size: 0.78rem; line-height: 1.5; margin: 0.5rem 0 0; }
 
 /* PR 4c (rulings M3): four scenario chips. "Stay at today's multiple"
    wraps at desktop width; keep the help glyph with the last word. */

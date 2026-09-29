@@ -17,7 +17,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-rental-property-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-rental-property.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
 ---
 <!-- ─── Hero ─── -->
 <section class="bvrp-hero">
@@ -667,7 +667,11 @@ eleventyComputed:
     <!-- Specific-to-you callout -->
     <div id="calc-specific-callout" class="calc-specific-callout"></div>
 
-    <!-- Baseline assumptions (collapsible — set once, ignore) — moved to the very bottom per TBR pattern -->
+    <!-- Baseline assumptions (collapsible — set once, ignore) — moved to the very bottom per TBR pattern.
+         The first group is the pair's shared, sitewide part (PR 4f; design §7, rulings M1, P5): its
+         words and presets come from components/real-estate-baseline.njk and
+         shared/real-estate-baseline.js binds it, as on Bitcoin vs. Real Estate. -->
+    {% import 'components/real-estate-baseline.njk' as reb %}
     <details class="calc-baseline">
       <summary>
         <span class="calc-baseline-summary-label">Baseline assumptions</span>
@@ -675,6 +679,18 @@ eleventyComputed:
       </summary>
 
       <div class="calc-baseline-grid">
+
+        <!-- Home appreciation (PR 4a, rulings M1): the pair's shared NOMINAL
+             input, lcs.homeApprNominal; was a hardcoded 3.0%. -->
+        <div class="calc-slider-group">
+          <div class="calc-slider-group-label">Home appreciation</div>
+          <div class="calc-slider-row">
+            <span class="calc-slider-name">Rate <span class="calc-slider-hint">(nominal / yr)</span> {{ reb.apprTip('bvrp') }}</span>
+            <input type="text" id="rpHomeAppreciation" class="calc-appr-input" value="4.68%" inputmode="decimal" aria-label="Home appreciation, nominal percent a year">
+          </div>
+          {{ reb.apprPresets('rp', 'calc-appr-presets', 'calc-appr-preset', '') }}
+          <p class="calc-appr-notice" id="rpApprNotice" hidden></p>
+        </div>
 
         <div class="calc-slider-group">
           <div class="calc-slider-group-label">Tax profile</div>
@@ -749,24 +765,6 @@ eleventyComputed:
             <span class="calc-slider-val" id="val-years-held">10 yrs</span>
           </div>
           <input type="range" id="calc-years-held" min="0" max="27" step="1" value="10">
-
-          <!-- Home appreciation (PR 4a, rulings M1): the pair's shared NOMINAL
-               input, lcs.homeApprNominal; was a hardcoded 3.0%. -->
-          <div class="calc-slider-row">
-            <span class="calc-slider-name">Home appreciation <span class="calc-slider-hint">(nominal / yr)</span>
-              <span class="help-tip" tabindex="0">?<span class="tip-content">
-                How fast the property&rsquo;s value rises, in nominal terms. The presets are the recorded US rate to 2025: <strong>Since 2000</strong> 4.68% a year (S&amp;P CoreLogic Case-Shiller National; the default, and the highest of the three windows), <strong>Since 1990</strong> 4.23%, and <strong>Long run</strong> 3.41% (Shiller&rsquo;s series from 1890, chained to Case-Shiller). A national index: your market can differ. The same setting drives Bitcoin vs. Real Estate.
-              </span></span>
-            </span>
-            <input type="text" id="calc-appreciation" class="calc-appr-input" value="4.68%" inputmode="decimal" aria-label="Home appreciation, nominal percent a year">
-          </div>
-          <div class="calc-appr-presets" id="calc-appr-presets" role="group" aria-label="Home appreciation presets">
-            <button type="button" class="calc-appr-preset" data-preset="long-run">Long run<span>3.41%</span></button>
-            <button type="button" class="calc-appr-preset" data-preset="since-1990">Since 1990<span>4.23%</span></button>
-            <button type="button" class="calc-appr-preset active" data-preset="since-2000">Since 2000<span>4.68%</span></button>
-            <button type="button" class="calc-appr-preset" data-preset="custom">Custom<span>your own</span></button>
-          </div>
-          <p class="calc-appr-notice" id="calc-appr-notice" hidden></p>
         </div>
 
         <!-- PR 4d (rulings M8): the existing mortgage applies on every path.

@@ -24,7 +24,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-real-estate-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-real-estate.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/bvre-annual-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/housing-monthly-data.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/bvre-annual-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/housing-monthly-data.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
   body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
 ---
 <section class="hero">
@@ -266,30 +266,24 @@ eleventyComputed:
 
                     <!-- Baseline assumptions (PR 4a/4b; rulings M1, M4-M6, P5, design §7).
                          BvRP's two-tier pattern: set once, then ignore. Blank fields use the
-                         sourced default shown as their placeholder (RealEstateModel.PAIR_DEFAULTS). -->
+                         sourced default shown as their placeholder (RealEstateModel.PAIR_DEFAULTS).
+                         The first two groups are the pair's shared, sitewide part (PR 4f): their
+                         words and presets come from components/real-estate-baseline.njk and
+                         shared/real-estate-baseline.js binds them, as on Bitcoin vs. Rental Property. -->
+                    {% import 'components/real-estate-baseline.njk' as reb %}
                     <details class="re-baseline" id="fwdBaseline">
                         <summary><span class="re-baseline-label">Baseline assumptions</span> <span class="re-baseline-hint" id="fwdBaselineHint">home prices 4.68% a year nominal (since 2000) &middot; Real view deflated at 6.5% (M2 growth)</span></summary>
                         <div class="re-baseline-body">
                             <div class="re-baseline-group">
-                                <div class="re-baseline-group-label">Home appreciation <span class="opt">(nominal / yr)</span><span class="help-tip" tabindex="0">?<span class="tip-content">How fast home prices rise, in <strong>nominal</strong> terms, the way house prices and mortgage rates are quoted. The presets are the recorded US rate to 2025: <strong>Since 2000</strong> 4.68% a year (S&amp;P CoreLogic Case-Shiller National; the default, and the highest of the three windows), <strong>Since 1990</strong> 4.23%, and <strong>Long run</strong> 3.41% (Shiller&rsquo;s series from 1890, chained to Case-Shiller). When inflation runs higher, home prices tend to rise in nominal terms while a fixed-rate loan balance doesn&rsquo;t. That is the fixed-rate borrower&rsquo;s inflation benefit. To model a higher-inflation future, raise nominal appreciation.</span></span></div>
-                                <div class="re-preset-btns" id="fwdApprPresets" role="group" aria-label="Home appreciation presets">
-                                    <button type="button" class="re-preset-btn" data-preset="long-run">Long run<span class="re-preset-val">3.41%</span></button>
-                                    <button type="button" class="re-preset-btn" data-preset="since-1990">Since 1990<span class="re-preset-val">4.23%</span></button>
-                                    <button type="button" class="re-preset-btn active" data-preset="since-2000">Since 2000<span class="re-preset-val">4.68%</span></button>
-                                    <button type="button" class="re-preset-btn" data-preset="custom">Custom<span class="re-preset-val">your own</span></button>
-                                </div>
+                                <div class="re-baseline-group-label">Home appreciation <span class="opt">(nominal / yr)</span>{{ reb.apprTip('bvre') }}</div>
+                                {{ reb.apprPresets('fwd', 're-preset-btns', 're-preset-btn', 're-preset-val') }}
                                 <div class="calc-field re-baseline-input"><input type="text" id="fwdHomeAppreciation" value="4.68%" inputmode="decimal" aria-label="Home appreciation, nominal percent a year"></div>
                                 <p class="re-baseline-note" id="fwdApprNotice" hidden></p>
                             </div>
                             <div class="re-baseline-group">
-                                <div class="re-baseline-group-label">Deflator for the Real view<span class="help-tip" tabindex="0">?<span class="tip-content">The inflation rate the <strong>Real</strong> view uses to turn future dollars into today&rsquo;s. It scales both paths by the same factor, so it never changes which one comes out ahead. It is the sitewide setting: changing it here changes it on The Half-Life and every other calculator that uses it.</span></span></div>
-                                <div class="re-preset-btns" id="fwdInflPresets" role="group" aria-label="Deflator presets">
-                                    <button type="button" class="re-preset-btn" data-preset="cpi-official">CPI<span class="re-preset-val">3.5%</span></button>
-                                    <button type="button" class="re-preset-btn active" data-preset="m2-growth">M2 growth<span class="re-preset-val">6.5%</span></button>
-                                    <button type="button" class="re-preset-btn" data-preset="shadow-stats">Shadow Stats<span class="re-preset-val">8%</span></button>
-                                    <button type="button" class="re-preset-btn" data-preset="custom">Custom<span class="re-preset-val">your own</span></button>
-                                </div>
-                                <div class="calc-field re-baseline-input" id="fwdInflCustomRow" hidden><input type="text" id="fwdInflCustom" inputmode="decimal" aria-label="Custom inflation, percent a year"></div>
+                                <div class="re-baseline-group-label">Deflator for the Real view <span class="opt">(% / yr)</span>{{ reb.inflTip('bvre') }}</div>
+                                {{ reb.inflPresets('fwd', 're-preset-btns', 're-preset-btn', 're-preset-val') }}
+                                <div class="calc-field re-baseline-input"><input type="text" id="fwdInflation" value="6.5%" inputmode="decimal" aria-label="Deflator for the Real view, percent a year"></div>
                             </div>
                             <div class="re-baseline-group">
                                 <div class="re-baseline-group-label">The mortgage</div>

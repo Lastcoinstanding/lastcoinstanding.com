@@ -231,7 +231,7 @@
     includeSweatEquity: false,
     // Nominal home appreciation, %/yr. The pair's shared input,
     // lcs.homeApprNominal (PR 4a, rulings M1); was a hardcoded 3.0.
-    // bindAppreciation() sets it from ModelingAssumptions before first render.
+    // bindBaseline() sets it from ModelingAssumptions before first render.
     appreciationPct: 4.68,
     // PR 4b (rulings M6): selling costs, one default on both pages (was a
     // hardcoded 8%), and the cost of each bitcoin purchase (was free).
@@ -945,59 +945,32 @@
     });
   }
 
-  // Home appreciation (PR 4a): chips + a typed value, both writing the
-  // shared nominal dimension. A typed value equal to a preset selects the
-  // preset. The one-line notice shows a pre-4a real value's conversion
-  // (ModelingAssumptions.migrationNote) until the reader next changes it.
-  function bindAppreciation(){
+  // The shared Baseline assumptions (PR 4f; design §7, rulings M1, P5):
+  // home appreciation (lcs.homeApprNominal, NOMINAL since PR 4a) and the
+  // deflator for the Real view (lcs.inflation) are bound by
+  // shared/real-estate-baseline.js, the binder Bitcoin vs. Real Estate uses
+  // too, so the two pages can't disagree about either. Typed appreciation
+  // updates the calculator at once and is committed to the sitewide store
+  // on 'change' (a value equal to a preset selects that preset); a store
+  // change, from this page, the other page or another tab, re-renders.
+  // The notice shows a pre-4a real value's conversion until the reader next
+  // changes appreciation.
+  function bindBaseline(){
     var MA = window.ModelingAssumptions;
-    var input = document.getElementById('calc-appreciation');
-    if (!MA || !input) return;
-    function pct2(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
-    function sync(){
-      var a = MA.get('homeApprNominal');
-      state.appreciationPct = a.value;
-      if (document.activeElement !== input) input.value = pct2(a.value);
-      document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
-        b.classList.toggle('active', b.dataset.preset === a.preset);
-      });
-      var note = document.getElementById('calc-appr-notice');
-      var n = MA.migrationNote && MA.migrationNote();
-      if (note) {
-        note.textContent = n ? ('Your saved home appreciation, ' + pct2(n.real) + ' a year real, was converted to ' + pct2(n.nominal) + ' nominal at the ' + pct2(n.inflation) + ' inflation assumption. The calculator now takes appreciation in nominal terms.') : '';
-        note.hidden = !n;
+    if (!MA || !window.RealEstateBaseline) return;
+    window.RealEstateBaseline.bind({
+      prefix: 'rp',
+      onInput: function(dim, v){
+        if (dim !== 'homeApprNominal') return;
+        state.appreciationPct = v;
+        rerender();
+      },
+      onChange: function(dim){
+        if (dim === 'homeApprNominal' || dim === '*') state.appreciationPct = MA.get('homeApprNominal').value;
+        rerender();
       }
-    }
-    function commit(v){
-      var pre = MA.presetFor('homeApprNominal', v);
-      if (MA.clearMigrationNote) MA.clearMigrationNote();
-      if (pre === 'custom') MA.set('homeApprNominal', 'custom', v); else MA.set('homeApprNominal', pre);
-    }
-    input.addEventListener('input', function(){
-      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
-      if (isFinite(v)) { state.appreciationPct = v; rerender(); }
     });
-    input.addEventListener('change', function(){
-      var v = parseFloat(String(input.value).replace(/[%\s]/g, ''));
-      if (isFinite(v)) commit(v);
-      input.value = pct2(state.appreciationPct);
-    });
-    document.querySelectorAll('#calc-appr-presets .calc-appr-preset').forEach(function(b){
-      b.addEventListener('click', function(){
-        var pre = b.dataset.preset;
-        if (MA.clearMigrationNote) MA.clearMigrationNote();
-        if (pre === 'custom') {
-          MA.set('homeApprNominal', 'custom', MA.get('homeApprNominal').value);
-          input.focus(); if (input.select) input.select();
-        } else {
-          MA.set('homeApprNominal', pre);
-        }
-      });
-    });
-    MA.subscribe(function(dim){
-      if (dim === 'homeApprNominal' || dim === '*') { sync(); rerender(); }
-    });
-    sync();
+    state.appreciationPct = MA.get('homeApprNominal').value;
   }
 
   function bindPortfolioSliders(){
@@ -1092,7 +1065,7 @@
     bindPathToggle();
     bindCAGRChips();
     bindZoomToggle();
-    bindAppreciation();
+    bindBaseline();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){
