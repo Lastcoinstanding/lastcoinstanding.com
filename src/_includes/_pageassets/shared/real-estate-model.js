@@ -197,6 +197,25 @@
     return Math.pow(totalGrowth, 1 / holdingYears) - 1;
   }
 
+  // ─── Rental-page rates (PR 4d) ───
+  // The yield portfolio's rates, and the verifiable rates the stablecoin-
+  // lending disclosure lists, in one dated object (rulings §7, item 12), so
+  // the monthly refresh is a one-place edit (MONTHLY_REFRESH_CHECKLIST §9.3a).
+  var YIELD_RATES = {
+    asOf: 'September 2026',
+    strc: 12.0,      // % a year, return of capital (DATA_AUDIT BvRP-5)
+    sata: 13.0,      // % a year, return of capital (BvRP-14)
+    lending: 4.0,    // % a year, ordinary income: the median of the four
+                     // lending rates below (4.04%), rounded (BvRP-28)
+    verifiable: [
+      { name: '3-month Treasury bill', kind: 'Reference (risk-free)', rate: 4.08, source: 'FRED DTB3, 24 Sep 2026', us: 'Yes' },
+      { name: 'Sky Savings Rate (sUSDS)', kind: 'DeFi savings', rate: 3.60, source: 'DefiLlama, base rate, 28 Sep 2026', us: 'Permissionless' },
+      { name: 'Aave v3 USDC (Ethereum)', kind: 'DeFi lending', rate: 3.63, source: 'DefiLlama, base rate, 28 Sep 2026', us: 'Permissionless' },
+      { name: 'Compound v3 USDC (Ethereum)', kind: 'DeFi lending', rate: 4.45, source: 'DefiLlama, base rate, 28 Sep 2026', us: 'Permissionless' },
+      { name: 'Ledn Growth Account (USDC)', kind: 'CeFi lending', rate: 5.00, source: 'Ledn rates page, Sep 2026', us: 'No' }
+    ]
+  };
+
   // ─── Math: rental side ───
   function calcRentalAnnualCF(s){
     // Net cash flow as expressed; user input already nets the waterfall.
@@ -266,19 +285,19 @@
     var alloc = {
       strc: amount * p.strc/100,
       sata: amount * p.sata/100,
-      ledn: amount * p.ledn/100,
+      lend: amount * p.lend/100,
       spot: amount * p.spot/100
     };
-    // Year 1 cash distributions
+    // Year 1 cash distributions, at the dated rates (YIELD_RATES)
     var year1 = {
-      strc: alloc.strc * 0.12,    // ROC; STRC rate 12.00% per 8-K 2026-09-01 (DATA_AUDIT BvRP-5)
-      sata: alloc.sata * 0.130,   // ROC
-      ledn: alloc.ledn * 0.05,    // ordinary; Ledn USDC Growth Account 5.00% tier (DATA_AUDIT BvRP-18)
+      strc: alloc.strc * (YIELD_RATES.strc / 100),   // ROC
+      sata: alloc.sata * (YIELD_RATES.sata / 100),   // ROC
+      lend: alloc.lend * (YIELD_RATES.lending / 100), // ordinary income
       spot: 0
     };
-    var pretax = year1.strc + year1.sata + year1.ledn;
-    // Ledn portion taxed; ROC tax-deferred
-    var ordinaryTax = year1.ledn * (s.federalBracketPct/100);
+    var pretax = year1.strc + year1.sata + year1.lend;
+    // Lending interest taxed; ROC tax-deferred
+    var ordinaryTax = year1.lend * (s.federalBracketPct/100);
     var year1AfterTax = pretax - ordinaryTax;
 
     // 10-year cumulative cash (flat yield assumption)
@@ -289,7 +308,7 @@
     var spotAppreciation = spotFV - alloc.spot;
 
     // Total wealth at year N
-    var preservedPrincipal = alloc.strc + alloc.sata + alloc.ledn;
+    var preservedPrincipal = alloc.strc + alloc.sata + alloc.lend;
     var totalWealth = preservedPrincipal + spotFV + cumulativeCash;
 
     return {
@@ -444,19 +463,19 @@
     var allocs = {
       strc: amount * p.strc/100,
       sata: amount * p.sata/100,
-      ledn: amount * p.ledn/100,
+      lend: amount * p.lend/100,
       spot: amount * p.spot/100
     };
-    var strcDist = allocs.strc * 0.12;   // keep in step with calcYieldPortfolio
-    var sataDist = allocs.sata * 0.13;
-    var lednDist = allocs.ledn * 0.05;   // keep in step with calcYieldPortfolio
-    var pretax = strcDist + sataDist + lednDist;
-    var ordTax = lednDist * (s.federalBracketPct/100);
+    var strcDist = allocs.strc * (YIELD_RATES.strc / 100);   // keep in step with calcYieldPortfolio
+    var sataDist = allocs.sata * (YIELD_RATES.sata / 100);
+    var lendDist = allocs.lend * (YIELD_RATES.lending / 100);
+    var pretax = strcDist + sataDist + lendDist;
+    var ordTax = lendDist * (s.federalBracketPct/100);
     var year1AfterTax = pretax - ordTax;
     var cumCash = year1AfterTax * t;
     var scenario = scenarioOverride || s.btcScenario;
     var spotFV = allocs.spot * btcBuyFactor(s) * scenarioGrowthFactor(scenario, t, s.holdingYears);
-    var preserved = allocs.strc + allocs.sata + allocs.ledn;
+    var preserved = allocs.strc + allocs.sata + allocs.lend;
     return preserved + spotFV + cumCash;
   }
 
@@ -842,6 +861,8 @@
     bvreProjection: bvreProjection,
     ledgerRetro: ledgerRetro,
     PAIR_DEFAULTS: PAIR_DEFAULTS,
+    // BvRP dated rates (PR 4d, item 12)
+    YIELD_RATES: YIELD_RATES,
     // bitcoin scenarios (M3), shared by both pages
     SCENARIOS: SCENARIOS,
     UPPER_TARGET: UPPER_TARGET,

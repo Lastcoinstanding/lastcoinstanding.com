@@ -244,33 +244,33 @@ eleventyComputed:
 
   <h3>The Numbers, $500K Side-by-Side</h3>
 
-  <p>Consider one unencumbered $500K rental, kept or sold. Selling is taxed, so the portfolio starts from the after-tax proceeds: about <strong>$411K</strong> after federal tax in the Path 1 worked example (state tax and NIIT would lower it further). Instrument rates as of September 2026; cash flows before income tax.</p>
+  <p>Consider one unencumbered $500K rental, kept or sold. Selling is taxed, so the portfolio starts from the after-tax proceeds: about <strong>$417K</strong> after federal tax in the Path 1 worked example (state tax and NIIT would lower it further). Instrument rates as of <span data-yr="asof">September 2026</span>; cash flows before income tax.</p>
 
   <div class="bvrp-table-wrap">
     <table class="bvrp-table">
       <thead>
-        <tr><th>Metric</th><th>Keep the $500K rental</th><th>Sell; ~$411K into a bitcoin yield portfolio</th></tr>
+        <tr><th>Metric</th><th>Keep the $500K rental</th><th>Sell; ~$417K into a bitcoin yield portfolio</th></tr>
       </thead>
       <tbody>
         <tr>
           <td>Composition</td>
           <td class="numeric">One property, no mortgage</td>
-          <td class="numeric">45% STRC ($184,950) + 30% SATA ($123,300) + 10% Ledn ($41,100) + 15% spot BTC ($61,650)</td>
+          <td class="numeric">45% STRC ($187,650) + 30% SATA ($125,100) + 10% stablecoin lending ($41,700) + 15% spot BTC ($62,550)</td>
         </tr>
         <tr>
           <td>Year 1 cash flow</td>
           <td class="numeric">$22,000 at a 4.4% net yield (the calculator&rsquo;s default; set your own below)</td>
-          <td class="numeric">~$40,300: STRC $22,194 at 12% + SATA $16,029 at 13% + Ledn $2,055 at 5% (stablecoin lending; not available to US residents); ~$38,200 of it expected to be return of capital</td>
+          <td class="numeric"><span data-yr-ex="total-y1">~$40,400</span>: STRC <span data-yr-ex="strc-y1">$22,518</span> at <span data-yr="strc">12%</span> + SATA <span data-yr-ex="sata-y1">$16,263</span> at <span data-yr="sata">13%</span> + stablecoin lending <span data-yr-ex="lend-y1">$1,668</span> at <span data-yr="lending">4%</span>; <span data-yr-ex="roc-y1">~$38,800</span> of it expected to be return of capital</td>
         </tr>
         <tr>
           <td>Yield</td>
           <td class="numeric">4.4% net of operating costs, on $500K</td>
-          <td class="numeric">9.8% blended, on $411K</td>
+          <td class="numeric"><span data-yr-ex="blended">9.7%</span> blended, on $417K</td>
         </tr>
         <tr>
           <td>10-year cash flow (rates held flat)</td>
           <td class="numeric">$220K + property appreciation</td>
-          <td class="numeric">~$403K +<span data-pl-stay-fv="61650" data-show="gain">&mdash;</span> appreciation on the spot slice (&ldquo;stay at today&rsquo;s multiple&rdquo;)</td>
+          <td class="numeric"><span data-yr-ex="ten-year">~$404K</span> +<span data-pl-stay-fv="62550" data-show="gain">&mdash;</span> appreciation on the spot slice (&ldquo;stay at today&rsquo;s multiple&rdquo;)</td>
         </tr>
         <tr>
           <td>Operational load</td>
@@ -286,7 +286,7 @@ eleventyComputed:
     </table>
   </div>
 
-  <p>About 1.8 times the Year 1 cash flow, from a smaller starting sum, with most of it expected to be tax-deferred as return of capital. No operational load, but the portfolio carries issuer-credit and market risk the rental doesn&rsquo;t. On the appreciation side, the 15% spot slice grows from $61,650 to <span data-pl-stay-fv="61650">&mdash;</span> over ten years if bitcoin stays at today&rsquo;s multiple of its Power Law trend (computed live; the reversion and floor cases in the calculator below give other answers). The rental&rsquo;s appreciation depends on its market; the calculator puts both side by side.</p>
+  <p>About <span data-yr-ex="ratio">1.8</span> times the Year 1 cash flow, from a smaller starting sum, with most of it expected to be tax-deferred as return of capital. No operational load, but the portfolio carries issuer-credit and market risk the rental doesn&rsquo;t. On the appreciation side, the 15% spot slice grows from $62,550 to <span data-pl-stay-fv="62550">&mdash;</span> over ten years if bitcoin stays at today&rsquo;s multiple of its Power Law trend (computed live; the reversion and floor cases in the calculator below give other answers). The rental&rsquo;s appreciation depends on its market; the calculator puts both side by side.</p>
 
   <h3>The Bear Case</h3>
 
@@ -362,7 +362,7 @@ eleventyComputed:
     <h3>Path 1 &mdash; Outright Sell (Full Pivot)</h3>
     <div class="bvrp-path-sub">High conviction · No leverage · Highest tax friction</div>
     <p>Sell the rental property outright, pay the tax bill, redeploy net proceeds into bitcoin or a bitcoin-yield portfolio. The cleanest path, but the most expensive on day one.</p>
-    <p>Tax math, worked example. A $500K property with a $200K adjusted basis (originally purchased for $300K, $100K depreciation taken) sells for $500K. After roughly 8% in transaction costs, net proceeds are $460K. The taxable gain is $260K: $100K is taxed at the 25% depreciation-recapture rate ($25K), the remaining $160K at 15% long-term capital gains ($24K). Total federal tax: $49K. Net cash to seller: <strong>$411K</strong> &mdash; an 18% all-in haircut at the federal level, before state tax and the 3.8% NIIT (which for a California high-bracket investor brings total leakage to roughly 27%).</p>
+    <p>Tax math, worked example. A $500K property with a $200K adjusted basis (originally purchased for $300K, $100K depreciation taken) sells for $500K. After 6.6% in selling costs (the calculator&rsquo;s default: a 5.6% commission plus about 1% of other closing costs), net proceeds are $467K. The taxable gain is $267K: $100K is taxed at the 25% depreciation-recapture rate ($25K), the remaining $167K at 15% long-term capital gains ($25K). Total federal tax: $50K. Net cash to seller: <strong>$417K</strong>, a 17% all-in haircut at the federal level, before state tax and the 3.8% NIIT (which for a California investor in the top bracket, at 20% capital gains, brings total leakage to roughly 27%).</p>
     <p>Critically: <strong>1031 exchanges don&rsquo;t apply</strong>. Bitcoin is not &ldquo;like-kind&rdquo; property for 1031 purposes, and opportunity zones don&rsquo;t qualify. The tax-deferral pathways landlords normally rely on are closed for this destination.</p>
     <p><strong>Best for:</strong> high conviction; long holding horizon (5&ndash;10+ years to amortize the upfront tax); investors who are also tired of being landlords for non-financial reasons.</p>
   </div>
@@ -535,7 +535,7 @@ eleventyComputed:
         <div class="calc-slider-group-label">Bitcoin yield portfolio</div>
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">STRC <span class="calc-slider-hint">(Strategy, 12%, ROC)</span>
+          <span class="calc-slider-name">STRC <span class="calc-slider-hint">(Strategy, <span data-yr="strc">12%</span>, ROC)</span>
             <span class="help-tip" tabindex="0">?<span class="tip-content">
               Strategy&rsquo;s variable-rate Series&nbsp;A perpetual preferred stock. Paying 12.00% annualized, semi-monthly (September 2026 8-K). Strategy reported 100% of its 2025 preferred distributions as return of capital and expects that treatment to continue. Return of capital is tax-deferred, not tax-free: it lowers your cost basis instead of being taxed as income now, and raises the gain when you sell.
             </span></span>
@@ -545,7 +545,7 @@ eleventyComputed:
         <input type="range" id="calc-port-strc" min="0" max="100" step="5" value="45">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">SATA <span class="calc-slider-hint">(Strive, 13%, ROC)</span>
+          <span class="calc-slider-name">SATA <span class="calc-slider-hint">(Strive, <span data-yr="sata">13%</span>, ROC)</span>
             <span class="help-tip" tabindex="0">?<span class="tip-content">
               Strive&rsquo;s variable-rate Series&nbsp;A perpetual preferred stock. Pays 13.00% annualized, every business day since June 16, 2026, backed by Strive&rsquo;s 26,355 BTC treasury (September 18, 2026) and a dividend reserve. For 2026, Strive expects 100% of distributions to be return of capital, to the extent of your basis (its Forms 8937); the final treatment is set after year-end. Tax-deferred, not tax-free.
             </span></span>
@@ -555,14 +555,14 @@ eleventyComputed:
         <input type="range" id="calc-port-sata" min="0" max="100" step="5" value="30">
 
         <div class="calc-slider-row">
-          <span class="calc-slider-name">Ledn <span class="calc-slider-hint">(stablecoin lending, 5%, ordinary)</span>
+          <span class="calc-slider-name">Stablecoin lending <span class="calc-slider-hint">(<span data-yr="lending">4%</span>, ordinary)</span>
             <span class="help-tip" tabindex="0">?<span class="tip-content">
-              Ledn&rsquo;s Growth Account is stablecoin lending: interest on USDC or USDT, not bitcoin (bitcoin Growth Accounts ended July 1, 2025). It pays 5.00% up to 100,000 USDC and 6.00% above (September 2026); the calculator uses 5%. <strong>Not available to US residents.</strong> Yields are taxed as ordinary income (no ROC shield), so the after-tax yield compresses materially at higher federal brackets. Lower yield but different risk concentration than the issuer-credit risk of STRC/SATA.
+              Interest on dollar stablecoins (USDC, USDT) lent through a platform or a protocol. Not bitcoin, and no return-of-capital shield: it is taxed as ordinary income, so the after-tax yield shrinks at higher brackets. The default, <span data-yr="lending">4%</span>, is the middle of the rates that can be checked from outside, listed under the calculator (<span data-yr="asof">September 2026</span>); it is about what a 3-month Treasury bill pays, so the extra risks (platform failure, smart-contract failure, loss of the dollar peg) are not currently being paid for. Ledn&rsquo;s Growth Account pays more but is not available to US residents.
             </span></span>
           </span>
-          <span class="calc-slider-val" id="val-port-ledn">10%</span>
+          <span class="calc-slider-val" id="val-port-lend">10%</span>
         </div>
-        <input type="range" id="calc-port-ledn" min="0" max="100" step="5" value="10">
+        <input type="range" id="calc-port-lend" min="0" max="100" step="5" value="10">
 
         <div class="calc-slider-row">
           <span class="calc-slider-name">Spot BTC <span class="calc-slider-hint">(no distributions)</span>
@@ -816,6 +816,21 @@ eleventyComputed:
 
   </div>
 
+  <!-- PR 4d (rulings §7, item 12): what the verifiable stablecoin-lending
+       instruments pay this month. Rows come from RealEstateModel.YIELD_RATES,
+       the one dated object the monthly refresh edits. -->
+  <div class="calc-rates-note" id="calc-rates-note">
+    <div class="calc-rates-title">Stablecoin lending: what the verifiable rates are (<span data-yr="asof">September 2026</span>)</div>
+    <p>The calculator&rsquo;s lending slice earns <span data-yr="lending">4%</span>, the middle of the rates below that anyone can check. Base rates only: token rewards some pools add are promotional, not lending income, and are left out.</p>
+    <div class="bvrp-table-wrap">
+      <table class="bvrp-table calc-rates-table">
+        <thead><tr><th>Instrument</th><th>Rate</th><th>Open to US residents</th></tr></thead>
+        <tbody id="calc-rates-rows"></tbody>
+      </table>
+    </div>
+    <p><strong>At current rates, stablecoin lending pays about what a Treasury bill pays.</strong> The extra risks &ndash; platform failure (Celsius, BlockFi and Voyager in 2022), smart-contract failure and loss of the dollar peg &ndash; are not currently being paid for. US platforms&rsquo; own rates can&rsquo;t be checked from outside, so they aren&rsquo;t listed: Coinbase shows its USDC rate only in the account, to paid Coinbase One members, and Nexo&rsquo;s &ldquo;up to&rdquo; rate depends on holding its own token.</p>
+  </div>
+
   <p style="margin-top:1.6rem;font-size:0.85rem;color:var(--ink-dim);font-style:italic">
     <strong>Model simplifications:</strong> Bitcoin scenarios are anchored to the site&rsquo;s Power Law model and dynamically recalibrate to bitcoin&rsquo;s current multiple-of-trend. Each scenario moves bitcoin&rsquo;s multiple of the trend in a straight line from today&rsquo;s to its target over the holding period, a simplification: in the record, reversion has been irregular in timing. The default, Stay at today&rsquo;s multiple, assumes no reversion. The calculator treats ROC distributions as untaxed for the whole holding period. In fact return of capital is tax-deferred: at current STRC/SATA rates basis runs out after about eight years, later distributions are taxed as capital gains, and the lower basis raises the gain at sale, so the after-tax figures are overstated, most for longer holds. State taxes simplified to a single rate per state. HELOC modeled as interest-only with balloon repayment.
   </p>
@@ -858,6 +873,7 @@ eleventyComputed:
       <li><strong>Return-of-capital treatment:</strong> Strategy reported 100% of 2025 preferred distributions as return of capital and expects the same for ten years or more (<a href="https://www.sec.gov/Archives/edgar/data/1050446/000119312526033573/mstr-ex99_1.htm" target="_blank" rel="noopener">EX-99.1, 2 February 2026</a>). For SATA, Strive states it &ldquo;does not have any accumulated earnings and profits, and does not expect to generate current earnings and profits in the current year or the foreseeable future&rdquo; (<a href="https://www.sec.gov/Archives/edgar/data/0001920406/000162828026034804/asst-20260514.htm" target="_blank" rel="noopener">8-K, 14 May 2026</a>), and its Forms 8937 state that &ldquo;it is expected that 100%&rdquo; of each 2026 distribution &ldquo;will be characterized as a return of capital for federal income tax purposes, to the extent of a recipient shareholder&rsquo;s tax basis&rdquo; (e.g. the <a href="https://s21.q4cdn.com/435279266/files/doc_news/2026/Mar/15/Form-8937-SATA-03-15-2026-VF-1.pdf" target="_blank" rel="noopener">March 2026 distribution</a>). These are estimates; Strive files corrected forms if they change, and the final treatment follows year-end on the 1099-DIV. Return of capital lowers basis; distributions beyond basis are taxed as capital gain.</li>
       <li><strong>YBTC:</strong> <a href="https://www.roundhillinvestments.com/etf/ybtc/" target="_blank" rel="noopener">Roundhill fund page</a> (fact sheet NAV return to 30 June 2026; weekly Rule 19a-1 notices for the estimated return-of-capital share). <strong>Ledn Growth Account (USDC/USDT only; 5.00% up to 100,000 USDC, 6.00% above; not available to US residents):</strong> <a href="https://www.ledn.io/legal/rates-terms" target="_blank" rel="noopener">rates page</a>, rendered 27 September 2026; <a href="https://www.ledn.io/legal/growth-account-terms" target="_blank" rel="noopener">Growth Account Terms</a> &sect;2 and &sect;13(c); <a href="https://help.ledn.io/hc/en-us/p/eligibility" target="_blank" rel="noopener">eligibility tool</a>; <a href="https://help.ledn.io/hc/en-us/articles/28481809829655" target="_blank" rel="noopener">end of bitcoin Growth Accounts</a>.</li>
       <li><strong>Ledn S&amp;P-rated Issuer Trust 2026-1 Notes:</strong> S&amp;P Global Ratings Presale Report (third-party verified).</li>
+      <li><strong>Stablecoin-lending rates (the calculator&rsquo;s slice and the list under it):</strong> the 3-month Treasury bill from <a href="https://fred.stlouisfed.org/series/DTB3" target="_blank" rel="noopener">FRED (DTB3)</a>; the Sky, Aave v3 and Compound v3 base rates from <a href="https://yields.llama.fi/pools" target="_blank" rel="noopener">DefiLlama&rsquo;s yields data</a> (on-chain; token rewards excluded); Ledn from its <a href="https://www.ledn.io/legal/rates-terms" target="_blank" rel="noopener">rates page</a>. Dated in the list; refreshed monthly.</li>
       <li><strong>BlockFi and BlockFills bankruptcies:</strong> Kroll restructuring administration dockets and Sidley Austin legal analysis (third-party verified).</li>
       <li><strong>Convertible-note stress point (about a 95% fall, roughly $4,000; net debt $3.0B as of 27 July 2026):</strong> Strategy <a href="https://assets.contentstack.io/v3/assets/bltf8d808d9b8cebd37/blt112f20b1e4c24a84/6a6bcf5c1dd9934bc74056f4/strategy-q2-2026-financial-results-presentation_3.pdf" target="_blank" rel="noopener">Q2 2026 results presentation</a>, 30 July 2026, p.&nbsp;11 (paraphrased). It updates the Q4 2025 figure of about $8,000, a 90% fall (<a href="https://assets.contentstack.io/v3/assets/bltf8d808d9b8cebd37/blt0a7be22d534bb050/69850541eb19d52d260c103b/strategy-q4-2025-financial-results.pdf" target="_blank" rel="noopener">Q4 2025 presentation</a>, p.&nbsp;31).</li>
     </ul>

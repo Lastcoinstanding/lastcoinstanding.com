@@ -60,6 +60,11 @@
        is now P1); new P5c is floor. BvRP captures include the chips and the
        chart, which gain Floor, so no BvRP vector is byte-comparable with
        4b: compare the tables.
+     PR 4d (item 12, M8; BvRP only) — the third yield slice is stablecoin
+       lending at the dated rate (4.0%; was Ledn at 5%), keyed `lend` (was
+       `ledn`), and the $500K example and worked tax example move to 6.6%
+       selling costs, so S-bvrp also captures the rate spans and the rates
+       disclosure.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -211,7 +216,7 @@
     setVal('calc-state', x.state, ['change']); setVal('calc-bracket', x.bracket, ['change']);
     setVal('calc-heloc-ltv', x.ltv); setVal('calc-heloc-rate', x.helocRate); setVal('calc-existing-mortgage', x.mortgage);
     setVal('calc-num-properties', x.props); setVal('calc-properties-retained', x.retained);
-    ['strc', 'sata', 'ledn', 'spot'].forEach(function(k, i){ setVal('calc-port-' + k, String(x.port[i])); });
+    ['strc', 'sata', 'lend', 'spot'].forEach(function(k, i){ setVal('calc-port-' + k, String(x.port[i])); });
     click('.calc-cagr-chip[data-scenario="' + x.scenario + '"]');
   }
   function captureRp(){
@@ -221,7 +226,8 @@
   }
   function captureRpStatic(){
     var q = function(sel){ return Array.prototype.map.call(document.querySelectorAll(sel), function(n){ return n.textContent; }); };
-    return { plCagr: q('[data-pl-cagr]'), plStay: q('[data-pl-stay-fv]') };
+    return { plCagr: q('[data-pl-cagr]'), plStay: q('[data-pl-stay-fv]'),
+             rates: q('[data-yr]'), example: q('[data-yr-ex]'), disclosure: html('calc-rates-rows') };
   }
 
   // ─── Runner ────────────────────────────────────────────────────────
