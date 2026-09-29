@@ -103,6 +103,12 @@
        New: P17–P24, the Real view (defaults; Paths 1, 2 and 3; a CPI
        deflator; a custom 0% deflator, which must equal Nominal in every
        figure; a 30-year hold; the first-3-years chart).
+     PR 5a (M9; BvRP only) — the rental page's tax corrections: recapture at
+       min(bracket, 25%) and never above the gain, depreciation on the
+       original building basis, state tax (and NIIT where it applies) on
+       rental income and lending interest, and the STRC/SATA return-of-
+       capital basis. Every BvRP vector moves except P9 (no taxable rental
+       income, no HELOC draw) and S-bvrp; BvRE is unchanged.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;

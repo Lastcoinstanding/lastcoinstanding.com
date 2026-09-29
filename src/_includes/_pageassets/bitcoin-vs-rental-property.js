@@ -192,10 +192,10 @@
 //   from gross via the §2 waterfall. Slider default ~4.4% nets to the
 //   editorial's $20-24K on a $500K property.
 // - BTC CAGR is flat over the holding period (declining-CAGR in v0.2).
-// - ROC distributions treated as untaxed for the full holding period. In fact
-//   ROC is tax-deferred: basis runs out after ~8 years at 12-13% yields, then
-//   distributions are capital gains, and the lower basis raises the gain at
-//   sale. Basis exhaustion is logged for PR 5 (Prompt 5).
+// - ROC distributions lower each instrument's basis; once it is used up (~8
+//   years at 12-13% yields) they are taxed as long-term gains in the year
+//   paid (PR 5a). The gain left in the lower basis is due at a sale, which
+//   the If sold basis (PR 5b) will show.
 // - State tax is a single rate per state, no AMT/local nuances.
 // - HELOC modeled as interest-only with balloon repayment at end of term.
 
@@ -727,6 +727,16 @@
       : 'All figures are nominal: future dollars, as paid.';
   }
 
+  // Return of capital, said plainly (PR 5a): tax-deferred, not tax-free.
+  function rocNote(yp, s){
+    if (!yp || (yp.allocations.strc + yp.allocations.sata) <= 0) return '';
+    var when = yp.rocGainYear > 0
+      ? 'At these rates the basis starts running out in year ' + yp.rocGainYear + ', and distributions beyond it are taxed as long-term gains in the year paid.'
+      : 'At these rates it is not used up within ' + s.holdingYears + ' year' + (s.holdingYears === 1 ? '' : 's') + '.';
+    return '<div class="calc-detail-warn">STRC and SATA pay return of capital: tax-deferred, not tax-free. Each payment lowers your cost basis. ' + when +
+      ' The gain left in the lower basis is due when you sell.</div>';
+  }
+
   function renderPathDetail(results, s){
     var el = document.getElementById('calc-path-detail');
     if (!el) return;
@@ -738,7 +748,7 @@
         '<div><span>Gross sale</span><strong>' + fmtMoneyFull(r.grossSale) + '</strong></div>' +
         '<div><span>Selling costs (' + parseFloat(s.sellCostPct.toFixed(2)) + '%)</span><strong>-' + fmtMoneyFull(r.transactionCosts) + '</strong></div>' +
         '<div><span>Net proceeds</span><strong>' + fmtMoneyFull(r.netProceeds) + '</strong></div>' +
-        '<div><span>Depreciation recapture (25%)</span><strong>-' + fmtMoneyFull(r.recaptureTax) + '</strong></div>' +
+        '<div><span>Depreciation recapture (' + parseFloat(r.recaptureRatePct.toFixed(2)) + '% on ' + fmtMoneyFull(r.unrecaptured) + ')</span><strong>-' + fmtMoneyFull(r.recaptureTax) + '</strong></div>' +
         '<div><span>Federal LTCG</span><strong>-' + fmtMoneyFull(r.ltcgTax) + '</strong></div>' +
         '<div><span>State tax (' + (s.stateCode === 'OTHER' ? 'typical ~5%' : s.stateCode) + ')</span><strong>-' + fmtMoneyFull(r.stateTax) + '</strong></div>' +
         '<div><span>NIIT</span><strong>-' + fmtMoneyFull(r.niit) + '</strong></div>' +
@@ -771,7 +781,7 @@
         '<div><span>Year 1 cash from yield portfolio</span><strong>' + fmtMoneyFull(r3.yieldPortfolio.year1AfterTax) + '</strong></div>' +
         '<div><span>Year 1 cash from ' + retainedCount + ' retained rental' + (retainedCount === 1 ? '' : 's') + '</span><strong>' + fmtMoneyFull(r3.retainedRental.annual.afterTax) + '</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Combined Year 1 cash flow</span><strong>' + fmtMoneyFull(r3.year1CashFlow) + '</strong></div>' +
-        '</div>' + shortfallNote(r3.shortfall);
+        '</div>' + shortfallNote(r3.shortfall) + rocNote(r3.yieldPortfolio, s);
     } else {
       var r4 = results.path;
       var yp = r4.yieldPortfolio;
@@ -794,7 +804,7 @@
         '<div><span>Spot BTC (' + p.spot + '%, ' + fmtMoneyFull(yp.allocations.spot) + ', no dist.)</span><strong>—</strong></div>' +
         '<div class="calc-detail-emphasis"><span>Year 1 after-tax total</span><strong>' + fmtMoneyFull(yp.year1AfterTax) + '</strong></div>' +
         '<div><span>Spot BTC value at year ' + s.holdingYears + ' (' + scenarioLabel(s.btcScenario) + ')</span><strong>' + fmtMoneyFull(yp.spotFV) + '</strong></div>' +
-        '</div></div>';
+        '</div></div>' + rocNote(yp, s);
     }
     // The mechanics stay in nominal dollars, as paid, in both views (PR 4f).
     // In the Real view, say so, and give the factor for the year-N values
