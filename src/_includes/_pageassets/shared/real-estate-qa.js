@@ -48,6 +48,14 @@
        growth 2%), E17 (the pre-4b tax and insurance: 1.2%, $1,800/yr).
        BvRP vectors gain `sell` 6.6 (was a hardcoded 8) and `btctx` 0.5;
        new P13 runs Path 1 at the old 8% and no bitcoin cost.
+     PR 4c (M3) — one scenario set on both pages (floor, stay, trend, upper),
+       each moving the multiple of trend in a straight line to its target at
+       the horizon end. The default is `stay` (was `trend`), and BvRE's upper
+       target is 2.5× (was 3×; BvRP's already was). BvRE: PROJ_BASE moves to
+       `stay`, so every projection vector that doesn't name a scenario now
+       runs under Stay. Like with like against 4b: new E18 (trend) is 4b's
+       E6; E8a (floor) is unchanged; E8b (upper) moves to 2.5×. New E19
+       captures the scenario line and the Stay button under each scenario.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -93,16 +101,16 @@
     { id: 'E4', desc: 'retro 2021, rate 3%, rent $2,000, 10% down', year: '2021', rate: '3', rent: '2000', down: '10' },
     { id: 'E5', desc: 'retro 2019, home $750,000, DCA on', year: '2019', home: '750000', dca: true }
   ];
-  var PROJ_BASE = { scenario: 'trend', method: 'mortgage', down: '20', home: '415000', horizon: '10',
+  var PROJ_BASE = { scenario: 'stay', method: 'mortgage', down: '20', home: '415000', horizon: '10',
                     appr: '4.68', rate: '6.8', rent: '', rentg: '', close: '1.04', ptax: '0.9', ins: '',
                     maint: '1', sell: '6.6', btctx: '0.5', invest: true, display: 'real', infl: 'm2-growth' };
   var PROJ = [
-    { id: 'E6',  desc: 'proj defaults ($415K, 10y, trend, mortgage 20%, Real)' },
+    { id: 'E6',  desc: 'proj defaults ($415K, 10y, stay, mortgage 20%, Real)' },
     { id: 'E7',  desc: 'proj defaults, Nominal display', display: 'nominal' },
     { id: 'E8a', desc: 'proj floor', scenario: 'floor' },
-    { id: 'E8b', desc: 'proj upper', scenario: 'upper' },
-    { id: 'E9a', desc: 'proj 5y, trend', horizon: '5' },
-    { id: 'E9b', desc: 'proj 20y, trend', horizon: '20' },
+    { id: 'E8b', desc: 'proj upper (2.5× from 4c)', scenario: 'upper' },
+    { id: 'E9a', desc: 'proj 5y, stay', horizon: '5' },
+    { id: 'E9b', desc: 'proj 20y, stay', horizon: '20' },
     { id: 'E10', desc: 'proj cash purchase', method: 'cash' },
     { id: 'E11', desc: 'proj mortgage, rent $1,500', rent: '1500' },
     { id: 'E12', desc: 'proj down 3.5%, rate 7.5%, appr 1.0', down: '3.5', rate: '7.5', appr: '1.0' },
@@ -110,7 +118,9 @@
     { id: 'E14', desc: 'proj, difference not invested', invest: false },
     { id: 'E15', desc: 'proj, no closing, selling or bitcoin costs', close: '0', sell: '0', btctx: '0' },
     { id: 'E16', desc: 'proj, rent growth 2%', rentg: '2' },
-    { id: 'E17', desc: 'proj, pre-4b tax 1.2% and insurance $1,800/yr', ptax: '1.2', ins: '1800' }
+    { id: 'E17', desc: 'proj, pre-4b tax 1.2% and insurance $1,800/yr', ptax: '1.2', ins: '1800' },
+    { id: 'E18', desc: 'proj trend (the pre-4c default)', scenario: 'trend' },
+    { id: 'E19', desc: 'scenario line and Stay button, each scenario at defaults', growth: true }
   ];
 
   function applyRetro(v){
@@ -148,6 +158,13 @@
   }
   function captureProj(){
     return { results: html('fwdResults'), cashOut: html('fwdCashOutLine') };
+  }
+  function captureGrowth(){
+    var up = document.querySelector('[data-upper-record]');
+    return ['floor', 'stay', 'trend', 'upper'].map(function(sc){
+      applyProj({ scenario: sc });
+      return { scenario: sc, line: html('fwdScenarioGrowth'), stay: html('fwdStayMult'), upper: up ? up.textContent : null };
+    });
   }
   function captureBvreStatic(){
     return { houses: html('housesVisual'), returnTable: html('returnTable'), returnEnd: html('returnTableEndPrices'),
@@ -230,7 +247,12 @@
         click('.calc-mode-label[data-mode="retrospective"]');
         RETRO.forEach(function(v){ applyRetro(v); var s = JSON.stringify(captureRetro()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
         click('.calc-mode-label[data-mode="projection"]');
-        PROJ.forEach(function(v){ applyProj(v); var s = JSON.stringify(captureProj()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
+        PROJ.forEach(function(v){
+          var s;
+          if (v.growth) s = JSON.stringify(captureGrowth());
+          else { applyProj(v); s = JSON.stringify(captureProj()); }
+          rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s);
+        });
         applyRetro({}); applyProj({});
         click('.calc-mode-label[data-mode="retrospective"]');
       } else {

@@ -480,7 +480,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // Belt-and-suspenders DOM-sync at end of init() force-syncs these
   // regardless, so a future drift in any of the three defaults gets
   // corrected before the first calc render.
-  var scenario = 'trend';
+  var scenario = 'stay';   // M3 (PR 4c): the default is Stay at today's multiple
   var method = 'mortgage';
   var LIVE_BTC_FALLBACK = 84000;
 
@@ -515,6 +515,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   }
 
   // ── Power Law scenario buttons ──
+  // Upper's caveat is the cycle-peak record, computed from the price data
+  // (RealEstateModel.upperRecordText) so it can't go stale; the markup
+  // carries the same sentence as its no-script fallback.
+  var _upperRecord = RealEstateModel.upperRecordText();
+  if(_upperRecord) document.querySelectorAll('[data-upper-record]').forEach(function(el){ el.textContent = _upperRecord; });
   document.querySelectorAll('.scenario-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('.scenario-btn').forEach(function(b){b.classList.remove('active')});
@@ -661,7 +666,18 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     setPlaceholder('fwdRentGrowth', pctTxt(homeApprNominal) + ' default');
     setPlaceholder('fwdInsurance', fmt(P.insuranceDefault) + ' default');
 
-    var scenarioLabel = scenario === 'floor' ? 'Floor' : (scenario === 'trend' ? 'Trend' : 'Upper');
+    var SCEN_NAMES = { floor: 'Floor', stay: 'Stay at today\u2019s multiple', trend: 'Trend', upper: 'Upper' };
+    var scenarioLabel = SCEN_NAMES[scenario] || 'Stay at today\u2019s multiple';
+    // M3: today's multiple on the Stay button, and the selected scenario's
+    // implied growth beside the selector (nominal, today → horizon end).
+    var stayMultEl = document.getElementById('fwdStayMult');
+    if(stayMultEl) stayMultEl.textContent = P.mult0.toFixed(2) + '\u00d7';
+    var growthEl = document.getElementById('fwdScenarioGrowth');
+    if(growthEl){
+      var g = P.impliedGrowthPct;
+      growthEl.innerHTML = scenarioLabel + ': bitcoin ' + (g < 0 ? 'falls' : 'grows') + ' <strong>' + Math.abs(g).toFixed(1) + '% a year</strong>, from ' +
+        fmt(btcNow) + ' (' + P.mult0.toFixed(2) + '\u00d7 trend) to ' + fmt(P.priceEnd) + ' (' + P.targetMult.toFixed(2) + '\u00d7) by ' + asOf + ', in nominal dollars.';
+    }
     var houseRateLabel = _mode === 'real'
       ? (P.homeApprRealPct.toFixed(1).replace('-', '\u2212') + '%/yr real')
       : (pctTxt(homeApprNominal) + '/yr nominal');
@@ -1051,7 +1067,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 //     mortgage   decimal (mortgage %)     default 6.8
 //     down       decimal (down payment %) default 20
 //     method     'cash' | 'mortgage'      default 'mortgage'
-//     pscenario  'floor'|'trend'|'upper'  default 'trend'
+//     pscenario  'floor'|'stay'|'trend'|'upper'  default 'stay' (M3, PR 4c;
+//                was 'trend', and 'upper' now means 2.5× trend, was 3×)
 //   PR 4b (rulings M2, M4, M5, M6; blank = the sourced default):
 //     rent       integer (first-year rent, $/mo)   blank = market rent
 //     rentg      decimal (rent growth %/yr)        blank = home appreciation
@@ -1113,7 +1130,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     btctx:     { elId: 'fwdBtcTxPct',          type: 'float',     def: 0.5,     evt: 'input', dp: 2 },
     inv:       { elId: 'fwdInvestDiff',        type: 'bool-on',                 evt: 'change' },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
-    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'trend',    persist: false },
+    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'stay',     persist: false },
     displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false }
   };
 
@@ -1424,8 +1441,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // active (line ~1285), which means JS variables `scenario` and
     // `method` can desync from the visual state when the rehydrated
     // value happens to match the markup default. E.g.: markup has
-    // Trend active, user lands on the page with no URL/storage params,
-    // the SCHEMA default is also 'trend' so applyValue is never even
+    // Stay active, user lands on the page with no URL/storage params,
+    // the SCHEMA default is also 'stay' so applyValue is never even
     // called for that key — but the module-init JS variable could be
     // stale. Force-syncing from the DOM here guarantees the calc uses
     // whatever the user actually sees highlighted.

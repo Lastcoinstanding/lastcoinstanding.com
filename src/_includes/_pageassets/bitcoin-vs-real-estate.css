@@ -510,3 +510,18 @@
 @media (max-width: 480px) {
   .re-field-grid { grid-template-columns: 1fr; }
 }
+/* PR 4c: the bitcoin scenario set (rulings M3). Four buttons, and the
+   selected scenario's implied growth directly under them. Below 720px the
+   four buttons sit two by two. */
+.scenario-btns-4 { margin-bottom: 0.6rem; }
+.scenario-sub { font-size: 0.7rem; font-weight: 400; opacity: 0.75; }
+.scenario-growth { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+.scenario-growth strong { color: var(--text); font-weight: 600; }
+@media (max-width: 720px) {
+  .scenario-btns-4 { flex-wrap: wrap; }
+  .scenario-btns-4 .scenario-btn { flex: 1 1 50%; }
+  .scenario-btns-4 .scenario-btn:nth-child(1) { border-radius: 4px 0 0 0; }
+  .scenario-btns-4 .scenario-btn:nth-child(2) { border-radius: 0 4px 0 0; }
+  .scenario-btns-4 .scenario-btn:nth-child(3) { border-radius: 0 0 0 4px; }
+  .scenario-btns-4 .scenario-btn:nth-child(4) { border-radius: 0 0 4px 0; }
+}
