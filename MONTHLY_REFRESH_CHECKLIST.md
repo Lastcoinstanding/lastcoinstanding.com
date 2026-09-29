@@ -829,6 +829,27 @@ Dated breaks in the GA4 series. Check this list before reading any month-over-mo
 
 - **2026-09-19: Enhanced-measurement history-change page_views turned OFF — views on slider pages are not comparable across this date.** (Pages that rewrite the URL as sliders move were logging a page_view per history change.) **Internal traffic tagged from 2026-09-20; filter Active from 2026-09-21.** Tagging is `traffic_type=internal`, set in `base.njk` — see `SITE_GUIDE` "GA4 internal-traffic tagging". Until the "Internal Traffic" data filter is switched from Testing to Active, internal hits are still IN the reports (labelled, not excluded); from the Active date they are permanently dropped, so sessions/views step down by JM's own usage at that date.
 
+## 9.7. Is Bitcoin a Bubble? — the weekly bitcoin line (MONTHLY, from 2026-09-29)
+
+`/not-a-bubble`'s chart plots bitcoin as a multiple of its 2014 price, one point per
+week, in `BTC_DATA_2014` at the top of `src/_includes/_pageassets/not-a-bubble.js`
+(DATA_AUDIT NB-1). Nothing refreshed it until 2026-09-29, when it was found ending
+at 2026-03-15 — six months short of the chart's "today" point, with a visible gap.
+
+- **Source:** Yahoo Finance BTC-USD **daily close** (UTC) on each **Sunday**. The
+  keyless chart endpoint works from a script:
+  `https://query1.finance.yahoo.com/v8/finance/chart/BTC-USD?interval=1d&range=1y`
+  (`chart.result[0].timestamp` and `indicators.quote[0].close`).
+- **Append** one `{"x": …, "y": …}` per Sunday after the last stored point, through
+  the latest **completed** Sunday: `x = round((date − 2017-12-16) in days / 365.25, 4)`,
+  `y = round(close / START_PRICE, 4)` with `START_PRICE = 398.8210144042969` (the
+  2014-09-21 close). Both formulas reproduce every stored point exactly (13 of 13
+  checked on 2026-09-29); if a check point doesn't, stop and find out why.
+- **Never append a partial week.** The "today" point is drawn from the shared live
+  price, so the line doesn't need to reach today.
+- **Verify:** load `/not-a-bubble`; the line should end within a week of the today
+  point, and the ATH annotation (`2025 ATH $123,513`) should not move.
+
 ## 10. Claude project mirror refresh
 
 **Last mirror refresh: 2026-09-17** (update this line BEFORE exporting,
