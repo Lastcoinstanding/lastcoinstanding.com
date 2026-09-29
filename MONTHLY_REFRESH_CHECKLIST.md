@@ -592,15 +592,13 @@ For each value, verify against the source listed and update in the BFI files as 
 **`/bitcoin-vs-rental-property` dated figures (added 2026-09-27; DATA_AUDIT BvRP-1–8, 14–15, 18).** Refresh these with the Strategy block, from EDGAR, and update the as-of dates in the body, the Methodology list and DATA_AUDIT in the same edit:
 - Strategy BTC holdings, USD Reserve, and the published "Annual interest + preferred dividends" from the latest MSTR Investor Briefing (SEC FWP filing). When it changes, recompute the three coverage tiles: holdings × $100K / $50K / $30K ÷ that figure.
 - The convertible-note stress point (paraphrased from the latest quarterly results presentation; currently Q2 2026, p.11). Update it when the Q3 deck lands.
-- STRC rate and schedule. **Since PR 3 (#126) the rate constant lives in `src/_includes/_pageassets/shared/real-estate-model.js`**, twice: `calcYieldPortfolio` (`strc: alloc.strc * 0.12`) and `calcYieldPortfolioAtYearT` (`var strcDist = allocs.strc * 0.12`). Change both, together with:
-  - the Path 4 detail label in `bitcoin-vs-rental-property.js` (`@ 12.0% ROC`, in `renderPathDetail`);
-  - the STRC slider hint and tooltip in `src/bitcoin-vs-rental-property.njk` ("Strategy, 12%, ROC"; "Paying 12.00% annualized…");
-  - the $500K table's STRC row and the Year 1 / yield / 10-year cells.
+- STRC rate and schedule. **Since PR 4d the rate lives in one dated object, `YIELD_RATES`, in `src/_includes/_pageassets/shared/real-estate-model.js`** (`strc: 12.0`, with `asOf`); see §9.3a. The calculator, the Path 4 label, the slider hint and the $500K example's rate cells all read it. By hand, only the STRC tooltip in `src/bitcoin-vs-rental-property.njk` ("Paying 12.00% annualized…").
 - STRC's next rate announcement is due around **2026-09-30** (DATA_AUDIT BvRP-5).
 - **Verify after any rate change:** open either page with `?qa` and run `await rePairQA.run()` in the console. The hashes will change; that is expected. Record the new ones in the refresh commit.
 - Convertible notes outstanding.
 - SATA rate and schedule; Strive BTC holdings and the STRC shares in its reserve.
-- Monthly until the Ledn US LLC transition settles (from October 2026), then semiannually: the Ledn Growth Account rates (rendered page, not the HTML placeholders) and whether US residents are eligible. The rate constant is `0.05` in **`src/_includes/_pageassets/shared/real-estate-model.js`** since PR 3 (#126): `calcYieldPortfolio` (`ledn: alloc.ledn * 0.05`) and `calcYieldPortfolioAtYearT` (`var lednDist = allocs.ledn * 0.05`). Change both, together with the Path 4 label in `bitcoin-vs-rental-property.js` (`@ 5.0% ord.`), the Ledn slider hint and tooltip in `src/bitcoin-vs-rental-property.njk`, and the $500K table's Ledn row.
+- SATA's rate is `YIELD_RATES.sata` (§9.3a); by hand, only the SATA tooltip.
+- Monthly until the Ledn US LLC transition settles (from October 2026), then semiannually: the Ledn Growth Account rates (rendered page, not the HTML placeholders) and whether US residents are eligible. Since PR 4d the calculator doesn't use Ledn (the slice is generic stablecoin lending); Ledn is a row in `YIELD_RATES.verifiable` (§9.3a) and an example in the CeFi prose.
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
 
@@ -776,6 +774,17 @@ _Added 2026-09-28 (PR 4b; DATA_AUDIT RE-3–RE-13)._ Every sourced default for `
   - `insurancePer400K` (RE-10) from NerdWallet's average-cost page (keep the $400K dwelling-coverage basis), and BvRE's insurance tooltip.
   - `sellPct` (RE-12) from Clever's latest agent surveys (midpoint of the most recent two) + the 1% estimate, and the selling-costs tooltips on **both** pages.
 - **Verify after any change:** open each page with `?qa` and run `await rePairQA.run()`; the hashes move, which is expected. Record the new digests in the refresh commit.
+
+## 9.3a. Rental page: the dated rates object and the stablecoin-lending disclosure (MONTHLY, from PR 4d)
+
+_Added 2026-09-28 (PR 4d; rulings §7 item 12; DATA_AUDIT BvRP-5, BvRP-14, BvRP-28)._ `/bitcoin-vs-rental-property` takes every yield rate from **one object**, `YIELD_RATES`, in `src/_includes/_pageassets/shared/real-estate-model.js`: `asOf`, `strc`, `sata`, `lending`, and `verifiable` (the rows of the disclosure under the calculator). The calculator, the slider labels, the Path 4 rows, the $500K example's rate-dependent cells (`data-yr-ex`) and the disclosure table all read it, so a refresh is one edit plus the dated tooltips.
+
+- **STRC and SATA:** from the latest 8-Ks (with the Strategy and Strive blocks above). Set `strc` / `sata`.
+- **The verifiable lending rates:** run `python3 scripts/verify-real-estate-sources.py` (Item 12 section): FRED `DTB3` (3-month T-bill, the reference), and from DefiLlama (`https://yields.llama.fi/pools`, **base** APY, token rewards excluded, the largest pool per asset on Ethereum) the Sky Savings Rate (sUSDS), Aave v3 USDC and Compound v3 USDC. Update each row's `rate` and `source` date.
+- **Ledn:** re-check its rates page and whether US residents are eligible after the Ledn US LLC migration; update its row (`us`).
+- **The 4.0% default (`lending`):** move it only if the median of the four lending rows drifts more than half a point from it. Then also update the BvRP-28 row, and the Year 1 figures in the prose if any quote it.
+- **`asOf`:** the month of the refresh.
+- **Verify:** open the page with `?qa` and run `await rePairQA.run()`; the S-bvrp and yield-portfolio hashes move, which is expected. Record the new digests in the refresh commit.
 
 ## 9.4. Case-Shiller National — the retrospective's house end point (MONTHLY, from PR 6)
 
