@@ -708,16 +708,25 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // with the retrospective since PR 4e: reOwnershipVisual, above).
     function buildOwnershipVisual(){ return reOwnershipVisual(cash, P.equityPct, 'ecFwd'); }
 
-    // What the renter does each month, in words.
+    // What the renter does each month, in words: every sign case, with or
+    // without the difference invested (PR 4e, as the retrospective). The
+    // mixed case stays true however often the sign flips.
+    var ranOut = (P.ranOutMonth && P.btcHeld === 0) ? ('year ' + Math.ceil(P.ranOutMonth / 12)) : null;
+    var firstSpan = '<span class="' + (f1.diff < 0 ? 'negative' : 'highlight') + '">' + fmtSigned(f1.diff) + '/mo</span>';
     var monthlyLine;
     if(!invest){
-      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and spends the difference from the owner’s cost instead of investing it.';
+      if(f1.diff >= 0 && fN.diff >= 0) monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and spends the difference from the owner’s cost instead of investing it.';
+      else if(f1.diff < 0 && fN.diff < 0) monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1), which costs more than the owner pays; the extra comes from income, and the bitcoin is left alone.';
+      else monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1). When the owner pays more, the difference is spent instead of invested; when rent costs more, the extra comes from income.';
     } else if(f1.diff >= 0 && fN.diff >= 0){
-      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and invests what the owner pays beyond it: <span class="highlight">' + fmtSigned(f1.diff) + '/mo</span> in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.';
+      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and invests what the owner pays beyond it: ' + firstSpan + ' in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.';
     } else if(f1.diff < 0 && fN.diff < 0){
-      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1), which costs more than the owner pays, and sells bitcoin to cover it: <span class="negative">' + fmtSigned(f1.diff) + '/mo</span> in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.';
+      monthlyLine = ranOut
+        ? ('Each month: pays rent (' + fmt(f1.rent) + ' in year 1), which costs more than the owner pays, and sells bitcoin to cover it (' + firstSpan + ' in year 1) until the bitcoin runs out in ' + ranOut + '; after that the extra comes from income (' + fmtSigned(fN.diff) + '/mo by the last month).')
+        : ('Each month: pays rent (' + fmt(f1.rent) + ' in year 1), which costs more than the owner pays, and sells bitcoin to cover it: ' + firstSpan + ' in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.');
     } else {
-      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1) and invests the difference from the owner’s cost, ' + fmtSigned(f1.diff) + '/mo in year 1; by the last month rent costs more and it sells bitcoin instead (' + fmtSigned(fN.diff) + '/mo).';
+      monthlyLine = 'Each month: pays rent (' + fmt(f1.rent) + ' in year 1), invests the difference when the owner pays more, and sells bitcoin to cover rent when it costs more: ' + firstSpan + ' in year 1, ' + fmtSigned(fN.diff) + '/mo by the last month.'
+        + (ranOut ? ' The bitcoin runs out in ' + ranOut + '; after that, rent above the owner’s cost comes from income.' : '');
     }
     var btcFromMonthly = P.btcHeld - P.btcUpfront;
     var monthlyTotals = invest
@@ -736,13 +745,14 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="period-label">'+asOf+' · Projected ('+modePeriodLabel()+')</div>' +
         '<div class="big-number">'+fmt(modeVal(R.btcIfSold, P.btcIfSold))+' <span style="font-size:.8rem;color:var(--text-muted)">if sold</span></div>' +
         '<div class="big-number-label">'+(_mode === 'real' ? 'bitcoin, if sold, in today’s purchasing power' : 'bitcoin, if sold, in future dollars')+'</div>' +
-        buildHouseIcons(housesCanBuy) +
+        (P.btcHeld > 0 ? buildHouseIcons(housesCanBuy) : '') +
         '<div class="detail-line">BTC held: '+P.btcHeld.toFixed(4)+' <span style="'+mutedS+'">('+P.btcUpfront.toFixed(4)+' up front '+(btcFromMonthly >= 0 ? '+ ' : '− ')+Math.abs(btcFromMonthly).toFixed(4)+' from the monthly differences)</span></div>' +
         '<div class="detail-line">Projected BTC price: <strong>'+fmt(modeVal(R.priceEnd, P.priceEnd))+'</strong> <span style="'+mutedS+'">'+modeUnit()+'; '+scenarioLabel+'</span></div>' +
-        '<div class="detail-line">Value: '+fmt(modeVal(R.btcValue, P.btcValue))+'; sale costs ('+pctTxt(btcTxPct)+'): <span class="negative">−'+fmt(modeVal(R.btcSaleCost, P.btcSaleCost))+'</span></div>' +
+        (P.btcHeld > 0 ? '<div class="detail-line">Value: '+fmt(modeVal(R.btcValue, P.btcValue))+'; sale costs ('+pctTxt(btcTxPct)+'): <span class="negative">−'+fmt(modeVal(R.btcSaleCost, P.btcSaleCost))+'</span></div>' : '') +
         '<div class="detail-line">'+monthlyTotals+'</div>' +
-        '<div class="detail-line">Rent paid: '+fmt(P.totals.rent)+' <span style="'+mutedS+'">over '+yrs+' years, from income, like the owner’s costs</span></div>' +
-        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">— projected home value '+fmt(modeVal(R.homeEnd, P.homeEnd))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>' +
+        '<div class="detail-line">Rent paid: '+fmt(P.totals.rent)+' <span style="'+mutedS+'">over '+yrs+' years'+(invest && P.totals.sold > 0.5 ? ', '+fmt(P.totals.sold)+' of it from bitcoin sales and the rest from income' : ', from income, like the owner’s costs')+'</span></div>' +
+        (ranOut ? '<div class="detail-line" style="font-weight:500;margin-top:.6rem"><span class="negative">The bitcoin runs out in '+ranOut+': rent above the owner’s cost comes from income after that, and nothing is left to buy a house with.</span></div>' :
+        '<div class="detail-line" style="color:var(--amber);font-weight:500;margin-top:.6rem">You could buy '+housesCanBuy.toFixed(1)+' houses <strong>outright</strong> in '+endYear+' <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">— projected home value '+fmt(modeVal(R.homeEnd, P.homeEnd))+' each '+modeUnit()+', vs. '+fmt(homePrice)+' today</span></div>') +
       '</div>';
 
     // ── HOUSE CARD (right) ──
@@ -775,8 +785,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var eq = document.getElementById('fwdCashOutLine');
     if(eq){
       eq.innerHTML = invest
-        ? ('Both households paid out <strong>'+fmt(P.cumCashOutOwner)+'</strong> over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: '+fmt(P.upfront)+' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'
-            + (P.totals.shortfall > 0.5 ? ' <span class="negative">The renter’s bitcoin ran out, so '+fmt(P.totals.shortfall)+' of rent came from income.</span>' : ''))
+        ? (P.totals.shortfall > 0.5
+            ? ('The owner paid out <strong>'+fmt(P.cumCashOutOwner)+'</strong> and the renter <strong>'+fmt(P.cumCashOutRenter)+'</strong> over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: the same '+fmt(P.upfront)+' up front, then the renter matched the owner’s monthly costs with rent plus bitcoin purchases, or with bitcoin sales when rent cost more, until the bitcoin ran out in year '+Math.ceil(P.ranOutMonth / 12)+'. <span class="negative">After that, '+fmt(P.totals.shortfall)+' of rent above the owner’s cost came from income.</span>')
+            : ('Both households paid out <strong>'+fmt(P.cumCashOutOwner)+'</strong> over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: '+fmt(P.upfront)+' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'))
         : ('The owner paid out '+fmt(P.cumCashOutOwner)+' and the renter '+fmt(P.cumCashOutRenter)+' over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: with the toggle off, only the up-front sum goes into bitcoin.');
     }
   }
@@ -1132,7 +1143,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // is set from it in init().
     happr:     { elId: 'fwdHomeAppreciation',  type: 'float',     def: 4.68,    evt: 'input', dp: 2, persist: false },
     mortgage:  { elId: 'fwdMortgageRate',      type: 'float',     def: 6.8,     evt: 'input'  },
-    down:      { elId: 'fwdDownPct',           type: 'float',     def: 20,      evt: 'input'  },
+    down:      { elId: 'fwdDownPct',           type: 'float',     def: 20,      evt: 'input', dp: 2 },
     // PR 4b: the Baseline assumptions block's rent and cost inputs, and the
     // M2 toggle. Blank rent / rent growth / insurance mean "the sourced
     // default" and are omitted, like any default.

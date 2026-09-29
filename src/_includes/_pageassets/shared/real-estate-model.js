@@ -937,7 +937,7 @@
     var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
               invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
     var cumOwner = upfront, cumRenter = upfront;
-    var rows = [], yr = null, first = null, last = null;
+    var rows = [], yr = null, first = null, last = null, ranOutMonth = null;
     for (var m = 1; m <= n; m++) {
       var k = Math.floor((m - 1) / 12);
       if (!yr) yr = { year: k + 1, interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
@@ -971,6 +971,7 @@
             var cover = btc * price * (1 - tx);
             t.sold += cover; yr.btcSoldUsd += cover; yr.btcSold += btc;
             sf = need - cover; btc = 0;
+            if (ranOutMonth === null) ranOutMonth = m;
           }
         }
       } else if (diff > 0) {
@@ -1011,7 +1012,7 @@
     o.rentGrowthPct = rg * 100; o.rentDefault = rentDefault; o.insuranceDefault = insDefault;
     o.priceToRent = D.priceToRent;
     o.down = down; o.closing = closing; o.upfront = upfront; o.loan = loan; o.monthlyPI = pi;
-    o.first = first; o.last = last;
+    o.first = first; o.last = last; o.ranOutMonth = ranOutMonth;
     o.btcNow = btcNow; o.mult0 = mult0; o.targetMult = target;
     o.btcUpfront = btcUpfront; o.btcHeld = btc; o.priceEnd = priceEnd;
     o.futureTrend = futureTrend; o.futureFloor = futureTrend * PL_FLOOR; o.futureUpper = futureTrend * UPPER_TARGET;
