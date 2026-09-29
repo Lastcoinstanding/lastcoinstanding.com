@@ -26,6 +26,37 @@
 (function(){
   'use strict';
 
+  // ─── Pair defaults: sourced, dated (PR 4b; rulings M4, M6, §7) ────────
+  // One place for the figures both pages default to. Sources, method and
+  // next-due dates: DATA_AUDIT RE-6..RE-13; REAL_ESTATE_PAIR_PR4_SOURCES.md.
+  var PAIR_DEFAULTS = {
+    // 2025 average of FRED MSPUS ($415,400): the median price of NEW
+    // houses sold (Census/HUD), rounded. Latest full year, as M1.
+    homePrice: 415000,
+    // Zillow, US: ZHVI (typical value, middle tier) ÷ (12 × ZORI, all
+    // homes), August 2026. Default rent = price ÷ (12 × this). Semiannual.
+    priceToRent: 15.77,
+    priceToRentAsOf: 'August 2026',
+    // LodeStar, calendar-2025 purchases (report 27 Apr 2026): $4,528, or
+    // 1.04% of price, INCLUDING recording fees and transfer taxes.
+    closingPct: 1.04,
+    // ATTOM: effective tax rate on single-family homes, 2025.
+    propTaxPct: 0.90,
+    // NerdWallet analysis of Quadrant Information Services rates, 6 May
+    // 2026: about $2,490 a year for $400,000 of dwelling coverage. The
+    // default scales it to the home's price and grows it with the value.
+    insurancePer400K: 2490,
+    // Rule of thumb, no primary: 1% of current value a year.
+    maintPct: 1.0,
+    // 5.6% commission (Clever's 2026 agent surveys: 5.70% in March, 5.46%
+    // in August; midpoint) + 1% seller closing costs (an estimate: no
+    // national primary; state transfer taxes dominate). Both pages.
+    sellPct: 6.6,
+    // Spread and fees on each bitcoin purchase and sale: a stated
+    // estimate, so one side isn't charged and the other free (M6).
+    btcTxPct: 0.5
+  };
+
   // ═══════════════════════════════════════════════════════════════════
   // BvRP — /bitcoin-vs-rental-property
   // Moved verbatim from bitcoin-vs-rental-property.js (PR 3). The page
@@ -55,23 +86,73 @@
   }
   function niitApplies(brkt){ return brkt >= 32; }
 
-  // ─── Power Law-anchored bitcoin growth scenarios ───────────────────
-  // Three named scenarios, all derived from shared/power-law-data.js so
-  // they auto-recalibrate as bitcoin's current multiple-of-trend shifts.
-  //
-  //   stay   — Bitcoin maintains today's multiple-of-trend forever.
-  //            Growth rate ≈ trend CAGR from today's price (no reversion
-  //            benefit / penalty from current entry conditions).
-  //
-  //   trend  — Bitcoin reverts from today's multiple back to 1.0× trend
-  //            linearly over the holding period. When entering below
-  //            trend (current case at ~0.45×), this is the "entry-timing
-  //            advantage" case that produces above-trend CAGR.
-  //
-  //   upper  — Bitcoin drifts from today's multiple toward 2.5× trend
-  //            (historical above-cycle peak, conservative vs the 3.0×
-  //            channel ceiling) over the holding period.
-  //
+  // ─── One bitcoin scenario set for both pages (M3, PR 4c) ─────────────
+  // Floor · Stay at today's multiple · Trend · Upper, all derived from
+  // shared/power-law-data.js, so they recalibrate as bitcoin's multiple
+  // of the trend moves. Each moves the multiple in a straight line from
+  // today's to a target at the horizon end, then multiplies by the trend
+  // on that day:
+  //   floor  → PL_FLOOR (0.42×), the channel's lower bound
+  //   stay   → today's multiple (the default: no reversion either way;
+  //            grows at the trend's own rate)
+  //   trend  → 1× (the gap to trend closes by the horizon end)
+  //   upper  → 2.5× (a stress test; see cyclePeakMultiples for the record)
+  // Both engines (BvRP's scenarioGrowthFactor, BvRE's bvreProjection)
+  // read scenarioMultiple, so the two pages can't drift apart again.
+  var UPPER_TARGET = 2.5;
+  var SCENARIOS = ['floor', 'stay', 'trend', 'upper'];
+  function scenarioTarget(scenario, mult0){
+    if (scenario === 'stay') return mult0;
+    if (scenario === 'floor') return PL_FLOOR;
+    if (scenario === 'upper') return UPPER_TARGET;
+    return 1.0;
+  }
+  function scenarioMultiple(scenario, mult0, progress){
+    var p = Math.max(0, Math.min(1, progress));
+    return mult0 + (scenarioTarget(scenario, mult0) - mult0) * p;
+  }
+
+  // The record behind Upper's caveat, computed from the price series so it
+  // can't go stale: the highest multiple of trend in each cycle-top year
+  // since the genesis era (2013, 2017, 2021) and in the current cycle
+  // (2024 to date). PL_DATA is sampled about every 12 days, so a peak
+  // between samples is missed: these are lower bounds, as on The Floor.
+  // Returns [{ year, month, mult }].
+  function cyclePeakMultiples(){
+    if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function' || typeof GENESIS_TS !== 'number') return [];
+    var out = [];
+    [[2013, 2013], [2017, 2017], [2021, 2021], [2024, 9999]].forEach(function(w){
+      var best = null;
+      for (var i = 0; i < PL_DATA.length; i++) {
+        var d = PL_DATA[i][0], dt = new Date((GENESIS_TS + d * 86400) * 1000), y = dt.getUTCFullYear();
+        if (y < w[0] || y > w[1]) continue;
+        var m = PL_DATA[i][1] / plPrice(d);
+        if (!best || m > best.mult) best = { year: y, month: dt.getUTCMonth(), mult: m };
+      }
+      if (best) out.push(best);
+    });
+    return out;
+  }
+
+  // Upper's caveat as a sentence fragment, from cyclePeakMultiples():
+  // "past cycle peaks reached at least 12× trend (2013), 5.4× (2017) and
+  // 3.2× (2021), each lower than the last and none sustained; the peak so
+  // far in this cycle is 1.2× (December 2024)". "At least" because the
+  // samples are lower bounds; "each lower than the last" is only said
+  // while it is true.
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function upperRecordText(){
+    var pk = cyclePeakMultiples();
+    if (pk.length < 2) return '';
+    var past = pk.slice(0, -1), cur = pk[pk.length - 1];
+    function x(m){ return (m >= 10 ? m.toFixed(0) : m.toFixed(1)) + '\u00d7'; }
+    var parts = past.map(function(p, i){ return x(p.mult) + (i === 0 ? ' trend' : '') + ' (' + p.year + ')'; });
+    var list = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
+    var falling = past.every(function(p, i){ return i === 0 || p.mult < past[i - 1].mult; }) && cur.mult < past[past.length - 1].mult;
+    return 'past cycle peaks reached at least ' + list + (falling ? ', each lower than the last and none sustained' : ', none sustained') +
+           '; the peak so far in this cycle is ' + x(cur.mult) + ' (' + MONTHS[cur.month] + ' ' + cur.year + ')';
+  }
+
   // currentBTCMultiple() reads today's multiple at call time so the
   // chips and chart reflect the live Power Law state.
 
@@ -92,6 +173,7 @@
       // Fallback to flat CAGR if Power Law data not loaded yet
       var fallbackCAGR = scenario === 'stay' ? 0.20
                        : scenario === 'upper' ? 0.45
+                       : scenario === 'floor' ? 0.15
                        : 0.30;
       return Math.pow(1 + fallbackCAGR, t);
     }
@@ -105,17 +187,7 @@
     var futureTrend = plPrice(todayDays + t * 365.25);
     var progress = Math.min(t / Math.max(1, holdingYears), 1.0);
 
-    var targetMult;
-    if (scenario === 'stay') {
-      targetMult = currentMult;
-    } else if (scenario === 'upper') {
-      targetMult = currentMult + progress * (2.5 - currentMult);
-    } else {
-      // 'trend' (default): linear interp to 1.0× trend
-      targetMult = currentMult + progress * (1.0 - currentMult);
-    }
-
-    var futurePrice = targetMult * futureTrend;
+    var futurePrice = scenarioMultiple(scenario, currentMult, progress) * futureTrend;
     return futurePrice / todaySpot;
   }
 
@@ -135,9 +207,15 @@
     return { pretax: gross, depreciation: depreciation, tax: tax, afterTax: gross - tax };
   }
 
+  // Selling costs (% of sale price) and bitcoin's purchase factor, read
+  // from state with the pair defaults as fallback (PR 4b, M6). Selling
+  // costs were a hardcoded 8%; bitcoin purchases were free.
+  function sellCostPct(s){ return (s.sellCostPct !== undefined && s.sellCostPct !== null) ? s.sellCostPct : PAIR_DEFAULTS.sellPct; }
+  function btcBuyFactor(s){ return 1 - ((s.btcTxPct !== undefined && s.btcTxPct !== null) ? s.btcTxPct : PAIR_DEFAULTS.btcTxPct) / 100; }
+
   function calcRentalExit(s, yearsToExit){
     var appreciatedValue = s.propertyValue * Math.pow(1 + s.appreciationPct/100, yearsToExit);
-    var transactionCosts = appreciatedValue * 0.08;
+    var transactionCosts = appreciatedValue * sellCostPct(s) / 100;
     var netProceeds = appreciatedValue - transactionCosts;
 
     // Simplified accumulated depreciation across total holding (pre + post)
@@ -177,7 +255,8 @@
   // ─── Math: bitcoin paths ───
   // Spot BTC future value uses scenarioGrowthFactor — the growth path is
   // Power Law-anchored rather than a flat CAGR. The `holdingYears` arg
-  // matters because it sets the reversion horizon for 'trend' and 'upper'.
+  // matters because it sets the horizon over which every scenario but
+  // 'stay' moves to its target multiple (M3).
   function calcSpotBTCFV(amount, years, scenario, holdingYears){
     return amount * scenarioGrowthFactor(scenario, years, holdingYears || years);
   }
@@ -205,8 +284,8 @@
     // 10-year cumulative cash (flat yield assumption)
     var cumulativeCash = year1AfterTax * s.holdingYears;
 
-    // Spot BTC FV
-    var spotFV = calcSpotBTCFV(alloc.spot, s.holdingYears, s.btcScenario);
+    // Spot BTC FV (bought net of the bitcoin transaction cost, M6)
+    var spotFV = calcSpotBTCFV(alloc.spot * btcBuyFactor(s), s.holdingYears, s.btcScenario);
     var spotAppreciation = spotFV - alloc.spot;
 
     // Total wealth at year N
@@ -255,7 +334,7 @@
   function calcPath1(s){
     var exitNow = calcRentalExit(s, 0);
     var netCash = exitNow.netCash;
-    var spotFV = calcSpotBTCFV(netCash, s.holdingYears, s.btcScenario);
+    var spotFV = calcSpotBTCFV(netCash * btcBuyFactor(s), s.holdingYears, s.btcScenario);
     return {
       saleAtYear0: exitNow,
       year1CashFlow: 0,  // pure spot, no distributions
@@ -269,7 +348,7 @@
     var helocDraw = Math.max(0, maxCltvDollar - s.existingMortgage);
     var annualCarry = helocDraw * (s.helocRatePct/100);
     var cumulativeCarry = annualCarry * s.holdingYears;
-    var btcFV = calcSpotBTCFV(helocDraw, s.holdingYears, s.btcScenario);
+    var btcFV = calcSpotBTCFV(helocDraw * btcBuyFactor(s), s.holdingYears, s.btcScenario);
 
     // Net wealth gain from leveraged BTC position
     var grossGain = btcFV - helocDraw;  // BTC appreciation
@@ -376,7 +455,7 @@
     var year1AfterTax = pretax - ordTax;
     var cumCash = year1AfterTax * t;
     var scenario = scenarioOverride || s.btcScenario;
-    var spotFV = allocs.spot * scenarioGrowthFactor(scenario, t, s.holdingYears);
+    var spotFV = allocs.spot * btcBuyFactor(s) * scenarioGrowthFactor(scenario, t, s.holdingYears);
     var preserved = allocs.strc + allocs.sata + allocs.ledn;
     return preserved + spotFV + cumCash;
   }
@@ -407,11 +486,11 @@
       var wealthPath;
       if (sUse.path === 1) {
         var exitNow = calcRentalExit(sUse, 0);
-        wealthPath = exitNow.netCash * growth;
+        wealthPath = exitNow.netCash * btcBuyFactor(sUse) * growth;
       } else if (sUse.path === 2) {
         var maxCltv = sUse.propertyValue * (sUse.helocLtv/100);
         var heloc = Math.max(0, maxCltv - sUse.existingMortgage);
-        var btcVal = heloc * growth;
+        var btcVal = heloc * btcBuyFactor(sUse) * growth;
         var carry = heloc * (sUse.helocRatePct/100) * t;
         wealthPath = wealthKeep + btcVal - heloc - carry;
       } else if (sUse.path === 3) {
@@ -535,120 +614,170 @@
     return o;
   }
 
-  // Projection DCA — was computeProjectionDca() in re.js, verbatim.
-  function projectionDca(method, btcNow, futurePrice, monthlyMort, impliedRent, horizonYrs){
-    if(method !== 'mortgage') return null;
-    var monthlySavings = Math.max(0, monthlyMort - impliedRent);
-    if(monthlySavings <= 0 || btcNow <= 0 || futurePrice <= 0) return null;
-    var dcaBtc = 0;
-    var totalMonths = horizonYrs * 12;
-    for(var m = 0; m < totalMonths; m++){
-      var frac = m / totalMonths;
-      var monthPrice = btcNow * Math.pow(futurePrice/btcNow, frac);
-      dcaBtc += monthlySavings / monthPrice;
-    }
-    return {
-      dcaBtc: dcaBtc,
-      dcaInvested: monthlySavings * totalMonths,
-      monthlySavings: monthlySavings
-    };
-  }
-
-  // Projection — was the math inside runFwdCalc() in re.js.
-  //   i: { method, scenario, horizonYrs, btcNow, homePrice, homeApprNominal,
-  //        inflRate, mortRate, dpf, rentOverride (number|null) }
-  // Uses plPrice/PL_FLOOR/PL_CEIL/GENESIS_TS (power-law-data.js) and CalcHelpers.
+  // ─── BvRE projection: equal cash out (PR 4b) ─────────────────────────
+  // Rulings M2 (equal cash out; replaces the "Go deeper" DCA and the
+  // cash-mode S&P leg), M4 (market rent), M5 (rent path), M6 (costs), on
+  // PR 4a's nominal frame and single horizon (M1, M10).
   //
-  // PR 4a (rulings M1, M10):
-  //  - Home appreciation is a NOMINAL input. Everything is computed in
-  //    nominal dollars; inflRate only deflates the Real view, and it
-  //    deflates both paths by the same factor, so it can't change which
-  //    path is ahead. (It used to convert a real rate to nominal at the
-  //    sitewide inflation, and the Real view subtracted nominal rent from
-  //    deflated bitcoin.)
-  //  - Bitcoin runs the same horizon as the house: today + horizonYrs
-  //    365.25-day years (it used to stop at 1 Jan of the end year).
+  // Both households spend the same every month:
+  //  - At purchase the buyer pays the down payment (or the whole price)
+  //    plus closing costs; the renter puts the same sum into bitcoin.
+  //  - Each month the owner pays P&I + property tax + insurance +
+  //    maintenance. The renter pays rent and, with "invests the
+  //    difference" on, buys bitcoin with (owner's cost − rent), or sells
+  //    bitcoin to cover rent when rent costs more. Off: only the upfront
+  //    sum is invested; monthly differences are spent or paid from income.
+  //  - Rent starts at market (price ÷ 12 ÷ price-to-rent) unless given,
+  //    and steps up once a year at the rent-growth rate (default: home
+  //    appreciation, i.e. a constant price-to-rent). Property tax,
+  //    insurance and maintenance follow the home's value, stepping once a
+  //    year in the same way.
+  //  - Bitcoin's price each month follows the scenario's path (M3,
+  //    scenarioMultiple above): its multiple of the Power Law trend moves
+  //    in a straight line from today's multiple to the scenario's target
+  //    at the horizon end, times the trend on that day. Purchases and
+  //    sales pay the bitcoin transaction cost.
+  //  - At the end, If sold (before tax, which is PR 5): house value −
+  //    selling costs − loan balance; bitcoin value − the transaction cost.
+  //    Held: before those costs. Real = nominal ÷ (1 + inflation)^years for
+  //    every end value, one factor for both paths.
+  //   i: { method 'mortgage'|'cash', scenario 'floor'|'stay'|'trend'|'upper',
+  //        horizonYrs, btcNow, homePrice, homeApprNominal, inflRate,
+  //        mortRate, dpf, rent (month-1 $/mo | null), rentGrowth (% | null),
+  //        closingPct, propTaxPct, insurance ($/yr in year 1 | null),
+  //        maintPct, sellPct, btcTxPct, investDiff (bool) }
+  //   Returns end values (nominal and real), the year-1 and final monthly
+  //   figures the cards quote, totals, and one row per year (the ledger
+  //   PR 6 renders; cumulative cash out equal on both sides by
+  //   construction while the difference is invested).
   function bvreProjection(i){
+    var D = PAIR_DEFAULTS;
+    var method = i.method, horizonYrs = i.horizonYrs, btcNow = i.btcNow, homePrice = i.homePrice;
+    var n = Math.round(horizonYrs * 12);
+    var g = i.homeApprNominal / 100;
+    var rg = ((i.rentGrowth === null || i.rentGrowth === undefined) ? i.homeApprNominal : i.rentGrowth) / 100;
+    var tx = i.btcTxPct / 100;
+    var invest = i.investDiff !== false;
+    var defl = Math.pow(1 + i.inflRate / 100, horizonYrs);
+    function toReal(v){ return v / defl; }
+
+    var cash = method === 'cash';
+    var loan = cash ? 0 : homePrice * (1 - i.dpf);
+    var down = cash ? homePrice : homePrice * i.dpf;
+    var closing = homePrice * i.closingPct / 100;
+    var upfront = down + closing;
+    var mr = i.mortRate / 100 / 12;
+    var pi = loan > 0 ? mortgagePayment(loan, i.mortRate, 30, 'le0') : 0;
+    var rentDefault = homePrice / (12 * D.priceToRent);
+    var rent0 = (i.rent === null || i.rent === undefined) ? rentDefault : i.rent;
+    var insDefault = D.insurancePer400K * homePrice / 400000;
+    var ins0 = (i.insurance === null || i.insurance === undefined) ? insDefault : i.insurance;
+
+    // Bitcoin's monthly price path (see header).
+    var d0 = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var mult0 = btcNow / plPrice(d0);
+    var target = scenarioTarget(i.scenario, mult0);
+    function priceAt(m){ return scenarioMultiple(i.scenario, mult0, m / n) * plPrice(d0 + (m / 12) * 365.25); }
+
+    var btcUpfront = upfront * (1 - tx) / btcNow;
+    var btc = btcUpfront;
+    var bal = loan;
+    var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
+              invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
+    var cumOwner = upfront, cumRenter = upfront;
+    var rows = [], yr = null, first = null, last = null;
+    for (var m = 1; m <= n; m++) {
+      var k = Math.floor((m - 1) / 12);
+      if (!yr) yr = { year: k + 1, interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
+                      btcBoughtUsd: 0, btcSoldUsd: 0, btcBought: 0, btcSold: 0, shortfall: 0 };
+      var vk = homePrice * Math.pow(1 + g, k);
+      var interest = 0, principal = 0;
+      if (bal > 0) {
+        interest = bal * mr;
+        principal = Math.min(pi - interest, bal);
+        bal -= principal;
+        if (bal < 1e-6) bal = 0;
+      }
+      var tax = vk * i.propTaxPct / 100 / 12;
+      var ins = ins0 * Math.pow(1 + g, k) / 12;
+      var maint = vk * i.maintPct / 100 / 12;
+      var owner = interest + principal + tax + ins + maint;
+      var rent = rent0 * Math.pow(1 + rg, k);
+      var diff = owner - rent;
+      if (m === 1) first = { owner: owner, pi: interest + principal, tax: tax, ins: ins, maint: maint, rent: rent, diff: diff };
+      if (m === n) last = { owner: owner, rent: rent, diff: diff };
+      var price = priceAt(m);
+      var sf = 0;
+      if (invest) {
+        if (diff > 0) {
+          var b = diff * (1 - tx) / price;
+          btc += b; t.invested += diff; yr.btcBoughtUsd += diff; yr.btcBought += b;
+        } else if (diff < 0) {
+          var need = -diff, sell = need / (price * (1 - tx));
+          if (sell <= btc) { btc -= sell; t.sold += need; yr.btcSoldUsd += need; yr.btcSold += sell; }
+          else {
+            var cover = btc * price * (1 - tx);
+            t.sold += cover; yr.btcSoldUsd += cover; yr.btcSold += btc;
+            sf = need - cover; btc = 0;
+          }
+        }
+      } else if (diff > 0) {
+        t.spent += diff;
+      } else {
+        t.fromIncome += -diff;
+      }
+      t.shortfall += sf; yr.shortfall += sf;
+      t.interest += interest; t.principal += principal; t.tax += tax; t.ins += ins; t.maint += maint;
+      t.owner += owner; t.rent += rent;
+      yr.interest += interest; yr.principal += principal; yr.tax += tax; yr.ins += ins; yr.maint += maint;
+      yr.owner += owner; yr.rent += rent;
+      cumOwner += owner;
+      cumRenter += invest ? (owner + sf) : rent;
+      if (m % 12 === 0 || m === n) {
+        yr.months = m; yr.homeValue = homePrice * Math.pow(1 + g, m / 12); yr.balance = bal;
+        yr.equity = yr.homeValue - bal; yr.btcPrice = price; yr.btcHeld = btc; yr.btcValue = btc * price;
+        yr.cumCashOutOwner = cumOwner; yr.cumCashOutRenter = cumRenter;
+        rows.push(yr); yr = null;
+      }
+    }
+
     var o = {};
-    var method = i.method, horizonYrs = i.horizonYrs, btcNow = i.btcNow, homePrice = i.homePrice,
-        inflRate = i.inflRate, mortRate = i.mortRate, dpf = i.dpf;
-    function toReal(nominalFutureValue) {
-      return window.CalcHelpers.deflateToToday(nominalFutureValue, inflRate, horizonYrs);
-    }
-    var homeApprNominalPct = i.homeApprNominal;
-    var homeAppr = homeApprNominalPct / 100;
-    // The same rate in today's dollars, for display only.
-    var homeApprRealPct = ((1 + homeAppr) / (1 + inflRate / 100) - 1) * 100;
-    var amount = (method === 'cash') ? homePrice : homePrice * dpf;
-    var loanAmt = homePrice * (1 - dpf);
-    var mr = mortRate / 100 / 12;
-    var nPayments = 360;
-    var monthlyMort = mortgagePayment(loanAmt, mortRate, 30, 'le0');
-    var impliedRent = (i.rentOverride !== null && i.rentOverride !== undefined) ? i.rentOverride : (monthlyMort * 0.75);
-    var totalRentPaid = impliedRent * 12 * horizonYrs;
+    var homeEnd = homePrice * Math.pow(1 + g, horizonYrs);
+    var sellCosts = homeEnd * i.sellPct / 100;
+    var houseHeld = homeEnd - bal;
+    var houseIfSold = homeEnd - sellCosts - bal;
+    var priceEnd = priceAt(n);
+    var btcValue = btc * priceEnd;
+    var btcSaleCost = btcValue * tx;
+    var btcIfSold = btcValue - btcSaleCost;
+    var futureTrend = plPrice(d0 + horizonYrs * 365.25);
 
-    var btcBought = amount / btcNow;
-    var nowMs = Date.now();
-    var futureDays = (nowMs / 1000 - GENESIS_TS) / 86400 + horizonYrs * 365.25;
-    var endDateMs = nowMs + horizonYrs * 365.25 * 86400000;
-    var futureTrend = plPrice(futureDays);
-    var futureFloor = futureTrend * PL_FLOOR;
-    var futureCeil = futureTrend * PL_CEIL;
-    var futurePrice;
-    if(i.scenario === 'floor'){ futurePrice = futureFloor; }
-    else if(i.scenario === 'trend'){ futurePrice = futureTrend; }
-    else { futurePrice = futureCeil; }
-
-    var btcValue = btcBought * futurePrice;
-    var btcNet = btcValue - totalRentPaid;
-    var btcValueReal = toReal(btcValue);
-    var futurePriceReal = toReal(futurePrice);
-    // Same factor as the house (M1): the rent netted off at the end is
-    // deflated with the value it is netted from.
-    var totalRentPaidReal = toReal(totalRentPaid);
-    var btcNetReal = toReal(btcNet);
-    var btcReturn = ((btcNetReal - amount) / amount * 100).toFixed(0);
-    var btcCAGR = btcNetReal > 0 ? ((Math.pow(btcNetReal/amount, 1/horizonYrs) - 1) * 100).toFixed(1) : '—';
-
-    var futureHomeValue = homePrice * Math.pow(1 + homeAppr, horizonYrs);
-    var futureHomeValueReal = toReal(futureHomeValue);
-    var bal = 0, equity = futureHomeValue, interestPaid = 0, totalMortPaid = 0;
-    if(method === 'mortgage'){
-      var monthsPaid = horizonYrs * 12;
-      bal = amortizeBalance(loanAmt, mr, Math.min(monthsPaid, nPayments), monthlyMort);
-      bal = Math.max(0, bal);
-      equity = futureHomeValue - bal;
-      totalMortPaid = monthlyMort * Math.min(monthsPaid, nPayments);
-      interestPaid = totalMortPaid - (loanAmt - bal);
-    }
-    var equityReal = toReal(equity);
-    var propTax = homePrice * 0.012 * horizonYrs;
-    var insurance = 150 * 12 * horizonYrs;
-    var maintenance = homePrice * 0.01 * horizonYrs;
-    var totalHouseCost = amount + totalMortPaid + propTax + insurance + maintenance;
-    var housesCanBuy = Math.max(0, btcNetReal / futureHomeValueReal);
-    var equityPct = futureHomeValue > 0 ? Math.round((equity / futureHomeValue) * 100) : 0;
-
-    o.homeApprNominalPct = homeApprNominalPct; o.homeAppr = homeAppr; o.homeApprRealPct = homeApprRealPct;
-    o.amount = amount; o.loanAmt = loanAmt;
-    o.mr = mr; o.nPayments = nPayments; o.monthlyMort = monthlyMort; o.impliedRent = impliedRent;
-    o.totalRentPaid = totalRentPaid; o.totalRentPaidReal = totalRentPaidReal;
-    o.btcBought = btcBought; o.futureDays = futureDays; o.endDateMs = endDateMs;
-    o.futureTrend = futureTrend; o.futureFloor = futureFloor; o.futureCeil = futureCeil; o.futurePrice = futurePrice;
-    o.btcValue = btcValue; o.btcNet = btcNet; o.btcValueReal = btcValueReal; o.futurePriceReal = futurePriceReal;
-    o.btcNetReal = btcNetReal; o.btcReturn = btcReturn; o.btcCAGR = btcCAGR;
-    o.futureHomeValue = futureHomeValue; o.futureHomeValueReal = futureHomeValueReal;
-    o.bal = bal; o.equity = equity; o.interestPaid = interestPaid; o.totalMortPaid = totalMortPaid;
-    o.equityReal = equityReal; o.propTax = propTax; o.insurance = insurance; o.maintenance = maintenance;
-    o.totalHouseCost = totalHouseCost; o.housesCanBuy = housesCanBuy; o.equityPct = equityPct;
+    o.nowMs = Date.now(); o.endDateMs = o.nowMs + horizonYrs * 365.25 * 86400000;
+    o.months = n; o.investDiff = invest; o.method = method;
+    o.homeApprNominalPct = i.homeApprNominal;
+    o.homeApprRealPct = ((1 + g) / (1 + i.inflRate / 100) - 1) * 100;
+    o.rentGrowthPct = rg * 100; o.rentDefault = rentDefault; o.insuranceDefault = insDefault;
+    o.priceToRent = D.priceToRent;
+    o.down = down; o.closing = closing; o.upfront = upfront; o.loan = loan; o.monthlyPI = pi;
+    o.first = first; o.last = last;
+    o.btcNow = btcNow; o.mult0 = mult0; o.targetMult = target;
+    o.btcUpfront = btcUpfront; o.btcHeld = btc; o.priceEnd = priceEnd;
+    o.futureTrend = futureTrend; o.futureFloor = futureTrend * PL_FLOOR; o.futureUpper = futureTrend * UPPER_TARGET;
+    o.impliedGrowthPct = (Math.pow(priceEnd / btcNow, 1 / horizonYrs) - 1) * 100;
+    o.btcValue = btcValue; o.btcSaleCost = btcSaleCost; o.btcIfSold = btcIfSold;
+    o.homeEnd = homeEnd; o.balance = bal; o.sellCosts = sellCosts; o.houseHeld = houseHeld; o.houseIfSold = houseIfSold;
+    o.equityPct = homeEnd > 0 ? Math.round((houseHeld / homeEnd) * 100) : 0;
+    o.real = {
+      btcValue: toReal(btcValue), btcIfSold: toReal(btcIfSold), btcSaleCost: toReal(btcSaleCost), priceEnd: toReal(priceEnd),
+      homeEnd: toReal(homeEnd), sellCosts: toReal(sellCosts), balance: toReal(bal),
+      houseHeld: toReal(houseHeld), houseIfSold: toReal(houseIfSold)
+    };
+    o.deflator = defl;
+    o.housesCanBuy = homeEnd > 0 ? Math.max(0, btcIfSold / homeEnd) : 0;
+    o.totals = t;
+    o.cumCashOutOwner = cumOwner; o.cumCashOutRenter = cumRenter;
+    o.rows = rows;
     return o;
-  }
-
-  // Imputed rent into an index fund (the projection's cash-mode "go
-  // deeper" leg) — was inline in renderAdvanced(). Retired by M2 in PR 6.
-  function imputedRentFV(impliedRent, rate, months){
-    var monthlyRate = rate / 12;
-    return monthlyRate > 0 ? impliedRent * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) : impliedRent * months;
   }
 
   // ─── Ledger (PR 3: built, not rendered; PR 6 renders it) ──────────
@@ -711,9 +840,15 @@
     // BvRE
     bvreRetro: bvreRetro,
     bvreProjection: bvreProjection,
-    projectionDca: projectionDca,
-    imputedRentFV: imputedRentFV,
     ledgerRetro: ledgerRetro,
+    PAIR_DEFAULTS: PAIR_DEFAULTS,
+    // bitcoin scenarios (M3), shared by both pages
+    SCENARIOS: SCENARIOS,
+    UPPER_TARGET: UPPER_TARGET,
+    scenarioTarget: scenarioTarget,
+    scenarioMultiple: scenarioMultiple,
+    cyclePeakMultiples: cyclePeakMultiples,
+    upperRecordText: upperRecordText,
     // BvRP (original names kept so the page's aliases read 1:1)
     STATE_CAPGAIN: STATE_CAPGAIN,
     STATE_PROP_TAX_RATE: STATE_PROP_TAX_RATE,
