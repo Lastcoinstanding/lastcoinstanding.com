@@ -463,7 +463,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // visible. Parsers in runCalculator already strip $ , % whitespace
     // so internal math is unaffected.
     (function(){
-        function fmtMoney(el){if(!el) return;var raw=(el.value||'').replace(/[^0-9.]/g,'');if(!raw){el.value='';return;}var n=parseFloat(raw);if(!isFinite(n)){el.value='';return;}el.value='$'+Math.round(n).toLocaleString();}
+        function fmtMoney(el){if(!el) return;var raw=(el.value||'').replace(/[^0-9.]/g,'');if(!raw){el.value='';return;}var n=parseFloat(raw);if(!isFinite(n)){el.value='';return;}el.value='$'+Math.round(n).toLocaleString('en-US');}
         function fmtPercent(el){if(!el) return;var raw=(el.value||'').replace(/[^0-9.]/g,'');if(!raw){el.value='';return;}var n=parseFloat(raw);if(!isFinite(n)){el.value='';return;}el.value=parseFloat(n.toFixed(2))+'%';}
         var hp=document.getElementById('customHomePrice');if(hp) hp.addEventListener('blur',function(){fmtMoney(hp);});
         var rt=document.getElementById('customRent');if(rt) rt.addEventListener('blur',function(){fmtMoney(rt);});
@@ -528,11 +528,14 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       typed = true;
       if(status) status.textContent = '';
     });
-    input.value = '$' + Math.round(TODAY_PRICE).toLocaleString();
+    // Values written into inputs use US formatting, whatever the browser's
+    // locale: the parsers strip "$" and "," only, so "$77.219" (de-DE) would
+    // read as $77.
+    input.value = '$' + Math.round(TODAY_PRICE).toLocaleString('en-US');
     runFwdCalc();
     fetchTodayPrice(function(p, source){
       if(typed) return;
-      input.value = '$' + Math.round(p).toLocaleString();
+      input.value = '$' + Math.round(p).toLocaleString('en-US');
       if(status) status.textContent = source === 'live' ? '(live)' : todayPriceNote(source).trim();   // "(latest monthly data)", as on the retrospective
       runFwdCalc();
     });
@@ -579,7 +582,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   (function applyPairDefaults(){
     var D = RealEstateModel.PAIR_DEFAULTS;
     function set(id, v){ var el = document.getElementById(id); if(el) el.value = v; }
-    set('fwdHomePrice', '$' + D.homePrice.toLocaleString());
+    set('fwdHomePrice', '$' + D.homePrice.toLocaleString('en-US'));   // US format in any locale (the parser strips "," only)
     set('fwdClosingPct', D.closingPct + '%');
     set('fwdPropTaxPct', D.propTaxPct + '%');
     set('fwdMaintPct', D.maintPct + '%');
@@ -813,7 +816,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         if(!raw){ el.value = ''; return; }
         var n = parseFloat(raw);
         if(!isFinite(n)){ el.value = ''; return; }
-        el.value = '$' + Math.round(n).toLocaleString();
+        el.value = '$' + Math.round(n).toLocaleString('en-US');
       });
     }
     function bindPercent(id, dp){
