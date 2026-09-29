@@ -2,6 +2,18 @@
   {
     "display": "9/29/26",
     "date": "2026-09-29",
+    "page": "/not-a-bubble",
+    "summary": "Is Bitcoin a Bubble?: Corrected the crash count. Bitcoin has fallen more than 75% four times (2011, 2014–15, 2018, 2022), not \"over 80% three times\"; 2022's fall was 77%. The chart's price labels now say they are weekly closes."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/the-gallery",
+    "summary": "Corrections across the site: The Gallery no longer says bitcoin beat the S&P 500 in every 5-year window (entries at the 2017 and 2021 peaks trailed). Also corrected: Lump Sum's recovery claim, Borrowing's worked example and its PARITY Act statement (a draft, not law), Bull & Bear's price reference, and the date of Executive Order 6102 (1933)."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
     "page": "/bitcoin-vs-rental-property",
     "summary": "Bitcoin vs. Rental Property: results now show in today's dollars by default, with a Real / Nominal toggle as on Bitcoin vs. Real Estate, and a line under it explaining the difference. Home appreciation and the inflation rate are set in Baseline assumptions, and a change on either page carries to the other."
   },
