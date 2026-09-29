@@ -109,6 +109,17 @@
        rental income and lending interest, and the STRC/SATA return-of-
        capital basis. Every BvRP vector moves except P9 (no taxable rental
        income, no HELOC draw) and S-bvrp; BvRE is unchanged.
+     PR 5b (M7, M9) — tax on a sale, both pages. BvRE's cards lead with the
+       after-tax figure, if sold (the home-sale exclusion, bitcoin's gain over
+       its cost basis, coins sold along the way), and "houses it could buy"
+       uses the after-tax figure: every retrospective and projection vector
+       moves except E19 (the scenario line). BvRP's headline, chips and table
+       compare the two sides if sold at year N, after tax: every vector moves
+       except S-bvrp. Both pages pin the tax profile (United States, married
+       filing jointly, 24%, typical state; R7). New: E25 (no capital-gains
+       tax), E26 (a $1.5M house, 20 years, single: the gain exceeds the
+       exclusion), P25 (no capital-gains tax), P26 (Path 1, 20 years, 35%,
+       NIIT applies).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -158,7 +169,8 @@
   ];
   var PROJ_BASE = { scenario: 'stay', method: 'mortgage', down: '20', home: '415000', horizon: '10',
                     appr: '4.68', rate: '6.8', rent: '', rentg: '', close: '1.04', ptax: '0.9', ins: '',
-                    maint: '1', sell: '6.6', btctx: '0.5', invest: true, display: 'real', infl: 'm2-growth' };
+                    maint: '1', sell: '6.6', btctx: '0.5', invest: true, display: 'real', infl: 'm2-growth',
+                    regime: 'us', filing: 'mfj', bracket: '24', state: 'OTHER' };
   var PROJ = [
     { id: 'E6',  desc: 'proj defaults ($415K, 10y, stay, mortgage 20%, Real)' },
     { id: 'E7',  desc: 'proj defaults, Nominal display', display: 'nominal' },
@@ -177,7 +189,9 @@
     { id: 'E18', desc: 'proj trend (the pre-4c default)', scenario: 'trend' },
     { id: 'E19', desc: 'scenario line and Stay button, each scenario at defaults', growth: true },
     { id: 'E22', desc: 'proj, custom deflator 2.5% (PR 4f)', infl: 'custom', inflVal: 2.5 },
-    { id: 'E23', desc: 'proj, Shadow Stats deflator 8% (PR 4f)', infl: 'shadow-stats' }
+    { id: 'E23', desc: 'proj, Shadow Stats deflator 8% (PR 4f)', infl: 'shadow-stats' },
+    { id: 'E25', desc: 'proj, no capital-gains tax (PR 5b)', regime: 'none' },
+    { id: 'E26', desc: 'proj, $1.5M house, 20y, single: gain above the exclusion (PR 5b)', home: '1500000', horizon: '20', filing: 'single' }
   ];
 
   // The deflator: a preset, or a custom value (PR 4f).
@@ -186,8 +200,14 @@
     if (!MA) return;
     if (x.infl === 'custom') MA.set('inflation', 'custom', x.inflVal); else MA.set('inflation', x.infl);
   }
+  // BvRE's tax profile (PR 5b): one block for both calculators.
+  function setTax(x){
+    setVal('reTaxRegime', x.regime || 'us', ['change']); setVal('reFiling', x.filing || 'mfj', ['change']);
+    setVal('reBracket', x.bracket || '24', ['change']); setVal('reState', x.state || 'OTHER', ['change']);
+  }
   function applyRetro(v){
     var x = Object.assign({}, RETRO_BASE, v);
+    setTax(x);
     click('.toggle-group .toggle-btn[data-mode="' + x.mode + '"]');
     setVal('calcYear', x.year, ['change']);            // clears the custom inputs
     var d = el('calcInvestDiff');
@@ -206,6 +226,7 @@
     var x = Object.assign({}, PROJ_BASE, v);
     var MA = window.ModelingAssumptions;
     setInfl(x); MA.set('homeApprNominal', 'since-2000'); MA.set('realReturns', 'diversified');
+    setTax(x);
     click('.purchase-btn[data-method="' + x.method + '"]');   // also resets the advanced box
     click('.scenario-btn[data-scenario="' + x.scenario + '"]');
     click('.display-mode-btn[data-mode="' + x.display + '"]');
@@ -241,7 +262,7 @@
   var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
                   props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5',
-                  mortRate: '4.4', mortYears: '20', display: 'nominal', infl: 'm2-growth', zoom: 'full' };
+                  mortRate: '4.4', mortYears: '20', display: 'nominal', infl: 'm2-growth', zoom: 'full', regime: 'us' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -271,7 +292,9 @@
     { id: 'P21', desc: 'Real view: CPI deflator 3.5%', display: 'real', infl: 'cpi-official' },
     { id: 'P22', desc: 'Real view: custom deflator 0% (every figure = Nominal)', display: 'real', infl: 'custom', inflVal: 0 },
     { id: 'P23', desc: 'Real view: Path 1, hold 30y', display: 'real', path: '1', hold: '30' },
-    { id: 'P24', desc: 'Real view: first 3 years of the chart', display: 'real', zoom: 'first3' }
+    { id: 'P24', desc: 'Real view: first 3 years of the chart', display: 'real', zoom: 'first3' },
+    { id: 'P25', desc: 'no capital-gains tax (PR 5b)', regime: 'none' },
+    { id: 'P26', desc: 'Path 1, 20y, 35% bracket: NIIT applies (PR 5b)', path: '1', hold: '20', bracket: '35' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
@@ -286,6 +309,7 @@
     setVal('calc-property-value', x.value); setVal('calc-net-yield', x.yld); setVal('calc-holding-years', x.hold);
     setVal('calc-adjusted-basis', x.basis); setVal('calc-years-held', x.held);
     setVal('calc-state', x.state, ['change']); setVal('calc-bracket', x.bracket, ['change']);
+    setVal('calc-tax-regime', x.regime, ['change']);   // PR 5b
     setVal('calc-heloc-ltv', x.ltv); setVal('calc-heloc-rate', x.helocRate); setVal('calc-existing-mortgage', x.mortgage);
     setVal('calc-mortgage-rate', x.mortRate); setVal('calc-mortgage-years', x.mortYears);
     setVal('calc-num-properties', x.props); setVal('calc-properties-retained', x.retained);
