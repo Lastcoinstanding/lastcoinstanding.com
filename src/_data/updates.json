@@ -2,6 +2,12 @@
   {
     "display": "9/29/26",
     "date": "2026-09-29",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: Corrected the tax model. Depreciation recapture is now taxed at your bracket's rate, capped at 25%, and depreciation runs on the original building cost rather than today's value. Rental income and lending interest now pay state tax. STRC and SATA return of capital lowers your cost basis, and once it runs out (around year 8 or 9) later payments are taxed as capital gains. At the defaults the bitcoin path's lead rises from about $49K to about $54K in today's dollars."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
     "page": "/not-a-bubble",
     "summary": "Is Bitcoin a Bubble?: Corrected the crash count. Bitcoin has fallen more than 75% four times (2011, 2014–15, 2018, 2022), not \"over 80% three times\"; 2022's fall was 77%. The chart's price labels now say they are weekly closes."
   },
