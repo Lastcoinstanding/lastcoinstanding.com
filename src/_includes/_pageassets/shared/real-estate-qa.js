@@ -125,6 +125,11 @@
        unchanged. setTax() also resets the three. New: E27 (bitcoin in a
        tax-advantaged account), E28 (mortgage interest deducted), E29 (Custom:
        home 20% above a $0 exemption, bitcoin 15%).
+     PR 6a — "Show the calculation" on both pages. The ledger renders in its
+       own container, so every vector is unchanged. New: E30 (the look-back's
+       ledger, 2017) and E31 (the projection's, defaults), P27 (Path 4) and
+       P28 (Path 2): each hashes the ledger's CSV (RealEstateLedger.toCsv),
+       without its URL line.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -199,8 +204,15 @@
     { id: 'E26', desc: 'proj, $1.5M house, 20y, single: gain above the exclusion (PR 5b)', home: '1500000', horizon: '20', filing: 'single' },
     { id: 'E27', desc: 'proj, bitcoin in a tax-advantaged account (PR 5c)', account: 'advantaged' },
     { id: 'E28', desc: 'proj, mortgage interest deducted (PR 5c)', deduct: true },
-    { id: 'E29', desc: 'proj, Custom: home 20% above $0, bitcoin 15% (PR 5c)', regime: 'custom', cHome: '20%', cExempt: '$0', cBtc: '15%' }
+    { id: 'E29', desc: 'proj, Custom: home 20% above $0, bitcoin 15% (PR 5c)', regime: 'custom', cHome: '20%', cExempt: '$0', cBtc: '15%' },
+    { id: 'E30', desc: 'the look-back ledger, 2017 (PR 6a)', ledger: 'retro' },
+    { id: 'E31', desc: 'the projection ledger, defaults (PR 6a)', ledger: 'proj' }
   ];
+  // The ledger as its CSV, without the URL line (PR 6a).
+  function captureLedger(id){
+    var n = el(id); if (!n || !n._ledgerSpec || !window.RealEstateLedger) return null;
+    return window.RealEstateLedger.toCsv(n._ledgerSpec).split('\n').filter(function(l){ return l.indexOf('# Live scenario URL') !== 0; }).join('\n');
+  }
 
   // The deflator: a preset, or a custom value (PR 4f).
   function setInfl(x){
@@ -306,7 +318,9 @@
     { id: 'P23', desc: 'Real view: Path 1, hold 30y', display: 'real', path: '1', hold: '30' },
     { id: 'P24', desc: 'Real view: first 3 years of the chart', display: 'real', zoom: 'first3' },
     { id: 'P25', desc: 'no capital-gains tax (PR 5b)', regime: 'none' },
-    { id: 'P26', desc: 'Path 1, 20y, 35% bracket: NIIT applies (PR 5b)', path: '1', hold: '20', bracket: '35' }
+    { id: 'P26', desc: 'Path 1, 20y, 35% bracket: NIIT applies (PR 5b)', path: '1', hold: '20', bracket: '35' },
+    { id: 'P27', desc: 'the ledger, defaults (Path 4) (PR 6a)', ledger: true },
+    { id: 'P28', desc: 'the ledger, Path 2 (PR 6a)', ledger: true, path: '2' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
@@ -384,6 +398,12 @@
         PROJ.forEach(function(v){
           var s;
           if (v.growth) s = JSON.stringify(captureGrowth());
+          else if (v.ledger === 'retro') {
+            click('.calc-mode-label[data-mode="retrospective"]'); applyRetro({});
+            s = JSON.stringify(captureLedger('calcLedger'));
+            click('.calc-mode-label[data-mode="projection"]');
+          }
+          else if (v.ledger === 'proj') { applyProj({}); s = JSON.stringify(captureLedger('fwdLedger')); }
           else { applyProj(v); s = JSON.stringify(captureProj()); }
           rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s);
         });
@@ -395,7 +415,7 @@
         await sleep(200);                                     // chart builds on tab activation
         var s0 = JSON.stringify(captureRpStatic());
         rows.push({ id: 'S-bvrp', desc: 'Power Law copy spans', hash: fnv(s0), len: s0.length }); all.push(s0);
-        RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
+        RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(v.ledger ? captureLedger('calc-ledger') : captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
         applyRp({});
         if (saved.display) click('.calc-frame-btn[data-mode="' + saved.display + '"]');   // the reader's frame (PR 4f)
       }

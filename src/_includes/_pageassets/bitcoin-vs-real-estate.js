@@ -26,6 +26,49 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       return 'Before tax ' + f(pre) + '; tax on the gain over what was paid: <span class="negative">\u2212' + f(tax) + '</span>' +
         (Math.abs(R.btcTax.realized) > 0.5 ? ' <span style="font-size:.78rem;color:var(--text-muted)">(including coins sold along the way, due in the years they were sold)</span>' : '');
     }
+    // ── Show the calculation (PR 6a; rulings M2, M7, P2, P7) ──
+    // Both calculators: the engine's rows, one per year, and the sale at
+    // the end, in nominal dollars as paid. o is bvreRetro's or
+    // bvreProjection's output; opts.retro picks the year labels.
+    function reLedgerSpec(o, opts){
+      var yr = { label: opts.retro ? 'Year' : 'Year of the projection', fmt: 'text',
+                 get: function(r){ return opts.retro ? (r.year + (r.toDate ? ' to date' : '')) : String(r.year); } };
+      var $ = 'nominal $';
+      var house = { id: 'house', label: 'The house', rows: o.rows, columns: [yr,
+        { label: 'Home value', unit: $, get: function(r){ return r.homeValue; } },
+        { label: 'Mortgage balance', unit: $, get: function(r){ return r.balance; } },
+        { label: 'Principal', unit: $, get: function(r){ return r.principal; } },
+        { label: 'Interest', unit: $, get: function(r){ return r.interest; } },
+        { label: 'Property tax', unit: $, get: function(r){ return r.tax; } },
+        { label: 'Insurance', unit: $, get: function(r){ return r.ins; } },
+        { label: 'Maintenance', unit: $, get: function(r){ return r.maint; } },
+        { label: 'Equity', unit: $, get: function(r){ return r.equity; } },
+        { label: 'Cumulative cash out', unit: $, get: function(r){ return r.cumCashOutOwner; } }] };
+      var btc = { id: 'btc', label: 'Bitcoin + rent', rows: o.rows, columns: [yr,
+        { label: 'Bitcoin price', unit: $, get: function(r){ return r.btcPrice; } },
+        { label: 'Rent paid', unit: $, get: function(r){ return r.rent; } },
+        { label: 'Invested', unit: $, get: function(r){ return r.btcBoughtUsd; } },
+        { label: 'Sold for rent', unit: $, get: function(r){ return r.btcSoldUsd; } },
+        { label: 'BTC bought', unit: 'BTC', fmt: 'btc', get: function(r){ return r.btcBought; } },
+        { label: 'BTC sold', unit: 'BTC', fmt: 'btc', get: function(r){ return r.btcSold; } },
+        { label: 'BTC held', unit: 'BTC', fmt: 'btc', get: function(r){ return r.btcHeld; } },
+        { label: 'Bitcoin value', unit: $, get: function(r){ return r.btcValue; } },
+        { label: 'Cumulative cash out', unit: $, get: function(r){ return r.cumCashOutRenter; } }] };
+      var final = { cols: ['House', 'Bitcoin'], rows: [
+        { label: 'Market value', values: [o.homeEnd, o.btcValue] },
+        { label: 'Selling costs', values: [-o.sellCosts, -o.btcSaleCost] },
+        { label: 'Mortgage repaid', values: [-o.balance, null] },
+        { label: 'Before tax', values: [o.houseIfSold, o.btcIfSold] },
+        { label: 'Tax on the sale', values: [-o.homeTax.tax, -o.btcTax.tax] },
+        { label: 'After tax', values: [o.houseAfterTax, o.btcAfterTax], strong: true }] };
+      return {
+        note: 'Every amount is in nominal dollars, as paid' + (opts.realNote ? '; ' + opts.realNote : '') + '. The last rows sell both at the end, as the cards do. Cumulative cash out is the same on both tabs when the renter invests the difference.',
+        tabs: [house, btc], final: final,
+        csv: { filename: opts.filename, meta: [['Last Coin Standing', 'Bitcoin vs. Real Estate: ' + opts.calc]].concat(opts.meta || [])
+               .concat([['Tax', o.taxProfile.taxRegime + ' / ' + o.taxProfile.filing + ' / ' + o.taxProfile.federalBracketPct + '% / ' + o.taxProfile.stateCode],
+                        ['Amounts', 'nominal USD, as paid'], ['Live scenario URL', window.location.href]]) }
+      };
+    }
     function reHouseTaxLine(R, f, conv){
       var h = R.homeTax, pre = conv(R.houseIfSold), tax = conv(h.tax);
       var cap = '$' + h.cap.toLocaleString('en-US');
@@ -456,6 +499,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                     : ('Both households paid out <strong>' + rFmt(R.cumCashOutOwner) + '</strong> from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: ' + rFmt(R.upfront) + ' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'))
                 : ('The owner paid out ' + rFmt(R.cumCashOutOwner) + ' and the renter ' + rFmt(R.cumCashOutRenter) + ' from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: with the toggle off, only the up-front sum went into bitcoin.');
         }
+        if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('calcLedger'), reLedgerSpec(R, {
+            retro: true, calc: 'the look-back', filename: 'bitcoin-vs-real-estate-lookback.csv',
+            meta: [['Start', startLabel], ['End', endLabel + ' (house value to ' + houseLabel + ')'], ['Home price', Math.round(hs)], ['Bitcoin today', Math.round(R.btcToday)]] }));
     }
     window.runRetroCalc = runCalculator;
 
@@ -837,6 +883,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             : ('Both households paid out <strong>'+fmt(P.cumCashOutOwner)+'</strong> over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: '+fmt(P.upfront)+' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'))
         : ('The owner paid out '+fmt(P.cumCashOutOwner)+' and the renter '+fmt(P.cumCashOutRenter)+' over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: with the toggle off, only the up-front sum goes into bitcoin.');
     }
+    if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
+      retro: false, calc: 'the projection', filename: 'bitcoin-vs-real-estate-projection.csv',
+      realNote: _mode === 'real' ? 'the Real view on the cards divides the end values by ' + P.deflator.toFixed(2) + ' (' + (window.RealEstateBaseline ? window.RealEstateBaseline.deflatorPhrase() : 'the deflator') + ')' : '',
+      meta: [['Horizon', horizonYrs + ' years'], ['Home price', Math.round(homePrice)], ['Bitcoin now', Math.round(btcNow)], ['Scenario', scenario], ['Home appreciation', homeApprNominal + '% nominal']] }));
   }
 
   // ── Event listeners ──
