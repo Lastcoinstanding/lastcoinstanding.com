@@ -2627,7 +2627,8 @@ no client JS, no manual flags, self-expiring by construction.
 
 - **Source of truth & rules** (`_data/freshness.js`, exposes the `freshness`
   map): **NEW** = the slug's FIRST `updates.json` entry is within 30 days;
-  **UPDATED** = its LATEST entry is within 30 days and it is not NEW (NEW
+  **UPDATED** = its LATEST entry is within **7 days** (was 30 until
+  2026-09-30, JM: "changed this week", so the chip stays a signal) and it is not NEW (NEW
   suppresses UPDATED). Windows are measured from the build clock (`new Date()`),
   so a badge expires at the first deploy after its window closes — acceptable
   staleness for a constantly-deploying site.

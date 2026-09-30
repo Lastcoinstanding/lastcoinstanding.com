@@ -301,7 +301,7 @@ When in doubt, write it long, then cut by half.
 > **Freshness badges are automatic — never hand-place one.** The
 > `updates.json` entry you write here IS the badge. `_data/freshness.js`
 > computes a quiet `NEW` chip (within 30 days of a slug's first entry) and
-> `UPDATED` chip (within 30 days of its latest entry, suppressed while NEW
+> `UPDATED` chip (within 7 days of its latest entry, suppressed while NEW
 > shows) at build time, surfaced in the nav dropdowns and `/calculators`
 > tiles. Badges self-expire at the next deploy after their window closes.
 > There is no manual flag to set and no chip to remove later. (Framework:
