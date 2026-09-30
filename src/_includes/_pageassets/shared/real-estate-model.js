@@ -809,6 +809,59 @@
     return trajectory;
   }
 
+  // ─── If sold at year t, for the chart (PR 6b, M7) ───
+  // Each year's value if both sides were sold that year, before and after
+  // tax, on the same bitcoin path as the whole horizon (the scenario's
+  // multiple at year t of H, not a t-year scenario). At t = H it equals
+  // computeAll's ifSold (rePairQA checks). Year 0 is a sale today.
+  function calcIfSoldTrajectory(s, scenarioOverride){
+    var sUse = scenarioOverride ? Object.assign({}, s, { btcScenario: scenarioOverride }) : s;
+    var H = sUse.holdingYears, sc = sUse.btcScenario, bf = btcBuyFactor(sUse);
+    var keepMultiplier = (sUse.path === 3) ? sUse.numProperties : 1;
+    var keepS = keepMultiplier !== 1 ? Object.assign({}, sUse, { propertyValue: sUse.propertyValue * keepMultiplier }) : sUse;
+    var ky = rentalYears(keepS, keepMultiplier, H);
+    var sold = Math.max(0, sUse.numProperties - sUse.propertiesRetained);
+    var retainedS = Object.assign({}, sUse, { propertyValue: sUse.propertyValue * sUse.propertiesRetained });
+    var ry = rentalYears(retainedS, sUse.propertiesRetained, H);
+    var one = rentalYears(sUse, 1, H);
+    var sale1 = afterRepayment(calcRentalExit(sUse, 0).netCash, existingLoan(sUse, 1, 0).balance0);
+    var sale3 = afterRepayment(calcRentalExit(Object.assign({}, sUse, { propertyValue: sUse.propertyValue * sold }), 0).netCash, existingLoan(sUse, sold, 0).balance0);
+    var heloc = Math.max(0, sUse.propertyValue * (sUse.helocLtv / 100) - sUse.existingMortgage);
+    var yy = (sUse.path === 3) ? yieldYears(sale3.deployed, sUse, H) : (sUse.path === 4 ? yieldYears(sale1.deployed, sUse, H) : null);
+    function rentalAt(S, years, t){
+      var x = calcRentalExit(S, t), pre = cumulativeRentalCash(years, t) + x.netProceeds - years.loan.balance[t];
+      return { pre: pre, tax: x.totalTax };
+    }
+    function yieldAt(t, deployed){
+      var a = yy.alloc, cum = 0;
+      for (var k = 1; k <= t; k++) cum += yy.rows[k].afterTax;
+      var basisLeft = t > 0 ? yy.rows[t].basisLeft : (a.strc + a.sata);
+      var spot = btcSold(sUse, a.spot * bf * scenarioGrowthFactor(sc, t, H), a.spot);
+      var prefTax = Math.max(0, (a.strc + a.sata) - basisLeft) * gainRate(sUse);
+      return { pre: a.strc + a.sata + a.lend + spot.proceeds + cum, tax: prefTax + spot.tax };
+    }
+    var out = [];
+    for (var t = 0; t <= H; t++) {
+      var g = scenarioGrowthFactor(sc, t, H);
+      var keep = rentalAt(keepS, ky, t), pre, tax;
+      if (sUse.path === 1) {
+        var b1 = btcSold(sUse, sale1.deployed * bf * g, sale1.deployed);
+        pre = b1.proceeds - sale1.shortfall; tax = b1.tax;
+      } else if (sUse.path === 2) {
+        var k2 = rentalAt(sUse, one, t), b2 = btcSold(sUse, heloc * bf * g, heloc);
+        pre = k2.pre + b2.proceeds - heloc - heloc * (sUse.helocRatePct / 100) * t; tax = k2.tax + b2.tax;
+      } else if (sUse.path === 3) {
+        var y3 = yieldAt(t), k3 = rentalAt(retainedS, ry, t);
+        pre = y3.pre + k3.pre - sale3.shortfall; tax = y3.tax + k3.tax;
+      } else {
+        var y4 = yieldAt(t);
+        pre = y4.pre - sale1.shortfall; tax = y4.tax;
+      }
+      out.push({ year: t, keepPre: keep.pre, keepTax: keep.tax, keep: keep.pre - keep.tax, pathPre: pre, pathTax: tax, path: pre - tax });
+    }
+    return out;
+  }
+
   // ─── BvRP's ledger: the rental and the path, year by year (PR 6a) ───
   // The rows behind the chart (calcWealthTrajectory) and the table: the
   // kept rental (all N properties on Path 3) and the chosen path, one row
@@ -1365,6 +1418,7 @@
     calcYieldPortfolioAtYearT: calcYieldPortfolioAtYearT,
     calcWealthTrajectory: calcWealthTrajectory,
     ledgerRental: function(s, scenarioOverride){ return { rows: calcWealthTrajectory(s, scenarioOverride), cards: computeAll(s) }; },
-    rentalLedger: rentalLedger
+    rentalLedger: rentalLedger,
+    calcIfSoldTrajectory: calcIfSoldTrajectory
   };
 })();

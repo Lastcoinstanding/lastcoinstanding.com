@@ -130,6 +130,12 @@
        ledger, 2017) and E31 (the projection's, defaults), P27 (Path 4) and
        P28 (Path 2): each hashes the ledger's CSV (RealEstateLedger.toCsv),
        without its URL line.
+     PR 6b (BvRP; M7, P4) — the chart values each year if sold, after tax,
+       by default, with a Held toggle and a difference line (dataset 5).
+       Every BvRP vector's chart capture moves (the other captures don't);
+       BvRE is unchanged. RP_BASE pins the basis; new P29 is the Held chart.
+       Checked: the If sold line's last point equals the table's after-tax
+       total on every path.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -286,7 +292,7 @@
   var RP_BASE = { path: '4', scenario: 'stay', value: '500000', yld: '4.4', hold: '10', basis: '60', held: '10',
                   state: 'OTHER', bracket: '24', ltv: '80', helocRate: '9.5', mortgage: '200000',
                   props: '3', retained: '2', port: [45, 30, 10, 15], appr: '4.68', sell: '6.6', btctx: '0.5',
-                  mortRate: '4.4', mortYears: '20', display: 'nominal', infl: 'm2-growth', zoom: 'full', regime: 'us' };
+                  mortRate: '4.4', mortYears: '20', display: 'nominal', infl: 'm2-growth', zoom: 'full', regime: 'us', chartBasis: 'ifsold' };
   var RP = [
     { id: 'P1',  desc: 'defaults (Path 4, stay, $500K, 4.4%, 10y, OTHER, 24%)' },
     { id: 'P2',  desc: 'Path 1', path: '1' },
@@ -320,7 +326,8 @@
     { id: 'P25', desc: 'no capital-gains tax (PR 5b)', regime: 'none' },
     { id: 'P26', desc: 'Path 1, 20y, 35% bracket: NIIT applies (PR 5b)', path: '1', hold: '20', bracket: '35' },
     { id: 'P27', desc: 'the ledger, defaults (Path 4) (PR 6a)', ledger: true },
-    { id: 'P28', desc: 'the ledger, Path 2 (PR 6a)', ledger: true, path: '2' }
+    { id: 'P28', desc: 'the ledger, Path 2 (PR 6a)', ledger: true, path: '2' },
+    { id: 'P29', desc: 'the Held chart (PR 6b)', chartBasis: 'held' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
@@ -329,6 +336,7 @@
     if (window.ModelingAssumptions) window.ModelingAssumptions.set('homeApprNominal', 'since-2000');
     click('.calc-frame-btn[data-mode="' + x.display + '"]');   // PR 4f
     click('.calc-chart-zoom-btn[data-zoom="' + x.zoom + '"]');
+    click('.calc-chart-basis-btn[data-basis="' + x.chartBasis + '"]');   // PR 6b
     click('.calc-path-btn[data-path="' + x.path + '"]');
     setVal('rpHomeAppreciation', x.appr);                     // input only, as on BvRE
     setVal('calc-sell-cost', x.sell); setVal('calc-btc-tx', x.btctx);

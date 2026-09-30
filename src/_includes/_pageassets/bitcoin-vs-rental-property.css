@@ -1412,6 +1412,9 @@ html, body {
 .calc-chart-header .calc-chart-title {
   margin-bottom: 0;  /* overrides the v0.2 .calc-chart-title's margin */
 }
+/* PR 6b: the If sold / Held toggle sits beside the zoom toggle; the title
+   takes its own row so the two toggles line up. */
+.calc-chart-header .calc-chart-title { flex: 1 1 100%; }
 .calc-chart-zoom {
   display: inline-flex;
   gap: 0.3rem;
@@ -1420,7 +1423,8 @@ html, body {
   border-radius: 0.4rem;
   padding: 0.15rem;
 }
-.calc-chart-zoom-btn {
+.calc-chart-zoom-btn,
+.calc-chart-basis-btn {
   font-family: var(--font-body);
   font-size: 0.74rem;
   font-weight: 500;
@@ -1433,8 +1437,10 @@ html, body {
   transition: background 0.18s, color 0.18s;
   letter-spacing: 0.02em;
 }
-.calc-chart-zoom-btn:hover { color: var(--ink); }
-.calc-chart-zoom-btn.active {
+.calc-chart-zoom-btn:hover,
+.calc-chart-basis-btn:hover { color: var(--ink); }
+.calc-chart-zoom-btn.active,
+.calc-chart-basis-btn.active {
   background: rgba(224,148,34,0.14);
   color: var(--amber-bright);
   font-weight: 600;
