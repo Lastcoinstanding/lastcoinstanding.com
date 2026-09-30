@@ -1,5 +1,7 @@
 # REAL_ESTATE_PAIR_DESIGN — Bitcoin vs. Real Estate + Bitcoin vs. Rental Property
 
+> **Historical from ship (2026-09-29).** The pair shipped in PRs 0–8 (PAGE_IDEAS_BACKLOG, Promoted / shipped, lists the merges). **SITE_GUIDE §14 and §14.1 are now authoritative** for what the pages do, with §46 (URL vocabulary), §53.2 (series strip), §55.4 (shared modules) and STYLE_GUIDE §6.49 (ledger and grid). `REAL_ESTATE_PAIR_RULINGS.md` keeps the rulings and each PR's implementation notes. This spec is kept as the record of intent; where it and the pages differ, the pages and SITE_GUIDE win.
+
 _v1, 2026-09-26. Build spec for revising `/bitcoin-vs-real-estate` (BvRE) and `/bitcoin-vs-rental-property` (BvRP) onto one framework. Promotes a chat-side backlog capture (`REAL_ESTATE_PAIR_REVISION_2026-09-26`, a project note, not a repo file). Commit this file at repo root (planning docs are repo-tracked; no `claude/` prefix). The Claude Code prompts that execute it are in `REAL_ESTATE_PAIR_CLAUDE_CODE_PROMPTS.md`._
 
 _Written chat-side from the live pages (read 2026-09-26) and the project docs, **not** from the repo. Anything this spec says about code structure is a hypothesis for Phase 0 to confirm or correct. Where Phase 0 finds the code differs, Phase 0's finding wins and this spec is amended._

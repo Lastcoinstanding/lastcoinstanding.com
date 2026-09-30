@@ -1,6 +1,11 @@
-// ─── Bitcoin vs. Rental Property — page scripts (v0.1 / Phase 1)
-//     Currently scoped to a single component: the Entry-Timing Indicator,
-//     which renders BTC's current multiple-of-trend with a categorical
+// ─── Bitcoin vs. Rental Property — page scripts
+//     The page's IIFEs, in order: the Entry-Timing Indicator (below); the
+//     Power Law figures quoted in the prose; the rates quoted in the copy;
+//     the calculator; tab routing. The calculator's arithmetic is the pair's
+//     shared engine, shared/real-estate-model.js (SITE_GUIDE §55); the page
+//     reference is SITE_GUIDE §14.1.
+//
+//     The Entry-Timing Indicator renders BTC's current multiple-of-trend with a categorical
 //     label (Favorable / Neutral / Elevated). Data comes from the canonical
 //     shared/power-law-data.js (PL_DATA, TODAY_PRICE, fetchTodayPrice).
 //
@@ -12,8 +17,6 @@
 //     data refresh); fetchTodayPrice replaces it with the live spot when a
 //     live source answers. The render path uses display-only DOM updates
 //     to avoid layout thrash on the live-price replacement.
-//
-//     Calculator (Phase 2) will live in a separate IIFE in this file.
 
 (function(){
   function categorize(multiple){
@@ -96,7 +99,7 @@
 // from shared/power-law-data.js instead of hardcoded. All figures use the
 // "stay at today's multiple" case: the multiple-of-trend is held, so the
 // growth factor is plPrice(t1) / plPrice(t0) and doesn't depend on spot.
-// Same formula and 365-day year as the calculator's 'stay' chip
+// Same formula and 365.25-day year as the calculator's 'stay' chip
 // (scenarioGrowthFactor, now in shared/real-estate-model.js), so the prose
 // and the chip agree.
 //   data-pl-cagr="a,b"      annualised growth from year a to year b, "29%"
@@ -180,22 +183,26 @@
   }
 })();
 
-// ─── Calculator (Phase 2 v0.1) ───────────────────────────────────────
-// Interactive head-to-head between rental property and bitcoin paths.
-// Replaces the Section 7 "Coming Soon" placeholder.
+// ─── Calculator ──────────────────────────────────────────────────────
+// Keeping the rental against four paths out of it (1 sell into bitcoin,
+// 2 HELOC into bitcoin, 3 sell some into the yield portfolio, 4 sell into
+// the yield portfolio). Continuous: every control re-renders, no Compute
+// button. The arithmetic is shared/real-estate-model.js (computeAll and
+// friends); this IIFE holds the state, binds the controls and renders.
+// Page reference: SITE_GUIDE §14.1; the pair's rulings and build notes:
+// REAL_ESTATE_PAIR_RULINGS.md.
 //
-// Math model documented in BITCOIN_VS_RENTAL_PROPERTY_CALCULATOR_DESIGN_1.md.
-// Continuous: every slider movement re-renders. No "Compute" button.
-//
-// v0.1 simplifications (to be relaxed in future iterations):
-// - Net rental yield is taken as a direct user input rather than computed
-//   from gross via the §2 waterfall. Slider default ~4.4% nets to the
-//   editorial's $20-24K on a $500K property.
-// - BTC CAGR is flat over the holding period (declining-CAGR in v0.2).
+// Model simplifications, stated on the page:
+// - Net rental yield is a direct input rather than computed from gross via
+//   the Reality tab's waterfall. The ~4.4% default nets to the editorial's
+//   $20-24K on a $500K property.
+// - Bitcoin follows one of the pair's four Power Law scenarios (M3): the
+//   multiple of trend moves in a straight line to the scenario's target at
+//   the horizon. Every scenario assumes the Power Law trend continues.
 // - ROC distributions lower each instrument's basis; once it is used up (~8
 //   years at 12-13% yields) they are taxed as long-term gains in the year
-//   paid (PR 5a). The gain left in the lower basis is due at a sale, which
-//   the If sold basis (PR 5b) will show.
+//   paid (PR 5a). The gain left in the lower basis is due at a sale (the If
+//   sold basis, PR 5b).
 // - State tax is a single rate per state, no AMT/local nuances.
 // - HELOC modeled as interest-only with balloon repayment at end of term.
 

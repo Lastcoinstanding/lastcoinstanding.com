@@ -1,7 +1,8 @@
 /* ─── Bitcoin vs. Rental Property — page styles
-       Under-construction draft. Editorial-led page (Phase 1) with
-       entry-timing indicator. Calculator deferred to Phase 2.
-       Follows STYLE_GUIDE typography scale + LCS palette. ─── */
+       The four tabs, the entry-timing indicator and the calculator
+       (SITE_GUIDE §14.1). The shared ledger's styles are
+       shared/real-estate-ledger.css. Follows STYLE_GUIDE typography
+       scale + LCS palette. ─── */
 
 :root {
   --bg-page: #0a0908;

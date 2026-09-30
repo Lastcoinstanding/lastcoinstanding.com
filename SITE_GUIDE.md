@@ -934,11 +934,13 @@ Three takes, and the lesson is the one the lock chamber already taught, extended
 
 **Added:** April 18, 2026. **Refreshed:** May 7, 2026 (Phase 4 restructure). Decision-frame page for the bitcoin-vs-housing question. After Phase 4 hosts both retrospective and projection calculators on the same canvas, paired via a temporal toggle.
 
+**Rebuilt 2026-09-27 → 09-29 as the tenant's half of the real-estate pair** (PRs 1–8, #121–#156 and the close-out). The rental page, the landlord's half, is **§14.1**. This section and §14.1 are the reference from ship; `REAL_ESTATE_PAIR_DESIGN.md` is historical, and `REAL_ESTATE_PAIR_RULINGS.md` keeps JM's rulings and each PR's implementation notes. What the calculators do now is summarised in *The pair build* below; the older subsections are kept where they still hold and marked where they don't.
+
 ### Tab structure (4 tabs)
 
 | Tab | `data-tab` | Panel id | Notes |
 |---|---|---|---|
-| The Postponed Purchase | `calculator` | `panel-calculator` | The dual-mode calculator (default tab; see sub-section below) |
+| Postponed Purchase Calculator | `calculator` | `panel-calculator` | The dual-mode calculator (default tab; see sub-section below) |
 | A Home Priced in Bitcoin | `btc-house` | `panel-btc-house` | Historical comparison: same house in dollars vs. in bitcoin over time |
 | The Ceiling | `ceiling` | `panel-ceiling` | Affordability ceiling chart |
 | The Affordability Crisis | `crisis` | `panel-crisis` | Home-price-to-income ratio across monetary eras (Nominal Revolution, Bretton Woods, etc.) |
@@ -974,8 +976,9 @@ Three hashes resolve cleanly:
 
 | Hash | Behavior |
 |---|---|
-| `#calculator` | Calculator tab (default), retrospective mode |
-| `#projection` | Calculator tab AND projection mode auto-activated. Canonical short alias. |
+| `#calculator` | Calculator tab (default), retrospective mode. The calculator tab writes it (PR 8, ruling P9: both of the pair's calculators answer to `#calculator`) |
+| `#postponed-purchase` | Legacy: what the calculator tab wrote before PR 8. Still opens the calculator, and is rewritten to `#calculator` on landing |
+| `#projection` | Calculator tab AND projection mode auto-activated. Canonical short alias. The rental page's "Run this on the other side" link targets it |
 | `#calc-mode-projection` | Same as `#projection` (legacy long form, matches the DOM id; routes correctly and rewrites the URL to `#projection` on landing via `history.replaceState`) |
 
 `applyHashToMode()` inside the BvRE js handles both initial page load and subsequent `hashchange` events. The pattern is reusable for any future page with sub-mode states reachable via hash.
@@ -989,7 +992,7 @@ Third optional input field "Your interest rate" on Retrospective mode (originall
 - Shows `(vs. prevailing X%)` parenthetical in scenario text when custom rate active
 - Clears on year change; placeholder updates to show new year's average
 - Clamped 0.5%–15%
-- Flows through to: monthly payment, remaining balance, total cost, rent estimate, DCA savings
+- Flows through to the monthly payment, the balance and the interest. (Before PR 4e it also set the rent estimate and the "Go deeper" DCA; rent is now market rent and the DCA is retired.)
 - Mobile responsive at 768px and 480px stacks to single column
 
 ### Variable down payment % (both modes, added July 2026)
@@ -1024,12 +1027,11 @@ spans), the retrospective scenario sentence ("{X}% of median home price $Y"),
 and both result-card "{X}% down" sublabels recompute from the input — each
 percentage stays in the same clause as its dollar anchor.
 
-**Rent decision (flagged).** The default rent (~75% of the equivalent mortgage
-payment) **tracks** the down-payment-adjusted payment — that is its stated
-definition, and a bigger down payment ⇒ smaller loan ⇒ smaller payment ⇒ lower
-implied rent. This falls out automatically because the mortgage payment is
-computed from the adjusted loan; no separate handling. A user's explicit rent
-override still wins.
+**Rent decision — superseded (PR 4b, 4e; ruling M4).** The default rent was
+~75% of the equivalent mortgage payment, so it tracked the down payment. It is
+now **market rent** for the price (Zillow's price-to-rent ratio: price ÷ 12 ÷
+15.77 in the projection; the start year's ratio in the retrospective), so the
+down payment no longer moves it. A reader's own rent still wins.
 
 **Left intentionally at 20%:** the *other tabs* (Home Priced in Bitcoin seesaw,
 The Ceiling burden chart, Affordability cost chart) — their `p*0.2` and
@@ -1051,11 +1053,59 @@ Bitcoin vs. Real Estate and Bitcoin vs. Rental Property share two baseline assum
 
 **QA.** `rePairQA` pins BvRP's display and deflator: P1–P16 run Nominal and are byte-identical with PR 4e; P17–P24 run the Real view. `rePairQA.parityCheck()` computes the same house (price, nominal appreciation, horizon, selling costs, deflator and a 30-year loan) with each page's engine and asserts that value, selling costs, the Real values, the deflator and the loan's payment, interest and balance agree; it runs on either page.
 
+### The pair build: what the calculators do now (PRs 3–8, 2026-09-27 → 09-29)
+
+The authoritative summary; each PR's detail is in `REAL_ESTATE_PAIR_RULINGS.md` §11–§20.
+
+- **One engine.** Every figure on both pages comes from `shared/real-estate-model.js` (`window.RealEstateModel`, §55.4): `bvreRetro` / `ledgerRetro` (the look-back) and `bvreProjection` here, `computeAll` and friends on the rental page. Sourced defaults are one object, `PAIR_DEFAULTS` (MONTHLY_REFRESH_CHECKLIST §9.3).
+- **Nominal model, Real view by default** (M1, P5). Home appreciation is nominal (`lcs.homeApprNominal`: long run 3.41%, since 1990 4.23%, **since 2000 4.68%**, the default); the Real view divides every value by one deflator (`lcs.inflation`, M2 growth 6.5% by default), so it never changes which path is ahead. The frame line under the Real / Nominal toggle says which view is showing, with a worked example.
+- **Equal cash out** (M2). Both households spend the same every month: the buyer the mortgage, property tax, insurance and maintenance; the renter the rent, investing the difference in bitcoin (or selling bitcoin when rent costs more). The ledger's two tabs show the same cumulative cash out. "The renter invests the difference" is on by default in both modes.
+- **Bitcoin scenarios** (M3): Floor 0.42× · **Stay at today's multiple** (default) · Trend 1× · Upper 2.5× of the Power Law trend by the horizon, moving in a straight line from today's multiple. Every scenario assumes the trend continues, and the page says so.
+- **The look-back runs to today** (M11, P8): monthly from July of the start year (2014–2024), the house on Case-Shiller National, market rent from Zillow, today's bitcoin price live; its last ledger row is "to date".
+- **Tax on a sale** (M7, M9; PR 5): results lead with the figure **if sold, after tax**, the before-tax figure beside it. The home-sale exclusion ($250K / $500K from a 2-year hold); bitcoin's gain over what was paid, coins sold along the way included; long-term rate by bracket, state, NIIT from 32%. Options: No capital-gains tax, Custom rates, bitcoin in a tax-advantaged account, the mortgage-interest deduction (off by default). IRS primaries: DATA_AUDIT TX-1–TX-9.
+- **Results** (P2, P4, P6, P7; PRs 6–7): cards, then a wealth chart in each calculator (If sold after tax by default, or Held; the difference as the heaviest line; Floor drawn faintly in the projection; a first-3-years zoom), the sensitivity grid in the projection (scenario × home prices, or horizon × mortgage rate), and **Show the calculation**, a ledger with a CSV download. Ledger = cards = chart end-point, checked by `rePairQA.booksCheck()`.
+- **The pair** (C1, P3, P9; PR 8): the pair line under the hero; the series strip at the top (§53.2); "Run this on the other side" above the share section, carrying the shared inputs to the rental page's calculator (§46). This page's own links now carry Tax on a sale too (§17.5's table).
+- **QA:** `?qa` loads `rePairQA` (`shared/real-estate-qa.js`); `await rePairQA.all()` runs the 37 byte-identity vectors and every identity check. Digests at ship: this page `6cbf3491`, the rental page `31638210`.
+
 ### Cross-link role
 
 - BvRE applies the Power Law channel as a forward projection (in Projection mode); BvRE's related-set points to The Channel page (Power Law Tab 4) as the canonical visualization of the bands.
 - BvRE no longer describes Power Law as a "forward-looking companion" — the projection lives here now. BvRE describes Power Law as "the growth model behind the projection."
 - The retirement page applies the same channel as a retirement projection; both BvRE and retirement reference Power Law as the model home.
+
+## 14.1 Bitcoin vs. Rental Property (`/bitcoin-vs-rental-property.html`)
+
+**The landlord's half of the real-estate pair** (§14 is the tenant's). Published before the pair build without a section of its own; this one was written at the build's close (2026-09-29, ruling C6), and with §14 it is the reference from ship. The question: keep a rental property, or sell (or borrow against) it into bitcoin or bitcoin-yield instruments. The subtitle states the register: *"The landlord's comparison: operating costs, tax and exit frictions on one side, the alternative's risks on the other."*
+
+### Tabs and hashes
+
+| Tab | `data-tab` / hash | Notes |
+|---|---|---|
+| The Reality | `reality` (default) | What a landlord's yield is once costs are counted: the expense waterfall, vacancy, sale costs, regulation (DATA_AUDIT BvRP-9–13, 19–25) |
+| The Bitcoin Case | `bitcoin` | The Entry-Timing Indicator (today's multiple of trend, Favorable / Neutral / Elevated), the yield instruments (STRC, SATA) and their risks, the $500K worked example; Power Law figures in the prose are computed live (`data-pl-*`, BvRP-26) |
+| The Four Paths | `paths` | 1 Outright Sell · 2 HELOC · 3 Partial Sale · 4 Sell + Yield Portfolio, and their constraints |
+| The Calculator | `calculator` | Titled "Rental Property vs. Bitcoin: A Scenario Analysis" |
+
+Tabs write their id as the hash (`history.replaceState`); a hash names the tab to open. The chart builds only when the calculator tab is visible (STYLE_GUIDE §6.14).
+
+### The calculator
+
+- **Inputs:** the path (default **4**, Sell + Yield Portfolio), property value ($500K), net rental yield (4.4%), holding period (10 years), the path's own inputs (HELOC LTV and rate; properties and how many kept; the portfolio split, STRC 45 / SATA 30 / lending 10 / spot 15), and the Baseline assumptions block: the pair's shared home appreciation and deflator (§14's PR 4f subsection), the tax profile (regime, state, bracket), the property's facts (adjusted basis 60%, years held 10), the existing mortgage ($200K at 4.4%, 20 years left; BvRP-27) and costs (selling 6.6%, bitcoin 0.5% per trade, HELOC 9.5%).
+- **Engine:** `RealEstateModel.computeAll(state)` and friends (§55.4). Every path carries or repays the existing mortgage (M8). Tax (M9, PR 5a–5b): depreciation on the original building basis, recapture at min(bracket, 25%) and never above the gain, the long-term rate on the rest, state tax and NIIT; rental income and lending interest taxed yearly; STRC/SATA distributions are return of capital, lowering basis, with the gain due at a sale.
+- **Results:** the headline and the comparison table compare the two sides **if sold at year N, after tax** (with before-tax and held figures in the table), in the Real view by default. Then the scenario chips (each scenario's implied growth and difference), the chart (keep rental, the path under each scenario, the difference; **If sold, after tax** or **Held**; full window or first 3 years; colours: rental blue, Stay orange, Trend green, Upper magenta, Floor light neutral), the path card, the sensitivity grid (scenario × home prices, or holding period × net yield), **Show the calculation** (the rental and the path, year by year, with a CSV), the specific-to-you callout and **Run this on the other side** (to §14's projection, carrying the shared inputs).
+- **Dated rates:** one object, `YIELD_RATES` (STRC, SATA, the lending slice and the verifiable-rates disclosure under the calculator; BvRP-5, 14, 28). Strategy's and Strive's figures in the prose refresh with the Strategy block (MONTHLY_REFRESH_CHECKLIST §0.7, the rental-page list, §9.3a).
+
+### URL state
+
+Apart from the two sitewide assumptions (`lcs.homeApprNominal`, `lcs.inflation`), the page stores nothing. It **reads** the pair's shared inputs (§46: `horizon` as the holding period, `happr`, `sell`, `btctx`, `pscenario`, `displaymode`, `tax`, `bracket`, `state`) through its own controls, and a legacy `appr` once, with the one-line note. Once the reader touches something it keeps those params in the address bar current. It has no share section.
+
+### QA
+
+`/bitcoin-vs-rental-property?qa`, then `await rePairQA.all()`: vectors P1–P31 and S-bvrp, the parity and tax-parity checks, and `booksCheck()` (table = chart = ledger on every path, scenario, frame and basis). Digest at ship `31638210`.
+
+### Cross-linking
+
+The pair line under the hero and the series strip at the top (§53.2) link to §14; the Related card for §14 carries the pair line. Related also: the Power Law, the Gallery, the flagship retirement page, Bitcoin and Fixed Income.
 
 ## 15. Chart.js patterns and lessons
 
@@ -1250,10 +1300,11 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 | `rdown` | decimal | retro | `#customDownPct` | the reader's down payment, %; omitted when blank (blank = 20). PR 4e |
 | `dca` | — | — | — | **retired in PR 4e** with the retrospective's "Go deeper" checkbox (replaced by equal cash out and `rinv`, on by default); dropped from the address bar on load, and from storage at the next write |
 | `home` | integer | proj | `#fwdHomePrice` | comma-formatted in DOM; URL strips commas; default 415000 (PR 4b; `PAIR_DEFAULTS.homePrice`) |
-| `horizon` | integer | proj | `#fwdHorizon` | one of `5`/`10`/`15`/`20`, default 10 |
+| `horizon` | integer | proj | `#fwdHorizon` | `5`/`10`/`15`/`20` in the select, default 10. A pair name (§46): a value from 1 to 30 the select doesn't list, as the rental page's holding period can be, is added to it rather than rounded (PR 8) |
 | `happr` | decimal | proj | `#fwdHomeAppreciation` | **nominal** %/yr, 2 dp (PR 4a, rulings M1/P3). Omitted when it equals the reader's own `lcs.homeApprNominal` value (4.68 unless changed); a value equal to a preset selects that preset. Not stored in `lcs.bvre.calc.v1`: the sitewide dimension is its storage |
 | `appr` | decimal | proj | — | **legacy, read once.** The pre-4a *real* rate. On load it is converted to nominal at the sitewide inflation, applied as `happr`, announced in one line under the appreciation control, and deleted from the address bar; it is never written. A stored `appr` in `lcs.bvre.calc.v1` is ignored (it was almost always the old default, 3.5) |
 | `mortgage` | decimal | proj | `#fwdMortgageRate` | nominal %, default 6.8 |
+| `down` | decimal | proj | `#fwdDownPct` | down payment, %, 2 dp; default 20 (bounds 3–95) |
 | `method` | enum | proj | `.purchase-btn.active` | `'cash'` or `'mortgage'` (default) |
 | `pscenario` | enum | proj | `.scenario-btn.active` | `'stay'` (default), `'floor'`, `'trend'` or `'upper'` (PR 4c, rulings M3; the default was `'trend'`). Each moves bitcoin's multiple of the Power Law trend in a straight line from today's to a target at the horizon end: `floor` 0.42×, `stay` today's multiple, `trend` 1×, `upper` 2.5× (was 3× on this page before 4c). Legacy links carry `floor`, `trend` or `upper`, which keep their keys (P3). Not stored (`persist: false`) |
 | `rent` | integer | proj | `#fwdMonthlyRent` | year-1 rent, $/mo; omitted when blank (blank = market rent, price ÷ 12 ÷ 15.77). PR 4b |
@@ -1265,6 +1316,14 @@ Unknown params are preserved on the URL untouched — `URLSearchParams.set/delet
 | `sell` | decimal | proj | `#fwdSellPct` | selling costs, % of price; default 6.6. PR 4b |
 | `btctx` | decimal | proj | `#fwdBtcTxPct` | bitcoin cost per purchase or sale, %; default 0.5. PR 4b |
 | `inv` | bool, default on | proj | `#fwdInvestDiff` | `'0'` when "The renter invests the difference" is off; omitted when on. PR 4b |
+| `displaymode` | enum | proj | `.display-mode-btn.active` | `'real'` (default) or `'nominal'`. Not stored (`persist: false`): a fresh load shows Real |
+| `tax` | enum | both | `#reTaxRegime` | Tax on a sale (PR 8): `'us'` (default), `'none'`, `'custom'`. With `bracket` and `state`, a pair name (§46). Links only, like the rest of the block: none of it is stored. A value the select doesn't offer is ignored |
+| `filing` | enum | both | `#reFiling` | `'mfj'` (default), `'single'`, `'hoh'`, `'mfs'` |
+| `bracket` | enum | both | `#reBracket` | federal bracket, `'24'` default (`12`/`22`/`24`/`32`/`35`/`37`) |
+| `state` | enum | both | `#reState` | state code, `'OTHER'` (typical ~5%) default |
+| `btcacct` | enum | both | `#reBtcAccount` | `'taxable'` (default) or `'advantaged'` |
+| `mded` | bool | both | `#reMortgageDeduction` | `'1'` when the mortgage-interest deduction is on |
+| `chrate`, `chexempt`, `cbrate` | decimal / integer | both | `#reCustomHomeRate`, `#reCustomHomeExempt`, `#reCustomBtcRate` | the Custom regime's home rate (20), exemption ($0) and bitcoin rate (20) |
 | `advanced`, `advrate` | — | — | — | **retired in PR 4b** with the "Go deeper" DCA and S&P leg (replaced by equal cash out, M2); dropped from the address bar on load |
 
 `fwdBtcNow` (current BTC price) is intentionally NOT in the URL — it's a live-fetched value that goes stale within hours, so a shared link lets the receiver's calculator pull fresh price rather than pin a past value. The same holds for the retrospective's end price (PR 4e): both calculators take today's price from the shared `fetchTodayPrice` (one request, cached sitewide), start from the latest `PL_DATA` sample so they render at once, and fall back to it if no live source answers (§40.2). The retrospective's own inputs follow `year` in the schema, because a change of year clears the price, rent and rate: a link sets the year, then them. They travel in links only (`persist: false`), as before 4e they were never stored: a stored set would mix with a link's, and a link's `year` would wipe it.
@@ -2786,7 +2845,9 @@ Not advice (facts-not-signals; no "you should"), not a single-security/MSTR anal
 - **Senders write today's live position.** How Much Cash's underwater-manager handoff link carries `?pos=<livePos, 3dp>` (clamped into range, so it is always a value the receiver accepts). **The Bitcoin Dashboard** (§47) is the second sender: its jump-back-in links tagged `[data-pos-carry]` receive today's channel position at runtime, using this exact `pos` encoding — no new receiver was added, and only the two pages that already accept `pos` (Wait-or-Deploy, How Much Cash) are wired; the other four jump links are plain deep links.
 - **Receivers apply URL-wins-on-first-load precedence.** A valid `?pos=` overrides the page's own default on load. *Whether a page also persists* is a **per-page** choice, not part of the shared contract: How Much Cash persists to `localStorage` (it holds a personal strategy — split, tax, stack); Wait-or-Deploy persists **nothing** (its relevance is always today's live position, so it is 2-tier — URL > live default, with URL write-back as the only reload layer). The shared part is the *vocabulary* and the *precedence direction*, not the storage tier.
 
-**Current parameters (per page — the suite is not one flat namespace).** Position family: How Much Cash `share` / `tax` / `pos` / `rebuy` / `stack`; Wait-or-Deploy `pos` (receivers). Senders: How Much Cash and **The Bitcoin Dashboard** (§47) both write `pos`. Other pages own page-specific params: Power Law `?fit=` (regression cutoff), The Bitcoin Hurdle Rate `?r=` / `?h=` / `?lens=` / `?view=` (+ `?k=` debug, stripped on interaction), Bitcoin vs. Real Estate tab hashes. New pages: reuse a family name when the quantity matches (above); otherwise name for the page and record it in that page's Integration block.
+**Current parameters (per page — the suite is not one flat namespace).** Position family: How Much Cash `share` / `tax` / `pos` / `rebuy` / `stack`; Wait-or-Deploy `pos` (receivers). Senders: How Much Cash and **The Bitcoin Dashboard** (§47) both write `pos`. Other pages own page-specific params: Power Law `?fit=` (regression cutoff), The Bitcoin Hurdle Rate `?r=` / `?h=` / `?lens=` / `?view=` (+ `?k=` debug, stripped on interaction). New pages: reuse a family name when the quantity matches (above); otherwise name for the page and record it in that page's Integration block.
+
+**The real-estate pair family (PR 8, 2026-09-29; ruling P3).** Bitcoin vs. Real Estate's URL names (§17.5's table) are the pair's vocabulary, and Bitcoin vs. Rental Property reads them, **no prefixes**. The shared names, the inputs both calculators have with the same meaning: `horizon` (years from today; the rental page's holding period), `happr` (home appreciation, **nominal** %/yr, a new name in PR 4a because the quantity changed; the legacy real `appr` is read once and converted), `sell`, `btctx`, `pscenario` (`floor`/`stay`/`trend`/`upper`), `displaymode`, and three new names, **`tax`**, **`bracket`**, **`state`**. **Refused, by the rule above:** the home price and the mortgage (a house to buy against a rental owned; a new loan against the one on the rental) and the tenant page's filing status, account and custom rates, which the rental page doesn't have. **Senders:** links tagged `data-re-carry` (the series strip, §53.2, and each page's "Run this on the other side") are rewritten by `shared/real-estate-carry.js` with the current values, a value equal to the pair default left out, on load and after any input. **Receivers:** the tenant page through its own URL reader (it has always read these names); the rental page applies them through its own controls (a value a control doesn't offer is ignored, a slider takes its nearest step) and keeps them in its address bar. **Hashes:** both calculators answer to `#calculator` (P9); the tenant page's `#projection` opens its projection.
 
 ---
 
@@ -3125,6 +3186,14 @@ Fourth page of the Power Law family (**Bitcoin and The Power Law** · **The Bitc
 
 **Homepage variant — `rfam_home` (Treatment A, shipped 2026-09-21).** The fifth surface is now its own variant, selected by `{% set rfam_home = true %}` before the include (only `src/index.njk` sets it). On the homepage the strip is a section, not a boxed object: no frame, padding or radius and no icon; a top hairline (`rgba(247,147,26,0.15)`) with 2rem above the content; the header centered — eyebrow *The retirement tools*, heading *Retiring on bitcoin? Four questions, in order.* (no link), a one-line lede *Each tool answers one question, and your inputs travel between them — start from the beginning →* carrying the hub link in the dotted-underline idiom; foot paragraph removed; cards unchanged. It sits on the hero's 64rem column with the hero's horizontal padding, directly under the hero and above the Featured carousel (which gained a matching *All explorations* eyebrow and the same 64rem width). Every variant rule is scoped to `.rfam--home` and the variant markup is behind `onHome`, so the five tool-page strips render byte-identically — the ship verified outerHTML and computed styles on `/the-bitcoin-retirement` and `/bitcoin-retirement` against the pre-change build. Same day, the hero's two buttons became one CTA vocabulary (STYLE_GUIDE §6.48) and the tertiary "Free, live-computed…" line was removed; the ship is the last hero change before the 2026-10-19 read.
 
+### 53.2 The real-estate series strip (`components/real-estate-series.njk`, PR 8, 2026-09-29)
+
+**The retirement strip's pattern, for the real-estate pages** (ruling P9): its own scoped `<style>` with `rser-` selectors and var-with-fallback colours, one include line per page, the component owns its heading ("Bitcoin and real estate"), the current page is marked from `slug`. Items are questions, not page names: **"Buy or rent?"** (the tenant, §14) and **"Keep the rental?"** (the landlord, §14.1).
+
+**Two differences from §53.1, both deliberate.** (1) **It sits at the top of each page** (the first thing in the main column), not the foot: the two pages are one decision seen from two sides, so the reader should know the other side exists before starting. (2) **Its links carry state.** §53.1's hrefs are plain; here each link to another page carries `data-re-carry` and `data-re-carry-hash`, and `shared/real-estate-carry.js` rewrites the href with the page's current shared inputs (§46), targeting `#calculator`. Without script the plain href stands.
+
+**Growth.** The backlog's next two spokes (Compare Housing Plans; the homeowner's side; PAGE_IDEAS_BACKLOG "Real-estate series") are further entries in the component's `series` list, each with the hash its calculator answers to. The row is `auto-fit`, so a third or fourth card needs no CSS.
+
 ---
 
 ## 54. The Bitcoin Rundown (`/the-rundown.html`) — v2, THE BRIEFING
@@ -3229,6 +3298,20 @@ Read by How Much Cash, Wait-or-Deploy-Now and the Rundown. The HMC/WODN mirror t
 **Two things in it are read wrongly if you are in a hurry, and both have caused real errors:**
 - **`pos` is a NORMALISED channel position in `[-0.08, 1.0]`, not a multiple of trend.** `posOf(price, days)` and `ratioOf(pos)` convert. `?pos=0.42` lands on **0.96× trend**, not 0.42×. See §46 for the URL vocabulary.
 - **"Waiting" targets a lower POSITION, not a lower price** (`DROP = 0.15`, capped at `WAIT_CAP = 2 years`). The trend rises underneath the waiter, so a position 0.15 lower months later can be a **higher price** than the one they refused. That is why WODN can report a lower position arriving in 35 of 35 entries while waiting still won only 66% of the time. Never read `arrived` as "the dip came".
+
+### 55.4 The real-estate pair's shared modules (PRs 3–8, 2026-09-27 → 29)
+
+One engine and one set of components for §14 and §14.1, so the two pages can't disagree about a figure, a label or a link. Each is a page_scripts include; each page includes what it uses, after `real-estate-model.js`.
+
+| Module | Global | What it owns |
+|---|---|---|
+| `real-estate-model.js` | `RealEstateModel` | Every calculation on both pages (PR 3 extracted it byte-identical, then PRs 4–7 built on it): `PAIR_DEFAULTS`, `RENTAL_DEFAULTS`, `YIELD_RATES`; the scenarios (M3); the deflator; the tax functions; `bvreRetro`, `bvreProjection`, `ledgerRetro`; `computeAll`, the trajectories and `rentalLedger` for the rental page |
+| `real-estate-baseline.js` (+ `components/real-estate-baseline.njk`) | `RealEstateBaseline` | The shared Baseline assumptions (appreciation and deflator), their presets, the frame line; the njk holds the pair's shared tooltips and option lists (§14, PR 4f) |
+| `real-estate-ledger.js` / `.css` | `RealEstateLedger` | "Show the calculation": tabs, the final sale rows, the CSV (STYLE_GUIDE §6.49) |
+| `real-estate-chart.js` | `RealEstateChart` | The tenant page's wealth charts (the rental page draws its own, in the same colours and line styles) |
+| `real-estate-grid.js` | `RealEstateGrid` | The sensitivity grid, built so the retirement flagship can adopt it (STYLE_GUIDE §6.49) |
+| `real-estate-carry.js` | `RealEstateCarry` | The pair's URL vocabulary and the carrying links (§46, §53.2) |
+| `real-estate-qa.js` (served at `/qa/`, loaded by `real-estate-qa-loader.js` on `?qa` only) | `rePairQA` | The tripwire: `run()` (byte-identity vectors), `parityCheck()`, `taxParityCheck()`, `booksCheck()`, `ledgerCheck()`, `all()` |
 
 ---
 

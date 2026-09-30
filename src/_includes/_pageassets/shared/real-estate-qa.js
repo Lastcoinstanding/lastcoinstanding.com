@@ -15,6 +15,11 @@
        rePairQA.ledgerCheck()               // ledger final row = cards
        rePairQA.parityCheck()               // same shared inputs, same
                                             // house-side figures (PR 4f)
+       rePairQA.taxParityCheck()            // same shared tax inputs, same
+                                            // tax on both pages (PR 8)
+       await rePairQA.booksCheck()          // ledger = stat block = chart;
+                                            // equal cash out (PR 8)
+       await rePairQA.all()                 // all of the above
 
    It drives the page's own controls (so the real call paths run,
    not just the engine), pins everything that varies between loads,
@@ -148,6 +153,14 @@
        (scenario × home prices and holding period × net yield), hashing each
        grid's values. Checked: the reader's cell equals the cards (BvRE) and
        the headline (BvRP).
+     PR 8 (design §11, §12) — no vector moves. The parity tripwire is
+       finished: taxParityCheck() (the shared tax inputs give the same rate
+       and the same tax on both pages) and booksCheck() (on each page, every
+       scenario, both frames and both valuation bases: ledger = stat block =
+       chart, the difference line = bitcoin minus the house, and BvRE's
+       equal cash out, M2). all() runs everything. run()'s save-and-restore
+       moved into session(), which booksCheck() shares; run()'s output is
+       unchanged.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -397,32 +410,65 @@
              rates: q('[data-yr]'), example: q('[data-yr-ex]'), disclosure: html('calc-rates-rows') };
   }
 
-  // ─── Runner ────────────────────────────────────────────────────────
-  async function run(opts){
-    opts = opts || {};
-    var p = page();
-    if (!p) { console.error('rePairQA: not on a real-estate pair page'); return null; }
-
+  // ─── Session: pin, run, restore ───────────────────────────────────
+  // Everything a run touches (Date.now, TODAY_PRICE, the projection's
+  // price, the sitewide assumptions, BvRE's stored settings, the URL, the
+  // reader's frame) is saved first and put back after, whatever happens.
+  // `body` drives the page's controls synchronously.
+  async function session(p, body){
+    var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE,
+                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null, display: state_display() };
+    try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
+    if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
+    Date.now = function(){ return FIXED_NOW; };
+    try {
+      window.TODAY_PRICE = FIXED_BTC;                         // the retrospective's end price on BvRE (PR 4e); BvRP's price
+      click('.tab-btn[data-tab="calculator"]');
+      if (p === 'bvrp') await sleep(200);                     // BvRP's chart builds on tab activation
+      body();
+      if (p === 'bvre') {
+        applyRetro({}); applyProj({});
+        click('.calc-mode-label[data-mode="retrospective"]');
+      } else {
+        applyRp({});
+        if (saved.display) click('.calc-frame-btn[data-mode="' + saved.display + '"]');   // the reader's frame (PR 4f)
+      }
+    } finally {
+      Date.now = saved.now;
+      window.TODAY_PRICE = saved.today;
+      if (p === 'bvre') {
+        if (saved.btcNow !== null) setVal('fwdBtcNow', saved.btcNow);   // the projection's price, as the reader had it
+        if (window.runRetroCalc) window.runRetroCalc();
+      }
+      if (window.ModelingAssumptions) Object.keys(saved.ma).forEach(function(d){
+        var m = saved.ma[d]; if (m && m.preset === 'custom') window.ModelingAssumptions.set(d, 'custom', m.value); else if (m) window.ModelingAssumptions.set(d, m.preset);
+      });
+      await sleep(400);                                       // let the debounced URL/storage writer run, then restore
+      try { if (saved.store === null) localStorage.removeItem('lcs.bvre.calc.v2'); else localStorage.setItem('lcs.bvre.calc.v2', saved.store); } catch (e) {}
+      history.replaceState(null, '', saved.url);
+    }
+  }
+  async function settle(p, opts){
     // Let live fetches settle so they can't overwrite a pinned value mid-run:
     // the projection's status, and the shared fetcher's in-flight queue
     // (power-law-data.js), which the retrospective waits on (PR 4e).
     if (p === 'bvre') {
       for (var w = 0; w < 120 && (/loading/i.test((el('fwdBtcPriceStatus') || {}).textContent || '') || window.__lcsPriceQueue); w++) await sleep(250);
     } else {
-      await sleep(opts.settleMs || 3000);
+      await sleep((opts && opts.settleMs) || 3000);
     }
+  }
 
-    // Save state
-    var saved = { now: Date.now, url: location.pathname + location.search + location.hash, store: null, ma: {}, today: window.TODAY_PRICE,
-                  btcNow: el('fwdBtcNow') ? el('fwdBtcNow').value : null, display: state_display() };
-    try { saved.store = localStorage.getItem('lcs.bvre.calc.v2'); } catch (e) {}
-    if (window.ModelingAssumptions) ['inflation', 'homeApprNominal', 'realReturns'].forEach(function(d){ saved.ma[d] = window.ModelingAssumptions.get(d); });
+  // ─── Runner ────────────────────────────────────────────────────────
+  async function run(opts){
+    opts = opts || {};
+    var p = page();
+    if (!p) { console.error('rePairQA: not on a real-estate pair page'); return null; }
+    await settle(p, opts);
 
-    Date.now = function(){ return FIXED_NOW; };
     var rows = [], all = [];
-    try {
+    await session(p, function(){
       if (p === 'bvre') {
-        window.TODAY_PRICE = FIXED_BTC;                         // the retrospective's end price (PR 4e)
         click('.tab-btn[data-tab="calculator"]');
         var st = JSON.stringify(captureBvreStatic());
         rows.push({ id: 'S-bvre', desc: 'static exhibits (tabs I, II, IV)', hash: fnv(st), len: st.length }); all.push(st);
@@ -448,32 +494,12 @@
           else { applyProj(v); s = JSON.stringify(captureProj()); }
           rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s);
         });
-        applyRetro({}); applyProj({});
-        click('.calc-mode-label[data-mode="retrospective"]');
       } else {
-        window.TODAY_PRICE = FIXED_BTC;
-        click('.tab-btn[data-tab="calculator"]');
-        await sleep(200);                                     // chart builds on tab activation
         var s0 = JSON.stringify(captureRpStatic());
         rows.push({ id: 'S-bvrp', desc: 'Power Law copy spans', hash: fnv(s0), len: s0.length }); all.push(s0);
         RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(v.ledger ? captureLedger('calc-ledger') : v.grid ? captureGrid('calc-grid', v.grid) : captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
-        applyRp({});
-        if (saved.display) click('.calc-frame-btn[data-mode="' + saved.display + '"]');   // the reader's frame (PR 4f)
       }
-    } finally {
-      Date.now = saved.now;
-      window.TODAY_PRICE = saved.today;
-      if (p === 'bvre') {
-        if (saved.btcNow !== null) setVal('fwdBtcNow', saved.btcNow);   // the projection's price, as the reader had it
-        if (window.runRetroCalc) window.runRetroCalc();
-      }
-      if (window.ModelingAssumptions) Object.keys(saved.ma).forEach(function(d){
-        var m = saved.ma[d]; if (m && m.preset === 'custom') window.ModelingAssumptions.set(d, 'custom', m.value); else if (m) window.ModelingAssumptions.set(d, m.preset);
-      });
-      await sleep(400);                                       // let the debounced URL/storage writer run, then restore
-      try { if (saved.store === null) localStorage.removeItem('lcs.bvre.calc.v2'); else localStorage.setItem('lcs.bvre.calc.v2', saved.store); } catch (e) {}
-      history.replaceState(null, '', saved.url);
-    }
+    });
 
     var digest = fnv(all.join('\u0001'));
     var fails = [];
@@ -596,6 +622,188 @@
     return { pass: fails.length === 0, fails: fails, rows: out };
   }
 
-  window.rePairQA = { run: run, ledgerCheck: ledgerCheck, parityCheck: parityCheck,
-                      vectors: { retro: RETRO, projection: PROJ, rental: RP, parity: PARITY } };
+
+  // ─── Tax parity: the same shared tax inputs, the same tax (PR 8) ───
+  // Design §11's parity tripwire, its tax half. The pair carries `tax`,
+  // `bracket` and `state` (P3); each page turns them into a tax profile its
+  // own way: BvRE through bvreTaxProfile() from its select values (strings),
+  // BvRP as its state object (bindSelect makes the bracket a number). For
+  // each profile the check asserts the same long-term rate on both, the same
+  // tax on the bitcoin sold at each PARITY house's horizon (BvRE's
+  // btcSaleTax against BvRP's gain × rate), and the same tax on the house's
+  // gain once the exclusion is out of it (BvRE's home-sale tax at a 1-year
+  // hold, which has no exclusion, against the gain × BvRP's rate; the
+  // rental's recapture has no BvRE counterpart and is not compared).
+  var TAX = [
+    { id: 'T1', desc: 'the default: United States, 24%, typical state', tax: 'us', bracket: '24', state: 'OTHER' },
+    { id: 'T2', desc: 'United States, 37%, California: NIIT and the top state rate', tax: 'us', bracket: '37', state: 'CA' },
+    { id: 'T3', desc: 'United States, 12%, Texas: no federal or state tax on the gain', tax: 'us', bracket: '12', state: 'TX' },
+    { id: 'T4', desc: 'United States, 32%, New York: NIIT from the 32% bracket', tax: 'us', bracket: '32', state: 'NY' },
+    { id: 'T5', desc: 'no capital-gains tax', tax: 'none', bracket: '24', state: 'OTHER' }
+  ];
+  function taxParityCheck(){
+    var RE = window.RealEstateModel;
+    if (!RE || !RE.bvreTaxProfile || !RE.gainRate) { console.error('rePairQA.taxParityCheck: needs RealEstateModel'); return null; }
+    var out = [], fails = [];
+    function near(a, b){ return Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
+    TAX.forEach(function(t){
+      var tp = RE.bvreTaxProfile({ taxRegime: t.tax, filing: 'mfj', taxBracket: t.bracket, taxState: t.state, btcAccount: 'taxable' });
+      var s = { taxRegime: t.tax, federalBracketPct: Number(t.bracket), stateCode: t.state };
+      var rate = RE.gainRate(s), ok = near(RE.gainRate(tp), rate), btc = true, home = true;
+      PARITY.forEach(function(v){
+        var gain = v.price * (Math.pow(1 + v.appr / 100, v.years) - 1), proceeds = v.price + gain;
+        btc = btc && near(RE.btcSaleTax(tp, proceeds, v.price, 0).tax, Math.max(0, gain) * rate);
+        home = home && near(RE.homeSaleTax(tp, proceeds, 0, v.price, 1).tax, Math.max(0, gain) * rate);
+      });
+      var row = { id: t.id, desc: t.desc, ratePct: Math.round(rate * 10000) / 100, rate: ok, bitcoinTax: btc, houseGainTax: home, ok: ok && btc && home };
+      if (!row.ok) fails.push(t.id);
+      out.push(row);
+    });
+    console.table(out);
+    if (!fails.length) console.log('%crePairQA.taxParityCheck PASS', 'color:#7fc47f;font-weight:bold', '— ' + out.length + ' tax profiles, the same on both pages');
+    else console.error('rePairQA.taxParityCheck FAIL', fails);
+    return { pass: fails.length === 0, fails: fails, rows: out };
+  }
+
+  // ─── Books: ledger = stat block = chart, on the page (PR 8) ───
+  // Design §11's parity tripwire, its second and third halves, and §12's
+  // acceptance: on each page, for every scenario, both frames and both
+  // valuation bases, the ledger's totals, the stat block and the chart's
+  // end-points agree, and (BvRE, M2) cumulative cash out is the same on the
+  // ledger's two tabs. It drives the page's controls, as run() does, and
+  // reads what the page rendered: the ledger's spec (nominal, as paid), the
+  // cards or the table (in the frame shown), and the chart's datasets.
+  //   Frame: the ledger is nominal; the stat block and chart are in the
+  //   frame shown. The chart must equal the stat block to the dollar, and
+  //   chart ÷ ledger must be 1 in Nominal and 1 / the deflator in Real, the
+  //   same on both sides (so the Real view never changes which is ahead, M1).
+  //   Bases: If sold, the chart's last point = the ledger's After tax; Held,
+  //   it = the ledger's last row (BvRE: equity and bitcoin value; BvRP: total
+  //   held). The difference line = bitcoin (the path) minus the house (the
+  //   rental), in both.
+  var BOOKS_BVRE = (function(){
+    var v = [];
+    ['floor', 'stay', 'trend', 'upper'].forEach(function(sc){
+      ['mortgage', 'cash'].forEach(function(m){
+        ['real', 'nominal'].forEach(function(d){ v.push({ id: 'B-' + sc + '-' + m + '-' + d, scenario: sc, method: m, display: d }); });
+      });
+    });
+    v.push({ id: 'B-20y', horizon: '20' }, { id: 'B-5y-cpi', horizon: '5', infl: 'cpi-official' },
+           { id: 'B-noinvest', invest: false }, { id: 'B-rent4000', rent: '4000' }, { id: 'B-nocgt', regime: 'none' });
+    return v;
+  })();
+  var BOOKS_RETRO = [{ id: 'R-2014', year: '2014' }, { id: 'R-2017', year: '2017' }, { id: 'R-2017-cash', year: '2017', mode: 'cash' },
+                     { id: 'R-2021', year: '2021' }, { id: 'R-2021-rent4000', year: '2021', rent: '4000' }, { id: 'R-2024', year: '2024' }];
+  var BOOKS_RP = (function(){
+    var v = [];
+    ['1', '2', '3', '4'].forEach(function(path){
+      ['floor', 'stay', 'trend', 'upper'].forEach(function(sc){
+        ['real', 'nominal'].forEach(function(d){ v.push({ id: 'Q-' + path + '-' + sc + '-' + d, path: path, scenario: sc, display: d }); });
+      });
+    });
+    v.push({ id: 'Q-1y', path: '1', hold: '1' }, { id: 'Q-30y', path: '1', hold: '30' }, { id: 'Q-mort450', path: '1', mortgage: '450000' });
+    return v;
+  })();
+  function money(txt){ var m = String(txt).replace(/[−–]/g, '-').match(/-?\$[\d,]+/); return m ? Number(m[0].replace(/[$,]/g, '')) : NaN; }
+  function lastOf(ds){ return ds.data[ds.data.length - 1]; }
+  function finalRow(spec, label){ var r = spec.final.rows.filter(function(x){ return x.label === label; })[0]; return r ? r.values : null; }
+  function within(a, b, tol){ return isFinite(a) && isFinite(b) && Math.abs(a - b) <= tol; }
+  // chart ÷ ledger = want; 0 ÷ 0 passes (a renter whose bitcoin ran out).
+  function ratioOk(a, b, want){
+    if (Math.abs(a) < 0.5 && Math.abs(b) < 0.5) return true;
+    var r = a / b; return isFinite(r) && Math.abs(r - want) <= 1e-9 * Math.max(1, want);
+  }
+
+  function booksBvre(x, where){
+    var RE = window.RealEstateModel, proj = where === 'proj';
+    var box = el(proj ? 'fwdLedger' : 'calcLedger'), spec = box && box._ledgerSpec;
+    var cards = Array.prototype.map.call(document.querySelectorAll('#' + (proj ? 'fwdResults' : 'calcResultsContainer') + ' .big-number'), function(n){ return money(n.textContent); });
+    var block = proj ? 'fwdChartBlock' : 'calcChartBlock', pre = proj ? 'fwd' : 'calc';
+    function chart(basis){ click('#' + block + ' [data-basis="' + basis + '"]'); return window.RealEstateChart.data(pre); }
+    var sold = chart('ifsold'), held = chart('held'); chart('ifsold');
+    var after = finalRow(spec, 'After tax'), rows = spec.tabs[0].rows, last = rows[rows.length - 1];
+    var bLast = spec.tabs[1].rows[spec.tabs[1].rows.length - 1];
+    var H = lastOf(sold.datasets[0]), B = lastOf(sold.datasets[1]), D = lastOf(sold.datasets.filter(function(d){ return /^Difference/.test(d.label); })[0]);
+    var Hh = lastOf(held.datasets[0]), Bh = lastOf(held.datasets[1]), Dh = lastOf(held.datasets.filter(function(d){ return /^Difference/.test(d.label); })[0]);
+    var real = proj && (document.querySelector('.display-mode-btn.active') || {}).getAttribute('data-mode') === 'real';
+    var want = 1;
+    if (real) { var infl = window.ModelingAssumptions.get('inflation').value, yrs = +el('fwdHorizon').value; want = 1 / RE.deflator(infl, yrs); }
+    var shortfall = rows.reduce(function(a, r){ return a + (r.shortfall || 0); }, 0) + spec.tabs[1].rows.reduce(function(a, r){ return a + (r.shortfall || 0); }, 0);
+    var invest = el(proj ? 'fwdInvestDiff' : 'calcInvestDiff').checked;
+    var checks = {
+      cardsEqualChart: cards.length >= 2 && within(cards[0], B, 1) && within(cards[1], H, 1),
+      chartEqualLedgerAfterTax: ratioOk(H, after[0], want) && ratioOk(B, after[1], want),
+      heldEqualLedgerRow: ratioOk(Hh, last.equity, want) && ratioOk(Bh, bLast.btcValue, want),
+      equityEqualFinal: within(last.equity, finalRow(spec, 'Market value')[0] + finalRow(spec, 'Mortgage repaid')[0], 1e-6 * Math.max(1, Math.abs(last.equity))),
+      differenceLine: within(D, B - H, 1e-6 * Math.max(1, Math.abs(D))) && within(Dh, Bh - Hh, 1e-6 * Math.max(1, Math.abs(Dh))),
+      equalCashOut: !invest || shortfall > 0 || within(last.cumCashOutOwner, bLast.cumCashOutRenter, 1e-6 * Math.max(1, last.cumCashOutOwner))
+    };
+    return { checks: checks, figures: { house: Math.round(H), bitcoin: Math.round(B), cashOut: Math.round(last.cumCashOutOwner), frame: real ? 'real' : 'nominal' } };
+  }
+  function booksRp(){
+    var box = el('calc-ledger'), spec = box && box._ledgerSpec;
+    var body = el('calc-comparison-body'), table = {};
+    Array.prototype.forEach.call(body.querySelectorAll('tr'), function(tr){
+      var c = tr.cells, lab = c[0].textContent;
+      if (/total if held/.test(lab)) table.held = [money(c[1].textContent), money(c[2].textContent)];
+      if (/^If sold, after tax/.test(lab)) table.after = [money(c[1].textContent), money(c[2].textContent)];
+    });
+    var sc = (document.querySelector('.calc-cagr-chip.active') || {}).getAttribute('data-scenario');
+    var IDX = { stay: 1, trend: 2, upper: 3, floor: 4 };
+    function chart(basis){ click('.calc-chart-basis-btn[data-basis="' + basis + '"]'); var d = chartData('calc-chart'); return d; }
+    var sold = chart('ifsold'), held = chart('held'); chart('ifsold');
+    var K = lastOf(sold.datasets[0]), P = lastOf(sold.datasets[IDX[sc]]), D = lastOf(sold.datasets[5]);
+    var Kh = lastOf(held.datasets[0]), Ph = lastOf(held.datasets[IDX[sc]]), Dh = lastOf(held.datasets[5]);
+    var after = finalRow(spec, 'After tax'), tot = finalRow(spec, 'Total held');
+    var rl = spec.tabs[0].rows[spec.tabs[0].rows.length - 1], pl = spec.tabs[1].rows[spec.tabs[1].rows.length - 1];
+    var real = state_display() === 'real', want = 1;
+    if (real) want = 1 / window.RealEstateModel.deflator(window.ModelingAssumptions.get('inflation').value, +el('calc-holding-years').value);
+    var checks = {
+      tableEqualChart: within(table.after[0], K, 1) && within(table.after[1], P, 1) && within(table.held[0], Kh, 1) && within(table.held[1], Ph, 1),
+      chartEqualLedgerAfterTax: ratioOk(K, after[0], want) && ratioOk(P, after[1], want),
+      heldEqualLedger: ratioOk(Kh, tot[0], want) && ratioOk(Ph, tot[1], want) && within(rl.held, tot[0], 1e-6 * Math.max(1, Math.abs(tot[0]))) && within(pl.held, tot[1], 1e-6 * Math.max(1, Math.abs(tot[1]))),
+      differenceLine: within(D, P - K, 1e-6 * Math.max(1, Math.abs(D))) && within(Dh, Ph - Kh, 1e-6 * Math.max(1, Math.abs(Dh)))
+    };
+    return { checks: checks, figures: { keep: Math.round(K), path: Math.round(P), frame: real ? 'real' : 'nominal' } };
+  }
+  async function booksCheck(opts){
+    var p = page();
+    if (!p) { console.error('rePairQA.booksCheck: not on a real-estate pair page'); return null; }
+    await settle(p, opts);
+    var out = [], fails = [];
+    function record(id, r){
+      var ok = Object.keys(r.checks).every(function(k){ return r.checks[k]; });
+      if (!ok) fails.push(id);
+      out.push(Object.assign({ id: id, ok: ok }, r.figures, r.checks));
+    }
+    await session(p, function(){
+      if (p === 'bvre') {
+        click('.calc-mode-label[data-mode="retrospective"]');
+        BOOKS_RETRO.forEach(function(v){ applyRetro(v); record(v.id, booksBvre(v, 'retro')); });
+        click('.calc-mode-label[data-mode="projection"]');
+        BOOKS_BVRE.forEach(function(v){ applyProj(v); record(v.id, booksBvre(v, 'proj')); });
+      } else {
+        BOOKS_RP.forEach(function(v){ applyRp(v); record(v.id, booksRp()); });
+      }
+    });
+    console.table(out);
+    if (!fails.length) console.log('%crePairQA.booksCheck PASS', 'color:#7fc47f;font-weight:bold', '— ' + out.length + ' states: ledger = stat block = chart' + (p === 'bvre' ? ', equal cash out' : ''));
+    else console.error('rePairQA.booksCheck FAIL', fails);
+    return { page: p, pass: fails.length === 0, fails: fails, rows: out };
+  }
+
+  // Everything, in one call: the byte-identity vectors, then every identity.
+  async function all(opts){
+    var p = page(), r = { run: await run(opts), parity: parityCheck(), tax: taxParityCheck(), books: await booksCheck(opts) };
+    if (p === 'bvre') r.ledger = ledgerCheck();
+    var ok = r.parity && r.parity.pass && r.tax && r.tax.pass && r.books && r.books.pass && (p !== 'bvre' || (r.ledger && r.ledger.pass)) && (!opts || !opts.expect || r.run.pass);
+    if (ok) console.log('%crePairQA.all PASS', 'color:#7fc47f;font-weight:bold', '— digest ' + r.run.digest);
+    else console.error('rePairQA.all FAIL');
+    r.pass = !!ok;
+    return r;
+  }
+
+  window.rePairQA = { run: run, all: all, ledgerCheck: ledgerCheck, parityCheck: parityCheck, taxParityCheck: taxParityCheck, booksCheck: booksCheck,
+                      vectors: { retro: RETRO, projection: PROJ, rental: RP, parity: PARITY, tax: TAX,
+                                 books: { retro: BOOKS_RETRO, projection: BOOKS_BVRE, rental: BOOKS_RP } } };
 })();

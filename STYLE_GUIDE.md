@@ -2206,6 +2206,14 @@ Grow the hit area of an inline text link with **vertical padding** (`padding: 0.
 
 **Section eyebrow = the page's wayfinding idiom.** A short uppercase amber label (Inter 700, 0.64rem, 0.2em tracking, centered above the section) names what the section is — *The retirement tools*, *All explorations* — so a reader scanning down the page knows what each block is for without reading into it. Same label style as the retirement strip's `.rfam-tag`; on the homepage `.insight-eyebrow` reproduces it above the carousel tabs. One per section, above the heading or tabs; never as decoration on a card.
 
+### 6.49 House components from the real-estate pair: the calculation ledger and the sensitivity grid (2026-09-29)
+
+Two components built for the real-estate pair (SITE_GUIDE §55.4) are now house components: a calculator page that needs either uses the module, not a copy.
+
+**"Show the calculation" (`shared/real-estate-ledger.js` / `.css`, `RealEstateLedger.render(el, spec)`).** A closed `<details>` under the results, summary *"Show the calculation"* with the hint *"year by year, and the sale at the end"*. Inside: one line saying which dollars the table is in (nominal, as paid, even when the cards are Real), tabs (one per side of the comparison), a year-by-year table per tab, then the **final rows** (market value → selling costs → before tax → tax → after tax), and a **Download CSV** button. Rules: (1) the ledger's last row and final rows must equal the stat block and the chart's end-point, and the page's QA asserts it (`rePairQA.booksCheck()` is the model); (2) the CSV opens cleanly in a spreadsheet: a `#`-prefixed provenance header (page, inputs, date), one block per tab, every column labelled with its unit, dollars as whole numbers, BTC to 6 dp; (3) the table scrolls sideways inside its box on a phone, never the page; (4) the open state and chosen tab survive a re-render.
+
+**The sensitivity grid (`shared/real-estate-grid.js`, `RealEstateGrid`).** A 3 × 3 table of one result (the after-tax difference) under two assumptions, the reader's cell in the middle, outlined and labelled *yours*. The page gives the axis pairs and a function for one cell; a toggle switches pairs. Colour is diverging (the page's two series colours, grey at zero, strength by size), and **every cell carries its value and the side ahead in words**, so colour is never the only signal. Compact dollars, so it fits 375px. Caption, verbatim wherever it is used: *"A map of how the answer moves with two assumptions, not a probability distribution."* The reader's cell must equal the headline (checked). Never put an optimistic-only scenario on an axis (the pair leaves Upper out, M3).
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

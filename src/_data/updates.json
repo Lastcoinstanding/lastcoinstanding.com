@@ -3,6 +3,30 @@
     "display": "9/29/26",
     "date": "2026-09-29",
     "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: This page and Bitcoin vs. Rental Property now form a pair, the tenant's side and the landlord's side of one decision. A strip at the top links the two, and a Run this on the other side link opens the other calculator with the inputs they share: horizon, bitcoin scenario, home appreciation, sale costs, view and tax settings."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: This page and Bitcoin vs. Real Estate now form a pair, the landlord's side and the tenant's side of one decision. A strip at the top links the two, and a Run this on the other side link opens the other calculator with the inputs they share."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: New sensitivity grid under the projection: the after-tax difference under three bitcoin scenarios and three rates of home-price growth (or three horizons and mortgage rates), with your case in the middle."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: New sensitivity grid under the calculator: the after-tax difference under three bitcoin scenarios and three rates of home-price growth (or three holding periods and net yields), with your case in the middle."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/bitcoin-vs-real-estate",
     "summary": "Bitcoin vs. Real Estate: New wealth chart in both calculators: the house and the bitcoin each year, if sold that year after tax, with a Held view and a line showing the difference. The projection also draws the Floor scenario faintly."
   },
   {
