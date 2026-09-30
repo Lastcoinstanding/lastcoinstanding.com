@@ -242,3 +242,10 @@ PR 6 is split: **6a** "Show the calculation" and the CSV (P2, P7); **6b** the ch
 - **Bitcoin vs. Rental Property's chart** now values each year **if sold, after tax** by default (M7), with a *Held* toggle beside the zoom toggle. Held is the chart before 6b, unchanged (datasets identical on all four paths). If sold uses `RealEstateModel.calcIfSoldTrajectory`: each year t sold on the whole horizon's bitcoin path, so its last point equals the table's after-tax total (checked on every path at 10 and 20 years).
 - **The difference line** (P4): the selected scenario's path minus keeping the rental, on the same axis, near-white, solid and heaviest; in the legend and the tooltip. The note under the chart explains both bases.
 - **Bitcoin vs. Real Estate's chart** (new on that page, both calculators) is **6c**.
+
+## 17 · Implementation notes, PR 6c (2026-09-29; not new rulings)
+
+- **Bitcoin vs. Real Estate gains a wealth chart in both calculators** (P7: cards, toggle, chart, ledger), from `shared/real-estate-chart.js`: the house and the bitcoin each year, **If sold, after tax** by default (M7) or **Held**, the **difference** (bitcoin minus the house) as the heaviest line (P4), and in the projection the **Floor** scenario's bitcoin drawn faintly (M3). A first-3-years zoom on both (P4). Colours and line styles match the rental page's.
+- **Each point** comes from the engine (`o.points`: the purchase, then each year end), valued as the cards value the end; the last point equals the cards in both frames. The Real view divides each year by its own factor.
+- **Not shared with the rental page's chart**, which keeps its own code (scenario chips, legend toggles); the pair shares the look and the valuation, not the Chart.js wrapper. PR 8 can fold them together if it's worth it.
+- **No figure moves:** every rePairQA vector is unchanged; new E32, E33 hash the charts' data.

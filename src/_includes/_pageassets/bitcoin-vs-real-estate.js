@@ -69,6 +69,34 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                         ['Amounts', 'nominal USD, as paid'], ['Live scenario URL', window.location.href]]) }
       };
     }
+    // ── The chart (PR 6c; rulings M3, M7, P4, P7) ──
+    // o.points: the purchase, then one point per year (engine). conv(v, k)
+    // puts point k in the display frame; floorPts, the projection's Floor
+    // scenario, drawn faintly.
+    var reCharts = {};
+    function reChartToggles(prefix, rerun){
+      if (!reCharts[prefix] && window.RealEstateChart) reCharts[prefix] = window.RealEstateChart.bind(prefix, rerun);
+      return reCharts[prefix];
+    }
+    function reRenderChart(prefix, o, labels, conv, fmtFn, floorPts, rerun){
+      var t = reChartToggles(prefix, rerun);
+      if (!t) return;
+      var sold = t.basis() !== 'held';
+      var pts = o.points, n = t.zoom() === 'first3' ? Math.min(3, pts.length - 1) : pts.length - 1;
+      function series(get, ps){ return (ps || pts).slice(0, n + 1).map(function(p, k){ return conv(get(p), k); }); }
+      var H = function(p){ return sold ? p.houseAfter : p.houseHeld; }, B = function(p){ return sold ? p.btcAfter : p.btcHeld; };
+      var s = [
+        { style: 'house', label: 'The house', data: series(H) },
+        { style: 'btc', label: 'Bitcoin', data: series(B) },
+        { style: 'diff', label: 'Difference: bitcoin minus the house', data: series(function(p){ return B(p) - H(p); }) }
+      ];
+      if (floorPts) s.splice(2, 0, { style: 'floor', label: 'Bitcoin at Floor', data: series(B, floorPts) });
+      var fr = document.getElementById(prefix + 'ChartFrame');
+      if (fr) fr.textContent = '(' + (sold ? 'if sold that year, after tax' : 'held, before any sale') + (o.real ? (_reFrameReal() ? '; real, today\u2019s $' : '; nominal, future $') : '; nominal') + ')';
+      window.RealEstateChart.render(prefix, { labels: labels.slice(0, n + 1), series: s, fmt: fmtFn });
+    }
+    function _reFrameReal(){ var b = document.querySelector('.display-mode-btn.active'); return !b || b.getAttribute('data-mode') === 'real'; }
+
     function reHouseTaxLine(R, f, conv){
       var h = R.homeTax, pre = conv(R.houseIfSold), tax = conv(h.tax);
       var cap = '$' + h.cap.toLocaleString('en-US');
@@ -499,6 +527,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
                     : ('Both households paid out <strong>' + rFmt(R.cumCashOutOwner) + '</strong> from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: ' + rFmt(R.upfront) + ' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'))
                 : ('The owner paid out ' + rFmt(R.cumCashOutOwner) + ' and the renter ' + rFmt(R.cumCashOutRenter) + ' from ' + startLabel + ' to ' + endLabel + ' <span style="' + mutedS + '">(nominal)</span>: with the toggle off, only the up-front sum went into bitcoin.');
         }
+        reRenderChart('calc', R, [retroMonth(R.startKey).replace(/^(\w{3})\w*/, '$1')].concat(R.rows.map(function(r){ return r.toDate ? 'to date' : 'Dec ' + r.year; })),
+            function(v){ return v; }, rFmt, null, runCalculator);
         if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('calcLedger'), reLedgerSpec(R, {
             retro: true, calc: 'the look-back', filename: 'bitcoin-vs-real-estate-lookback.csv',
             meta: [['Start', startLabel], ['End', endLabel + ' (house value to ' + houseLabel + ')'], ['Home price', Math.round(hs)], ['Bitcoin today', Math.round(R.btcToday)]] }));
@@ -749,7 +779,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var sellPct = parseRange('fwdSellPct', 0, 10, D.sellPct);
     var btcTxPct = parseRange('fwdBtcTxPct', 0, 2, D.btcTxPct);
     var closingPct = parseRange('fwdClosingPct', 0, 10, D.closingPct);
-    var P = RealEstateModel.bvreProjection(Object.assign({
+    var _pIn = Object.assign({
       method: method, scenario: scenario, horizonYrs: horizonYrs, btcNow: btcNow,
       homePrice: homePrice, homeApprNominal: homeApprNominal, inflRate: inflRate,
       mortRate: mortRate, dpf: dpf,
@@ -760,7 +790,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       insurance: parseOpt('fwdInsurance', 0, 100000),
       maintPct: parseRange('fwdMaintPct', 0, 5, D.maintPct),
       sellPct: sellPct, btcTxPct: btcTxPct, investDiff: invest
-    }, reTaxInputs()));
+    }, reTaxInputs());
+    var P = RealEstateModel.bvreProjection(_pIn);
+    P._inputs = _pIn;
     function conv(x){ return _mode === 'real' ? x / P.deflator : x; }
     // Both paths end on the same day, horizonYrs from today (M10).
     var asOf = new Date(P.endDateMs).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
@@ -883,6 +915,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             : ('Both households paid out <strong>'+fmt(P.cumCashOutOwner)+'</strong> over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: '+fmt(P.upfront)+' up front, then the owner’s monthly costs, which the renter matched with rent plus bitcoin purchases, or with bitcoin sales when rent cost more.'))
         : ('The owner paid out '+fmt(P.cumCashOutOwner)+' and the renter '+fmt(P.cumCashOutRenter)+' over '+yrs+' years <span style="'+mutedS+'">(nominal)</span>: with the toggle off, only the up-front sum goes into bitcoin.');
     }
+    // The Floor scenario for the chart's faint line (M3); the same inputs.
+    var PF = scenario === 'floor' ? null : RealEstateModel.bvreProjection(Object.assign({}, P._inputs, { scenario: 'floor' }));
+    var defl = 1 + inflRate / 100;
+    reRenderChart('fwd', P, P.points.map(function(p, k){ return 'Y' + k; }),
+      function(v, k){ return _mode === 'real' ? v / Math.pow(defl, k) : v; }, fmt, PF ? PF.points : null, runFwdCalc);
     if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
       retro: false, calc: 'the projection', filename: 'bitcoin-vs-real-estate-projection.csv',
       realNote: _mode === 'real' ? 'the Real view on the cards divides the end values by ' + P.deflator.toFixed(2) + ' (' + (window.RealEstateBaseline ? window.RealEstateBaseline.deflatorPhrase() : 'the deflator') + ')' : '',

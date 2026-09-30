@@ -20,3 +20,15 @@
 .re-ledger-final { min-width: 22rem; }
 .re-ledger-final .re-ledger-strong td { font-weight: 700; color: var(--text, var(--ink, #ccc6b8)); }
 .re-ledger-csv { font: inherit; font-size: 0.76rem; padding: 0.4rem 0.9rem; border-radius: 0.3rem; border: 1px solid rgba(224,148,34,0.35); background: rgba(224,148,34,0.08); color: var(--amber, #e09422); cursor: pointer; }
+
+/* PR 6c: Bitcoin vs. Real Estate's wealth chart (shared/real-estate-chart.js). */
+.re-chart-block { margin: 1.4rem 0 0.4rem; }
+.re-chart-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; margin: 0 0 0.6rem; }
+.re-chart-title { flex: 1 1 100%; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber, #e09422); }
+.re-chart-frame { font-weight: 400; letter-spacing: 0.02em; text-transform: none; color: var(--text-dim, #9a9080); }
+.re-seg { display: inline-flex; gap: 0.3rem; border: 1px solid rgba(224,148,34,0.15); border-radius: 0.4rem; padding: 0.15rem; }
+.re-seg-btn { font: inherit; font-size: 0.74rem; padding: 0.35rem 0.7rem; border: none; border-radius: 0.3rem; background: transparent; color: var(--text-dim, #9a9080); cursor: pointer; }
+.re-seg-btn.active { background: rgba(224,148,34,0.14); color: var(--amber, #e09422); font-weight: 600; }
+.re-chart-wrap { position: relative; height: 320px; }
+@media (max-width: 480px) { .re-chart-wrap { height: 260px; } }
+.re-chart-block p.re-chart-note { font-size: 0.76rem; font-style: italic; line-height: 1.55; color: var(--text-dim, #9a9080); margin: 0.6rem 0 0; }

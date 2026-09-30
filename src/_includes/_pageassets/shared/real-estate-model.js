@@ -1124,6 +1124,7 @@
         yr.balance = bal; yr.equity = yr.homeValue - bal;
         yr.btcHeld = btc; yr.btcValue = btc * yr.btcPrice;
         yr.cumCashOutOwner = cumOwner; yr.cumCashOutRenter = cumRenter;
+        yr.btcBasis = basis; yr.realized = realized; yr.monthsElapsed = m;   // PR 6c: the chart's If sold points
         rows.push(yr); yr = null;
       }
     }
@@ -1147,6 +1148,8 @@
     o.btcValue = btcValue; o.btcSaleCost = btcSaleCost; o.btcIfSold = btcIfSold;
     o.balance = bal; o.sellCosts = sellCosts; o.houseHeld = houseHeld; o.houseIfSold = houseIfSold;
     o.equityPct = homeEnd > 0 ? Math.round((houseHeld / homeEnd) * 100) : 0;
+    o.rows = rows;
+    o.start = { homeValue: hs, balance: loan, btcValue: btcUpfront * entryPrice, btcBasis: upfront, realized: 0 };
     exitTaxes(o, i, homeEnd, sellCosts, hs + closing, n / 12, btcIfSold, basis, realized, houseIfSold, null);
     o.totals = t;
     o.cumCashOutOwner = cumOwner; o.cumCashOutRenter = cumRenter;
@@ -1166,6 +1169,16 @@
     o.homeTax = h; o.btcTax = b; o.btcBasis = btcBasis; o.homeBasis = homeBasis;
     o.houseAfterTax = houseIfSold - h.tax;
     o.btcAfterTax = btcIfSold - b.tax;
+    // Each year's point for the chart (PR 6c, M7): held, and if sold that
+    // year after tax, as the cards value the end. o.start is the purchase.
+    var tx = i.btcTxPct / 100;
+    function point(r, yrs){
+      var sc = r.homeValue * i.sellPct / 100, hPre = r.homeValue - sc - r.balance;
+      var bPre = r.btcValue * (1 - tx);
+      var ht = homeSaleTax(tp, r.homeValue, sc, homeBasis, yrs).tax, bt = btcSaleTax(tp, bPre, r.btcBasis, r.realized).tax;
+      return { houseHeld: r.homeValue - r.balance, btcHeld: r.btcValue, houseIfSold: hPre, btcIfSold: bPre, houseAfter: hPre - ht, btcAfter: bPre - bt };
+    }
+    o.points = [point(o.start, 0)].concat(o.rows.map(function(r){ return point(r, r.monthsElapsed / 12); }));
     // Houses the bitcoin could buy outright: after its tax (PR 5b; was before).
     o.housesCanBuy = homeEnd > 0 ? Math.max(0, o.btcAfterTax / homeEnd) : 0;
     if (realFn && o.real) {
@@ -1308,6 +1321,7 @@
         yr.months = m; yr.homeValue = homePrice * Math.pow(1 + g, m / 12); yr.balance = bal;
         yr.equity = yr.homeValue - bal; yr.btcPrice = price; yr.btcHeld = btc; yr.btcValue = btc * price;
         yr.cumCashOutOwner = cumOwner; yr.cumCashOutRenter = cumRenter;
+        yr.btcBasis = basis; yr.realized = realized; yr.monthsElapsed = m;   // PR 6c: the chart's If sold points
         rows.push(yr); yr = null;
       }
     }
@@ -1344,6 +1358,8 @@
       houseHeld: real(houseHeld), houseIfSold: real(houseIfSold)
     };
     o.deflator = defl;
+    o.rows = rows;
+    o.start = { homeValue: homePrice, balance: loan, btcValue: btcUpfront * btcNow, btcBasis: upfront, realized: 0 };
     exitTaxes(o, i, homeEnd, sellCosts, homePrice + closing, horizonYrs, btcIfSold, basis, realized, houseIfSold, real);
     o.totals = t;
     o.cumCashOutOwner = cumOwner; o.cumCashOutRenter = cumRenter;
