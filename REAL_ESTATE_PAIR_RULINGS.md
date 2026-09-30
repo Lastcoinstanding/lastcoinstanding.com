@@ -217,3 +217,12 @@ Prompt 5 is split into slices, as Prompt 4 was: **5a** the rental page's tax cor
 - **Inputs (R7 defaults):** a tax regime (United States / No capital-gains tax) on both pages; on BvRE one "Tax on a sale" block for both calculators with filing status, bracket and state; the option lists and tooltips are shared macros. Not stored or carried yet (PR 8). "Not tax advice" beside them. BvRE's meta descriptions say taxes are included again.
 - **Direction:** measurable, with no judgment call. On BvRE it narrows bitcoin's lead: bitcoin's gain is taxed and most houses' gains fall inside the exclusion (defaults, Real: bitcoin $789,843 → $647,927; the house unchanged at $175,189). On BvRP it widens the default lead, because the kept rental's exit tax (recapture and gain) is larger than the yield portfolio's: Real, $54,487 held → $91,946 if sold after tax (+$81,094 before tax). Path 1's lead narrows ($1,168,131 → $973,478 Real) because bitcoin's large gain is taxed.
 - **Left for 5c:** the holding-location toggle, the mortgage-interest deduction, Custom rates. The bracket-to-LTCG mapping and NIIT-by-bracket stay approximations, stated in the tooltip.
+
+## 14 · Implementation notes, PR 5c (2026-09-29; not new rulings)
+
+- **Bitcoin vs. Real Estate only**, in its Tax on a sale block, all off by default, so every earlier vector is unchanged:
+  - **Bitcoin held in** a taxable (default) or tax-advantaged account: Roth-style, no tax at the sale. The tooltip states the 2026 contribution limits (IRA $7,500, 401(k) $24,500, DATA_AUDIT TX-7) that make the up-front sum unrealistic to shelter at once, and that traditional accounts tax withdrawals instead.
+  - **Mortgage-interest deduction**, for itemisers: the owner saves interest x (bracket + state) on up to $750,000 of loan (TX-8); under equal cash out the renter invests that much less. Off by default because most households take the standard deduction ($32,200 joint, TX-9).
+  - **Custom regime:** a home-gain rate after an exemption (default 0) and a bitcoin-gain rate.
+- **Not on Bitcoin vs. Rental Property:** its paths deploy a sale's proceeds or a HELOC, far above any contribution limit, so a tax-advantaged option would mislead; rental mortgage interest is already deducted as a business expense.
+- **Figures at the defaults (Real):** projection bitcoin $647,927 after tax; tax-advantaged $789,843; with the deduction $527,512 (the owner's lower cost means less invested); Custom 20% / $0 / 15%: bitcoin $683,406, house $154,617 (was $175,189).
