@@ -2,6 +2,12 @@
   {
     "display": "9/29/26",
     "date": "2026-09-29",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: The chart now shows each year's value if both sides were sold that year, after tax, matching the headline, with a Held toggle for values before any sale. A new line shows the difference between your path and keeping the rental."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
     "page": "/bitcoin-vs-real-estate",
     "summary": "Bitcoin vs. Real Estate: New Show the calculation section under each calculator: the house and the bitcoin, year by year, and both sold at the end, with a CSV download."
   },
