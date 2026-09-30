@@ -325,8 +325,14 @@
   // (Stay) and Floor, which M3 draws faintly on every chart. Clicking a
   // different chip auto-hides the old primary (never Floor) and shows the
   // new one; manual toggles on the others persist across chip switches.
-  var legendVisibility = { 0: true, 1: true, 2: false, 3: false, 4: true };
+  var legendVisibility = { 0: true, 1: true, 2: false, 3: false, 4: true, 5: true };
   var chartZoom = 'full';  // 'full' | 'first3' — toggleable via UI above the chart
+  // PR 6b (rulings M7, P4): what the lines value. 'ifsold' (the default):
+  // both sides sold that year, after tax, as the headline and the table
+  // compare them. 'held': before selling costs and tax (the chart before
+  // 6b). Dataset 5 is the difference, the selected scenario's path minus
+  // keeping the rental, on the same axis.
+  var chartBasis = 'ifsold';
 
   // Colors for the five datasets, distinguishable on dark. Upper uses a
   // distinct hue and is dashed (a stress test, never sustained in the
@@ -344,17 +350,25 @@
     trend:     '#199e70',  // green
     upper:     '#d55181',  // magenta, dashed
     floor:     '#d4cdc0',  // light neutral, dotted
-    floorFaint: 'rgba(212,205,192,0.5)'
+    floorFaint: 'rgba(212,205,192,0.5)',
+    diff:      '#f4efe6'   // near-white, solid and heavy: the difference (PR 6b)
   };
 
   function renderChart(s){
     var canvas = document.getElementById('calc-chart');
     if (!canvas || typeof Chart === 'undefined') return;
 
-    var trajStay  = calcWealthTrajectory(s, 'stay');
-    var trajTrend = calcWealthTrajectory(s, 'trend');
-    var trajUpper = calcWealthTrajectory(s, 'upper');
-    var trajFloor = calcWealthTrajectory(s, 'floor');
+    // Held: the mark-to-market trajectory; If sold: each year's after-tax
+    // value if both sides were sold then (RealEstateModel.calcIfSoldTrajectory).
+    function traj(sc){
+      if (chartBasis === 'held') return calcWealthTrajectory(s, sc);
+      return RE.calcIfSoldTrajectory(s, sc).map(function(r){ return { year: r.year, wealthKeep: r.keep, wealthPath: r.path }; });
+    }
+    var trajStay  = traj('stay');
+    var trajTrend = traj('trend');
+    var trajUpper = traj('upper');
+    var trajFloor = traj('floor');
+    var trajSel = { stay: trajStay, trend: trajTrend, upper: trajUpper, floor: trajFloor }[s.btcScenario] || trajStay;
 
     // Zoom: if 'first3', slice to the first 4 years (Y0..Y3) so the
     // short-term tax-leakage dip is visible. Auto-scaling y-axis will
@@ -371,6 +385,7 @@
     var pathTrend = slice(trajTrend).map(function(r){ return inFrame(r.wealthPath, r.year); });
     var pathUpper = slice(trajUpper).map(function(r){ return inFrame(r.wealthPath, r.year); });
     var pathFloor = slice(trajFloor).map(function(r){ return inFrame(r.wealthPath, r.year); });
+    var diffData  = slice(trajSel).map(function(r){ return inFrame(r.wealthPath, r.year) - inFrame(r.wealthKeep, r.year); });
 
     function primary(scenario){ return scenario === s.btcScenario; }
 
@@ -443,6 +458,21 @@
         tension: 0.18,
         order: primary('floor') ? 1 : 5,
         hidden: !legendVisibility[4]
+      },
+      {
+        // The difference (P4): the selected path minus keeping the rental.
+        // Light, solid and heaviest, so it reads as the answer.
+        label: 'Difference: ' + scenarioLabel(s.btcScenario) + ' path minus keep rental',
+        data: diffData,
+        borderColor: CHART_COLORS.diff,
+        backgroundColor: CHART_COLORS.diff,
+        borderWidth: 3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        fill: false,
+        tension: 0.18,
+        order: 0,
+        hidden: !legendVisibility[5]
       }
     ];
 
@@ -535,7 +565,9 @@
     if (!el) return;
     var rows = [
       { idx: 0, label: 'Keep rental', color: CHART_COLORS.rental, dashed: true,
-        tip: 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Mark-to-market &mdash; the property\u2019s market value is included without applying the exit tax that would arise on sale.' },
+        tip: chartBasis === 'held'
+          ? 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Held: the property\u2019s market value, less the mortgage, before selling costs and the exit tax.'
+          : 'Net wealth if you keep the rental and sell it that year: after-tax cash flow to date, plus the sale after selling costs, the mortgage and the exit tax.' },
       { idx: 4, label: 'Bitcoin \u00b7 Floor', color: CHART_COLORS.floor, dashed: true,  // dotted on the chart
         tip: scenarioTipHTML('floor') },
       { idx: 1, label: 'Bitcoin \u00b7 Stay at today\u2019s multiple', color: CHART_COLORS.stay,
@@ -544,7 +576,10 @@
         tip: scenarioTipHTML('trend') },
       { idx: 3, label: 'Bitcoin \u00b7 Upper', color: CHART_COLORS.upper,
         dashed: true,  // visually less confident — matches dashed chart line
-        tip: scenarioTipHTML('upper') }
+        tip: scenarioTipHTML('upper') },
+      { idx: 5, label: 'Difference', color: CHART_COLORS.diff,
+        tip: 'The selected scenario\u2019s path minus keeping the rental, each year. Above zero, the path is ahead. ' +
+             (chartBasis === 'held' ? 'Held: before selling costs and tax.' : 'If sold: both sides sold that year, after selling costs and tax.') }
     ];
     var html = rows.map(function(r){
       var off = legendVisibility[r.idx] ? '' : ' off';
@@ -960,6 +995,20 @@
     });
   }
 
+  function bindBasisToggle(){
+    document.querySelectorAll('.calc-chart-basis-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        chartBasis = btn.dataset.basis;
+        document.querySelectorAll('.calc-chart-basis-btn').forEach(function(b){
+          var on = b.dataset.basis === chartBasis;
+          b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+        renderFrameUI(); renderChart(state); renderChartLegend();
+      });
+    });
+  }
+
   function bindZoomToggle(){
     document.querySelectorAll('.calc-chart-zoom-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -1005,7 +1054,8 @@
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     var cf = document.getElementById('calc-chart-frame');
-    if (cf) cf.textContent = real ? '(held, before tax; real, today\u2019s $)' : '(held, before tax; nominal, future $)';
+    var basisTxt = chartBasis === 'held' ? 'held, before tax' : 'if sold that year, after tax';
+    if (cf) cf.textContent = '(' + basisTxt + '; ' + (real ? 'real, today\u2019s $' : 'nominal, future $') + ')';
     var chipsNote = document.getElementById('calc-chips-frame');
     if (chipsNote) chipsNote.hidden = !real;
   }
@@ -1233,6 +1283,7 @@
     bindPathToggle();
     bindCAGRChips();
     bindZoomToggle();
+    bindBasisToggle();   // PR 6b
     bindBaseline();
     bindDisplayMode();
 
