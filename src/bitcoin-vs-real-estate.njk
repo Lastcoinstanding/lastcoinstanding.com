@@ -4,7 +4,7 @@ permalink: /bitcoin-vs-real-estate.html
 slug: bitcoin-vs-real-estate
 related:
   - slug: bitcoin-vs-rental-property
-    desc: "The sister page: same comparator structure applied to rental property as a yield-producing asset. If this page asks should I buy a home to live in, that page asks should I own bitcoin (or bitcoin-yield instruments) instead of being a landlord."
+    desc: "The tenant's side of the decision. For the landlord's side, see Bitcoin vs. Rental Property."
   - slug: bitcoin-vs-the-stock-market
     desc: "The same comparison structure applied to equities. If this page asks should I buy bitcoin or a house, BvSM asks should I buy bitcoin or the S&P 500 — same Power Law framework, different comparator."
   - slug: the-power-law
@@ -24,16 +24,18 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-real-estate-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-real-estate.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/bvre-annual-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/housing-monthly-data.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/bvre-annual-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/housing-monthly-data.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
   body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
 ---
 <section class="hero">
         <h1><em>Bitcoin</em> vs. Real Estate</h1>
         <div class="hero-subtitle">The Opportunity Cost</div>
         <p class="subtitle">A house didn't used to be an investment. Under sound money it was shelter, bought with savings at two to three years' income. Fiat money turned it into the default savings account. Bitcoin now competes for that role.</p>
+        <p class="hero-pair">The tenant's side of the decision. For the landlord's side, see <a href="/bitcoin-vs-rental-property">Bitcoin vs. Rental Property</a>.</p>
     </section>
 
     <main class="content-area">
+        {% include 'components/real-estate-series.njk' %}
         {% include 'components/tool-framing.njk' %}
 
         <div class="tab-nav">
@@ -177,7 +179,8 @@ eleventyComputed:
             <!-- Tax on a sale (PR 5b; rulings M7, M9, R7): one tax profile for both
                  calculators, from the pair's shared macros. The cards lead with
                  the after-tax figure, if sold, with the before-tax figure and the tax
-                 beside it. Not stored or linked yet (PR 8). -->
+                 beside it. Linked, not stored (PR 8): `tax`, `bracket` and `state` are
+                 pair names, carried to Bitcoin vs. Rental Property. -->
             {% import 'components/real-estate-baseline.njk' as reb %}
             <details class="re-baseline re-tax" id="reTax">
                 <summary><span class="re-baseline-label">Tax on a sale</span> <span class="re-baseline-hint" id="reTaxHint">United States &middot; married filing jointly &middot; 24% bracket &middot; Typical / average (~5%)</span></summary>
@@ -439,6 +442,10 @@ eleventyComputed:
                  panel-calculator so it only shows on the calculator tab
                  (other tabs are chart/essay surfaces without scenario
                  state). URL params per SITE_GUIDE §17.5 (BvRE schema). -->
+            <!-- PR 8 (rulings P3): the pair's shared inputs, carried to the
+                 landlord's page by shared/real-estate-carry.js. -->
+            <p class="re-other-side"><a href="/bitcoin-vs-rental-property#calculator" data-re-carry="/bitcoin-vs-rental-property" data-re-carry-hash="calculator">Run this on the other side &rarr;</a> Bitcoin vs. Rental Property, the landlord&rsquo;s version of the decision, opens with your horizon, bitcoin scenario, home appreciation, sale costs, Real or Nominal view, and tax regime, bracket and state.</p>
+
             <section class="share-section" id="shareSection">
               <div class="share-groups">
                 <div class="share-group" id="shareGroupScenario">

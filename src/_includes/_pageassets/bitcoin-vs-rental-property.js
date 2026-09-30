@@ -1125,7 +1125,11 @@
       ' This calculator is decision framing, not personalized financial, tax, or legal advice.';
   }
 
+  // Held while carried inputs are applied at load (PR 8), so the first
+  // render, below, is the only one and the chart still waits for its tab.
+  var holdRender = false;
   function rerender(){
+    if (holdRender) return;
     var results = computeAll(state);
     renderFrameUI();
     renderPathDescription();
@@ -1218,6 +1222,59 @@
       }
     });
     state.appreciationPct = MA.get('homeApprNominal').value;
+  }
+
+  // The pair's shared inputs (PR 8; rulings P3, P9): a link from Bitcoin
+  // vs. Real Estate (its series strip or "Run this on the other side")
+  // carries them under that page's URL names, shared/real-estate-carry.js
+  // reads them, and they are applied here through the page's own controls,
+  // as if the reader had set them. A value a control doesn't offer is
+  // ignored (a custom tax regime: this page has none); a slider takes the
+  // nearest value it allows. The module also rewrites this page's links to
+  // the other side, and keeps the carried params in the address bar current.
+  function bindCarry(){
+    var C = window.RealEstateCarry;
+    if (!C) return;
+    function fire(el, ev){ el.dispatchEvent(new Event(ev, { bubbles: true })); }
+    function slider(id, v){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.value = String(Math.min(Number(el.max), Math.max(Number(el.min), v)));
+      fire(el, 'input');
+    }
+    function select(id, v){
+      var el = document.getElementById(id);
+      if (!el || !Array.prototype.some.call(el.options, function(o){ return o.value === String(v); })) return;
+      el.value = String(v);
+      fire(el, 'change');
+    }
+    function click(sel){ var b = document.querySelector(sel); if (b) b.click(); }
+    C.register({
+      writeUrl: true,
+      read: function(){
+        return { horizon: state.holdingYears, happr: state.appreciationPct, sell: state.sellCostPct, btctx: state.btcTxPct,
+                 pscenario: state.btcScenario, displaymode: state.displayMode, tax: state.taxRegime,
+                 bracket: state.federalBracketPct, state: state.stateCode };
+      },
+      apply: function(v){
+        holdRender = true;
+        try {
+          if (v.horizon !== undefined) slider('calc-holding-years', Math.round(v.horizon));
+          if (v.sell !== undefined) slider('calc-sell-cost', v.sell);
+          if (v.btctx !== undefined) slider('calc-btc-tx', v.btctx);
+          if (v.tax !== undefined) select('calc-tax-regime', v.tax);
+          if (v.bracket !== undefined) select('calc-bracket', v.bracket);
+          if (v.state !== undefined) select('calc-state', v.state);
+          if (v.pscenario !== undefined) click('.calc-cagr-chip[data-scenario="' + v.pscenario + '"]');
+          if (v.displaymode !== undefined) click('.calc-frame-btn[data-mode="' + v.displaymode + '"]');
+          if (v.happr !== undefined) {
+            var ap = document.getElementById('rpHomeAppreciation');
+            if (ap) { ap.value = v.happr + '%'; fire(ap, 'change'); }
+          }
+        } finally { holdRender = false; }
+      },
+      legacyNote: function(msg){ if (baselineCtl && baselineCtl.setLegacyNote) baselineCtl.setLegacyNote(msg); }
+    });
   }
 
   function bindPortfolioSliders(){
@@ -1316,6 +1373,7 @@
     bindBasisToggle();   // PR 6b
     bindBaseline();
     bindDisplayMode();
+    bindCarry();
 
     // Initial: show path-4 group, hide others
     document.querySelectorAll('.calc-path-specific').forEach(function(grp){

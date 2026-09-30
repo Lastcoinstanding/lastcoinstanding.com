@@ -537,8 +537,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
     // EVENT LISTENERS
     // Hash-based tab routing
-    var tabMap={'crisis':'affordability','btc-house':'priced-in-bitcoin','calculator':'postponed-purchase','ceiling':'the-ceiling'};
+    // PR 8 (rulings P9): both calculators of the pair answer to #calculator.
+    // Links made before PR 8 carry #postponed-purchase, which still opens
+    // the calculator and is rewritten to #calculator (and #projection opens
+    // its projection mode, below).
+    var tabMap={'crisis':'affordability','btc-house':'priced-in-bitcoin','calculator':'calculator','ceiling':'the-ceiling'};
     var reverseMap={};Object.keys(tabMap).forEach(function(k){reverseMap[tabMap[k]]=k});
+    reverseMap['postponed-purchase']='calculator';
     function activateTab(tabId){
         document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});
         document.querySelectorAll('.tab-panel').forEach(function(x){x.classList.remove('active');x.classList.add('js-hidden')});
@@ -550,6 +555,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     }
     function initTabFromHash(){
         var hash=window.location.hash.replace('#','');
+        if(hash==='postponed-purchase'){history.replaceState(null,'',window.location.pathname+window.location.search+'#calculator')}
         if(hash&&reverseMap[hash]){activateTab(reverseMap[hash])}
         else{
             document.querySelectorAll('.tab-panel').forEach(function(x){if(!x.classList.contains('active'))x.classList.add('js-hidden')});
@@ -1218,7 +1224,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     rrate:     { elId: 'customRate',           type: 'float',     def: NaN,     evt: 'input', dp: 2, persist: false },
     rdown:     { elId: 'customDownPct',        type: 'float',     def: NaN,     evt: 'input', dp: 2, persist: false },
     home:      { elId: 'fwdHomePrice',         type: 'thousands', def: 415000,  evt: 'input'  },
-    horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change' },
+    // A horizon the select doesn't list (1 to 30 years, carried from Bitcoin
+    // vs. Rental Property, PR 8) is added to it rather than rounded.
+    horizon:   { elId: 'fwdHorizon',           type: 'int',       def: 10,      evt: 'change', addOption: addHorizonOption },
     // Nominal home appreciation (PR 4a, rulings M1/P3): a NEW name, because
     // the quantity is new. The pre-4a `appr` was real; init() reads a legacy
     // `appr` once, converts it, and never writes it. Not persisted here:
@@ -1241,8 +1249,33 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     inv:       { elId: 'fwdInvestDiff',        type: 'bool-on',                 evt: 'change' },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
     pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'stay',     persist: false },
-    displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false }
+    displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false },
+    // PR 8 (rulings P3): Tax on a sale, linked but not stored, like the
+    // display frame. `tax`, `bracket` and `state` are pair names, which
+    // Bitcoin vs. Rental Property reads too (shared/real-estate-carry.js);
+    // the rest exist on this page only. A value the select doesn't offer is
+    // ignored.
+    tax:       { elId: 'reTaxRegime',          type: 'select',    def: 'us',       evt: 'change', persist: false },
+    filing:    { elId: 'reFiling',             type: 'select',    def: 'mfj',      evt: 'change', persist: false },
+    bracket:   { elId: 'reBracket',            type: 'select',    def: '24',       evt: 'change', persist: false },
+    state:     { elId: 'reState',              type: 'select',    def: 'OTHER',    evt: 'change', persist: false },
+    btcacct:   { elId: 'reBtcAccount',         type: 'select',    def: 'taxable',  evt: 'change', persist: false },
+    mded:      { elId: 'reMortgageDeduction',  type: 'bool',                       evt: 'change', persist: false },
+    chrate:    { elId: 'reCustomHomeRate',     type: 'float',     def: 20,      evt: 'input', dp: 2, persist: false },
+    chexempt:  { elId: 'reCustomHomeExempt',   type: 'thousands', def: 0,       evt: 'input', persist: false },
+    cbrate:    { elId: 'reCustomBtcRate',      type: 'float',     def: 20,      evt: 'input', dp: 2, persist: false }
   };
+
+  function addHorizonOption(el, years) {
+    if (years < 1 || years > 30) return false;
+    var opt = document.createElement('option');
+    opt.value = String(years);
+    opt.textContent = years + (years === 1 ? ' year (' : ' years (') + (new Date().getFullYear() + years) + ')';
+    var after = null;
+    Array.prototype.forEach.call(el.options, function(o){ if (parseInt(o.value, 10) < years) after = o; });
+    el.insertBefore(opt, after ? after.nextSibling : el.firstChild);
+    return true;
+  }
 
   function isBtn(spec) { return /^btn-/.test(spec.type); }
 
@@ -1270,6 +1303,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     if (spec.type === 'bool' || spec.type === 'bool-on') return el.checked ? 1 : 0;
     if (spec.type === 'thousands') return parseThousands(el.value);
     if (spec.type === 'int')   return parseInt(el.value, 10);
+    if (spec.type === 'select') return el.value;
     if (spec.type === 'float') return parseFloat(String(el.value).replace(/[%\s]/g, ''));
     return el.value;
   }
@@ -1302,6 +1336,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     } else if (spec.type === 'int') {
       var i = parseInt(raw, 10);
       if (!isFinite(i)) return;
+      if (el.tagName === 'SELECT' && !el.querySelector('option[value="' + i + '"]') && !(spec.addOption && spec.addOption(el, i))) return;
       el.value = String(i);
     } else if (spec.type === 'float') {
       var f = parseFloat(raw);
@@ -1310,6 +1345,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       // first-load appearance is consistent with edited appearance.
       var _p = Math.pow(10, spec.dp || 1);
       el.value = (Math.round(f * _p) / _p) + '%';
+    } else if (spec.type === 'select') {
+      var s = String(raw);
+      if (!Array.prototype.some.call(el.options, function(o){ return o.value === s; })) return;
+      el.value = s;
     } else {
       el.value = String(raw);
     }
@@ -1569,6 +1608,17 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     if (_activeMethodBtn) method = _activeMethodBtn.dataset.method;
 
     wireWriters();
+    // The pair's shared inputs, for the links that carry them to Bitcoin vs.
+    // Rental Property (PR 8, rulings P3/P9: the series strip and "Run this
+    // on the other side"). This page's own reader, above, reads the same
+    // names, so nothing is applied here.
+    if (window.RealEstateCarry) window.RealEstateCarry.register({
+      read: function(){
+        var out = {};
+        window.RealEstateCarry.KEYS.forEach(function(k){ if (SCHEMA[k]) out[k] = readValue(k); });
+        return out;
+      }
+    });
     // No syncUrl() here by design. A load — fresh or storage-restored — leaves the
     // address bar exactly as the reader arrived with it; the first interaction is
     // what starts writing. Storage still syncs, so stickiness is unaffected.

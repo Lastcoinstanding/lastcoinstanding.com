@@ -1,0 +1,68 @@
+{#-
+  ════════ REAL-ESTATE SERIES STRIP ════════
+
+  The real-estate decision, one question per page, with the current page
+  marked (PR 8; REAL_ESTATE_PAIR_DESIGN.md §11, rulings P9). Rendered at the
+  TOP of each page in the series, unlike the retirement strip, which sits at
+  the foot of its spokes (SITE_GUIDE §53.1).
+
+  Built on components/retirement-family.njk's pattern: its own scoped
+  `<style>`, every selector prefixed `rser-`, every colour a var with a
+  literal fallback (the host pages declare their palettes independently),
+  one include line per page, and the strip owns its heading, so a host page
+  must not wrap it in one:
+      {% include 'components/real-estate-series.njk' %}
+  Heading level: `{% set rser_level = 'h3' %}` first, if a page needs it.
+
+  THE LINKS CARRY THE SHARED INPUTS (P3). The retirement strip's hrefs are
+  plain and can't carry state. Here each link to another page has
+  `data-re-carry` (its path) and `data-re-carry-hash` (the calculator), and
+  shared/real-estate-carry.js rewrites its href with the page's current
+  pair params on load and after any input change. Without script the plain
+  href stands. The current page is marked from the page's `slug`.
+
+  MORE SPOKES. The backlog's next two (Compare Housing Plans; the
+  homeowner's side) are further entries in `series` below, each with the
+  hash its calculator answers to. The row takes any number of items.
+-#}
+{%- set rserLevel = rser_level | default('h2') -%}
+<style>
+.rser { max-width: 1100px; margin: 0 auto 2rem; padding: 0.9rem 1.1rem 1rem; border: 1px solid rgba(224,148,34,0.09); border-radius: 10px; }
+.rser-title { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.2rem; line-height: 1.4; }
+.rser-lede { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.84rem; line-height: 1.55; color: var(--text-dim, #9a9080); margin: 0 0 0.7rem; max-width: 68ch; }
+.rser-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.55rem; }
+.rser-item { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.65rem 0.8rem; border-radius: 7px; border: 1px solid var(--border-faint, rgba(224,148,34,0.15)); background: rgba(224,148,34,0.035); text-decoration: none; transition: border-color 0.15s, background 0.15s; }
+a.rser-item:hover, a.rser-item:focus-visible { border-color: rgba(224,148,34,0.34); background: rgba(224,148,34,0.08); }
+.rser-item.is-here { border-color: var(--amber, #e09422); background: rgba(224,148,34,0.1); }
+.rser-step { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber, #e09422); }
+.rser-item.is-here .rser-step::after { content: ' · you are here'; letter-spacing: 0.04em; text-transform: none; font-weight: 600; color: var(--text-dim, #9a9080); }
+.rser-q { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.05rem; line-height: 1.25; color: var(--ink-bright, #f2eee8); }
+.rser-t { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.74rem; line-height: 1.4; color: var(--ink-dim, #9a9080); }
+a.rser-item .rser-t::after { content: ' \2192'; color: var(--amber, #e09422); }
+@media (max-width: 560px) { .rser { padding: 0.8rem 0.9rem 0.9rem; } .rser-row { grid-template-columns: 1fr; } }
+</style>
+{%- set series = [
+  { slug: 'bitcoin-vs-real-estate',     step: 'The tenant',   q: 'Buy or rent?',      t: 'Bitcoin vs. Real Estate',     hash: 'calculator' },
+  { slug: 'bitcoin-vs-rental-property', step: 'The landlord', q: 'Keep the rental?',  t: 'Bitcoin vs. Rental Property', hash: 'calculator' }
+] -%}
+<nav class="rser" aria-labelledby="rser-title">
+  <{{ rserLevel }} class="rser-title" id="rser-title">Bitcoin and real estate</{{ rserLevel }}>
+  <p class="rser-lede">One decision, seen from each side of the lease. The links carry the inputs the calculators share.</p>
+  <div class="rser-row">
+    {%- for f in series -%}
+      {%- if f.slug == slug -%}
+    <span class="rser-item is-here" aria-current="page">
+      <span class="rser-step">{{ f.step }}</span>
+      <span class="rser-q">{{ f.q }}</span>
+      <span class="rser-t">{{ f.t }}</span>
+    </span>
+      {%- else -%}
+    <a class="rser-item" href="/{{ f.slug }}#{{ f.hash }}" data-re-carry="/{{ f.slug }}" data-re-carry-hash="{{ f.hash }}">
+      <span class="rser-step">{{ f.step }}</span>
+      <span class="rser-q">{{ f.q }}</span>
+      <span class="rser-t">{{ f.t }}</span>
+    </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</nav>

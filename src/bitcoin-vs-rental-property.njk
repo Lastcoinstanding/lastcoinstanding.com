@@ -4,7 +4,7 @@ permalink: /bitcoin-vs-rental-property.html
 slug: bitcoin-vs-rental-property
 related:
   - slug: bitcoin-vs-real-estate
-    desc: "The sister page: should you buy a home to live in, or own bitcoin and rent? This page asks the parallel investment question — should you own bitcoin (or bitcoin-yield instruments) instead of rental property as a yield-producing asset."
+    desc: "The landlord's side of the decision. For the tenant's side, see Bitcoin vs. Real Estate."
   - slug: the-power-law
     desc: "The growth model that anchors the bitcoin side of every comparison on this page, including the entry-timing indicator in the Bitcoin Case tab."
   - slug: the-gallery
@@ -17,12 +17,13 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-rental-property-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-rental-property.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-rental-property.js' %}"
 ---
 <!-- ─── Hero ─── -->
 <section class="bvrp-hero">
   <h1>Bitcoin vs. <em>Rental Property</em></h1>
   <p class="subhead">The landlord&rsquo;s comparison: operating costs, tax and exit frictions on one side, the alternative&rsquo;s risks on the other.</p>
+  <p class="bvrp-pair">The landlord&rsquo;s side of the decision. For the tenant&rsquo;s side, see <a href="/bitcoin-vs-real-estate">Bitcoin vs. Real Estate</a>.</p>
   <div class="tldr">
     <span class="tldr-label">TL;DR</span>
     Once a landlord&rsquo;s costs are counted (the dollars, the time and the operational load), net rental yield is often about half of what listings suggest. Bitcoin-treasury preferred stocks like <strong>STRC</strong> and <strong>SATA</strong> pay 12&ndash;13%, with return-of-capital treatment that defers tax much as depreciation does for a landlord, in exchange for issuer-credit risk; spot bitcoin adds exposure to bitcoin&rsquo;s price, drawdowns included. Below: the comparison, the four operational paths to switch, and the constraints to know before you act.
@@ -30,6 +31,8 @@ eleventyComputed:
 </section>
 
 <main class="bvrp-body">
+
+{% include 'components/real-estate-series.njk' %}
 
 {% include 'components/tool-framing.njk' %}
 
@@ -698,6 +701,11 @@ eleventyComputed:
 
     <!-- Specific-to-you callout -->
     <div id="calc-specific-callout" class="calc-specific-callout"></div>
+
+    <!-- PR 8 (rulings P3): the pair's shared inputs, carried to the tenant's
+         page by shared/real-estate-carry.js. Its projection is the forward
+         calculator that matches this one. -->
+    <p class="calc-other-side"><a href="/bitcoin-vs-real-estate#projection" data-re-carry="/bitcoin-vs-real-estate" data-re-carry-hash="projection">Run this on the other side &rarr;</a> Bitcoin vs. Real Estate, the tenant&rsquo;s version of the decision, opens its projection with your holding period as the horizon, and your bitcoin scenario, home appreciation, sale costs, Real or Nominal view, and tax regime, bracket and state.</p>
 
     <!-- Baseline assumptions (collapsible — set once, ignore) — moved to the very bottom per TBR pattern.
          The first two groups are the pair's shared, sitewide part (PR 4f; design §7, rulings M1, P5):
