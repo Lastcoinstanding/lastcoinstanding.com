@@ -235,9 +235,10 @@ append the current month's sample. A correct refresh silences it.
 > seeds and falls back to the **latest `PL_DATA` sample**. On a normal load the
 > live spot (Coinbase first, then Kraken, mempool.space, CoinGecko) overwrites it
 > within a second, so a stale seed is invisible. But when no source answers (a
-> network or ad-blocker that blocks them all; on 2026-09-29 CoinGecko alone
-> started refusing keyless requests, which took the whole site to the fallback
-> until the other sources were added) the site shows this fallback — labelled
+> network or ad-blocker that blocks them all; on 2026-09-29 a fault at CoinGecko,
+> then the only source, blocked keyless requests for most of a day and took the
+> whole site to the fallback until the other sources were added) the site shows
+> this fallback — labelled
 > with its date, **"as of Sep 12"**, never "live" (the 2026-07 honesty fix, dated
 > 2026-09-29). The date makes a stale refresh visible to readers: a fallback that
 > reads "as of Jul 31" in late September says plainly that the series is behind.
@@ -482,8 +483,8 @@ Quick post-refresh checks to confirm everything's coherent:
 7. **Confirm the live price loads** — open `/dashboard`: the price tile should
    read **"Today (live)"** and name its source ("Live price from Coinbase, …").
    If it reads "Price as of …", no live source answered: check the console and
-   whether a source has changed its terms (on 2026-09-29 CoinGecko began
-   refusing keyless requests without notice). The sources and their order are
+   whether a source is failing or has changed its terms (on 2026-09-29 a fault
+   at CoinGecko blocked keyless requests for most of a day). The sources and their order are
    `LCS_PRICE_SOURCES` in `shared/power-law-data.js` (SITE_GUIDE §40.2).
 
 ### 5.1 The Bitcoin Floor — `[floor-qa]` after a PL_DATA refresh
@@ -685,7 +686,7 @@ For each value, verify against the source listed and update in the BFI files as 
 
 | Field | Where it lives | Source to verify against |
 |---|---|---|
-| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,050` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845050`) | The latest Strategy 8-K (primary). CoinGecko's `/api/v3/companies/public_treasury/bitcoin` was the old shortcut, but CoinGecko began refusing keyless requests on 2026-09-29; use the 8-K and cross-check bitcointreasuries.net or Strategy IR. |
+| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,050` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845050`) | The latest Strategy 8-K (primary). Cross-check CoinGecko's `/api/v3/companies/public_treasury/bitcoin` (keyless; the Strategy entry has `symbol: "MSTR.US"`; out for most of 2026-09-29 by a CoinGecko fault, working again 2026-09-30), bitcointreasuries.net or Strategy IR. |
 | **mNAV** | `.njk` (`~0.8&amp;times;`) | SaylorTracker.com headline mNAV figure. Or compute: (MSTR price &times; shares outstanding) &divide; (BTC count &times; BTC price). |
 | **Shares outstanding** | `.njk` (`~384M`) | Latest 10-Q "Diluted shares outstanding" or Yahoo Finance MSTR Statistics page. Basic, all classes. |
 | **ATM issuance** | `.njk` (`Active` value cell + sub-text) | Latest 10-Q ATM disclosures + 8-K announcements for new facilities. Phrase as `Active` or `Paused` with a brief structural note. |
@@ -1106,9 +1107,10 @@ Pages consuming the shared helper: every page that shows a "today" price
 channel ribbon on every content page. Since 2026-09-29 that includes Is Bitcoin
 a Bubble? and Living on Bitcoin, which had their own CoinGecko calls.
 
-**2026-09-29 — several sources, dated fallback.** CoinGecko began refusing
-keyless requests at 06:42 UTC, and because it was the only source, every page
-showed the fallback until PR #133 shipped the same morning. `fetchTodayPrice()`
+**2026-09-29 — several sources, dated fallback.** A fault at CoinGecko blocked
+keyless requests from 06:42 UTC (CoinGecko fixed it that evening), and because it
+was the only source, every page showed the fallback until PR #133 shipped the
+same morning. `fetchTodayPrice()`
 now tries Coinbase → Kraken → mempool.space → CoinGecko and takes the first
 sane answer; the fallback is labelled with the sample's date rather than
 "latest monthly data". Nothing is added to the monthly refresh except the §5
