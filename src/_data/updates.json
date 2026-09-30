@@ -3,6 +3,12 @@
     "display": "9/29/26",
     "date": "2026-09-29",
     "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: Three optional tax settings in the Tax on a sale block: bitcoin held in a tax-advantaged account, a mortgage-interest deduction for those who itemize, and custom tax rates. All are off by default, so the results you see first are unchanged."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/bitcoin-vs-real-estate",
     "summary": "Bitcoin vs. Real Estate: Results now include tax on a sale. The house pays tax only on gain above the home-sale exclusion ($500,000 filing jointly, $250,000 otherwise); bitcoin pays tax on its gain, including coins sold along the way to cover rent. Both calculators lead with the after-tax figure, with the before-tax figure beside it. Set the regime, filing status, bracket and state in the new Tax on a sale block. At the defaults the projection's bitcoin falls from about $790K to about $648K in today's dollars; the house is unchanged, its gain within the exclusion."
   },
   {
