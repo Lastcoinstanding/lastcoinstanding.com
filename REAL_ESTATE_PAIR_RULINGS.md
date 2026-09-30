@@ -249,3 +249,12 @@ PR 6 is split: **6a** "Show the calculation" and the CSV (P2, P7); **6b** the ch
 - **Each point** comes from the engine (`o.points`: the purchase, then each year end), valued as the cards value the end; the last point equals the cards in both frames. The Real view divides each year by its own factor.
 - **Not shared with the rental page's chart**, which keeps its own code (scenario chips, legend toggles); the pair shares the look and the valuation, not the Chart.js wrapper. PR 8 can fold them together if it's worth it.
 - **No figure moves:** every rePairQA vector is unchanged; new E32, E33 hash the charts' data.
+
+## 18 · Implementation notes, PR 7 (2026-09-29; not new rulings)
+
+- **The sensitivity grid** (R9 / P1), a new shared component (`shared/real-estate-grid.js`, window.RealEstateGrid), built so the retirement flagship can adopt it: the page gives the axis pairs and a function for one cell. Each cell is the **after-tax difference if both are sold at the end** (bitcoin, or the path, minus the house, or keeping the rental), in the display frame; the reader's cell is outlined and labelled "yours".
+- **Axes.** Default on both: bitcoin scenario (Floor · Stay · Trend; never Upper, M3) × home prices a year (long run 3.41% · yours · yours + 2 points, a housing-boom case). Alternative: horizon (yours ± 5 years) × mortgage rate (± 1 point) on Bitcoin vs. Real Estate's projection, which drops it for a cash purchase; holding period × net rental yield (± 1 point) on the rental page.
+- **Colour:** diverging, orange where bitcoin (the path) is ahead and blue where the property is, the pair's series colours, grey at zero, strength by size; every cell labelled in the ink colour, with the side ahead in words. Compact dollars so the table fits a 375px phone.
+- **Caption:** "a map of how the answer moves with two assumptions, not a probability distribution."
+- **Placement:** Bitcoin vs. Real Estate's projection only (the look-back has no scenarios); on the rental page under the path card, above the ledger.
+- **No figure moves.** The reader's cell equals the cards (BvRE) and the headline (BvRP). If the reader picks Upper, no cell is theirs.
