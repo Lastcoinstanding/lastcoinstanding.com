@@ -136,6 +136,12 @@
        BvRE is unchanged. RP_BASE pins the basis; new P29 is the Held chart.
        Checked: the If sold line's last point equals the table's after-tax
        total on every path.
+     PR 6c (BvRE) — a wealth chart in both calculators, If sold after tax by
+       default, Held, the difference and (projection) the Floor faintly. The
+       charts render in their own blocks, so every vector is unchanged. New:
+       E32 (the look-back's chart, 2017) and E33 (the projection's, defaults),
+       hashing RealEstateChart.data(). Checked: each chart's last point equals
+       the cards, in both frames.
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -212,7 +218,9 @@
     { id: 'E28', desc: 'proj, mortgage interest deducted (PR 5c)', deduct: true },
     { id: 'E29', desc: 'proj, Custom: home 20% above $0, bitcoin 15% (PR 5c)', regime: 'custom', cHome: '20%', cExempt: '$0', cBtc: '15%' },
     { id: 'E30', desc: 'the look-back ledger, 2017 (PR 6a)', ledger: 'retro' },
-    { id: 'E31', desc: 'the projection ledger, defaults (PR 6a)', ledger: 'proj' }
+    { id: 'E31', desc: 'the projection ledger, defaults (PR 6a)', ledger: 'proj' },
+    { id: 'E32', desc: 'the look-back chart, 2017 (PR 6c)', chart: 'retro' },
+    { id: 'E33', desc: 'the projection chart, defaults (PR 6c)', chart: 'proj' }
   ];
   // The ledger as its CSV, without the URL line (PR 6a).
   function captureLedger(id){
@@ -412,6 +420,12 @@
             click('.calc-mode-label[data-mode="projection"]');
           }
           else if (v.ledger === 'proj') { applyProj({}); s = JSON.stringify(captureLedger('fwdLedger')); }
+          else if (v.chart === 'retro') {
+            click('.calc-mode-label[data-mode="retrospective"]'); applyRetro({});
+            s = JSON.stringify(window.RealEstateChart ? window.RealEstateChart.data('calc') : null);
+            click('.calc-mode-label[data-mode="projection"]');
+          }
+          else if (v.chart === 'proj') { applyProj({}); s = JSON.stringify(window.RealEstateChart ? window.RealEstateChart.data('fwd') : null); }
           else { applyProj(v); s = JSON.stringify(captureProj()); }
           rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s);
         });

@@ -24,7 +24,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-real-estate-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-real-estate.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/bvre-annual-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/housing-monthly-data.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/bvre-annual-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/housing-monthly-data.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-baseline.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-qa-loader.js' %}\n{% include '_pageassets/bitcoin-vs-real-estate.js' %}"
   body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
 ---
 <section class="hero">
@@ -230,6 +230,16 @@ eleventyComputed:
                     <label class="re-invest-toggle"><input type="checkbox" id="calcInvestDiff" checked> <span>The renter invests the difference</span></label><span class="help-tip" tabindex="0">?<span class="tip-content">On (the like-for-like case): both households spent the same every month. The owner paid the mortgage, property tax, insurance and maintenance; the renter paid rent and bought bitcoin with what was left, or sold bitcoin to cover rent when rent cost more. Off: only the up-front sum goes into bitcoin, and the monthly difference is spent, or paid from income when rent cost more. The off setting tests the objection that a mortgage forces saving and renters don&rsquo;t save.</span></span>
                     <p class="re-cashout-line" id="calcCashOutLine"></p>
                 </div>
+                <!-- The chart (PR 6c; rulings M7, P4, P7): cards, toggle, chart, ledger. -->
+                <div class="re-chart-block" id="calcChartBlock">
+                    <div class="re-chart-head">
+                        <div class="re-chart-title">Wealth over time <span class="re-chart-frame" id="calcChartFrame">(if sold that year, after tax)</span></div>
+                        <div class="re-seg" role="group" aria-label="What the lines value"><button type="button" class="re-seg-btn active" data-basis="ifsold" aria-pressed="true">If sold, after tax</button><button type="button" class="re-seg-btn" data-basis="held" aria-pressed="false">Held</button></div>
+                        <div class="re-seg" role="group" aria-label="Chart range"><button type="button" class="re-seg-btn active" data-zoom="full" aria-pressed="true">Full window</button><button type="button" class="re-seg-btn" data-zoom="first3" aria-pressed="false">First 3 years</button></div>
+                    </div>
+                    <div class="re-chart-wrap"><canvas id="calcChart"></canvas></div>
+                    <p class="re-chart-note"><em>If sold, after tax</em> (the default) sells both in each year, as the cards value the end: the house after selling costs, the loan and any tax above the home-sale exclusion; the bitcoin after its sale cost and the tax on its gain. <em>Held</em> is before any sale: the house&rsquo;s equity and the bitcoin&rsquo;s value. The heaviest, light line is the <strong>difference</strong>, bitcoin minus the house: above zero, bitcoin is ahead.</p>
+                </div>
                 <!-- Show the calculation (PR 6a; rulings P2, P7): under the cards and the toggle. -->
                 <div id="calcLedger"></div>
 
@@ -398,6 +408,16 @@ eleventyComputed:
                         <label class="re-invest-toggle"><input type="checkbox" id="fwdInvestDiff" checked> <span>The renter invests the difference</span></label><span class="help-tip" tabindex="0">?<span class="tip-content">On (the like-for-like case): both households spend the same every month. The owner pays the mortgage, property tax, insurance and maintenance; the renter pays rent and buys bitcoin with what&rsquo;s left, or sells bitcoin to cover rent when rent costs more. Off: only the up-front sum goes into bitcoin, and the monthly difference is spent, or paid from income when rent costs more. The off setting tests the objection that a mortgage forces saving and renters don&rsquo;t save.</span></span>
                         <p class="re-cashout-line" id="fwdCashOutLine"></p>
                     </div>
+                    <!-- The chart (PR 6c; rulings M3, M7, P4, P7). -->
+                    <div class="re-chart-block" id="fwdChartBlock">
+                    <div class="re-chart-head">
+                        <div class="re-chart-title">Wealth over time <span class="re-chart-frame" id="fwdChartFrame">(if sold that year, after tax)</span></div>
+                        <div class="re-seg" role="group" aria-label="What the lines value"><button type="button" class="re-seg-btn active" data-basis="ifsold" aria-pressed="true">If sold, after tax</button><button type="button" class="re-seg-btn" data-basis="held" aria-pressed="false">Held</button></div>
+                        <div class="re-seg" role="group" aria-label="Chart range"><button type="button" class="re-seg-btn active" data-zoom="full" aria-pressed="true">Full window</button><button type="button" class="re-seg-btn" data-zoom="first3" aria-pressed="false">First 3 years</button></div>
+                    </div>
+                    <div class="re-chart-wrap"><canvas id="fwdChart"></canvas></div>
+                    <p class="re-chart-note"><em>If sold, after tax</em> (the default) sells both in each year, as the cards value the end: the house after selling costs, the loan and any tax above the home-sale exclusion; the bitcoin after its sale cost and the tax on its gain. <em>Held</em> is before any sale: the house&rsquo;s equity and the bitcoin&rsquo;s value. The heaviest, light line is the <strong>difference</strong>, bitcoin minus the house: above zero, bitcoin is ahead. The Floor scenario&rsquo;s bitcoin is drawn faintly, whichever scenario you pick.</p>
+                </div>
                     <!-- Show the calculation (PR 6a; rulings P2, P7). -->
                     <div id="fwdLedger"></div>
                 </div>
