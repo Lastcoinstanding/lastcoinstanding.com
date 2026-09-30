@@ -476,6 +476,12 @@
   }
 
   // Pretty-format date string yyyy-mm-dd → 'Mon dd, yyyy'
+  // A preset's age today, "~9y": the verdict text names the long-horizon
+  // presets by how long they have run, so the figure can't go stale
+  // (2026-09-30; they were fixed "~8y" and "~12y").
+  function presetAge(isoStr) {
+    return '~' + Math.round((Date.now() - Date.parse(isoStr + 'T00:00:00Z')) / (365.25 * 86400000)) + 'y';
+  }
   function fmtDate(isoStr) {
     var d = new Date(isoStr);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -676,11 +682,11 @@
     var btcWon = btcValue > spValue && btcValue > ndqValue;
     var verdictText;
     if (years < 1) {
-      // Very recent top (2025 ATH at ~7mo): pre-argument horizon
-      verdictText = '<strong>Less than a year of history.</strong> Bitcoin is currently at ' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). This is well below the 5-to-10-year horizon the page&rsquo;s argument depends on. <strong>The 2017 top preset (~8y) and 2013 top preset (~12y) show what the same scenario looks like once that horizon is reached</strong> &mdash; both show bitcoin pulling decisively ahead.';
+      // Very recent start (under a year): pre-argument horizon
+      verdictText = '<strong>Less than a year of history.</strong> Bitcoin is currently at ' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). This is well below the 5-to-10-year horizon the page&rsquo;s argument depends on. <strong>The 2017 top preset (' + presetAge('2017-12-17') + ') and 2013 top preset (' + presetAge('2013-11-30') + ') show what the same scenario looks like once that horizon is reached</strong> &mdash; both show bitcoin pulling decisively ahead.';
     } else if (years < 3) {
-      // Short horizon (2024 Mar at ~2y): too early to draw the conclusion
-      verdictText = 'After <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position is at <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong> (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). Still a short horizon by the page&rsquo;s argument. <strong>Try the 2017 (~8y) or 2013 (~12y) presets to see the pattern after the long-horizon argument has had time to play out.</strong>';
+      // Short horizon (under 3 years; the 2025 ATH preset from October 2026): too early to draw the conclusion
+      verdictText = 'After <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ', the bitcoin position is at <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong> (' + fmtUsd(btcValue) + ' vs. ' + fmtUsd(spValue) + '). Still a short horizon by the page&rsquo;s argument. <strong>Try the 2017 (' + presetAge('2017-12-17') + ') or 2013 (' + presetAge('2013-11-30') + ') presets to see the pattern after the long-horizon argument has had time to play out.</strong>';
     } else if (btcWon) {
       // Long horizon, BTC dominates (2013 + 2017 cases): the strong-argument message
       verdictText = 'Over <strong>' + years.toFixed(1) + ' years</strong> from ' + fmtDate(startDate) + ' to today, the bitcoin position is worth <strong>' + fmtMultiple(btcVsSp) + ' the S&amp;P 500 position</strong>, despite starting at a cyclical top. Holding through the drawdowns paid off.';
