@@ -13,6 +13,8 @@ annual and event-driven. Start there, and start each refresh by running
 `python3 scripts/data-freshness.py`. The numbered sections below it hold the
 method for each item.
 
+**The UPDATED chip (from 2026-09-30).** A page whose figures or copy a refresh changes gets a line in `src/_data/updates.json` (neutral register, what changed and to when). That entry is what shows the nav's **UPDATED** chip, for 7 days (`_data/freshness.js`; SITE_GUIDE §40). Write it only when a reader would see a change: a constant nobody reads, or a refresh that finds nothing new, gets no entry, so the chip keeps meaning something.
+
 This list will grow over time as the site adds pages with time-sensitive
 content. When you add a new page that bakes in a data series, a dated figure or
 an as-of date string, add its row to §0 (and a section if the method isn't
