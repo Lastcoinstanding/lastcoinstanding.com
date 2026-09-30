@@ -114,6 +114,9 @@ Citations behind the sitewide modeling-assumption presets. See `STYLE_GUIDE.md �
 | TX-4 | Unrecaptured §1250 gain | taxed at the ordinary rate, at most **25%**; the calculator uses min(bracket, 25%) on the depreciation, never more than the gain | IRS Topic 409 | https://www.irs.gov/taxtopics/tc409 | 2026-09-29 | 2027-01 |
 | TX-5 | Net investment income tax | **3.8%** above MAGI $250,000 (joint), $200,000 (single, HoH), $125,000 (MFS); fixed in statute, not indexed. Includes rental income and gains on rental property; excludes home-sale gain excluded under §121 | IRS NIIT page; Topic 559; CRS IF11820 | https://www.irs.gov/individuals/net-investment-income-tax · https://www.irs.gov/taxtopics/tc559 · https://www.congress.gov/crs-product/IF11820 | 2026-09-29 | 2027-01 |
 | TX-6 | Collectibles rate | 28% maximum for collectibles (coins, art); bitcoin is property (Notice 2014-21), and the IRS hasn't designated it a collectible, so the calculators use the ordinary LTCG rates | IRS Topic 409; Notice 2014-21 | https://www.irs.gov/taxtopics/tc409 | 2026-09-29 | 2027-01 |
+| TX-7 | 2026 contribution limits (the tax-advantaged tooltip, PR 5c) | IRA $7,500 (catch-up $1,100 at 50+); 401(k) elective deferrals $24,500 | IRS news release (Notice 2025-67) | https://www.irs.gov/newsroom/401k-limit-increases-to-24500-for-2026-ira-limit-increases-to-7500 | 2026-09-29 | 2026-11 (the 2027 limits) |
+| TX-8 | Mortgage-interest deduction limit (PR 5c) | interest on up to $750,000 of acquisition debt ($375,000 filing separately) for debt after Dec 15, 2017 | IRS Publication 936 (2025) | https://www.irs.gov/pub/irs-pdf/p936.pdf | 2026-09-29 | 2027-01 |
+| TX-9 | 2026 standard deduction (why the deduction is off by default) | $32,200 joint; $24,150 head of household; $16,100 single | Rev. Proc. 2025-32 §4.14 | https://www.irs.gov/pub/irs-drop/rp-25-32.pdf | 2026-09-29 | 2026-11 |
 
 ## Existing-page citations
 

@@ -120,6 +120,13 @@
   //   tp: { taxRegime, filing, federalBracketPct, stateCode }
   function homeSaleTax(tp, value, sellCosts, basis, years){
     var gain = value - sellCosts - basis;
+    // Custom (PR 5c): the reader's exemption and rate, no holding test.
+    if (tp.taxRegime === 'custom') {
+      var ex = Math.min(Math.max(0, gain), Math.max(0, numOr(tp.customHomeExempt, 0)));
+      var tx = Math.max(0, gain - ex);
+      return { gain: gain, exclusion: ex, cap: Math.max(0, numOr(tp.customHomeExempt, 0)), eligible: true, custom: true,
+               taxable: tx, tax: tx * Math.max(0, numOr(tp.customHomeRate, 0)) / 100 };
+    }
     var eligible = years >= 2;
     var cap = HOME_EXCLUSION[tp.filing] || HOME_EXCLUSION.mfj;
     var exclusion = (!noGainTax(tp) && eligible) ? Math.min(Math.max(0, gain), cap) : 0;
@@ -133,12 +140,31 @@
   // A net loss is not credited.
   function btcSaleTax(tp, proceeds, basis, realized){
     var gain = proceeds - basis + (realized || 0);
-    return { gain: gain, realized: realized || 0, tax: Math.max(0, gain) * gainRate(tp) };
+    // PR 5c: in a tax-advantaged account (Roth-style) the sale is untaxed;
+    // under Custom, the reader's bitcoin rate.
+    var rate = tp.btcAccount === 'advantaged' ? 0
+             : tp.taxRegime === 'custom' ? Math.max(0, numOr(tp.customBtcRate, 0)) / 100
+             : gainRate(tp);
+    return { gain: gain, realized: realized || 0, advantaged: tp.btcAccount === 'advantaged', tax: Math.max(0, gain) * rate };
   }
   // BvRE's inputs as a tax profile, with R7's defaults.
   function bvreTaxProfile(i){
     return { taxRegime: i.taxRegime || 'us', filing: i.filing || 'mfj',
-             federalBracketPct: numOr(i.taxBracket, 24), stateCode: i.taxState || 'OTHER' };
+             federalBracketPct: numOr(i.taxBracket, 24), stateCode: i.taxState || 'OTHER',
+             btcAccount: i.btcAccount || 'taxable', mortgageDeduction: !!i.mortgageDeduction,
+             customHomeRate: i.customHomeRate, customHomeExempt: i.customHomeExempt, customBtcRate: i.customBtcRate };
+  }
+  // The mortgage-interest deduction (PR 5c; off by default, for itemisers):
+  // the owner saves the interest times the federal bracket plus the state
+  // rate, on up to $750,000 of loan ($375,000 filing separately; IRS
+  // Publication 936). No saving under No capital-gains tax or Custom, whose
+  // income tax isn't modelled. The share of interest covered is fixed by the
+  // opening loan.
+  var MORTGAGE_DEBT_CAP = { mfj: 750000, single: 750000, hoh: 750000, mfs: 375000 };
+  function interestSavingRate(tp, loan){
+    if (!tp.mortgageDeduction || tp.taxRegime !== 'us' || !(loan > 0)) return 0;
+    var cover = Math.min(1, (MORTGAGE_DEBT_CAP[tp.filing] || 750000) / loan);
+    return cover * (tp.federalBracketPct / 100 + stateRateOf(tp));
   }
 
   // Depreciation on the ORIGINAL building basis (PR 5a, M9; it was 80% of
@@ -930,7 +956,8 @@
     var btc = btcUpfront, bal = loan;
     var basis = upfront, realized = 0;   // bitcoin's cost basis and the gain on coins sold along the way (PR 5b)
     var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
-              invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
+              invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0, interestSaving: 0 };
+    var saveRate = interestSavingRate(bvreTaxProfile(i), loan);
     var cumOwner = upfront, cumRenter = upfront;
     var rows = [], yr = null, first = null, last = null, ranOut = null;
     for (var m = 1; m <= n; m++) {
@@ -949,6 +976,8 @@
       var ins = i.insurancePer400K * vj / 400000 / 12;
       var maint = vj * i.maintPct / 100 / 12;
       var owner = interest + principal + tax + ins + maint;
+      var saving = interest * saveRate;   // the mortgage-interest deduction (PR 5c; 0 unless on)
+      owner -= saving; t.interestSaving += saving;
       var rent = rent0 * rentIndexAt(S, jl) / z0;
       var diff = owner - rent;
       if (m === 1) first = { owner: owner, pi: interest + principal, tax: tax, ins: ins, maint: maint, rent: rent, diff: diff };
@@ -1117,7 +1146,8 @@
     var bal = loan;
     var basis = upfront, realized = 0;   // bitcoin's cost basis and the gain on coins sold along the way (PR 5b)
     var t = { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, owner: 0, rent: 0,
-              invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0 };
+              invested: 0, sold: 0, shortfall: 0, spent: 0, fromIncome: 0, interestSaving: 0 };
+    var saveRate = interestSavingRate(bvreTaxProfile(i), loan);
     var cumOwner = upfront, cumRenter = upfront;
     var rows = [], yr = null, first = null, last = null, ranOutMonth = null;
     for (var m = 1; m <= n; m++) {
@@ -1136,6 +1166,8 @@
       var ins = ins0 * Math.pow(1 + g, k) / 12;
       var maint = vk * i.maintPct / 100 / 12;
       var owner = interest + principal + tax + ins + maint;
+      var saving = interest * saveRate;   // the mortgage-interest deduction (PR 5c; 0 unless on)
+      owner -= saving; t.interestSaving += saving;
       var rent = rent0 * Math.pow(1 + rg, k);
       var diff = owner - rent;
       if (m === 1) first = { owner: owner, pi: interest + principal, tax: tax, ins: ins, maint: maint, rent: rent, diff: diff };

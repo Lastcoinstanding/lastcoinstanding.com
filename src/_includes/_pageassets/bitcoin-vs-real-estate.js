@@ -11,12 +11,17 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // after-tax figures; these helpers read the inputs and word the lines.
     function reTaxInputs(){
       function v(id, d){ var el = document.getElementById(id); return el && el.value ? el.value : d; }
-      return { taxRegime: v('reTaxRegime', 'us'), filing: v('reFiling', 'mfj'), taxBracket: +v('reBracket', '24'), taxState: v('reState', 'OTHER') };
+      function n(id, d){ var el = document.getElementById(id); var x = el ? parseFloat(String(el.value).replace(/[$,%\s]/g, '')) : NaN; return isFinite(x) ? x : d; }
+      var d = document.getElementById('reMortgageDeduction');
+      return { taxRegime: v('reTaxRegime', 'us'), filing: v('reFiling', 'mfj'), taxBracket: +v('reBracket', '24'), taxState: v('reState', 'OTHER'),
+               btcAccount: v('reBtcAccount', 'taxable'), mortgageDeduction: !!(d && d.checked),   // PR 5c
+               customHomeRate: n('reCustomHomeRate', 20), customHomeExempt: n('reCustomHomeExempt', 0), customBtcRate: n('reCustomBtcRate', 20) };
     }
     // f formats money; conv(x) gives the displayed value of a nominal x.
     function reBtcTaxLine(R, f, conv){
       var pre = conv(R.btcIfSold), tax = conv(R.btcTax.tax);
       if (R.taxProfile.taxRegime === 'none') return 'Before tax the same: no capital-gains tax';
+      if (R.btcTax.advantaged) return 'Before tax the same: held in a tax-advantaged account';
       if (!(R.btcTax.tax > 0)) return 'Before tax ' + f(pre) + '; no tax: no gain';
       return 'Before tax ' + f(pre) + '; tax on the gain over what was paid: <span class="negative">\u2212' + f(tax) + '</span>' +
         (Math.abs(R.btcTax.realized) > 0.5 ? ' <span style="font-size:.78rem;color:var(--text-muted)">(including coins sold along the way, due in the years they were sold)</span>' : '');
@@ -26,6 +31,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       var cap = '$' + h.cap.toLocaleString('en-US');
       if (R.taxProfile.taxRegime === 'none') return 'Before tax the same: no capital-gains tax';
       if (!(h.gain > 0)) return 'Before tax ' + f(pre) + '; no tax: no gain on the sale';
+      if (h.custom) return 'Before tax ' + f(pre) + '; tax at your rate' + (h.cap > 0 ? ' above your ' + cap + ' exemption' : '') + ': <span class="negative">\u2212' + f(tax) + '</span>';
       if (!h.eligible) return 'Before tax ' + f(pre) + '; tax on the gain: <span class="negative">\u2212' + f(tax) + '</span> <span style="font-size:.78rem;color:var(--text-muted)">(held under 2 years, so no home-sale exclusion)</span>';
       // The gain and the exclusion are stated in nominal dollars: the
       // exclusion is a fixed dollar amount, not indexed.
@@ -436,6 +442,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             '<div class="detail-line">If held instead of sold: ' + rFmt(R.houseHeld) + ' <span style="' + mutedS + '">(value less ' + (cash ? 'nothing owed' : 'the loan') + ')</span></div>' +
             (cash ? '' : '<div class="detail-line">Interest paid: <span class="negative">' + rFmt(T.interest) + '</span> <span style="' + mutedS + '">(nominal sum; not recovered at sale)</span></div>') +
             '<div class="detail-line">Tax, insurance and maintenance: ' + rFmt(T.tax + T.ins + T.maint) + ' <span style="' + mutedS + '">(nominal sum)</span></div>' +
+            (T.interestSaving > 0.5 ? '<div class="detail-line">Mortgage-interest deduction: saved ' + rFmt(T.interestSaving) + ' <span style="' + mutedS + '">(nominal sum; the monthly cost above is after it)</span></div>' : '') +
           '</div>';
 
         document.getElementById('calcResultsContainer').innerHTML = '<div class="calc-results-grid">' + btcHtml + houseHtml + '</div>';
@@ -815,6 +822,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         '<div class="detail-line">If held instead of sold: '+fmt(modeVal(R.houseHeld, P.houseHeld))+' <span style="'+mutedS+'">(value less '+(cash ? 'nothing owed' : 'the loan')+')</span></div>' +
         (cash ? '' : '<div class="detail-line">Interest paid: <span class="negative">'+fmt(P.totals.interest)+'</span> <span style="'+mutedS+'">(nominal sum; not recovered at sale)</span></div>') +
         '<div class="detail-line">Tax, insurance and maintenance: '+fmt(P.totals.tax + P.totals.ins + P.totals.maint)+' <span style="'+mutedS+'">(nominal sum)</span></div>' +
+        (P.totals.interestSaving > 0.5 ? '<div class="detail-line">Mortgage-interest deduction: saved '+fmt(P.totals.interestSaving)+' <span style="'+mutedS+'">(nominal sum; the monthly cost above is after it)</span></div>' : '') +
       '</div>';
 
     resultsEl.innerHTML =
@@ -904,12 +912,16 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var filings = { mfj: 'married filing jointly', single: 'single', hoh: 'head of household', mfs: 'married filing separately' };
     function hint(){
       var t = reTaxInputs(), el = document.getElementById('reTaxHint');
+      var box = document.getElementById('reTaxCustom');
+      if (box) box.hidden = t.taxRegime !== 'custom';   // PR 5c
       if (!el) return;
       var st = document.getElementById('reState');
-      el.textContent = t.taxRegime === 'none' ? names.none
-        : names.us + ' · ' + filings[t.filing] + ' · ' + t.taxBracket + '% bracket · ' + (st ? st.options[st.selectedIndex].text : 'typical state');
+      var extra = (t.btcAccount === 'advantaged' ? ' · bitcoin tax-advantaged' : '') + (t.mortgageDeduction && t.taxRegime === 'us' ? ' · mortgage interest deducted' : '');
+      el.textContent = (t.taxRegime === 'none' ? names.none
+        : t.taxRegime === 'custom' ? 'custom: home ' + t.customHomeRate + '% above $' + Math.round(t.customHomeExempt).toLocaleString('en-US') + ', bitcoin ' + t.customBtcRate + '%'
+        : names.us + ' · ' + filings[t.filing] + ' · ' + t.taxBracket + '% bracket · ' + (st ? st.options[st.selectedIndex].text : 'typical state')) + extra;
     }
-    ['reTaxRegime', 'reFiling', 'reBracket', 'reState'].forEach(function(id){
+    ['reTaxRegime', 'reFiling', 'reBracket', 'reState', 'reBtcAccount', 'reMortgageDeduction', 'reCustomHomeRate', 'reCustomHomeExempt', 'reCustomBtcRate'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.addEventListener('change', function(){ hint(); runFwdCalc(); if (window.runRetroCalc) window.runRetroCalc(); });
     });

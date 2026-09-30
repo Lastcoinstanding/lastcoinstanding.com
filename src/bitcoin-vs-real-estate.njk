@@ -183,11 +183,18 @@ eleventyComputed:
                 <summary><span class="re-baseline-label">Tax on a sale</span> <span class="re-baseline-hint" id="reTaxHint">United States &middot; married filing jointly &middot; 24% bracket &middot; Typical / average (~5%)</span></summary>
                 <div class="re-baseline-body">
                     <div class="re-field-grid">
-                        <div class="calc-field"><label for="reTaxRegime">Tax regime{{ reb.regimeTip('bvre') }}</label><select id="reTaxRegime">{{ reb.regimeOptions() }}</select></div>
+                        <div class="calc-field"><label for="reTaxRegime">Tax regime{{ reb.regimeTip('bvre') }}</label><select id="reTaxRegime">{{ reb.regimeOptions('bvre') }}</select></div>
                         <div class="calc-field"><label for="reFiling">Filing status{{ reb.filingTip() }}</label><select id="reFiling">{{ reb.filingOptions() }}</select></div>
                         <div class="calc-field"><label for="reBracket">Federal bracket{{ reb.bracketTip() }}</label><select id="reBracket">{{ reb.bracketOptions() }}</select></div>
                         <div class="calc-field"><label for="reState">State</label><select id="reState">{{ reb.stateOptions() }}</select></div>
+                        <div class="calc-field"><label for="reBtcAccount">Bitcoin held in{{ reb.accountTip() }}</label><select id="reBtcAccount"><option value="taxable" selected>A taxable account</option><option value="advantaged">A tax-advantaged account</option></select></div>
                     </div>
+                    <div class="re-field-grid re-tax-custom" id="reTaxCustom" hidden>
+                        <div class="calc-field"><label for="reCustomHomeRate">Home gain rate <span class="opt">(%)</span>{{ reb.customTip() }}</label><input type="text" id="reCustomHomeRate" value="20%" inputmode="decimal"></div>
+                        <div class="calc-field"><label for="reCustomHomeExempt">Home exemption <span class="opt">($)</span></label><input type="text" id="reCustomHomeExempt" value="$0" inputmode="decimal"></div>
+                        <div class="calc-field"><label for="reCustomBtcRate">Bitcoin gain rate <span class="opt">(%)</span></label><input type="text" id="reCustomBtcRate" value="20%" inputmode="decimal"></div>
+                    </div>
+                    <label class="re-invest-toggle re-tax-deduct"><input type="checkbox" id="reMortgageDeduction"> <span>I itemize: deduct mortgage interest</span></label>{{ reb.deductionTip() }}
                     {{ reb.notTaxAdvice('re-baseline-note') }}
                 </div>
             </details>
