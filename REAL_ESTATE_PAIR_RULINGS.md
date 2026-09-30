@@ -226,3 +226,13 @@ Prompt 5 is split into slices, as Prompt 4 was: **5a** the rental page's tax cor
   - **Custom regime:** a home-gain rate after an exemption (default 0) and a bitcoin-gain rate.
 - **Not on Bitcoin vs. Rental Property:** its paths deploy a sale's proceeds or a HELOC, far above any contribution limit, so a tax-advantaged option would mislead; rental mortgage interest is already deducted as a business expense.
 - **Figures at the defaults (Real):** projection bitcoin $647,927 after tax; tax-advantaged $789,843; with the deduction $527,512 (the owner's lower cost means less invested); Custom 20% / $0 / 15%: bitcoin $683,406, house $154,617 (was $175,189).
+
+## 15 · Implementation notes, PR 6a (2026-09-29; not new rulings)
+
+PR 6 is split: **6a** "Show the calculation" and the CSV (P2, P7); **6b** the chart with the difference line and the Held / If sold toggle (M7, P4), on both pages.
+
+- **One module, both pages:** `shared/real-estate-ledger.js` (window.RealEstateLedger) renders a disclosure with two tabs, the final rows (market value or total held → selling costs → before tax → tax → after tax) and a CSV of every tab with a #-prefixed provenance header; `shared/real-estate-ledger.css` styles it with each page's tokens. `toCsv` is the shared CSV writer P2 asked for.
+- **Bitcoin vs. Real Estate:** under the cards and the toggle in both calculators (P7): *The house* and *Bitcoin + rent*, one row per year from the engine's own rows (calendar years to date in the look-back). Cumulative cash out is the same on both tabs when the renter invests the difference.
+- **Bitcoin vs. Rental Property:** under the path card: *Keep the rental* (all N on Path 3) and the path, from `RealEstateModel.rentalLedger`. Each row's *Total held* is the chart's point for that year.
+- **Nominal, as paid, in both views** (a small departure from Prompt 6's "current frame"): the note above the table says so and, in the Real view, gives the divisor the cards use. Deflating a ledger of payments year by year would make its sums unreadable.
+- **No figure moves:** every rePairQA vector is unchanged; new E30, E31, P27 and P28 hash the ledgers' CSVs. Checked: the ledgers' after-tax rows equal the cards (BvRE, both calculators) and the table (BvRP, all four paths), and each ledger's last *Total held* equals the table's held total.

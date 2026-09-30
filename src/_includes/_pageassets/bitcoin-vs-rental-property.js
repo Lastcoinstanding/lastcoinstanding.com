@@ -765,6 +765,41 @@
       : ' If sold: the rental pays depreciation recapture and tax on its gain; bitcoin pays tax on its gain over what was paid for it; STRC and SATA are sold at par, so the return of capital that lowered their basis is taxed as a gain. Selling costs are in both the before- and after-tax rows.';
   }
 
+  // Show the calculation (PR 6a; rulings P2): the kept rental and the
+  // path, year by year, in nominal dollars as paid, and both sold at the end.
+  function renderLedger(results, s){
+    if (!window.RealEstateLedger || !RE.rentalLedger) return;
+    var L = RE.rentalLedger(s), $ = 'nominal $';
+    var pathName = ['', 'Sell + Spot Bitcoin', 'HELOC + Bitcoin', 'Partial Sale + Yield', 'Sell + Yield Portfolio'][s.path];
+    var yr = { label: 'Year', fmt: 'text', get: function(r){ return String(r.year); } };
+    function col(label, key, fmt, unit){ return { label: label, unit: unit === undefined ? $ : unit, fmt: fmt, get: function(r){ return r[key]; } }; }
+    var rental = { id: 'rental', label: s.path === 3 ? 'Keep all ' + s.numProperties + ' rentals' : 'Keep the rental', rows: L.rental, columns: [yr,
+      col('Property value', 'value'), col('Mortgage balance', 'balance'), col('Net operating income', 'noi'), col('Depreciation', 'depreciation'),
+      col('Mortgage interest', 'interest'), col('Debt service', 'debtService'), col('Income tax', 'tax'), col('Cash after tax', 'cash'),
+      col('Cumulative cash', 'cumCash'), col('Equity', 'equity'), col('Total held', 'held')] };
+    var pc = [yr, col('Bitcoin price', 'btcPrice'), col('Bitcoin value', 'btcValue')];
+    if (s.path === 2) pc = pc.concat([col('HELOC balance', 'heloc'), col('HELOC interest paid, to date', 'helocInterest')]);
+    if (s.path === 3 || s.path === 4) pc = pc.concat([col('Preferreds and lending, at par', 'par'), col('Distributions', 'dist'), col('Tax on them', 'distTax'),
+      col('Cash after tax', 'cash'), col('Cumulative cash', 'cumCash'), col('ROC basis left', 'basisLeft')]);
+    pc.push(col(s.path === 2 || s.path === 3 ? 'Total held (with the kept rental' + (s.path === 3 ? 's' : '') + ')' : 'Total held', 'held'));
+    var k = results.keep, p = results.path;
+    var final = { cols: ['Keep rental', pathName], rows: [
+      { label: 'Total held', values: [k.totalWealth, p.totalWealth] },
+      { label: 'Selling costs', values: [k.ifSold.preTax - k.totalWealth, p.ifSold.preTax - p.totalWealth] },
+      { label: 'Before tax', values: [k.ifSold.preTax, p.ifSold.preTax] },
+      { label: 'Tax on the sale', values: [-k.ifSold.tax, -p.ifSold.tax] },
+      { label: 'After tax', values: [k.ifSold.afterTax, p.ifSold.afterTax], strong: true }] };
+    RealEstateLedger.render(document.getElementById('calc-ledger'), {
+      note: 'Every amount is in nominal dollars, as paid' + (isReal() ? '; the Real view above divides the year-' + s.holdingYears + ' totals by ' + RE.deflator(inflPct(), s.holdingYears).toFixed(2) : '') +
+            '. <em>Total held</em> is the chart\u2019s line for that year; the last rows sell both at year ' + s.holdingYears + ', as the table does.',
+      tabs: [rental, { id: 'path', label: pathName, rows: L.path, columns: pc }], final: final,
+      csv: { filename: 'bitcoin-vs-rental-property.csv', meta: [['Last Coin Standing', 'Bitcoin vs. Rental Property: ' + pathName],
+        ['Property value', s.propertyValue], ['Net rental yield', s.netRentalYield + '%'], ['Holding period', s.holdingYears + ' years'],
+        ['Bitcoin scenario', s.btcScenario], ['Tax', (s.taxRegime || 'us') + ' / ' + s.federalBracketPct + '% / ' + s.stateCode],
+        ['Amounts', 'nominal USD, as paid'], ['Live scenario URL', window.location.href]] }
+    });
+  }
+
   function renderPathDetail(results, s){
     var el = document.getElementById('calc-path-detail');
     if (!el) return;
@@ -1018,6 +1053,7 @@
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);
+    renderLedger(results, state);
     renderPath3Derived(state);
     renderCAGRChips(state);
     renderChart(state);
@@ -1216,6 +1252,7 @@
     renderHeadline(results, state);
     renderComparison(results, state);
     renderPathDetail(results, state);
+    renderLedger(results, state);
     renderPath3Derived(state);
     renderCAGRChips(state);
     renderSpecificCallout(state);

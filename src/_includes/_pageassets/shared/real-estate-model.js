@@ -809,6 +809,51 @@
     return trajectory;
   }
 
+  // ─── BvRP's ledger: the rental and the path, year by year (PR 6a) ───
+  // The rows behind the chart (calcWealthTrajectory) and the table: the
+  // kept rental (all N properties on Path 3) and the chosen path, one row
+  // per year, nominal dollars as paid. `held` equals the chart's point for
+  // that year; the last year's `held` equals the table's "if held" total.
+  function rentalLedger(s){
+    var H = s.holdingYears, sc = s.btcScenario;
+    var keepMultiplier = (s.path === 3) ? s.numProperties : 1;
+    var keepS = keepMultiplier !== 1 ? Object.assign({}, s, { propertyValue: s.propertyValue * keepMultiplier }) : s;
+    var ky = rentalYears(keepS, keepMultiplier, H);
+    var traj = calcWealthTrajectory(s);
+    var btc0 = (typeof TODAY_PRICE !== 'undefined' && TODAY_PRICE > 0) ? TODAY_PRICE : null;
+    var rental = [], cum = 0;
+    for (var t = 1; t <= H; t++) {
+      var r = ky.rows[t];
+      cum += r.afterTax;
+      var value = keepS.propertyValue * Math.pow(1 + s.appreciationPct / 100, t);
+      rental.push({ year: t, value: value, balance: ky.loan.balance[t], noi: r.pretax, depreciation: r.depreciation,
+                    interest: r.interest, debtService: r.debtService, tax: r.tax, cash: r.afterTax, cumCash: cum,
+                    equity: value - ky.loan.balance[t], held: traj[t].wealthKeep });
+    }
+    var bf = btcBuyFactor(s), path = [];
+    var sold = Math.max(0, s.numProperties - s.propertiesRetained);
+    var sale = (s.path === 3)
+      ? afterRepayment(calcRentalExit(Object.assign({}, s, { propertyValue: s.propertyValue * sold }), 0).netCash, existingLoan(s, sold, 0).balance0)
+      : afterRepayment(calcRentalExit(s, 0).netCash, existingLoan(s, 1, 0).balance0);
+    var heloc = Math.max(0, s.propertyValue * (s.helocLtv / 100) - s.existingMortgage);
+    var yy = (s.path === 3 || s.path === 4) ? yieldYears(sale.deployed, s, H) : null;
+    var pcum = 0;
+    for (var k = 1; k <= H; k++) {
+      var g = scenarioGrowthFactor(sc, k, H), row = { year: k, btcPrice: btc0 ? btc0 * g : null, held: traj[k].wealthPath };
+      if (s.path === 1) row.btcValue = sale.deployed * bf * g;
+      else if (s.path === 2) { row.btcValue = heloc * bf * g; row.heloc = heloc; row.helocInterest = heloc * (s.helocRatePct / 100) * k; }
+      else {
+        var y = yy.rows[k];
+        pcum += y.afterTax;
+        row.btcValue = yy.alloc.spot * bf * g;
+        row.par = yy.alloc.strc + yy.alloc.sata + yy.alloc.lend;
+        row.dist = y.pretax; row.distTax = y.tax; row.cash = y.afterTax; row.cumCash = pcum; row.basisLeft = y.basisLeft;
+      }
+      path.push(row);
+    }
+    return { rental: rental, path: path };
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // BvRE — /bitcoin-vs-real-estate
   // Moved from bitcoin-vs-real-estate.js (PR 3, 2026-09-27). Every
@@ -1319,6 +1364,7 @@
     computeAll: computeAll,
     calcYieldPortfolioAtYearT: calcYieldPortfolioAtYearT,
     calcWealthTrajectory: calcWealthTrajectory,
-    ledgerRental: function(s, scenarioOverride){ return { rows: calcWealthTrajectory(s, scenarioOverride), cards: computeAll(s) }; }
+    ledgerRental: function(s, scenarioOverride){ return { rows: calcWealthTrajectory(s, scenarioOverride), cards: computeAll(s) }; },
+    rentalLedger: rentalLedger
   };
 })();
