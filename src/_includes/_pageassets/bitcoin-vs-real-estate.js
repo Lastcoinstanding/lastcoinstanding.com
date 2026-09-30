@@ -920,6 +920,32 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var defl = 1 + inflRate / 100;
     reRenderChart('fwd', P, P.points.map(function(p, k){ return 'Y' + k; }),
       function(v, k){ return _mode === 'real' ? v / Math.pow(defl, k) : v; }, fmt, PF ? PF.points : null, runFwdCalc);
+    // The sensitivity grid (PR 7; R9, P1): the after-tax difference if sold,
+    // bitcoin minus the house, as two assumptions move; yours outlined.
+    if (window.RealEstateGrid) {
+      var SC = [['floor', 'Floor'], ['stay', 'Stay'], ['trend', 'Trend']];
+      var LR = window.ModelingAssumptions ? window.ModelingAssumptions._dimensions.homeApprNominal.presetValues['long-run'] : 3.41;
+      function pc(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+      var hs = [Math.max(1, horizonYrs - 5), horizonYrs, Math.min(30, horizonYrs + 5)];
+      var axes = [{ id: 'scen', label: 'Scenario \u00d7 home prices',
+        rows: { label: 'Bitcoin', items: SC.map(function(x){ return { label: x[1], v: x[0] }; }) },
+        cols: { label: 'Home prices a year', items: [{ label: 'Long run ' + pc(LR), v: LR }, { label: 'Yours ' + pc(homeApprNominal), v: homeApprNominal }, { label: 'Yours + 2 pts ' + pc(homeApprNominal + 2), v: homeApprNominal + 2 }] } }];
+      if (method !== 'cash') axes.push({ id: 'hr', label: 'Horizon \u00d7 mortgage rate',
+        rows: { label: 'Horizon', items: hs.map(function(h){ return { label: h + ' years', v: h }; }) },
+        cols: { label: 'Mortgage rate', items: [mortRate - 1, mortRate, mortRate + 1].map(function(r){ r = Math.max(0, r); return { label: pc(r), v: r }; }) } });
+      RealEstateGrid.render(document.getElementById('fwdGrid'), {
+        axes: axes, ahead: ['bitcoin ahead', 'house ahead'],
+        frame: '(if sold, after tax; ' + (_mode === 'real' ? 'real, today\u2019s $' : 'nominal, future $') + ')',
+        cell: function(pair, rv, cv){
+          var x = pair === 'scen' ? { scenario: rv, homeApprNominal: cv } : { horizonYrs: rv, mortRate: cv };
+          var Q = RealEstateModel.bvreProjection(Object.assign({}, _pIn, x));
+          var d = Q.btcAfterTax - Q.houseAfterTax;
+          return _mode === 'real' ? d / Q.deflator : d;
+        },
+        mine: function(pair){ if (pair === 'hr') return [1, 1]; var k = ['floor', 'stay', 'trend'].indexOf(scenario); return k < 0 ? null : [k, 1]; },
+        note: 'Each cell: the bitcoin minus the house, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. Upper isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
+      });
+    }
     if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
       retro: false, calc: 'the projection', filename: 'bitcoin-vs-real-estate-projection.csv',
       realNote: _mode === 'real' ? 'the Real view on the cards divides the end values by ' + P.deflator.toFixed(2) + ' (' + (window.RealEstateBaseline ? window.RealEstateBaseline.deflatorPhrase() : 'the deflator') + ')' : '',

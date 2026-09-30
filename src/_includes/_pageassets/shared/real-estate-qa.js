@@ -142,6 +142,12 @@
        E32 (the look-back's chart, 2017) and E33 (the projection's, defaults),
        hashing RealEstateChart.data(). Checked: each chart's last point equals
        the cards, in both frames.
+     PR 7 (R9, P1) — the sensitivity grid on both pages, in its own block:
+       every vector is unchanged. New: E34 and E35 (the projection's grid,
+       scenario × home prices and horizon × mortgage rate), P30 and P31
+       (scenario × home prices and holding period × net yield), hashing each
+       grid's values. Checked: the reader's cell equals the cards (BvRE) and
+       the headline (BvRP).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -220,8 +226,18 @@
     { id: 'E30', desc: 'the look-back ledger, 2017 (PR 6a)', ledger: 'retro' },
     { id: 'E31', desc: 'the projection ledger, defaults (PR 6a)', ledger: 'proj' },
     { id: 'E32', desc: 'the look-back chart, 2017 (PR 6c)', chart: 'retro' },
-    { id: 'E33', desc: 'the projection chart, defaults (PR 6c)', chart: 'proj' }
+    { id: 'E33', desc: 'the projection chart, defaults (PR 6c)', chart: 'proj' },
+    { id: 'E34', desc: 'the grid, scenario x home prices (PR 7)', grid: 'scen' },
+    { id: 'E35', desc: 'the grid, horizon x mortgage rate (PR 7)', grid: 'hr' }
   ];
+  // A grid's values under one axis pair (PR 7).
+  function captureGrid(id, pair){
+    var n = el(id); if (!n) return null;
+    var b = n.querySelector('[data-pair="' + pair + '"]'); if (b) b.click();
+    var g = n._gridValues || null;
+    var first = n.querySelector('.re-grid-axes [data-pair]'); if (first) first.click();   // back to the default pair
+    return g;
+  }
   // The ledger as its CSV, without the URL line (PR 6a).
   function captureLedger(id){
     var n = el(id); if (!n || !n._ledgerSpec || !window.RealEstateLedger) return null;
@@ -335,7 +351,9 @@
     { id: 'P26', desc: 'Path 1, 20y, 35% bracket: NIIT applies (PR 5b)', path: '1', hold: '20', bracket: '35' },
     { id: 'P27', desc: 'the ledger, defaults (Path 4) (PR 6a)', ledger: true },
     { id: 'P28', desc: 'the ledger, Path 2 (PR 6a)', ledger: true, path: '2' },
-    { id: 'P29', desc: 'the Held chart (PR 6b)', chartBasis: 'held' }
+    { id: 'P29', desc: 'the Held chart (PR 6b)', chartBasis: 'held' },
+    { id: 'P30', desc: 'the grid, scenario x home prices (PR 7)', grid: 'scen' },
+    { id: 'P31', desc: 'the grid, holding period x net yield (PR 7)', grid: 'hy' }
   ];
   function applyRp(v){
     var x = Object.assign({}, RP_BASE, v);
@@ -426,6 +444,7 @@
             click('.calc-mode-label[data-mode="projection"]');
           }
           else if (v.chart === 'proj') { applyProj({}); s = JSON.stringify(window.RealEstateChart ? window.RealEstateChart.data('fwd') : null); }
+          else if (v.grid) { applyProj({}); s = JSON.stringify(captureGrid('fwdGrid', v.grid)); }
           else { applyProj(v); s = JSON.stringify(captureProj()); }
           rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s);
         });
@@ -437,7 +456,7 @@
         await sleep(200);                                     // chart builds on tab activation
         var s0 = JSON.stringify(captureRpStatic());
         rows.push({ id: 'S-bvrp', desc: 'Power Law copy spans', hash: fnv(s0), len: s0.length }); all.push(s0);
-        RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(v.ledger ? captureLedger('calc-ledger') : captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
+        RP.forEach(function(v){ applyRp(v); var s = JSON.stringify(v.ledger ? captureLedger('calc-ledger') : v.grid ? captureGrid('calc-grid', v.grid) : captureRp()); rows.push({ id: v.id, desc: v.desc, hash: fnv(s), len: s.length }); all.push(s); });
         applyRp({});
         if (saved.display) click('.calc-frame-btn[data-mode="' + saved.display + '"]');   // the reader's frame (PR 4f)
       }
