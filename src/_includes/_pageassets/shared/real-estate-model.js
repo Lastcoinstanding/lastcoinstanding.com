@@ -1414,6 +1414,7 @@
     HOME_EXCLUSION: HOME_EXCLUSION,
     homeSaleTax: homeSaleTax,
     btcSaleTax: btcSaleTax,
+    bvreTaxProfile: bvreTaxProfile,   // PR 8: rePairQA.taxParityCheck
     rentalIfSold: rentalIfSold,
     pathIfSold: pathIfSold,
     currentBTCMultiple: currentBTCMultiple,

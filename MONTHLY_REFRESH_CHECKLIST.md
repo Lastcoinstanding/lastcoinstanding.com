@@ -701,7 +701,7 @@ For each value, verify against the source listed and update in the BFI files as 
 - The convertible-note stress point (paraphrased from the latest quarterly results presentation; currently Q2 2026, p.11). Update it when the Q3 deck lands.
 - STRC rate and schedule. **Since PR 4d the rate lives in one dated object, `YIELD_RATES`, in `src/_includes/_pageassets/shared/real-estate-model.js`** (`strc: 12.0`, with `asOf`); see §9.3a. The calculator, the Path 4 label, the slider hint and the $500K example's rate cells all read it. By hand, only the STRC tooltip in `src/bitcoin-vs-rental-property.njk` ("Paying 12.00% annualized…").
 - STRC's next rate announcement is due around **2026-09-30** (DATA_AUDIT BvRP-5).
-- **Verify after any rate change:** open either page with `?qa` and run `await rePairQA.run()` in the console. The hashes will change; that is expected. Record the new ones in the refresh commit.
+- **Verify after any rate change:** open either page with `?qa` and run `await rePairQA.all()` in the console. The hashes will change; that is expected. The identity checks must still pass. Record the new ones in the refresh commit.
 - Convertible notes outstanding.
 - SATA rate and schedule; Strive BTC holdings and the STRC shares in its reserve.
 - SATA's rate is `YIELD_RATES.sata` (§9.3a); by hand, only the SATA tooltip.
@@ -894,7 +894,7 @@ _Added 2026-09-28 (PR 4b; DATA_AUDIT RE-3–RE-13)._ Every sourced default for `
   - `propTaxPct` (RE-9) when ATTOM's annual property-tax analysis lands (April): the national effective rate on single-family homes, and the property-tax tooltip.
   - `insurancePer400K` (RE-10) from NerdWallet's average-cost page (keep the $400K dwelling-coverage basis), and BvRE's insurance tooltip.
   - `sellPct` (RE-12) from Clever's latest agent surveys (midpoint of the most recent two) + the 1% estimate, and the selling-costs tooltips on **both** pages.
-- **Verify after any change:** open each page with `?qa` and run `await rePairQA.run()`; the hashes move, which is expected. Record the new digests in the refresh commit.
+- **Verify after any change:** open each page with `?qa` and run `await rePairQA.all()`; the hashes move, which is expected, and every identity check (parity, tax parity, ledger = stat block = chart) must still pass, which is expected. Record the new digests in the refresh commit.
 
 ## 9.3a. Rental page: the dated rates object and the stablecoin-lending disclosure (MONTHLY, from PR 4d)
 
@@ -905,7 +905,7 @@ _Added 2026-09-28 (PR 4d; rulings §7 item 12; DATA_AUDIT BvRP-5, BvRP-14, BvRP-
 - **Ledn:** re-check its rates page and whether US residents are eligible after the Ledn US LLC migration; update its row (`us`).
 - **The 4.0% default (`lending`):** move it only if the median of the four lending rows drifts more than half a point from it. Then also update the BvRP-28 row, and the Year 1 figures in the prose if any quote it.
 - **`asOf`:** the month of the refresh.
-- **Verify:** open the page with `?qa` and run `await rePairQA.run()`; the S-bvrp and yield-portfolio hashes move, which is expected. Record the new digests in the refresh commit.
+- **Verify:** open the page with `?qa` and run `await rePairQA.all()`; the S-bvrp and yield-portfolio hashes move, which is expected. Record the new digests in the refresh commit.
 
 ## 9.4. The retrospective's monthly series: Case-Shiller, Zillow rents and values (MONTHLY, from PR 4e)
 
@@ -917,7 +917,7 @@ _Added 2026-09-27 as a placeholder (design v1.2, ruling P8); **live since PR 4e*
 - **Bitcoin** (RE-20): nothing here. The start-year averages come from `PL_DATA` (§1) and the monthly flows from `BTC_MONTHLY` (§1, BTC-M-1). A month whose previous month's close isn't in `BTC_MONTHLY` yet trades at today's price, so a late §1 refresh degrades gently rather than breaking.
 - **`csData`** (RE-16, in `shared/bvre-annual-data.js`): the annual averages behind the growth-of-$1 and every-starting-year exhibits and The Gallery's chart 4. Append the new full year each January, when `homeData` and `btcData` roll forward (the annual step in that file's header; it has no section here yet, see TECH_DEBT), not monthly.
 - **Start years:** the select offers 2014–2024. Add a year to it (and the URL notes in `bitcoin-vs-real-estate.js`) only once that calendar year is complete in `ZHVI_US`, `ZORI_US` and `PL_DATA` (the engine returns nothing for a year without them, and the page says the data isn't complete) and `homeData` and `mortgageRates` carry a sourced full-year value for it (the 2025 values are due a check first; see TECH_DEBT).
-- **Verify:** open `/bitcoin-vs-real-estate?qa` and run `await rePairQA.run()` and `rePairQA.ledgerCheck()`. A new Case-Shiller month moves every retrospective hash (E1–E5, E20, E21), which is expected; a new ZORI or ZHVI month moves them only when it lands in a July or in a start year. Record the new digest in the refresh commit.
+- **Verify:** open `/bitcoin-vs-real-estate?qa` and run `await rePairQA.all()` (it includes `ledgerCheck()`). A new Case-Shiller month moves every retrospective hash (E1–E5, E20, E21), which is expected; a new ZORI or ZHVI month moves them only when it lands in a July or in a start year. Record the new digest in the refresh commit.
 
 ## 9.5. Search Console indexing sweep (MONTHLY)
 

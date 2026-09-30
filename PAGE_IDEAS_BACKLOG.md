@@ -781,11 +781,7 @@ _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retire
 
 _Cluster opened 2026-09-26 (JM). `/bitcoin-vs-real-estate` (the tenant's side) and `/bitcoin-vs-rental-property` (the landlord's side) revised onto one engine, one assumption surface and one results pattern._
 
-- [ ] **Real-estate pair revision** → **promoted 2026-09-26** to `REAL_ESTATE_PAIR_DESIGN.md` (build prompts: `REAL_ESTATE_PAIR_CLAUDE_CODE_PROMPTS.md`). Promotes a chat-side backlog capture; the design doc is the entry of record.
-  - **Sequence:** PR 0 Phase 0 report (`REAL_ESTATE_PAIR_PHASE0_REPORT.md`) → PR 1 BvRP sourcing fixes → PR 2 register pass → PR 3 shared-engine extraction → PRs 4–8 build (assumptions, tax regime, chart + ledger, sensitivity grid, carry + parity + bookkeeping). PRs 1–2 are the pre-Tuesday 2026-09-29 priority.
-  - **Close-out:** PR 8 marks this entry `- [x]` with SHAs and moves it to Promoted / shipped.
-  - **Progress:** PRs 0–2 merged 2026-09-27 (#121, #122, #123) plus the copy follow-up #124. Rulings P7–P9 (results on BvRE's first tab, retrospective to today, series strip) added in design v1.2.
-  - **Next pages:** the pair becomes a series. Two further spokes are captured under **[Real-estate series](#real-estate-series)** below; the series strip (P9) is built to take them.
+_Shipped 2026-09-29: the revision entry moved to Promoted / shipped. The pair continues as a series, below._
 
 ### Real-estate series
 
@@ -812,6 +808,11 @@ _Opened 2026-09-27 (JM). The pair above plus the pages that extend it, each answ
 ---
 
 ## Promoted / shipped
+
+- [x] **Real-estate pair revision** → **shipped 2026-09-29** (PRs 0–8). `/bitcoin-vs-real-estate` (the tenant's side) and `/bitcoin-vs-rental-property` (the landlord's side) on one engine, one assumption surface and one results pattern. Reference from ship: SITE_GUIDE §14 and §14.1 (with §46, §53.2, §55.4, STYLE_GUIDE §6.49); rulings and per-PR notes: `REAL_ESTATE_PAIR_RULINGS.md`; `REAL_ESTATE_PAIR_DESIGN.md` is historical.
+  - **Merges:** PR 0 Phase 0 `9d46050` (#121) · PR 1 BvRP sourcing `2150d4e` (#122) · PR 2 register `d6c8289` (#123), copy follow-up `5cf2c9e` (#124) · series capture `6ba60cf` (#125) · PR 3 shared engine `132834a` (#126), PR 4 sources `2114d59` (#127) · PR 4a nominal frame `3fc13cc` (#128) · 4b rent, costs, equal cash out `a6d7204` (#129) · 4c scenarios `9a5ed11` (#130) · 4d rental `70767ed` (#131) · 4e retrospective to today `05b5cfd` (#132) · 4f Baseline and Real view `e5635e3` (#137) · 5a rental tax `8e6a88a` (#143) · 5b tax on a sale `b34fd9a` (#145) · 5c tax options `5558310` (#147) · 6a ledger `6755de5` (#149) · 6b rental chart `3a53364` (#151), note `be57da0` (#152) · 6c BvRE charts `4f449ad` (#153) · 7 sensitivity grid `3526bd2` (#155) · 8a pair lines, series strip, carry, one hash `928dfbb` (#156) · 8b parity QA and bookkeeping (the close-out PR). Related fixes in the same window: chart colours `2ad5e92` (#140), claims refresh `4d7b2e9` (#141).
+  - **Figures at ship** (BTC pinned $100,000; defaults; Real view, M2 6.5%): rePairQA digests BvRE `6cbf3491`, BvRP `31638210`, 37 vectors each; `rePairQA.all()` passes on both.
+  - **Open after ship:** TECH_DEBT §6 (real-estate pair) lists what was left.
 
 - [x] **Is Bitcoin a Singularity?** — the singularity half of the "Singularity" umbrella. → **published on Substack 2026-09-24:** https://lastcoinstanding.substack.com/p/is-bitcoin-a-singularity
   ~2,300 words. Both senses layered (singular → therefore it pulls); the ratchet through individuals → companies → institutions → states; punctuated adoption over a smooth price curve; fiat/bitcoin incompatibility via Gresham vs. Thiers; four falsifiers. Boundary rulings are recorded on the umbrella entry above.
