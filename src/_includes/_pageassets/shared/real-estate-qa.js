@@ -120,6 +120,11 @@
        tax), E26 (a $1.5M house, 20 years, single: the gain exceeds the
        exclusion), P25 (no capital-gains tax), P26 (Path 1, 20 years, 35%,
        NIIT applies).
+     PR 5c (BvRE) — where the bitcoin is held, the mortgage-interest
+       deduction and a Custom regime, all off by default: every vector is
+       unchanged. setTax() also resets the three. New: E27 (bitcoin in a
+       tax-advantaged account), E28 (mortgage interest deducted), E29 (Custom:
+       home 20% above a $0 exemption, bitcoin 15%).
    ============================================================ */
 (function(){
   if (typeof window === 'undefined') return;
@@ -191,7 +196,10 @@
     { id: 'E22', desc: 'proj, custom deflator 2.5% (PR 4f)', infl: 'custom', inflVal: 2.5 },
     { id: 'E23', desc: 'proj, Shadow Stats deflator 8% (PR 4f)', infl: 'shadow-stats' },
     { id: 'E25', desc: 'proj, no capital-gains tax (PR 5b)', regime: 'none' },
-    { id: 'E26', desc: 'proj, $1.5M house, 20y, single: gain above the exclusion (PR 5b)', home: '1500000', horizon: '20', filing: 'single' }
+    { id: 'E26', desc: 'proj, $1.5M house, 20y, single: gain above the exclusion (PR 5b)', home: '1500000', horizon: '20', filing: 'single' },
+    { id: 'E27', desc: 'proj, bitcoin in a tax-advantaged account (PR 5c)', account: 'advantaged' },
+    { id: 'E28', desc: 'proj, mortgage interest deducted (PR 5c)', deduct: true },
+    { id: 'E29', desc: 'proj, Custom: home 20% above $0, bitcoin 15% (PR 5c)', regime: 'custom', cHome: '20%', cExempt: '$0', cBtc: '15%' }
   ];
 
   // The deflator: a preset, or a custom value (PR 4f).
@@ -204,6 +212,10 @@
   function setTax(x){
     setVal('reTaxRegime', x.regime || 'us', ['change']); setVal('reFiling', x.filing || 'mfj', ['change']);
     setVal('reBracket', x.bracket || '24', ['change']); setVal('reState', x.state || 'OTHER', ['change']);
+    setVal('reBtcAccount', x.account || 'taxable', ['change']);                       // PR 5c
+    var d = el('reMortgageDeduction'); if (d && d.checked !== !!x.deduct) { d.checked = !!x.deduct; fire(d, 'change'); }
+    setVal('reCustomHomeRate', x.cHome || '20%', ['change']); setVal('reCustomHomeExempt', x.cExempt || '$0', ['change']);
+    setVal('reCustomBtcRate', x.cBtc || '20%', ['change']);
   }
   function applyRetro(v){
     var x = Object.assign({}, RETRO_BASE, v);

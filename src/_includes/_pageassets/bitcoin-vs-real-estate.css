@@ -511,3 +511,6 @@
   .scenario-btns-4 .scenario-btn:nth-child(3) { border-radius: 0 0 0 4px; }
   .scenario-btns-4 .scenario-btn:nth-child(4) { border-radius: 0 0 4px 0; }
 }
+/* PR 5c: the Tax on a sale block's Custom fields and deduction toggle. */
+.re-tax-custom[hidden] { display: none; }
+.re-tax .re-tax-deduct { display: inline-flex; margin: 0.8rem 0 0; }

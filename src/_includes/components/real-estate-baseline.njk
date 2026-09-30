@@ -74,9 +74,12 @@
   them between the pages is PR 8). The state rates here are first paint
   and labels only; the engine's STATE_CAPGAIN holds the numbers. -#}
 
-{% macro regimeOptions() -%}
+{% macro regimeOptions(side) -%}
 <option value="us" selected>United States</option>
 <option value="none">No capital-gains tax</option>
+{%- if side == 'bvre' %}
+<option value="custom">Custom</option>
+{%- endif %}
 {%- endmacro %}
 
 {% macro filingOptions() -%}
@@ -133,6 +136,22 @@
 
 {% macro bracketTip(extra) -%}
 <span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content">Your ordinary federal bracket. The calculator maps it to a long-term capital-gains rate (0% at 10&ndash;12%, 15% at 22&ndash;32%, 20% at 35&ndash;37%) and applies the 3.8% net investment income tax from the 32% bracket. An approximation: the real rates depend on taxable income and MAGI, and a large gain can push you into a higher band.</span></span>
+{%- endmacro %}
+
+{# PR 5c (BvRE): where the bitcoin is held, the mortgage-interest deduction,
+   and the Custom regime. Constants here are definitional limits set by
+   published acts (STYLE_GUIDE §10.8): IRS News Release on the 2026 limits,
+   Publication 936, Rev. Proc. 2025-32. DATA_AUDIT TX-7 to TX-9. #}
+{% macro accountTip(extra) -%}
+<span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content"><strong>Taxable</strong> (the default): the gain is taxed when the bitcoin is sold. <strong>Tax-advantaged</strong> models a Roth-style account (a Roth IRA holding a bitcoin fund, say): no tax at the sale. Two limits the calculator doesn&rsquo;t apply: contributions are capped (in 2026, $7,500 a year to an IRA, $24,500 to a 401(k)), so the up-front sum usually couldn&rsquo;t go in at once; and a traditional account taxes withdrawals as income instead.</span></span>
+{%- endmacro %}
+
+{% macro deductionTip(extra) -%}
+<span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content">Off by default: most households take the standard deduction ($32,200 filing jointly in 2026), and then mortgage interest saves no tax. Turn it on if you itemize. The owner then saves the interest times your federal bracket plus the state rate, on up to $750,000 of loan (IRS Publication 936), and the renter invests that much less each month. It overstates the saving for anyone close to the standard deduction.</span></span>
+{%- endmacro %}
+
+{% macro customTip(extra) -%}
+<span class="help-tip{% if extra %} {{ extra }}{% endif %}" tabindex="0">?<span class="tip-content">Your own rates, for another country or a view of future tax law: a rate on the home&rsquo;s gain after an exemption you set (0 by default), and a rate on bitcoin&rsquo;s gain. Filing status and bracket don&rsquo;t apply, and the mortgage-interest deduction is off.</span></span>
 {%- endmacro %}
 
 {% macro notTaxAdvice(cls) -%}
