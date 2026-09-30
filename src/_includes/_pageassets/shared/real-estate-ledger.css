@@ -32,3 +32,23 @@
 .re-chart-wrap { position: relative; height: 320px; }
 @media (max-width: 480px) { .re-chart-wrap { height: 260px; } }
 .re-chart-block p.re-chart-note { font-size: 0.76rem; font-style: italic; line-height: 1.55; color: var(--text-dim, #9a9080); margin: 0.6rem 0 0; }
+
+/* PR 7: the sensitivity grid (shared/real-estate-grid.js). */
+.re-grid-block { margin: 1.4rem 0 0.4rem; }
+.re-grid { border-collapse: separate; border-spacing: 3px; width: 100%; font-variant-numeric: tabular-nums; table-layout: fixed; }
+.re-grid th:first-child { width: 22%; }
+.re-grid-block p.re-chart-note { font-size: 0.76rem; font-style: italic; line-height: 1.55; color: var(--text-dim, var(--ink-dim, #968b7a)); margin: 0.6rem 0 0; }
+@media (max-width: 480px) {
+  .re-grid { border-spacing: 2px; }
+  .re-grid th { font-size: 0.64rem; padding: 0.25rem 0.2rem; }
+  .re-grid td { padding: 0.4rem 0.15rem; }
+  .re-grid-v { font-size: 0.74rem; }
+  .re-grid-w { font-size: 0.58rem; }
+}
+.re-grid th { font-size: 0.72rem; font-weight: 600; color: var(--text-dim, var(--ink-dim, #968b7a)); padding: 0.35rem 0.5rem; text-align: center; }
+.re-grid th:first-child { text-align: left; }
+.re-grid .re-grid-corner { font-weight: 400; font-style: italic; }
+.re-grid td { text-align: center; padding: 0.55rem 0.4rem; border-radius: 0.3rem; border: 1px solid transparent; }
+.re-grid td.re-grid-mine { border-color: var(--text, var(--ink, #ccc6b8)); }
+.re-grid-v { display: block; font-size: 0.86rem; font-weight: 600; color: var(--text, var(--ink, #ccc6b8)); }
+.re-grid-w { display: block; font-size: 0.66rem; color: var(--text-dim, var(--ink-dim, #968b7a)); }

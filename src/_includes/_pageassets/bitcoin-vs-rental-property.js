@@ -800,6 +800,35 @@
       : ' If sold: the rental pays depreciation recapture and tax on its gain; bitcoin pays tax on its gain over what was paid for it; STRC and SATA are sold at par, so the return of capital that lowered their basis is taxed as a gain. Selling costs are in both the before- and after-tax rows.';
   }
 
+  // The sensitivity grid (PR 7; rulings R9, P1): the after-tax difference
+  // if both are sold at the end, the path minus keeping the rental, as two
+  // assumptions move; the reader's cell outlined.
+  function renderGrid(s){
+    if (!window.RealEstateGrid) return;
+    var LR = window.ModelingAssumptions ? window.ModelingAssumptions._dimensions.homeApprNominal.presetValues['long-run'] : 3.41;
+    function pc(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
+    var H = s.holdingYears, hs = [Math.max(1, H - 5), H, Math.min(30, H + 5)], y = s.netRentalYield;
+    RealEstateGrid.render(document.getElementById('calc-grid'), {
+      axes: [
+        { id: 'scen', label: 'Scenario \u00d7 home prices',
+          rows: { label: 'Bitcoin', items: [['floor', 'Floor'], ['stay', 'Stay'], ['trend', 'Trend']].map(function(x){ return { label: x[1], v: x[0] }; }) },
+          cols: { label: 'Home prices a year', items: [{ label: 'Long run ' + pc(LR), v: LR }, { label: 'Yours ' + pc(s.appreciationPct), v: s.appreciationPct }, { label: 'Yours + 2 pts ' + pc(s.appreciationPct + 2), v: s.appreciationPct + 2 }] } },
+        { id: 'hy', label: 'Holding period \u00d7 net yield',
+          rows: { label: 'Holding period', items: hs.map(function(h){ return { label: h + ' years', v: h }; }) },
+          cols: { label: 'Net rental yield', items: [y - 1, y, y + 1].map(function(v){ v = Math.max(0, v); return { label: pc(v), v: v }; }) } }
+      ],
+      ahead: ['path ahead', 'rental ahead'],
+      frame: '(if sold, after tax; ' + (isReal() ? 'real, today\u2019s $' : 'nominal, future $') + ')',
+      cell: function(pair, rv, cv){
+        var x = pair === 'scen' ? { btcScenario: rv, appreciationPct: cv } : { holdingYears: rv, netRentalYield: cv };
+        var t = Object.assign({}, s, x), r = computeAll(t);
+        return inFrame(r.path.ifSold.afterTax, t.holdingYears) - inFrame(r.keep.ifSold.afterTax, t.holdingYears);
+      },
+      mine: function(pair){ if (pair === 'hy') return [1, 1]; var k = ['floor', 'stay', 'trend'].indexOf(s.btcScenario); return k < 0 ? null : [k, 1]; },
+      note: 'Each cell: your path minus keeping the rental, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. Upper isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
+    });
+  }
+
   // Show the calculation (PR 6a; rulings P2): the kept rental and the
   // path, year by year, in nominal dollars as paid, and both sold at the end.
   function renderLedger(results, s){
@@ -1104,6 +1133,7 @@
     renderComparison(results, state);
     renderPathDetail(results, state);
     renderLedger(results, state);
+    renderGrid(state);
     renderPath3Derived(state);
     renderCAGRChips(state);
     renderChart(state);
@@ -1304,6 +1334,7 @@
     renderComparison(results, state);
     renderPathDetail(results, state);
     renderLedger(results, state);
+    renderGrid(state);
     renderPath3Derived(state);
     renderCAGRChips(state);
     renderSpecificCallout(state);
