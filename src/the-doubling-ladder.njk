@@ -73,7 +73,7 @@ eleventyComputed:
     <h2>Gravity, not clockwork</h2>
     <p>If the ladder is &ldquo;just algebra,&rdquo; where is the genuinely remarkable part? Here: across more than fifteen years, the <em>actual</em> price has spent the whole time misbehaving &mdash; overshooting wildly in every mania, crashing far below in every bear market &mdash; and yet, averaged over its entire life, it sits almost exactly <strong>on</strong> the trendline.</p>
     <p class="dl-pull">The trend doesn't tick like a clock. It pulls like <em>gravity</em>. Price is always somewhere it shouldn't be, and always being dragged back &mdash; reversion to the mean.</p>
-    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is anything but orderly. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs <em>(the wave plots ln(actual&nbsp;&divide;&nbsp;trend), so +2.5 means about 12&times; above the line; &minus;0.9 means roughly 0.4&times;)</em>. But sum all 191 months and the mean log-deviation is <strong>+0.014</strong> &mdash; just a whisker above the line. The median month sits <em>slightly below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
+    <p>Measure the distance from trend month by month &mdash; <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; and the record is anything but orderly. It is a series of enormous excursions: up to <strong>+2.5</strong> in the 2011 and 2013 frenzies (roughly twelve times the trend), down past <strong>&minus;0.9</strong> in the deepest bear troughs <em>(the wave plots ln(actual&nbsp;&divide;&nbsp;trend), so +2.5 means about 12&times; above the line; &minus;0.9 means roughly 0.4&times;)</em>. But sum all 193 months and the mean log-deviation is <strong>+0.005</strong> &mdash; just a whisker above the line. The median month sits <em>slightly below</em> trend; only about <strong>41%</strong> of months close above it. The average is held near zero not by calm, but by a few violent overshoots balancing many quiet undershoots.</p>
   </section>
 
   <!-- VISUAL B — THE DEVIATION WAVE (centerpiece) -->
@@ -83,11 +83,11 @@ eleventyComputed:
     <div class="dl-chart-subtitle">Not price in a band &mdash; the <em>gap</em> itself. Each month's distance above or below the trendline, as a wave straddling a zero centerline. Green is the market above trend; red is below. The dashed line is the 15-year average. The vertical axis is <em>ln(actual&nbsp;&divide;&nbsp;trend)</em> &mdash; above 0 means the market sits above the trend &mdash; and the ticks read as a multiple of trend (&times;2, &times;4), with the log value in parentheses.</div>
     <div class="dl-chart-wrapper" data-chart-copy data-chart-title="The deviation wave" data-chart-heading="closest:.dl-chart-container .dl-chart-title" data-chart-sub="closest:.dl-chart-container .dl-chart-subtitle"><canvas id="waveChart"></canvas></div>
     <div class="dl-wave-stats">
-      <span class="dl-wave-stat"><span class="dl-wave-swatch above"></span> Above trend: <strong>41.9%</strong> of months (80)</span>
-      <span class="dl-wave-stat"><span class="dl-wave-swatch below"></span> Below trend: <strong>58.1%</strong> of months (111)</span>
-      <span class="dl-wave-stat">Mean: <strong>+0.014</strong> ln &middot; essentially zero</span>
+      <span class="dl-wave-stat"><span class="dl-wave-swatch above"></span> Above trend: <strong>41.5%</strong> of months (80)</span>
+      <span class="dl-wave-stat"><span class="dl-wave-swatch below"></span> Below trend: <strong>58.5%</strong> of months (113)</span>
+      <span class="dl-wave-stat">Mean: <strong>+0.005</strong> ln &middot; essentially zero</span>
     </div>
-    <div class="dl-chart-source"><strong>This is the centerpiece, and it is deliberately not the channel chart.</strong> The Power Law's channel shows price riding inside a corridor. This shows the corridor subtracted away &mdash; only the deviation remains. The shape is the argument: tall green spikes that don't last, broad red shallows that do, and a long-run average pinned to the line. Month-end closes vs. the trendline; 191 months, mid-2010 to mid-2026.</div>
+    <div class="dl-chart-source"><strong>This is the centerpiece, and it is deliberately not the channel chart.</strong> The Power Law's channel shows price riding inside a corridor. This shows the corridor subtracted away &mdash; only the deviation remains. The shape is the argument: tall green spikes that don't last, broad red shallows that do, and a long-run average pinned to the line. Month-end closes vs. the trendline; 193 months, mid-2010 to August 2026.</div>
     <div class="dl-trendnote">
       <p><strong>The ceiling is falling; the floor holds.</strong> Each mania has overshot the trend less than the last &mdash; about 9&times; in 2011, 4&times; in 2017, 3&times; in 2021 &mdash; while every bear has bottomed near 0.4&times; of trend. The wave is compressing from the top: bitcoin's overshoots are shrinking as the asset matures, even as its floor stays remarkably constant. The dashed green line fits the four cycle <em>peaks</em>; the dashed red line fits the four cycle <em>troughs</em>.</p>
       <p class="dl-trendnote-caveat">Four cycles is a small sample, and 2013 overshot more than 2011; read this as a tendency across recent cycles, not a guarantee the ceiling keeps falling.</p>
@@ -109,8 +109,8 @@ eleventyComputed:
     <p class="dl-register-note">The audit trail. Every figure on this page is reproducible from the daily Blockchain.info series and the stated coefficients. The deviation statistics below are recomputed in-browser from the embedded month-end series, so what you read is provably what the wave is drawn from.</p>
     <div class="dl-register-stats">
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-exp">5.76</div><div class="dl-stat-label">Fitted exponent <em>b</em><br>(reference window)</div></div>
-      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-mean">+0.014</div><div class="dl-stat-label">Mean log-deviation<br>(ln, 191 months)</div></div>
-      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-above">80 / 111</div><div class="dl-stat-label">Months above / below<br>trendline</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-mean">+0.005</div><div class="dl-stat-label">Mean log-deviation<br>(ln, 193 months)</div></div>
+      <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-above">80 / 113</div><div class="dl-stat-label">Months above / below<br>trendline</div></div>
       <div class="dl-stat-card"><div class="dl-stat-value" id="dl-stat-split">41% / 59%</div><div class="dl-stat-label">Months above / below<br>split</div></div>
     </div>
     <div class="dl-table-wrap">
