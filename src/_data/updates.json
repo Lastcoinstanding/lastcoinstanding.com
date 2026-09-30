@@ -2,6 +2,18 @@
   {
     "display": "9/29/26",
     "date": "2026-09-29",
+    "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: Results now include tax on a sale. The house pays tax only on gain above the home-sale exclusion ($500,000 filing jointly, $250,000 otherwise); bitcoin pays tax on its gain, including coins sold along the way to cover rent. Both calculators lead with the after-tax figure, with the before-tax figure beside it. Set the regime, filing status, bracket and state in the new Tax on a sale block. At the defaults the projection's bitcoin falls from about $790K to about $648K in today's dollars; the house is unchanged, its gain within the exclusion."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: The headline and table now compare both sides as if sold at the end of the holding period, after tax: the rental pays recapture and tax on its gain, bitcoin on its gain, and STRC and SATA on the gain their return of capital left in a lower basis. At the defaults the lead rises from about $54K to about $92K in today's dollars, because selling the rental costs more in tax than selling the yield portfolio. The chart still shows values held, before tax."
+  },
+  {
+    "display": "9/29/26",
+    "date": "2026-09-29",
     "page": "/bitcoin-vs-rental-property",
     "summary": "Bitcoin vs. Rental Property: Corrected the tax model. Depreciation recapture is now taxed at your bracket's rate, capped at 25%, and depreciation runs on the original building cost rather than today's value. Rental income and lending interest now pay state tax. STRC and SATA return of capital lowers your cost basis, and once it runs out (around year 8 or 9) later payments are taxed as capital gains. At the defaults the bitcoin path's lead rises from about $49K to about $54K in today's dollars."
   },
