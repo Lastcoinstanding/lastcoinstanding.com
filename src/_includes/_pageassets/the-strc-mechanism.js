@@ -39,7 +39,10 @@
     asOf: "2026-07-28",
     price: 88.32,              // last close; reader-adjustable in the lens
     parAmount: 100.00,
-    rateAnnualPct: 12.00,      // paid semi-monthly, $0.50 × 2, since Jul 2026
+    // From src/_data/preferredRates.json (window.PREFERRED_RATES), the one
+    // place the site keeps the rate (2026-09-30); 12.00 is the fallback. A
+    // change also appends a row to rateHistory below.
+    rateAnnualPct: (window.PREFERRED_RATES && window.PREFERRED_RATES.strc && isFinite(window.PREFERRED_RATES.strc.ratePct)) ? window.PREFERRED_RATES.strc.ratePct : 12.00,   // paid semi-monthly, $0.50 × 2, since Jul 2026
     sharesOutstanding: 104600000,  // ≈ $10.46B notional net of buybacks
     priorMonthVWAP: null,      // populate at refresh; drives the bracket dial
     rateHistory: [             // 8-K-sourced, one row per change

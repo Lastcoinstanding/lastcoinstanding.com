@@ -73,9 +73,16 @@
   };
 
   // Path definitions (yield + tax treatment)
+  // The preferreds' rates come from src/_data/preferredRates.json, injected
+  // as window.PREFERRED_RATES (components/preferred-rates.njk), the one place
+  // the site keeps them (MONTHLY_REFRESH_CHECKLIST §0.7). The literals are the
+  // fallback if the injection is missing.
+  var PR = window.PREFERRED_RATES || {};
+  var STRC_PCT = (PR.strc && isFinite(PR.strc.ratePct)) ? PR.strc.ratePct : 12.0;
+  var SATA_PCT = (PR.sata && isFinite(PR.sata.ratePct)) ? PR.sata.ratePct : 13.0;
   var PATHS = {
-    strc:     { label: 'STRC (11.5% ROC)',  yield: 0.115, treatment: 'roc' },
-    sata:     { label: 'SATA (13% ROC)',    yield: 0.130, treatment: 'roc' },
+    strc:     { label: 'STRC (' + STRC_PCT + '% ROC)',  yield: STRC_PCT / 100, treatment: 'roc' },
+    sata:     { label: 'SATA (' + SATA_PCT + '% ROC)',  yield: SATA_PCT / 100, treatment: 'roc' },
     treasury: { label: '10yr Treasury',     yield: 0.043, treatment: 'ordinary-fed-only' },
     igcorp:   { label: 'IG Corporate Bond', yield: 0.055, treatment: 'ordinary' }
   };

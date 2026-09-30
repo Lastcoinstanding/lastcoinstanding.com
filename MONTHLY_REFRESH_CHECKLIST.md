@@ -44,7 +44,8 @@ It reads every data series, dated block and dated string straight from the sourc
 | Case-Shiller, Zillow rents and values | `shared/housing-monthly-data.js` | FRED, Zillow | §9.4 |
 | Is Bitcoin a Bubble? weekly line `BTC_DATA_2014` | `not-a-bubble.js` | Yahoo, Sunday closes | §9.7 |
 | Strategy at a glance (Fixed Income Tab II) | `bitcoin-fixed-income.njk` / `.js` | 8-K | §7 |
-| Fixed Income beyond the card: Tab III "Where we are now", every STRC rate mention, path rates, the Tab II table, runway and reserve | `bitcoin-fixed-income.njk` / `.js` | 8-K, Strategy IR | §7.1 |
+| The preferreds' rates (STRC, SATA): one file for Fixed Income, the rental page and The STRC Mechanism | `src/_data/preferredRates.json` | 8-K | §0.7 |
+| Fixed Income beyond the card: the Tab II table, runway and reserve prose (Tab III is a dated record since 2026-09-30) | `bitcoin-fixed-income.njk` | 8-K, Strategy IR | §7.1 |
 | `STRC_DATA`, the reserve's months-of-dividends figure, the episode decision | `the-strc-mechanism.js` / `.njk` | 8-K | §7.5 |
 | STRC daily close (automatic; check the Action ran) | `src/_data/strcClose.json` | GitHub Action | §7.6 |
 | `YIELD_RATES` and the rental page's dated rates | `shared/real-estate-model.js`, `bitcoin-vs-rental-property.njk` | FRED, DefiLlama, issuers | §9.3a |
@@ -100,7 +101,7 @@ The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy N
 The same fact appears on several pages; after each refresh they must agree:
 
 - **Strategy's bitcoin count:** `BTC_HELD` (`bitcoin-fixed-income.js`) and the Tab II card, `STRC_DATA.btcHoldings`, and the rental page's treasury line and sources list. (On 2026-09-29 they read 845,050, 843,775 and 846,000.)
-- **The STRC dividend rate:** `YIELD_RATES.strc`, `STRC_DATA.rateAnnualPct`, and every rate on Bitcoin Fixed Income (§7.1).
+- **The STRC dividend rate:** one place since 2026-09-30, **`src/_data/preferredRates.json`** (`strc.ratePct`, `schedule`, `source`, and the file's `asOf` / `asOfLabel`; SATA beside it). Bitcoin Fixed Income's prose, tables, tax example (computed at build time by `src/_data/preferredTax.js`) and calculator, the rental page's `YIELD_RATES.strc`, and The STRC Mechanism's `STRC_DATA.rateAnnualPct` all read it (`components/preferred-rates.njk` injects it as `window.PREFERRED_RATES`). A change also needs: a new `rateHistory` row on The STRC Mechanism (§7.5), the rental page's STRC tooltip (by hand), and DATA_AUDIT BvRP-5.
 - **Strategy's USD reserve and dividend bill:** `STRC_DATA.usdReserveB`, Fixed Income Tab III, the rental page's sources.
 - **Standing modelling figures quoted in prose:** the dollar's purchasing-power half-life and M2 growth (The Half-Life, The Fixed Pie, The Bitcoin Migration, What Money Has to Be, Money Trees' `data.json`) should use one set of numbers (TECH_DEBT "Refresh audit 2026-09-29" lists the current disagreement).
 
@@ -700,12 +701,12 @@ For each value, verify against the source listed and update in the BFI files as 
 **`/bitcoin-vs-rental-property` dated figures (added 2026-09-27; DATA_AUDIT BvRP-1–8, 14–15, 18).** Refresh these with the Strategy block, from EDGAR, and update the as-of dates in the body, the Methodology list and DATA_AUDIT in the same edit:
 - Strategy BTC holdings, USD Reserve, and the published "Annual interest + preferred dividends" from the latest MSTR Investor Briefing (SEC FWP filing). When it changes, recompute the three coverage tiles: holdings × $100K / $50K / $30K ÷ that figure.
 - The convertible-note stress point (paraphrased from the latest quarterly results presentation; currently Q2 2026, p.11). Update it when the Q3 deck lands.
-- STRC rate and schedule. **Since PR 4d the rate lives in one dated object, `YIELD_RATES`, in `src/_includes/_pageassets/shared/real-estate-model.js`** (`strc: 12.0`, with `asOf`); see §9.3a. The calculator, the Path 4 label, the slider hint and the $500K example's rate cells all read it. By hand, only the STRC tooltip in `src/bitcoin-vs-rental-property.njk` ("Paying 12.00% annualized…").
-- STRC's next rate announcement is due around **2026-09-30** (DATA_AUDIT BvRP-5).
+- STRC rate and schedule. **The rate lives in `src/_data/preferredRates.json` (§0.7, since 2026-09-30)**, which `YIELD_RATES.strc` in `src/_includes/_pageassets/shared/real-estate-model.js` reads (its literal is only the fallback); see §9.3a. The calculator, the Path 4 label, the slider hint and the $500K example's rate cells all read it. By hand, only the STRC tooltip in `src/bitcoin-vs-rental-property.njk` ("Paying 12.00% annualized…").
+- STRC's next rate announcement: none by 2026-09-30 11:00 PT (12.00% held since July); check at each refresh (DATA_AUDIT BvRP-5).
 - **Verify after any rate change:** open either page with `?qa` and run `await rePairQA.all()` in the console. The hashes will change; that is expected. The identity checks must still pass. Record the new ones in the refresh commit.
 - Convertible notes outstanding.
 - SATA rate and schedule; Strive BTC holdings and the STRC shares in its reserve.
-- SATA's rate is `YIELD_RATES.sata` (§9.3a); by hand, only the SATA tooltip.
+- SATA's rate is `preferredRates.json` `sata.ratePct` (§0.7), read by `YIELD_RATES.sata`; by hand, only the SATA tooltip.
 - Monthly until the Ledn US LLC transition settles (from October 2026), then semiannually: the Ledn Growth Account rates (rendered page, not the HTML placeholders) and whether US residents are eligible. Since PR 4d the calculator doesn't use Ledn (the slice is generic stablecoin lending); Ledn is a row in `YIELD_RATES.verifiable` (§9.3a) and an example in the CeFi prose.
 
 If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt;0.1&times;, ATM status unchanged, insight prose still accurate), the only required update is the as-of date.
@@ -714,11 +715,11 @@ If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt
 
 §7 covers the "Strategy at a glance" card only. The rest of the page quotes the same company's figures in about a dozen other places, and on 2026-09-29 they had drifted: Tab III still read June 6 and contradicted the card (it said the ATM was paused, cash ~$900M; the card said Active, ~0.8× mNAV and the reserve was $5.04B), and the page presented STRC at 11.5% after the rate had moved to 12%. Refresh these with §7, from the same filings, in the same commit. Line numbers are as of 2026-09-29.
 
-- **Tab III "Where we are now"** (`bitcoin-fixed-income.njk` ~484–517). It is dated ("As of Friday, June 6, 2026. This snapshot is refreshed monthly") and carries the bitcoin price and its distance from the high, STRC's price and implied yield, SATA's price and rate, the mNAV reading, cash and months of runway, dividend arrears, ATM status and the month's actions. Rewrite it from the latest 8-K and check the weekday matches the date (June 6, 2026 was a Saturday). `scripts/data-freshness.py` reads this date.
-- **Every STRC rate on the page.** The card "11.5–13%" (njk ~87), the table's "Current dividend rate" (~218), the prose at ~160, 172, 245, 373, 388–389 and 773, and `PATHS` in `bitcoin-fixed-income.js` (~76–80; the path buttons are at njk ~604–607). They must equal `YIELD_RATES.strc` and `STRC_DATA.rateAnnualPct` (§0.7). Check the payment frequency wording (monthly or semi-monthly) at ~160, 219 and 235 at the same time.
+- ~~**Tab III "Where we are now"**~~ **Became a dated record on 2026-09-30 (JM's ruling): "Where things stood on June 6, 2026", not refreshed, pointing to The STRC Mechanism for current figures. Leave it as it is.** Was (`bitcoin-fixed-income.njk` ~484–517): It is dated ("As of Friday, June 6, 2026. This snapshot is refreshed monthly") and carries the bitcoin price and its distance from the high, STRC's price and implied yield, SATA's price and rate, the mNAV reading, cash and months of runway, dividend arrears, ATM status and the month's actions. Rewrite it from the latest 8-K and check the weekday matches the date (June 6, 2026 was a Saturday). `scripts/data-freshness.py` reads this date.
+- **Every STRC rate on the page** now comes from `src/_data/preferredRates.json` (§0.7, 2026-09-30); nothing to edit here by hand except the payment-frequency row in the Tab II table (njk ~219) when the schedule changes. Was: the card "11.5–13%" (njk ~87), the table's "Current dividend rate" (~218), the prose at ~160, 172, 245, 373, 388–389 and 773, and `PATHS` in `bitcoin-fixed-income.js` (~76–80; the path buttons are at njk ~604–607). They must equal `YIELD_RATES.strc` and `STRC_DATA.rateAnnualPct` (§0.7). Check the payment frequency wording (monthly or semi-monthly) at ~160, 219 and 235 at the same time.
 - **The Tab II capital-stack table** (njk ~218–227, 243): $7.98B, ~$35.6B, 2.93×, ~44 years, $44–62B, ~$1.08B, 843,738 BTC, and Strive's count.
 - **"As of Q1 2026" capital structure** (njk ~285–361): move to the latest 10-Q when it lands.
-- **Reserve, runway and dividend-bill prose** (njk ~363, 439, 453, 781, 799, 803, 815): these quote a ~$900M reserve and 6.75 months of runway; use the figures in `STRC_DATA` (§7.5).
+- **Reserve, runway and dividend-bill prose** (The Mechanism's "The cash reserve" card; The Risks §3 and §4): updated 2026-09-30 to the $5.04B reserve (2026-09-20), the $1.70B annual bill and September's mNAV below 1.0×. Refresh with the rental page's Strategy block (DATA_AUDIT BvRP-2, BvRP-3) and the Tab II card.
 - **Present-tense state statements** (njk ~476, 785 "ATM channel has frozen", 795 "has not" crossed 1.0×): rewrite whenever the state they describe changes.
 
 The page's path reference rates (Treasury 4.3%, investment grade 5.5%, M2 6.5%, trend CAGR ~28%; njk ~72–116, 146, 383–390, 773) move slowly; check them quarterly under §9.10.

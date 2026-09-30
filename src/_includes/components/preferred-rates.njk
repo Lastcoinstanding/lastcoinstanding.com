@@ -1,0 +1,5 @@
+{#- The preferreds' dividend rates, from src/_data/preferredRates.json (one
+    place; MONTHLY_REFRESH_CHECKLIST §0.7). Include it in the page body, before
+    page_scripts (which base.njk appends at the end of the body), on any page
+    whose script reads window.PREFERRED_RATES. -#}
+<script>window.PREFERRED_RATES = {{ preferredRates | dump | safe }};</script>

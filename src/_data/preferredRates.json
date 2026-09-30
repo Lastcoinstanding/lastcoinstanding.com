@@ -1,0 +1,17 @@
+{
+  "asOf": "2026-09-30",
+  "asOfLabel": "September 30, 2026",
+  "note": "The one place the site keeps the bitcoin-backed preferreds' dividend rates. Read by Bitcoin and Fixed Income (prose, tax example, calculator), Bitcoin vs. Rental Property (YIELD_RATES) and The STRC Mechanism (STRC_DATA). MONTHLY_REFRESH_CHECKLIST \u00a70.7 and \u00a77.1; DATA_AUDIT BvRP-5, BvRP-14.",
+  "strc": {
+    "ratePct": 12.0,
+    "since": "July 2026",
+    "schedule": "semi-monthly since July 2026",
+    "source": "Strategy 8-K filed 2026-09-01: 12.00% held for semi-monthly periods from 2026-09-16"
+  },
+  "sata": {
+    "ratePct": 13.0,
+    "since": "2026",
+    "schedule": "every business day since June 16, 2026, declared monthly",
+    "source": "Strive 8-K filed 2026-09-14: 13.00% held for October 2026"
+  }
+}

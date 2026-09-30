@@ -343,6 +343,16 @@ html, body {
   margin: 2rem 0;
   overflow-x: auto;
 }
+/* The dating line under a comparison table (2026-09-30). */
+.table-note {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--ink-dim, #968b7a);
+  margin: -1.2rem 0 2rem;
+}
+.table-note a { color: var(--amber, #e09422); }
 .comparison-table {
   width: 100%;
   border-collapse: collapse;
