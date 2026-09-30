@@ -977,12 +977,12 @@ Some figures were computed from the price series once and written into the sourc
 
 ## 9.9. The Doubling Ladder: its own series (QUARTERLY, from 2026-09-29)
 
-`the-doubling-ladder.js` embeds three arrays computed offline from blockchain.info daily closes (method in the file header): `LADDER` (each doubling rung and the first daily close at or above it), `DEVIATION` (month-end ln(actual ÷ trend)) and `MONTHLY_HIGH`. The page uses its own coefficients (`DL_A`, `DL_B`), not the shared ones, by design (DATA_AUDIT PL-3). On 2026-09-29 the arrays ended in June 2026.
+`the-doubling-ladder.js` embeds three arrays computed offline from blockchain.info daily closes (method in the file header): `LADDER` (each doubling rung and the first daily close at or above it), `DEVIATION` (month-end ln(actual ÷ trend)) and `MONTHLY_HIGH`. The page uses its own coefficients (`DL_A`, `DL_B`), not the shared ones, by design (DATA_AUDIT PL-3). On 2026-09-29 the arrays ended in June 2026 (a partial June, built on June 14); on 2026-09-30 they were extended through August 2026 (June's point moved to the June 30 close). Add **September** at the next refresh, once its month-end close is in the series. The method reproduces the stored points exactly from `https://api.blockchain.info/charts/market-price?timespan=6months&format=json&sampled=false` (May 2026: −0.6407).
 
 Each quarter:
 1. Append the months since the last point with the same method and coefficients.
 2. Record any rung crossing in `LADDER` (first daily close at or above the level).
-3. Restate the checksum the page prints (months, mean ln-deviation, months above and below trend with their shares, the date span): the file header, and the text at njk ~86–90 and 112–114 ("mid-2010 to mid-2026", 41.9% / 58.1%, 80 / 111).
+3. Restate the checksum the page prints (months, mean ln-deviation, months above and below trend with their shares, the date span): the file header, and the text at njk ~86–90 and 112–114 (since 2026-09-30: "mid-2010 to August 2026", 41.5% / 58.5%, 80 / 113, mean +0.005, 193 months).
 4. The page's cycle peaks and troughs (js ~271–272, njk ~92) stop at 2021–22. The 2025 peak and the next trough belong there when confirmed (§12).
 
 `scripts/data-freshness.py` reports the last point of `DEVIATION` and `MONTHLY_HIGH`.
