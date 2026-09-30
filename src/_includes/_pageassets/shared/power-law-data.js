@@ -155,10 +155,11 @@ function todayPriceProviderName(){
 
 // ═══════ LIVE PRICE SOURCES (multi-source, 2026-09-29) ═══════
 // Until 2026-09-29 the site asked one provider, CoinGecko's keyless
-// /simple/price. At 06:42 UTC that day CoinGecko began refusing keyless
-// requests (HTTP 403 "Request blocked" or 429; a browser sees a CORS failure),
-// and every page fell back to the latest PL_DATA sample. One provider was a
-// single point of failure for every "today" on the site.
+// /simple/price. From 06:42 UTC that day a fault at CoinGecko refused keyless
+// requests (HTTP 403 "Request blocked" or 429; a browser sees a CORS failure)
+// until CoinGecko fixed it that evening, and meanwhile every page fell back to
+// the latest PL_DATA sample. One provider was a single point of failure for
+// every "today" on the site, whatever the cause.
 //
 // The fetch now walks this ordered list and takes the FIRST sane answer. Every
 // entry is keyless, sends CORS headers a browser accepts from this origin (each
@@ -166,7 +167,10 @@ function todayPriceProviderName(){
 //   Coinbase      — spot price (data.amount, a string)
 //   Kraken        — last trade on XBT/USD (result.<pair>.c[0], a string)
 //   mempool.space — its USD price index (USD, a number)
-//   CoinGecko     — kept LAST in case it reopens to keyless requests
+//   CoinGecko     — its multi-exchange average (bitcoin.usd); last because
+//                   the keyless tier rate-limits (the 429s behind the 2026-07
+//                   mislabel), some ad-block lists carry its host, and it was
+//                   the source that failed on 2026-09-29. Working again since.
 // Tested and NOT usable from a browser (no CORS header or blocked): Bitstamp,
 // CryptoCompare, Bitfinex. Order is reliability first; the sources differ from
 // one another by a few hundredths of a percent, well inside any readout's
