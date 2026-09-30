@@ -71,6 +71,7 @@ companion:
     class), distinct from STRC_DATA.asOf (the filing-sourced constants). Runs before
     page_scripts (which base.njk appends at end of body). -#}
 <script>window.STRC_CLOSE = {{ strcClose | dump | safe }};</script>
+{% include 'components/preferred-rates.njk' %}
 
 <section class="hero">
   <h1>The STRC <em>Mechanism</em></h1>

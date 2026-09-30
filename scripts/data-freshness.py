@@ -194,13 +194,14 @@ def yield_rates():
            35, 45, 'monthly', '§9.3a', 'shared/real-estate-model.js', 'asOf is a month; dated from its last day')
 
 
+# Bitcoin Fixed Income Tab III "Where we are now" became a dated record of
+# June 6, 2026 on 2026-09-30 (JM's ruling), so it is no longer a refresh item.
+# The preferreds' rates are checked below (preferredRates.json).
 @safe
-def bfi_tab3_snapshot():
-    s = read(SRC, 'bitcoin-fixed-income.njk')
-    m = re.search(r'As of \w+day, (\w+) (\d{1,2}), (\d{4})\. This snapshot is refreshed monthly', s)
-    last = dt.date(int(m.group(3)), MONTHS[m.group(1).lower()], int(m.group(2)))
-    by_age('Bitcoin Fixed Income Tab III "Where we are now"', last, 35, 45, 'monthly', '§7.1',
-           'bitcoin-fixed-income.njk')
+def preferred_rates():
+    s = json.loads(read(SRC, '_data', 'preferredRates.json'))
+    by_age('Preferred dividend rates (src/_data/preferredRates.json: STRC, SATA)',
+           dt.date.fromisoformat(s['asOf']), 35, 45, 'monthly (8-K)', '§0.7', 'preferredRates.json')
 
 
 # ── Quarterly ─────────────────────────────────────────────────────────────────

@@ -309,10 +309,15 @@
   // The yield portfolio's rates, and the verifiable rates the stablecoin-
   // lending disclosure lists, in one dated object (rulings §7, item 12), so
   // the monthly refresh is a one-place edit (MONTHLY_REFRESH_CHECKLIST §9.3a).
+  // STRC's and SATA's rates come from src/_data/preferredRates.json, the one
+  // place the site keeps them, injected as window.PREFERRED_RATES by
+  // components/preferred-rates.njk (2026-09-30); the literals are the fallback.
+  var _PR = (typeof window !== 'undefined' && window.PREFERRED_RATES) || {};
+  function _prRate(k, d){ return (_PR[k] && isFinite(_PR[k].ratePct)) ? _PR[k].ratePct : d; }
   var YIELD_RATES = {
     asOf: 'September 2026',
-    strc: 12.0,      // % a year, return of capital (DATA_AUDIT BvRP-5)
-    sata: 13.0,      // % a year, return of capital (BvRP-14)
+    strc: _prRate('strc', 12.0),   // % a year, return of capital (DATA_AUDIT BvRP-5)
+    sata: _prRate('sata', 13.0),   // % a year, return of capital (BvRP-14)
     lending: 4.0,    // % a year, ordinary income: the median of the four
                      // lending rates below (4.04%), rounded (BvRP-28)
     verifiable: [

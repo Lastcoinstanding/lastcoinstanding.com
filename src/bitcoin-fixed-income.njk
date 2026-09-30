@@ -23,6 +23,7 @@ related:
   - slug: paper-bitcoin
     desc: "The other side of holding a claim shaped like bitcoin \u2014 what survives and what is signed away at each custody layer."
 ---
+{% include 'components/preferred-rates.njk' %}
 
 <div class="page-wrap">
 
@@ -84,7 +85,7 @@ related:
         <div class="card-badge">★ This page</div>
         <div class="card-eyebrow">Bitcoin-Backed Preferreds</div>
         <div class="card-sub">STRC, SATA</div>
-        <div class="card-yield">11.5–13%</div>
+        <div class="card-yield">{{ preferredRates.strc.ratePct }}–{{ preferredRates.sata.ratePct }}%</div>
         <div class="card-yield-label">nominal yield</div>
         <ul class="card-attrs">
           <li><span class="attr-label">Real after-tax:</span> <span class="positive-yield"><strong>+2.5 to +3.5%</strong></span></li>
@@ -157,7 +158,7 @@ related:
 
     <h2 class="section-title">The new instruments — what they are and what they aren't</h2>
 
-    <p class="prose">A handful of public companies — Strategy Inc. (formerly MicroStrategy), Strive Asset Management, and a growing set of imitators — have built balance sheets dominantly composed of bitcoin. To fund continued bitcoin accumulation, they issue preferred equity instruments that pay variable-rate dividends targeted to trade near a $100 par value. The most prominent are Strategy's STRC and Strive's SATA. They pay 11.5% and 13.0% annualized dividends respectively, in USD, on schedules that have become increasingly frequent — STRC monthly, SATA moving to daily payments mid-June 2026.</p>
+    <p class="prose">A handful of public companies — Strategy Inc. (formerly MicroStrategy), Strive Asset Management, and a growing set of imitators — have built balance sheets dominantly composed of bitcoin. To fund continued bitcoin accumulation, they issue preferred equity instruments that pay variable-rate dividends targeted to trade near a $100 par value. The most prominent are Strategy's STRC and Strive's SATA. They pay {{ preferredRates.strc.ratePct }}% and {{ preferredRates.sata.ratePct }}% annualized dividends respectively, in USD, on schedules that have become increasingly frequent: STRC {{ preferredRates.strc.schedule }}, SATA {{ preferredRates.sata.schedule }}.</p>
 
     <p class="prose">You can buy these instruments with dollars. You receive dollars in return. <strong>You don't need to own bitcoin to participate</strong> — you can switch from a conventional fixed-income position into these directly. For a bitcoiner, entering means either selling some bitcoin or using fiat from other sources; once you hold the instrument, your exposure has converted from direct bitcoin holdings into a USD-denominated income claim against the issuer's bitcoin-heavy balance sheet.</p>
 
@@ -169,7 +170,7 @@ related:
 
     <p class="prose">The spectrum framing above shows the arbitrage at a high level — these instruments deliver S&amp;P-equivalent returns at fixed-income volatility because bitcoin's structural growth premium funds the spread. The mechanism beneath that is straightforward enough to spell out.</p>
 
-    <p class="prose">Bitcoin's Power Law trend is projected to compound at roughly 28% per year on a 10-to-15-year-forward basis &mdash; declining as the horizon lengthens, and well above the 11.5% the issuer pays on STRC. The issuer accumulates bitcoin with capital raised at par, watches the bitcoin grow at a rate above the cost of preferred capital, and uses the surplus to fund the dividend — with what's left over accruing as bitcoin-per-share growth for the common equity. As long as bitcoin's long-term growth rate stays meaningfully above the dividend rate, the structure is <em>accretive at every layer</em> — common shareholders, preferred shareholders, and the issuer's bitcoin treasury all benefit.</p>
+    <p class="prose">Bitcoin's Power Law trend is projected to compound at roughly 28% per year on a 10-to-15-year-forward basis &mdash; declining as the horizon lengthens, and well above the {{ preferredRates.strc.ratePct }}% the issuer pays on STRC. The issuer accumulates bitcoin with capital raised at par, watches the bitcoin grow at a rate above the cost of preferred capital, and uses the surplus to fund the dividend — with what's left over accruing as bitcoin-per-share growth for the common equity. As long as bitcoin's long-term growth rate stays meaningfully above the dividend rate, the structure is <em>accretive at every layer</em> — common shareholders, preferred shareholders, and the issuer's bitcoin treasury all benefit.</p>
 
     <p class="prose">The instruments are, in effect, an indirect bet on bitcoin's continued long-term accretion, with the volatility absorbed by the common shareholder rather than by the preferred holder.</p>
 
@@ -215,8 +216,8 @@ related:
         </thead>
         <tbody>
           <tr><th>Par-anchoring mechanism</th><td>Discretionary rate adjustment on monthly VWAP brackets</td><td>Daily-payment smoothing + no-issuance-below-par discipline</td></tr>
-          <tr><th>Current dividend rate</th><td>11.50%</td><td>13.00%</td></tr>
-          <tr><th>Dividend frequency</th><td>Monthly (semi-monthly proposed)</td><td>Daily, from June 16, 2026</td></tr>
+          <tr><th>Current dividend rate</th><td>{{ preferredRates.strc.ratePct.toFixed(2) }}%</td><td>{{ preferredRates.sata.ratePct.toFixed(2) }}%</td></tr>
+          <tr><th>Dividend frequency</th><td>Semi-monthly, since July 2026 (daily record dates proposed; shareholder vote expected October 28, 2026)</td><td>Every business day, since June 16, 2026 (declared monthly)</td></tr>
           <tr><th>Cumulative?</th><td>Yes — accrues if unpaid</td><td>Yes — accrues if unpaid</td></tr>
           <tr><th>Capital structure position</th><td>Middle (debt + STRF above; STRK + STRD + common below)</td><td>Senior-most listed (no debt; common below)</td></tr>
           <tr><th>Asset cushion above tranche</th><td>$7.98B</td><td>$0</td></tr>
@@ -224,15 +225,16 @@ related:
           <tr><th>Over-collateralization at tranche</th><td>2.93x</td><td>Higher per-share, smaller stack</td></tr>
           <tr><th>Dividend coverage runway</th><td>~44 years at current BTC</td><td>12 to 19.6 years + 18-month reserve</td></tr>
           <tr><th>Issuer common market cap</th><td>$44–62B</td><td>~$1.08B</td></tr>
-          <tr><th>Issuer bitcoin holdings</th><td>843,738 BTC</td><td>~19,000 BTC</td></tr>
+          <tr><th>Issuer bitcoin holdings (Q1 2026)</th><td>843,738 BTC</td><td>~19,000 BTC</td></tr>
           <tr><th>Collateralized by bitcoin?</th><td><strong>No</strong> — unsecured mezzanine equity</td><td><strong>No</strong> — unsecured mezzanine equity</td></tr>
         </tbody>
       </table>
     </div>
+    <p class="table-note">Rates and schedules as of {{ preferredRates.asOfLabel }}. The balance-sheet rows are the Q1-2026 snapshot the capital-structure analysis below uses; <a href="/the-strc-mechanism">The STRC Mechanism</a> recomputes STRC&rsquo;s coverage from the current balance sheet.</p>
 
     <p class="prose"><strong>STRC's par-defense uses a rate ratchet.</strong> When STRC's monthly volume-weighted average price drifts off par, the board adjusts the dividend rate to pull demand back. If VWAP is between $95 and $98.99, the rate goes up by at least 25 basis points; below $95, by at least 50 basis points. The mechanism is rules-based but discretionary, and structurally asymmetric — the board can raise aggressively but can only reduce within a strict mathematical constraint (no more than 25 bps per month plus the intra-month decline in one-month SOFR). This is price-defense via yield manipulation.</p>
 
-    <p class="prose"><strong>SATA's par-defense uses payment cadence and issuance discipline.</strong> Daily dividend payments dissolve the ex-dividend price sawtooth that's structurally present in monthly-paying preferreds — the inter-payment price gradient becomes too small to register as a discrete drop. Combined with an explicit no-issuance-below-par rule, this is price-defense via flow design rather than rate adjustment. Strategy is now proposing semi-monthly payouts for STRC, implicitly acknowledging that high-frequency distribution is structurally more responsive than discretionary rate adjustment.</p>
+    <p class="prose"><strong>SATA's par-defense uses payment cadence and issuance discipline.</strong> Daily dividend payments dissolve the ex-dividend price sawtooth that's structurally present in monthly-paying preferreds — the inter-payment price gradient becomes too small to register as a discrete drop. Combined with an explicit no-issuance-below-par rule, this is price-defense via flow design rather than rate adjustment. Strategy moved STRC to semi-monthly payouts in July 2026 and has proposed daily record dates (a shareholder vote is expected October 28, 2026), implicitly acknowledging that high-frequency distribution is structurally more responsive than discretionary rate adjustment.</p>
 
     <p class="prose">Both mechanisms are new — they're being tested for the first time this year.</p>
 
@@ -242,11 +244,11 @@ related:
 
     <p class="prose"><strong>Reasons to prefer STRC.</strong> Vastly larger balance sheet — bitcoin treasury roughly 44× SATA's. Subordinate capital cushion below STRC roughly 35× the entire Strive balance sheet. Institutional-scale daily liquidity. Slightly longer operating history of the par-anchoring mechanism. Strategy's senior debt is structured to be patient (no margin covenants, 0.42% weighted-average coupon, long maturities), which insulates STRC from forced-action triggers that destroyed historical analogs in 2008. STRC sits in a more <em>over-collateralized</em> position than any leveraged-asset preferred has been historically, even though its priority position in the capital stack is middle-of-stack rather than senior-most.</p>
 
-    <p class="prose"><strong>Reasons to prefer SATA.</strong> Higher dividend rate (13% vs 11.5%). Cleaner seniority — nothing above SATA in the capital stack, since Strive eliminated debt. More responsive par-anchoring (daily payments + no-issuance-below-par). Explicit 18-month dividend reserve (12 months cash + 6 months STRC). Tax treatment is somewhat more clearly committed to return-of-capital characterization by the issuer.</p>
+    <p class="prose"><strong>Reasons to prefer SATA.</strong> Higher dividend rate ({{ preferredRates.sata.ratePct }}% vs {{ preferredRates.strc.ratePct }}%). Cleaner seniority — nothing above SATA in the capital stack, since Strive eliminated debt. More responsive par-anchoring (daily payments + no-issuance-below-par). An explicit reserve of more than 18 months of dividend coverage, held in USD and marketable securities, per Strive's May 2026 investor presentation. Tax treatment is somewhat more clearly committed to return-of-capital characterization by the issuer.</p>
 
     <p class="prose">Different shape of risk. Reasonable holders can prefer either.</p>
 
-    <p class="prose"><em>(One small detail worth knowing: SATA's 18-month reserve composition includes 6 months in STRC preferred — meaning a stress event affecting STRC will also mark down a portion of SATA's backstop. The correlation is structural and worth knowing if you're considering both.)</em></p>
+    <p class="prose"><em>(One small detail worth knowing: SATA's reserve includes STRC preferred, 505,000 shares worth about $50M as of September 18, 2026 — meaning a stress event affecting STRC will also mark down a portion of SATA's backstop. The correlation is structural and worth knowing if you're considering both.)</em></p>
 
     <!-- Strategy at a glance: snapshot ground-truth framing the capital-structure analysis below. BTC count verified against the 8-K of 7 September 2026 (September 2026 snapshot). Treasury USD value is computed live from TODAY_PRICE x BTC_HELD via the JS subscribed to fetchTodayPrice. mNAV, shares outstanding, and ATM status are snapshots refreshed monthly per MONTHLY_REFRESH_CHECKLIST. -->
     <aside class="strategy-glance" aria-labelledby="sg-title">
@@ -370,9 +372,9 @@ related:
 
     <p class="prose">Both Strategy and Strive currently expect their dividend distributions to qualify as <strong>return of capital (ROC)</strong> for U.S. federal income tax purposes rather than as ordinary dividend income. Under the IRC, corporate distributions are taxed as ordinary dividends only to the extent of the corporation's current and accumulated Earnings and Profits (E&P). Both companies operate at substantial accounting losses driven by bitcoin impairment charges, so neither has accumulated E&P. Distributions are therefore treated as basis-reducing returns of capital — not currently taxable — until the holder's cost basis is depleted, at which point further distributions are taxed as long-term capital gains.</p>
 
-    <p class="prose">At an 11.5% STRC dividend, your $100 basis is depleted in roughly 8.7 years. At a 13% SATA dividend, in roughly 7.7 years. For nearly a decade, you receive double-digit cash distributions with zero current-year federal tax. When you eventually sell — or when the issuer calls the shares at par — the difference between sale proceeds and your basis-adjusted-to-zero is recognized as a long-term capital gain, taxed at 20% federal (plus state and the NIIT).</p>
+    <p class="prose">At a {{ preferredRates.strc.ratePct }}% STRC dividend, your $100 basis is depleted in roughly {{ preferredTax.strc.depletionYears.toFixed(1) }} years. At a {{ preferredRates.sata.ratePct }}% SATA dividend, in roughly {{ preferredTax.sata.depletionYears.toFixed(1) }} years. For nearly a decade, you receive double-digit cash distributions with zero current-year federal tax. When you eventually sell — or when the issuer calls the shares at par — the difference between sale proceeds and your basis-adjusted-to-zero is recognized as a long-term capital gain, taxed at 20% federal (plus state and the NIIT).</p>
 
-    <p class="prose">Compare the resulting after-tax math across income instruments. A holder at a 42% combined ordinary income bracket:</p>
+    <p class="prose">Compare the resulting after-tax math across income instruments. A holder at a {{ preferredTax.assumptions.ordinaryPct }}% combined ordinary income bracket and a {{ preferredTax.assumptions.ltcgPct }}% combined long-term capital-gains rate (the calculator&rsquo;s default), buying at par and selling at par at the end of the hold:</p>
 
     <div class="comparison-table-wrap">
       <table class="comparison-table tax-table">
@@ -385,9 +387,9 @@ related:
           <tr><td>HY corporate bond</td><td>7.5%</td><td>Ordinary income</td><td>~4.35%</td><td class="negative-yield"><strong>−2.15%</strong></td></tr>
           <tr><td>Municipal bond</td><td>3.8%</td><td>Federal-exempt</td><td>~3.42%</td><td class="negative-yield"><strong>−3.08%</strong></td></tr>
           <tr><td>Qualified dividend stock</td><td>3.5%</td><td>20% LTCG</td><td>~2.45%</td><td class="negative-yield"><strong>−4.05%</strong></td></tr>
-          <tr><td><strong>STRC, ordinary income (hypothetical)</strong></td><td>11.5%</td><td>Ordinary income</td><td>~6.67%</td><td class="positive-yield"><strong>+0.17%</strong></td></tr>
-          <tr class="highlight-row"><td><strong>STRC under ROC (9-year hold)</strong></td><td>11.5%</td><td>Deferred, then LTCG</td><td><strong>~9% IRR</strong></td><td class="positive-yield"><strong>+2.5%</strong></td></tr>
-          <tr class="highlight-row"><td><strong>SATA under ROC (8-year hold)</strong></td><td>13.0%</td><td>Deferred, then LTCG</td><td><strong>~10% IRR</strong></td><td class="positive-yield"><strong>+3.5%</strong></td></tr>
+          <tr><td><strong>STRC, ordinary income (hypothetical)</strong></td><td>{{ preferredRates.strc.ratePct.toFixed(1) }}%</td><td>Ordinary income</td><td>~{{ preferredTax.strc.ordinary.toFixed(2) }}%</td><td class="positive-yield"><strong>+{{ preferredTax.strc.ordinaryReal.toFixed(2) }}%</strong></td></tr>
+          <tr class="highlight-row"><td><strong>STRC under ROC ({{ preferredTax.strc.hold }}-year hold)</strong></td><td>{{ preferredRates.strc.ratePct.toFixed(1) }}%</td><td>Deferred, then LTCG</td><td><strong>~{{ preferredTax.strc.roc.toFixed(1) }}% IRR</strong></td><td class="positive-yield"><strong>+{{ preferredTax.strc.rocReal.toFixed(1) }}%</strong></td></tr>
+          <tr class="highlight-row"><td><strong>SATA under ROC ({{ preferredTax.sata.hold }}-year hold)</strong></td><td>{{ preferredRates.sata.ratePct.toFixed(1) }}%</td><td>Deferred, then LTCG</td><td><strong>~{{ preferredTax.sata.roc.toFixed(1) }}% IRR</strong></td><td class="positive-yield"><strong>+{{ preferredTax.sata.rocReal.toFixed(1) }}%</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -396,7 +398,7 @@ related:
 
     <p class="prose">The entire conventional fixed-income column is negative in real after-tax terms. <em>Every</em> conventional instrument destroys purchasing power for a holder in a typical bracket. This isn't editorial bias — it's arithmetic, against a conservative inflation measure. Capital held in conventional fixed income is being silently transferred from holder to issuer in real terms, year after year.</p>
 
-    <p class="prose">And the ROC treatment is worth roughly 2.3 percentage points of annual after-tax return over the same instrument taxed as ordinary income — because the deferred tax isn't a static benefit, it's a compounding one. <strong>STRC at 11.5% ROC is approximately the tax-equivalent yield of a 15.5% taxable bond. SATA at 13% ROC is approximately the equivalent of an 18% taxable bond.</strong> There is no taxable instrument in the conventional fixed-income market that yields anywhere near these numbers without taking equity-grade or distressed-credit risk.</p>
+    <p class="prose">And the ROC treatment is worth roughly {{ preferredTax.strc.rocAdvantage.toFixed(1) }} percentage points of annual after-tax return over the same instrument taxed as ordinary income — because the deferred tax isn't a static benefit, it's a compounding one. <strong>STRC at {{ preferredRates.strc.ratePct }}% ROC is approximately the tax-equivalent yield of a {{ preferredTax.strc.taxEquivalent.toFixed(1) }}% taxable bond. SATA at {{ preferredRates.sata.ratePct }}% ROC is approximately the equivalent of a {{ preferredTax.sata.taxEquivalent.toFixed(1) }}% taxable bond.</strong> There is no taxable instrument in the conventional fixed-income market that yields anywhere near these numbers without taking equity-grade or distressed-credit risk.</p>
 
     <p class="prose">That contrast now rests on a filed record rather than an expectation: Treasury coupons are ordinary income in the year received, while 100% of Strategy's calendar-2025 preferred distributions were classified as a nontaxable return of capital — announced February 2, 2026 and reported on a <a href="https://www.strategy.com/investor-relations/dividend-return-of-capital" target="_blank" rel="noopener">Form 8937 for each distribution</a> — so the after-tax gap between the two is wider than the headline yields alone suggest. The same two conditions ride with it: Strategy's own caveat that its expectations on E&amp;P may change, and treatment that is holder-specific. Nothing here is tax advice.</p>
 
@@ -450,7 +452,7 @@ related:
         <div class="mechanism-num">5</div>
         <div class="mechanism-body">
           <h3>The cash reserve</h3>
-          <p>The temporal buffer that funds dividends through short stress events without triggering forced action on any of the above mechanisms. Strategy holds approximately $900 million in cash; in a scenario where the ATM channel is fully closed, this funds dividends for roughly 6.75 months pure-cash and 1.5–2.5 years with partial ATM access remaining functional.</p>
+          <p>The temporal buffer that funds dividends through short stress events without triggering forced action on any of the above mechanisms. Strategy&rsquo;s USD reserve was $5.04 billion on September 20, 2026, about three years of preferred dividends and convertible interest at $1.70 billion a year; the board&rsquo;s policy since June 29, 2026 is to hold at least twelve months. In a scenario where the ATM channel is fully closed, the reserve alone funds dividends for about that long. (In early June 2026 it was about $900 million, some 6.75 months.)</p>
         </div>
       </div>
     </div>
@@ -473,16 +475,16 @@ related:
       <li><strong>Resulting gap between mandated rate and market-clearing yield:</strong> 49 bps</li>
     </ul>
 
-    <p class="prose">The mandated response is structurally insufficient for the dislocation that actually occurred. The framework was calibrated for moderate, gradual de-anchoring — not for a step-change drop in the first days of a new month. The mechanism is bending. Whether it bends back, and how quickly, is the test currently underway.</p>
+    <p class="prose">The mandated response is structurally insufficient for the dislocation that actually occurred. The framework was calibrated for moderate, gradual de-anchoring — not for a step-change drop in the first days of a new month. The mechanism was bending. Whether it would bend back, and how quickly, was the test then underway.</p>
 
     <p class="prose">The second-order effect compounds the issue. When STRC trades below par, rational new investors buy at the open-market discount rather than through par-priced new issuance. <strong>Strategy's at-the-market issuance program froze in late May.</strong> The 32-BTC sale on May 26–31 — the first reported sale in over a year — runs counter to the previously assumed "never sell" position that informed much of MSTR's marketing narrative. It's worth noting, however, that this isn't necessarily a fatal break in the structure: issuing perpetual income obligations against a non-yielding asset must, over a long enough horizon, involve some periodic sales. <em>Not</em> selling under stress would arguably be the irrational behavior. The May $1.5 billion convertible-note buyback fits the same pattern — the company shifting to the liability-management playbook that the 1.22x mNAV pivot is designed to trigger.</p>
 
     <p class="prose">None of these are alarm signals in isolation. Each is a structural feature of the design responding to stress as intended. <strong>The question is duration.</strong> If bitcoin recovers and STRC re-anchors within the multi-year cash-reserve runway, the mechanism works as designed and the stress is a stress test, not a structural failure. If the stress persists beyond the runway, the system enters the genuine death-spiral conditions documented in <a href="#risks">The Risks</a>.</p>
 
-    <h2 class="section-title">Where we are now</h2>
+    <h2 class="section-title">Where things stood on June 6, 2026</h2>
 
-    <div class="live-snapshot" aria-label="Current state of bitcoin-backed preferreds">
-      <p class="snapshot-asof"><em>As of Friday, June 6, 2026. This snapshot is refreshed monthly; check the date stamp before relying on the numbers.</em></p>
+    <div class="live-snapshot" aria-label="Bitcoin-backed preferreds on June 6, 2026, a dated record">
+      <p class="snapshot-asof"><em>A dated record of the moment this tab describes, kept as it was on June 6, 2026; it is not refreshed. STRC&rsquo;s rate has been {{ preferredRates.strc.ratePct.toFixed(2) }}% since {{ preferredRates.strc.since }}. For STRC&rsquo;s price, rate, reserve and coverage today, see <a href="/the-strc-mechanism">The STRC Mechanism</a>.</em></p>
 
       <dl class="snapshot-grid">
         <dt>Bitcoin</dt>
@@ -514,7 +516,7 @@ related:
         </dd>
       </dl>
 
-      <p class="snapshot-footer"><em>The page is watching the structural test play out; this snapshot is the dashboard. For real-time prices, see your broker. Numbers here are not investment advice.</em></p>
+      <p class="snapshot-footer"><em>What followed: STRC&rsquo;s rate stepped up to 12.00% in July 2026, and its payments moved to semi-monthly. The current figures are on <a href="/the-strc-mechanism">The STRC Mechanism</a>; for real-time prices, see your broker. Numbers here are not investment advice.</em></p>
     </div>
 
   </section>
@@ -601,8 +603,8 @@ related:
         <div class="input-group">
           <label>Income path<span class="help-tip" tabindex="0">?<span class="tip-content">The instrument the income path holds. STRC and SATA are Strategy's bitcoin-backed preferreds (par-anchored, ROC-deferred tax). Treasury and IG Corp are the conventional baselines for after-tax comparison.</span></span></label>
           <div class="path-buttons">
-            <button class="path-btn active" data-path="strc">STRC (11.5% ROC)</button>
-            <button class="path-btn" data-path="sata">SATA (13% ROC)</button>
+            <button class="path-btn active" data-path="strc">STRC ({{ preferredRates.strc.ratePct }}% ROC)</button>
+            <button class="path-btn" data-path="sata">SATA ({{ preferredRates.sata.ratePct }}% ROC)</button>
             <button class="path-btn" data-path="treasury">10yr Treasury (4.3%)</button>
             <button class="path-btn" data-path="igcorp">IG Corp (5.5%)</button>
           </div>
@@ -770,7 +772,7 @@ related:
 
     <p class="prose">The common shareholder (MSTR or ASST) absorbs the volatility that the preferred holder is insulated from. When bitcoin drops and the company must fund preferred dividends from a falling asset base, the common equity bears the structural drag. When bitcoin appreciates and the company can issue preferred at par to buy more bitcoin, the common equity benefits from bitcoin-per-share accretion. The structure routes volatility into the common; the preferred is the senior claim that the common subordinates itself to.</p>
 
-    <p class="prose">This is not free. Over a long enough time horizon, if bitcoin's structural growth premium falls below the cost of preferred capital — currently 11.5% on STRC, 13% on SATA — the structure becomes value-destroying for the common. At present, bitcoin's Power Law trend CAGR is approximately 28% on a 10-to-15-year-forward window (as of 2026; shorter windows run higher &mdash; roughly 25% to 40% depending on the horizon and projection method), comfortably above either preferred coupon. Over the next two decades, the trend CAGR is projected to decay toward the low double digits. When trend CAGR drops below the preferred coupon, <strong>every share of STRC ever issued retroactively becomes a structural drain on the issuer's balance sheet.</strong></p>
+    <p class="prose">This is not free. Over a long enough time horizon, if bitcoin's structural growth premium falls below the cost of preferred capital — currently {{ preferredRates.strc.ratePct }}% on STRC, {{ preferredRates.sata.ratePct }}% on SATA — the structure becomes value-destroying for the common. At present, bitcoin's Power Law trend CAGR is approximately 28% on a 10-to-15-year-forward window (as of 2026; shorter windows run higher &mdash; roughly 25% to 40% depending on the horizon and projection method), comfortably above either preferred coupon. Over the next two decades, the trend CAGR is projected to decay toward the low double digits. When trend CAGR drops below the preferred coupon, <strong>every share of STRC ever issued retroactively becomes a structural drain on the issuer's balance sheet.</strong></p>
 
     <p class="prose">The structure depends on bitcoin's growth premium remaining above the cost of preferred capital. This is currently the case by a wide margin. It may not remain so over a multi-decade horizon. The calculator's long-horizon scenarios let users see when the margin compresses under their own assumptions.</p>
 
@@ -778,11 +780,11 @@ related:
 
     <p class="prose">The full coupled-system view is documented in <a href="#mechanism">The Mechanism</a>. Here, the page surfaces the cash-runway question that most concerns income-dependent readers, and presents the dual numbers rather than the single comforting one.</p>
 
-    <p class="prose">Strategy's $900 million cash reserve, against approximately $1.6 billion in annual aggregate preferred dividend obligations, is <strong>6.75 months</strong> of pure-cash dividend coverage. That is the worst-case runway — what holds if every capital-market channel is fully blocked. The often-cited "1.5 to 2.5 year" runway assumes some combination of reduced-but-still-functional ATM issuance, opportunistic STRD dividend skips (STRD is the non-cumulative junior tranche; skipped payments don't accrue), and operating-business cash flow continuing to contribute. Under conditions where capital markets remain at least partly functional, the runway extends to several years.</p>
+    <p class="prose">Strategy's USD reserve, $5.04 billion on September 20, 2026, against about $1.70 billion a year of preferred dividends and convertible interest, is roughly <strong>three years</strong> of pure-cash coverage (the board's floor is twelve months). That is the worst-case runway — what holds if every capital-market channel is fully blocked. In early June 2026 the same measure was about $900 million, or 6.75 months; the reserve has grown since. The runway lengthens if some capital-market access continues (reduced-but-still-functional ATM issuance, opportunistic STRD dividend skips — STRD is the non-cumulative junior tranche; skipped payments don't accrue — and operating cash flow), and it shortens if the reserve is also spent buying back preferred below par, as it was in September 2026 ($176.3 million of STRC in the week to September 7).</p>
 
-    <p class="prose">Both numbers can be true; they answer different questions. <em>Under conditions where Strategy retains capital-market access at compressed terms, the structure has multi-year runway through stress. Under conditions of full capital-market closure, the runway is months.</em> Which scenario actually unfolds depends on the duration of the bitcoin downturn and the institutional appetite for risk during it.</p>
+    <p class="prose">Both numbers can be true; they answer different questions. <em>Under conditions where Strategy retains capital-market access at compressed terms, the structure has multi-year runway through stress. Under conditions of full capital-market closure, the runway is the reserve's: about three years at its September 2026 size, less whatever it spends on buybacks.</em> Which scenario actually unfolds depends on the duration of the bitcoin downturn and the institutional appetite for risk during it.</p>
 
-    <p class="prose">The May–June 2026 sequence is currently testing this. The ATM channel has frozen; the company has executed both a defensive convertible buyback and a small bitcoin sale; the cash reserve is presumably being drawn down. How quickly the reserve depletes if the stress persists is the next milestone. The snapshot in <a href="#mechanism">The Mechanism</a> tracks this in real time.</p>
+    <p class="prose">The May–June 2026 sequence tested this: the ATM channel froze, and the company executed both a defensive convertible buyback and a small bitcoin sale. Since then the reserve has grown rather than drained, and in September 2026 mNAV slipped below 1.0&times; (section 4). How the reserve behaves if the stress persists, now that it also funds buybacks of preferred below par, is the next milestone. <a href="/the-strc-mechanism">The STRC Mechanism</a> tracks it from the current filings.</p>
 
     <h2 class="section-title">4. The mNAV compression risk</h2>
 
@@ -792,7 +794,7 @@ related:
 
     <p class="prose">The strongest disanalogy is that GBTC offered passive, fee-charging bitcoin exposure (fees that were notably higher than competing ETFs at the time) with no active strategy beyond holding the asset; MSTR's premium reflects active leveraged accumulation that has historically grown bitcoin-per-share for common holders at rates above spot bitcoin growth. If investors believe Strategy will continue to add bitcoin per share at above-spot rates, the premium has a different structural basis than GBTC's did. That belief depends on the company's continued access to capital markets at favorable terms — which is exactly what the current stress is testing.</p>
 
-    <p class="prose">The two material thresholds: <strong>1.22x mNAV</strong> is the operational pivot at which Strategy shifts from accumulation mode to liability management (buying back discounted converts and preferred rather than issuing new common). <strong>1.0x mNAV</strong> closes the equity issuance channel permanently and forces the company into a net-liquidation state, selling bitcoin to fund preferred coupons rather than issuing new capital. The first threshold has been crossed at points during 2025–2026. The second has not. Whether it will is the question the bear case rests on.</p>
+    <p class="prose">The two material thresholds: <strong>1.22x mNAV</strong> is the operational pivot at which Strategy shifts from accumulation mode to liability management (buying back discounted converts and preferred rather than issuing new common). <strong>1.0x mNAV</strong> is where issuing new common stops adding bitcoin per share and starts diluting it; held below it, the equity channel stops paying for itself, and preferred coupons must come from the reserve, other capital or bitcoin sales. The first threshold has been crossed at points during 2025–2026. <strong>The second was crossed in September 2026</strong>: mNAV slipped to about 0.8&times; on the common. What followed was mixed rather than the clean net-liquidation the simple model predicts: the ATMs still raised about $603 million in the week to August 30, then there were no ATM sales and no bitcoin bought or sold in the week to September 7, while $176.3 million went to buying back STRC below par (see Strategy at a glance, in The Instruments). How long mNAV stays below 1.0&times;, and what the reserve funds meanwhile, is now the question the bear case rests on.</p>
 
     <h2 class="section-title">5. The Ponzi-adjacent argument</h2>
 
