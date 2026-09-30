@@ -258,3 +258,13 @@ PR 6 is split: **6a** "Show the calculation" and the CSV (P2, P7); **6b** the ch
 - **Caption:** "a map of how the answer moves with two assumptions, not a probability distribution."
 - **Placement:** Bitcoin vs. Real Estate's projection only (the look-back has no scenarios); on the rental page under the path card, above the ledger.
 - **No figure moves.** The reader's cell equals the cards (BvRE) and the headline (BvRP). If the reader picks Upper, no cell is theirs.
+
+## 19 · Implementation notes, PR 8a (2026-09-29; not new rulings)
+
+- **Pair lines (C1)**, verbatim, under each hero's subtitle and as the sister page's Related card description.
+- **Series strip (P9):** `components/real-estate-series.njk`, at the top of both pages' main column, heading "Bitcoin and real estate", items "Buy or rent?" (the tenant, BvRE) and "Keep the rental?" (the landlord, BvRP), current page marked from `slug`. Further spokes are further entries in its `series` list.
+- **Carry (P3):** `shared/real-estate-carry.js` (window.RealEstateCarry). The pair names: `horizon` (BvRP's holding period), `happr`, `sell`, `btctx`, `pscenario`, `displaymode`, and three new ones, `tax`, `bracket`, `state`. Not carried: home price and mortgage (different quantities on the two pages) and BvRE's filing status, account and custom rates (BvRP has none). Values equal to the pair default are left out. Links with `data-re-carry` are rewritten on load and after any input; without script they stay plain. BvRP applies carried values through its own controls (a value a control doesn't offer is ignored; a slider takes its nearest step), reads a legacy `appr` once with BvRE's one-line note, and keeps the carried params in its address bar current. BvRE adds a carried horizon its select doesn't list (1 to 30 years) rather than rounding it.
+- **BvRE's own links now carry Tax on a sale** (`tax`, `filing`, `bracket`, `state`, `btcacct`, `mded`, `chrate`, `chexempt`, `cbrate`), not stored, like the display frame.
+- **"Run this on the other side":** BvRE, above the share section, to BvRP `#calculator`; BvRP, under the calculator, to BvRE `#projection`, the forward calculator that matches BvRP's (the strip's links target `#calculator`, P9).
+- **One hash (P9):** BvRE's calculator tab writes `#calculator`; `#postponed-purchase` still opens it and is rewritten; `#projection` still opens the projection.
+- **No figure moves:** rePairQA digests unchanged (BvRE `6cbf3491`, BvRP `31638210`, 37 vectors each).

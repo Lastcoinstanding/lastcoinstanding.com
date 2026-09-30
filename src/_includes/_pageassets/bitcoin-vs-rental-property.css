@@ -60,6 +60,31 @@ html, body {
   line-height: 1.5;
   letter-spacing: 0.01em;
 }
+/* PR 8 (rulings C1): the pair line, and the carry link under the calculator. */
+.bvrp-hero .bvrp-pair {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--ink-dim);
+  max-width: 700px;
+  margin: -0.6rem auto 1.4rem;
+  line-height: 1.55;
+}
+.bvrp-hero .bvrp-pair a, .calc-other-side a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(224,148,34,0.45);
+  text-underline-offset: 2px;
+}
+.bvrp-hero .bvrp-pair a:hover, .calc-other-side a:hover { text-decoration-color: var(--amber); }
+.calc-other-side {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  margin: 1.4rem 0 0;
+}
+.calc-other-side a { font-weight: 600; margin-right: 0.25rem; }
 .bvrp-hero .tldr {
   max-width: 720px;
   margin: 1.6rem auto 0;
