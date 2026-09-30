@@ -475,13 +475,13 @@
     return SP500_TR_DATA[Math.max(0, Math.min(idx, SP500_TR_DATA.length - 1))][0];
   }
 
-  // Pretty-format date string yyyy-mm-dd → 'Mon dd, yyyy'
   // A preset's age today, "~9y": the verdict text names the long-horizon
   // presets by how long they have run, so the figure can't go stale
   // (2026-09-30; they were fixed "~8y" and "~12y").
   function presetAge(isoStr) {
     return '~' + Math.round((Date.now() - Date.parse(isoStr + 'T00:00:00Z')) / (365.25 * 86400000)) + 'y';
   }
+  // Pretty-format date string yyyy-mm-dd → 'Mon dd, yyyy'
   function fmtDate(isoStr) {
     var d = new Date(isoStr);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
