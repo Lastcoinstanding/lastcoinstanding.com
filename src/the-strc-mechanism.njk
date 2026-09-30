@@ -17,7 +17,7 @@ related:
   - url: https://lastcoinstanding.substack.com/p/how-legitimate-is-strc
     title: "How Legitimate is STRC?"
     kind: substack
-    desc: "The author's own view, argued in long form — is a persistent 12% discount the arbitrage widening, or the thesis leaking? The opinion this page deliberately withholds."
+    desc: "The author's own view, argued in long form — is STRC's discount the arbitrage widening, or the thesis leaking? The opinion this page deliberately withholds."
     label: "Read on Substack"
 faq:
   - q: "Why does STRC trade away from par?"
@@ -25,7 +25,7 @@ faq:
   - q: "Is STRC's dividend guaranteed?"
     a: "No. STRC dividends are cumulative but payable only when and if the board declares them — rate-setting is board discretion, and the published rate-bracket framework is management policy that can be modified or abandoned without shareholder consent. There are holder-friendly guardrails on the downside (cuts are capped per month, floored at term SOFR, and legally barred while any cumulative dividends remain unpaid), but none of that makes the dividend a guarantee. Full suspension is also contractually available — arrears would accrue (blocking any rate cut until paid) rather than trigger a default; the Suspended scenario in the interactive models it. The interactive lets you see the sustained, cut, and suspended cases side by side, including where the suspended case turns clearly negative."
   - q: "What does STRC's buyback program do?"
-    a: "The issuer stood up a repurchase program that buys STRC below par. Retiring a $100-par share for less than $100 extinguishes a perpetual 12% obligation at a discount — at the disclosed average price that is roughly a 13.9% return on each buyback dollar, the accretion case. The same dollars are funded from outside the preferred (common-equity issuance and, conditionally, bitcoin sales), so the par defense is paid for elsewhere on the balance sheet. Both readings are computed on this page; neither is softened."
+    a: "The issuer stood up a repurchase program that buys STRC below par. Retiring a $100-par share for less than $100 extinguishes a perpetual 12% obligation at a discount — at the average price disclosed from July 20 to September 27, 2026 (about $96), that is roughly a 12.5% return on each buyback dollar, the accretion case. The same dollars are funded from outside the preferred (common-equity issuance and, conditionally, bitcoin sales), so the par defense is paid for elsewhere on the balance sheet. Both readings are computed on this page; neither is softened."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-strc-mechanism-head.html' %}"
   page_styles: "{% include '_pageassets/the-strc-mechanism.css' %}"
@@ -53,6 +53,11 @@ companion:
         resolved." At that point the nav slot RETIRES (sunset rule, design §2):
         reachability reverts to the parent (/bitcoin-fixed-income) + the related
         strip. The site never carries a stale dashboard in its nav.
+
+    The test for (b), JM 2026-09-30: a full calendar month with STRC's VWAP at
+    or above $99, or Strategy changing the rate or stating par is regained,
+    whichever comes first. Re-open if STRC later closes below $92.
+    MONTHLY_REFRESH_CHECKLIST §7.5 step 4.
 
   The title's question must always stay answerable by the reader. Every dated
   figure carries its as-of date in copy; the status strip and coverage block
@@ -375,13 +380,13 @@ companion:
       <div class="sb-cost-head">Which number to watch</div>
       <p class="sb-cost-body">Each failure mode has a figure on the board that would show it happening &mdash; so you can watch the number rather than be told a story. Each breakeven is the bitcoin price below which the treasury no longer covers everything owed at-or-above STRC, on that basis:</p>
       <ul class="sb-watch-list" id="sbBreakevens"></ul>
-      <p class="sb-cost-body">A breach of that line is a condition, not an event &mdash; no covenant forces sales; what would matter is how long coverage stays impaired while dividends draw the reserve (~25 months at current rates).</p>
+      <p class="sb-cost-body">A breach of that line is a condition, not an event &mdash; no covenant forces sales; what would matter is how long coverage stays impaired while dividends draw the reserve (about three years of all preferred dividends and debt interest at its September 2026 size).</p>
       <p class="sb-cost-foot">These replace the parent page&rsquo;s older $33K / $21K thresholds, which predate the recent bitcoin sales and current holdings &mdash; recomputed here, not inherited. The full failure taxonomy (bitcoin winter, at-the-market closure, coverage erosion, rate spiral) lives on the parent&rsquo;s <a href="/bitcoin-fixed-income">Risks</a> tab.</p>
     </div>
 
     <div class="sb-cost-block">
       <div class="sb-cost-head">The lever not pulled: suspension</div>
-      <p class="sb-cost-body">STRC dividends are non-mandatory &mdash; payable only when, as, and if declared &mdash; so full suspension is contractually available at any time. Because STRC is preferred equity rather than debt, unpaid dividends accrue and compound rather than trigger any default or bankruptcy. Pulling it has a priced structure: arrears accrue as a growing claim, rate cuts become legally barred while any arrears remain unpaid, and the framework&rsquo;s own capital engine depends on preferred markets staying open to the issuer. Against that, roughly 25 months of reserve at current rates makes it unnecessary today. During the June de-anchoring, suspension was openly debated in market coverage &mdash; raise, hold, or suspend were all treated as live possibilities. The <a href="#lens">Suspended toggle in the lens above</a> shows what that case does to the arithmetic.</p>
+      <p class="sb-cost-body">STRC dividends are non-mandatory &mdash; payable only when, as, and if declared &mdash; so full suspension is contractually available at any time. Because STRC is preferred equity rather than debt, unpaid dividends accrue and compound rather than trigger any default or bankruptcy. Pulling it has a priced structure: arrears accrue as a growing claim, rate cuts become legally barred while any arrears remain unpaid, and the framework&rsquo;s own capital engine depends on preferred markets staying open to the issuer. Against that, roughly three years of reserve at current rates makes it unnecessary today. During the June de-anchoring, suspension was openly debated in market coverage &mdash; raise, hold, or suspend were all treated as live possibilities. The <a href="#lens">Suspended toggle in the lens above</a> shows what that case does to the arithmetic.</p>
     </div>
   </section>
 
