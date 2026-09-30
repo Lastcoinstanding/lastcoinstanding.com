@@ -236,3 +236,9 @@ PR 6 is split: **6a** "Show the calculation" and the CSV (P2, P7); **6b** the ch
 - **Bitcoin vs. Rental Property:** under the path card: *Keep the rental* (all N on Path 3) and the path, from `RealEstateModel.rentalLedger`. Each row's *Total held* is the chart's point for that year.
 - **Nominal, as paid, in both views** (a small departure from Prompt 6's "current frame"): the note above the table says so and, in the Real view, gives the divisor the cards use. Deflating a ledger of payments year by year would make its sums unreadable.
 - **No figure moves:** every rePairQA vector is unchanged; new E30, E31, P27 and P28 hash the ledgers' CSVs. Checked: the ledgers' after-tax rows equal the cards (BvRE, both calculators) and the table (BvRP, all four paths), and each ledger's last *Total held* equals the table's held total.
+
+## 16 · Implementation notes, PR 6b (2026-09-29; not new rulings)
+
+- **Bitcoin vs. Rental Property's chart** now values each year **if sold, after tax** by default (M7), with a *Held* toggle beside the zoom toggle. Held is the chart before 6b, unchanged (datasets identical on all four paths). If sold uses `RealEstateModel.calcIfSoldTrajectory`: each year t sold on the whole horizon's bitcoin path, so its last point equals the table's after-tax total (checked on every path at 10 and 20 years).
+- **The difference line** (P4): the selected scenario's path minus keeping the rental, on the same axis, near-white, solid and heaviest; in the legend and the tooltip. The note under the chart explains both bases.
+- **Bitcoin vs. Real Estate's chart** (new on that page, both calculators) is **6c**.
