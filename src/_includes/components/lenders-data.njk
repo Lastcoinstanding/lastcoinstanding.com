@@ -1,0 +1,9 @@
+{#
+  Injects src/_data/lenders.json as window.LENDERS for the page script on
+  /bitcoin-lenders (same pattern as preferred-rates.njk → window.PREFERRED_RATES).
+  The cards themselves are rendered by Nunjucks in bitcoin-lenders.njk; the
+  script only recomputes trigger prices from the live bitcoin price, runs the
+  filter chips and the reader's-own-LTV control, so the page is complete
+  without JS. See SITE_GUIDE "Borrowing against bitcoin: the lenders".
+#}
+<script>window.LENDERS = {{ lenders | dump | safe }};</script>

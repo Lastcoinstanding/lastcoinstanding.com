@@ -2214,6 +2214,46 @@ Two components built for the real-estate pair (SITE_GUIDE §55.4) are now house 
 
 **The sensitivity grid (`shared/real-estate-grid.js`, `RealEstateGrid`).** A 3 × 3 table of one result (the after-tax difference) under two assumptions, the reader's cell in the middle, outlined and labelled *yours*. The page gives the axis pairs and a function for one cell; a toggle switches pairs. Colour is diverging (the page's two series colours, grey at zero, strength by size), and **every cell carries its value and the side ahead in words**, so colour is never the only signal. Compact dollars, so it fits 375px. Caption, verbatim wherever it is used: *"A map of how the answer moves with two assumptions, not a probability distribution."* The reader's cell must equal the headline (checked). Never put an optimistic-only scenario on an axis (the pair leaves Upper out, M3).
 
+### 6.50 The lender card and its chips (`/bitcoin-lenders`, 2026-10-01)
+
+A **description card**: the same fields in the same order on every instance, so the reader compares by scanning rather than reading. Page-scoped prefix `ln-`; the canonical form is below. Use it for any landscape of comparable things the site describes but does not rank (lenders, custodians, exchanges); do not use it for the site's own tools, which have the tile pattern (§6.9.1).
+
+```html
+<article class="ln-card" id="lender-strike">
+  <div class="ln-head">
+    <div class="ln-head-text"><h3 class="ln-name">Strike</h3><div class="ln-model">Custodial · Chicago · NMLS 2741098</div></div>
+    <div class="ln-chips"><span class="ln-tag yes">✓ Bitcoin only</span></div>
+  </div>
+  <div class="ln-rate"><b>8.75–11.25%</b><span>APR, fixed; tiered by loan size</span></div>
+  <div class="ln-ltv">
+    <div><div class="k">Opens at</div><div class="v">50%</div><div class="p">LTV</div></div>
+    <div class="call"><div class="k">Margin call</div><div class="v">70%</div><div class="p">72 h to cure to 65%</div></div>
+    <div class="liq"><div class="k">Liquidates</div><div class="v">85%</div><div class="p">partial, back to 65%</div></div>
+  </div>
+  <p class="ln-trig">At $83,500, a maximum loan (50% LTV) gets a margin call at <strong>$59,600</strong> (−29%) …</p>
+  <div class="ln-pair"><div class="plus"><span class="l">Distinguishing</span>…</div><div class="catch"><span class="l">The catch</span>…</div></div>
+  <details class="ln-more" data-id="strike">
+    <summary class="ln-more-btn"><span>Terms, custody, where, sources</span><span class="ln-more-arrow">›</span></summary>
+    <div class="ln-more-body">
+      <dl class="ln-dl"><dt>Your coins</dt><dd>…</dd><dt>Terms</dt><dd>…</dd><dt>Minimum</dt><dd>…</dd><dt>Where</dt><dd>…</dd><dt>Track record</dt><dd>…</dd></dl>
+      <div class="ln-foot">Sources, read 2026-09-30: …</div>
+      <a class="ln-depth" href="…">Depth: … →</a>
+    </div>
+  </details>
+</article>
+<dialog class="ln-dialog" id="lnDialog">…</dialog>  <!-- once per page -->
+```
+
+**Rules.**
+- **Three chips, three meanings.** `ln-tag yes` (green outline, ✓) and `ln-tag no` (red outline, names the other collateral) are one axis: what the lender takes. `ln-tag qual` (amber, dashed) is a second axis: *this is not an open-use loan against the stack*, with the reason as the label ("Buying power · no cash out", "Wrapped bitcoin, not bitcoin", "A different animal · mortgage"). A card never carries two of the first kind; it may carry one of the second. The group header may carry a qualifier when it applies to every card in the group (mortgages).
+- **The LTV strip is three cells, always.** Opens at / the lender's own word for the call line (`Margin call`, `Alerts`, `Warning`, `Violation`, `"Danger"`) / Liquidates. The call value is amber, the liquidation value red; a missing figure prints *not published* in the value slot, never a dash and never an estimate. The small line under each is the mechanic in a few words (cure window, partial or full, fee).
+- **The rate is the lender's headline**, big, with its basis beside it in small type; `b.np` dims a *not published* headline so it doesn't read as a number.
+- **The trigger sentence** is the card's one live element. Price-free at build, priced by script; the verbs and the order are the same in both renderers (SITE_GUIDE §57).
+- **Distinguishing is green, The catch is red, and every card has both.** A card with no catch is a sales card; a card with no distinguishing line is filler.
+- **The face is what a reader decides with; the rest is one click away.** Marks, rate, the three lines, the trigger sentence, Distinguishing and The catch stay on the face (JM, 2026-09-30). Everything else lives in a `<details class="ln-more">` whose summary is a quiet amber row at the foot; without JS it expands in place, with JS it opens the page's one `<dialog class="ln-dialog">` in large type (two columns ≥760px: the pair left, the details right; the group name as a crumb; close by ×, Escape, backdrop or Back). The dialog is filled by cloning the card's parts, so it never carries copy of its own. The dated sources (dotted underline, muted) and the one amber *Depth* link are the last things in the detail.
+- Grid: three across ≥1080px, two ≥700px, one below; `align-items: stretch` so a row's cards share a height and the foot sits at the bottom (`margin-top: auto`). At ≤520px the chips drop under the name.
+- Colour through tokens only (`--green`, `--red`, `--amber`, `--text-dim`, …); the page defines them in its `:root`.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

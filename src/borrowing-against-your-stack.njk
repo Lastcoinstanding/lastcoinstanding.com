@@ -3,6 +3,8 @@ layout: base.njk
 permalink: /borrowing-against-your-stack.html
 slug: borrowing-against-your-stack
 related:
+  - slug: bitcoin-lenders
+    desc: "The companion map: nineteen lenders, one card each, with the published rate, the loan-to-value lines, the bitcoin price that triggers them today, who holds the coins, and the catch. The categories argued here, lender by lender."
   - slug: bitcoin-as-collateral
     desc: "Why lenders price bitcoin the way they do. The collateral argument underneath this calculator: the ten properties a lender actually weighs, scored against Treasuries, property and gold, and the gap between that scorecard and the rate you are quoted."
   - slug: the-power-law
@@ -159,7 +161,7 @@ eleventyComputed:
             <p class="prose"><em>Which strategy you're actually running depends on whether your asset's compound growth rate exceeds your interest rate across your time horizon &mdash; and, more practically, whether you can survive the drawdowns along the way.</em> The Power Law channel and a conservative LTV are the two levers that decide the answer. The Calculator on the next tab makes this concrete.</p>
         </div>
 
-        <div class="section">
+        <div class="section" id="lender-categories">
             <h2>The four categories of bitcoin lender</h2>
             <p class="prose">Not every lender operates with the same ethos. The bitcoin-aligned approaches &mdash; those built around verifiable on-chain segregation, no rehypothecation, transparent collateral, and bitcoin-only focus &mdash; sit on one side of the market. The crypto-ethos approaches sit on the other, with material structural differences in how your collateral is held and what happens when anything goes wrong.</p>
 
@@ -174,7 +176,7 @@ eleventyComputed:
 
             <p class="prose"><strong>Bitcoin-native Layer 2 lending.</strong> <em>The architecturally promising frontier.</em> Citrea (a ZK-rollup that launched mainnet in January 2026, using BitVM2 for trust-minimized exits), Stacks with its sBTC primitive, Rootstock with its long uptime record. The structural argument: bring smart-contract functionality to bitcoin without ever wrapping it onto a foreign chain. Still small in 2026 &mdash; TVL across the category remains modest compared to Ethereum-based DeFi &mdash; but the trust-minimized exit primitive (BitVM2) addresses the structural failure mode that has defined cross-chain bridges for the last six years. Worth monitoring as the next several years unfold.</p>
 
-            <h3>Crypto-ethos approaches (covered for completeness only)</h3>
+            <h3 id="defi-wrapped">Crypto-ethos approaches (covered for completeness only)</h3>
 
             <p class="prose"><strong>DeFi via wrapped BTC.</strong> Aave, Morpho Blue, Spark, Compound V3, Euler V2 are the most prominent. The marketing claim is that smart contracts replace human custody, oracles replace platform operations, code replaces fiduciary responsibility &mdash; that the system is <em>trustless</em> and <em>decentralized</em>.</p>
 
@@ -191,9 +193,11 @@ eleventyComputed:
             <p class="prose"><strong>Rehypothecating CeFi.</strong> Nexo, Binance Loans, Matrixport. These platforms subsidize their headline rates (Nexo advertises borrowing rates as low as 2.9%) by lending out user collateral to third parties &mdash; generating yield on assets that don't belong to them, with the profit funding the lower stated rates. <em>This is the structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager between 2022 and 2023.</em> Subsidized rates aren't a benefit; they're a signal that the lender is making money somewhere structural &mdash; and that somewhere is your collateral commingled with other obligations.</p>
 
             <p class="prose"><strong>Predatory-LTV platforms.</strong> YouHodler offers up to 90% opening LTV with a 97% liquidation threshold &mdash; a ~7% drawdown to liquidation. These platforms exist legally and have customers; the only useful purpose served by mentioning them on this page is to make concrete what aggressive terms look like on paper, so readers can pattern-match against them when they appear elsewhere.</p>
+
+            <p class="prose"><em>Lender by lender.</em> The categories above are the argument; the companion page <a href="/bitcoin-lenders">Borrowing against bitcoin: the lenders</a> is the map &mdash; one card per lender, nineteen of them, with the published rate, the three loan-to-value lines, the bitcoin price that triggers each one today, who holds the coins, the minimum, where it operates, and the catch. Figures there are read from each lender&rsquo;s own pages and dated, so where a rate quoted in this essay has moved since it was written, the card is the current figure.</p>
         </div>
 
-        <div class="section">
+        <div class="section" id="rehypothecation">
             <h2>The single biggest variable: rehypothecation</h2>
             <p class="prose">If you remember nothing else from this page, remember this: <em>rehypothecation is the structural axis on which every other risk turns.</em></p>
             <p class="prose">Every catastrophic failure of bitcoin-backed lending in the last decade &mdash; Celsius, BlockFi, Genesis, Voyager &mdash; was a rehypothecation failure at its core. The lender re-lent depositor collateral to third parties to generate yield, those third parties were over-leveraged, the contagion propagated, and depositors discovered they'd been operating in a black box where the lender owed them their bitcoin back but no longer had it.</p>
@@ -227,7 +231,7 @@ eleventyComputed:
             <p class="prose">The hidden-complexity warning extends beyond direct lenders. Structured products that wrap bitcoin or bitcoin-adjacent equities (covered-call ETFs, leveraged BTC notes, certain MSTR-derivative products) often disclose leverage and effective rehypothecation deep in their prospectus fine print &mdash; page-40 territory, where retail buyers rarely read. <em>The structural pattern is the same: implicit leverage that's not visible on the surface, structured to be discovered only when something has already gone wrong.</em></p>
         </div>
 
-        <div class="section">
+        <div class="section" id="cautionary-record">
             <h2>The cautionary record</h2>
             <p class="prose">A few words on what the historical record actually shows. <em>Every catastrophic failure of bitcoin-backed lending in the last decade was a failure of the rehypothecating-CeFi or DeFi categories described above &mdash; not the bitcoin-aligned approaches the page recommends.</em> Celsius, BlockFi, Genesis, Voyager all engaged in the practice that defines the bottom tier of the rehypothecation hierarchy. The DeFi cascade detailed earlier was an architecture-level failure of the wrapped-BTC category. None of these were collaborative-custody multisig failures. None were Tier-1 non-rehypothecating CeFi failures. The collapses on record are the predictable failures of the structural choices the page already tells you to avoid.</p>
             <p class="prose">That framing matters because the same failures, read without it, can produce the wrong takeaway &mdash; <em>that lending against bitcoin is dangerous in general</em>, rather than the actual lesson: <em>that the specific structural choices these companies made were dangerous, and avoiding those choices is the point of this page</em>.</p>

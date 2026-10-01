@@ -508,7 +508,7 @@ Captured during the merge pass, because the backlog is now large enough that the
     2. **"Definitely not pledged twice" is conditional.** It holds for on-chain, self-custodied or visible-multisig collateral. It does **not** automatically hold for collateral at a custodian or exchange — which is where most institutional collateral actually sits. And proof-of-reserves without proof-of-liabilities is incomplete. The true claim is *"bitcoin makes verifiability possible,"* not *"bitcoin collateral is verified."*
   - **Register:** both — site Arguments/Numbers treatment (facts, mechanics, comparisons) + Substack for the "unrecognized-but-inevitable" thesis voice.
 
-- [ ] **Margin-call / borrow-against-stack calculator — site tool (The Numbers).**
+- [x] **Margin-call / borrow-against-stack calculator — site tool (The Numbers).** **Shipped 2026-10-01 as `/bitcoin-lenders` (SITE_GUIDE §57)** — resolved as a *new page*, not a BAS extension: BAS's loan-health tab already computes the margin-call price for one loan; the new page is the "compare offerings side-by-side" half, nineteen lender cards with the trigger price computed from each lender's published LTV lines at the live price (same arithmetic as BAS), and a reader's-own-LTV control. No lender recommendations; no affiliate links; PARTNERSHIPS_REFERRALS_POLICY honoured. The house-drawdown / power-law stress test of a trigger price stays on BAS.
   Surfaced 2026-07-30. Collateral cluster.
   - **Filed as SITE TOOL (JM 2026-08-08)** — but see the open question below before promotion.
   - **OPEN — new page vs. extension (verify at promotion, JM 2026-08-08):** this may be an **extension of `/borrowing-against-your-stack`** rather than a new page — BAS already covers bitcoin as collateral and already carries a tool. **Precedent:** the three-track scenario entry rules "extend the BFI calculator, do **not** build a new page." **Verify at promotion:** check what BAS's tool currently computes before deciding new page vs. extension. (Captured so it isn't rediscovered — do not resolve now.)
@@ -516,7 +516,7 @@ Captured during the merge pass, because the backlog is now large enough that the
   - **Prior art:** Strike's new borrow product has a calculator to review.
   - **Guardrails:** facts-not-signals; leverage content = elevated counsel attention; no lender recommendations — computed comparison only, PARTNERSHIPS_REFERRALS_POLICY applies.
 
-- [ ] **Collateral/services company research + freshness pass — task, not a page.**
+- [x] **Collateral/services company research + freshness pass — task, not a page.** **Done 2026-09-30** (`claude/LENDER_RESEARCH_2026-09-30.md` in the project; `src/_data/lenders.json`): nineteen lenders from primary sources, dated. Not covered and still open as leads: AnchorWatch (custody, not a lender today), People's Reserve, "Horizon". Debifi was researched (3-of-4 multisig, institutional lenders). The freshness line is MONTHLY_REFRESH §7.6.
   Surfaced 2026-07-30. Collateral cluster.
   - **Filed as TASK (JM 2026-08-08)** — and a **prerequisite** for the margin-call calculator's "compare offerings side-by-side" feature. First in the cluster sequence.
   - **Research:** current offerings — AnchorWatch, People's Reserve, Strike borrow-against-bitcoin, **Debify** (L1 multisig — added 2026-08-02), "Horizon" (disambiguate at research — several bitcoin cos use the name).
