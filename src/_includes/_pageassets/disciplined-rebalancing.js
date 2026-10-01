@@ -72,9 +72,9 @@
     // Horizontal reference percentile lines — values match the
     // canonical thresholds documented in the percentile table above.
     var refs = [
-      { y: 0.87, label: '50th — historical median', color: 'rgba(255,255,255,0.25)' },
-      { y: 1.34, label: '70th', color: 'rgba(224,148,34,0.35)' },
-      { y: 1.78, label: '80th', color: 'rgba(224,148,34,0.55)' },
+      { y: 0.85, label: '50th — historical median', color: 'rgba(255,255,255,0.25)' },
+      { y: 1.32, label: '70th', color: 'rgba(224,148,34,0.35)' },
+      { y: 1.75, label: '80th', color: 'rgba(224,148,34,0.55)' },
       { y: 2.83, label: '90th', color: 'rgba(224,148,34,0.75)' }
     ];
 
@@ -694,8 +694,8 @@
   // Read default slider values to render initial threshold lines
   var sellEl = document.getElementById('drSellPct');
   var rebuyEl = document.getElementById('drRebuyPct');
-  var initialSellRatio = sellEl ? percentileToRatio(parseInt(sellEl.value)) : 1.78;
-  var initialRebuyRatio = rebuyEl ? percentileToRatio(parseInt(rebuyEl.value)) : 0.87;
+  var initialSellRatio = sellEl ? percentileToRatio(parseInt(sellEl.value)) : 1.75;
+  var initialRebuyRatio = rebuyEl ? percentileToRatio(parseInt(rebuyEl.value)) : 0.85;
 
   // Dataset index map — used by update functions
   var DS = {

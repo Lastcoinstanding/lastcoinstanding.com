@@ -19,14 +19,14 @@
    moved since 2026-05.
 
    SP500_TR_DATA — S&P 500 Total Return index (^SP500TR), daily close on
-   or before the 28th of each month, 2010-01 → 2026-08. Source: Yahoo
+   or before the 28th of each month, 2010-01 → 2026-09. Source: Yahoo
    Finance historical data for ^SP500TR. Index points.
 
    NDQ_TR_DATA — NASDAQ-100 total return, proxied by QQQ's dividend-
    adjusted close (Invesco QQQ Trust; total return net of its 0.20%
    expense ratio, so it UNDERSTATES the index's true total return by
    roughly 0.2%/yr — a conservative bias against bitcoin's comparator, not
-   for it). Same Day-28 sampling, 2010-01 → 2026-08. Rebased so that the
+   for it). Same Day-28 sampling, 2010-01 → 2026-09. Rebased so that the
    2010-01-28 value equals the NASDAQ-100 price index that day (1886.70),
    so magnitudes read as index points; every ratio between two dates is
    unchanged by the rebase. Source: Yahoo Finance QQQ adjusted close.
@@ -97,7 +97,7 @@ var SP500_TR_DATA = [
     ["2025-05-28", 12996.67],["2025-06-28", 13641.10],["2025-07-28", 14130.61],["2025-08-28", 14395.51],
     ["2025-09-28", 14725.98],["2025-10-28", 15285.10],["2025-11-28", 15211.14],["2025-12-28", 15406.48],
     ["2026-01-28", 15526.69],["2026-02-28", 15323.80],["2026-03-28", 14203.24],["2026-04-28", 15931.22],
-    ["2026-05-28", 16897.64],["2026-06-28", 16447.29],["2026-07-28", 16625.90],["2026-08-28", 17276.49]
+    ["2026-05-28", 16897.64],["2026-06-28", 16447.29],["2026-07-28", 16625.90],["2026-08-28", 17276.49],["2026-09-28", 17230.95]
 ];
 
 var NDQ_TR_DATA = [
@@ -150,5 +150,5 @@ var NDQ_TR_DATA = [
     ["2025-05-28", 25774.24],["2025-06-28", 27254.22],["2025-07-28", 28251.53],["2025-08-28", 28695.73],
     ["2025-09-28", 29669.56],["2025-10-28", 31509.29],["2025-11-28", 30828.76],["2025-12-28", 31099.57],
     ["2026-01-28", 31564.75],["2026-02-28", 30272.14],["2026-03-28", 28078.65],["2026-04-28", 32818.89],
-    ["2026-05-28", 36714.20],["2026-06-28", 35301.68],["2026-07-28", 33751.24],["2026-08-28", 35796.83]
+    ["2026-05-28", 36714.20],["2026-06-28", 35301.68],["2026-07-28", 33751.24],["2026-08-28", 35796.83],["2026-09-28", 36839.49]
 ];

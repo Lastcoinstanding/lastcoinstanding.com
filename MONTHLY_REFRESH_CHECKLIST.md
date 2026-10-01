@@ -881,11 +881,12 @@ table in `src/_includes/_pageassets/bitcoin-and-metcalfes-law.js`.
 - **Pinned chart dataset (`src/_includes/_pageassets/bitcoin-and-metcalfes-law-data.js`).**
   The §IV fit chart reads a committed static weekly series — 808 points, one per
   ISO week: Coin Metrics `PriceUSD` + `AdrBalCnt` (holders) and Blockchain.com
-  `n-unique-addresses` (active) — **pulled 2026-06-20** (source + pull date are in
-  the file header). Re-pull **quarterly** (not monthly — it's a structural scatter,
+  `n-unique-addresses` (active) — **pulled 2026-10-01** (823 points to 2026-09-28; source + pull date are in
+  the file header). That pull found Coin Metrics had revised `AdrBalCnt` history ~1% lower since 2015, so the series
+  was replaced whole rather than appended (never mix vintages), and `FITS` was re-measured from the same pull. Re-pull **quarterly** (not monthly — it's a structural scatter,
   not a date-stamped headline figure): regenerate the weekly series, and **before
   committing, confirm the refreshed full-history holders fit still reproduces
-  β ≈ 1.84 / R² ≈ 0.95** (and the era pattern: retail strong → ETF-era broken). If
+  β ≈ 1.83 / R² ≈ 0.94** (1.84 / 0.95 before the 2026-10-01 vintage) (and the era pattern: retail strong → ETF-era broken). If
   it drifts materially, reconcile against the `FITS` object before shipping.
 
 **OG card — no regeneration needed.** `og-bitcoin-and-metcalfes-law.jpg` is a

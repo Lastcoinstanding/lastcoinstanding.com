@@ -240,7 +240,7 @@ eleventyComputed:
                                 <p id="drSellPctExplainer" class="dr-field-explainer"></p>
                             </div>
                             <div class="dr-field">
-                                <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.87&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
+                                <label>Rebuy percentile <span id="drRebuyPctReadout" class="dr-field-readout">50th percentile</span><button type="button" class="dr-tt dr-tt-right" aria-label="About this input">?<span class="dr-tt-card">The price-to-trend ratio at-or-below which you rebuy after a sell. The 50th percentile is the historical median (~0.85&times; trend). <strong>Lower percentile = waits for deeper drawdowns: more BTC captured per rebuy when it fires, but historically fired less often.</strong></span></button></label>
                                 <input type="range" id="drRebuyPct" min="5" max="55" value="50" step="5">
                                 <p id="drRebuyPctExplainer" class="dr-field-explainer"></p>
                             </div>
@@ -373,7 +373,7 @@ eleventyComputed:
             <h3>1. Percentile, defined</h3>
             <p>The single most consequential math decision on this page is what <em>"80th percentile"</em> means. We use <strong>historical-frequency percentile</strong>, matching the convention already in use on <a href="/the-power-law">the Power Law page's</a> status badge.</p>
 
-            <p>For each day in <code>PL_DATA</code> (genesis through present, ~5,500+ samples), we compute that day's <em>price/trend ratio</em> &mdash; the closing price divided by the Power Law trend value at that day. We sort all the resulting ratios. The Pth percentile is the ratio level such that historical ratios have been <em>at or below</em> that level P% of the time.</p>
+            <p>For each sample in <code>PL_DATA</code> (mid-2010 to the present, about 480 samples roughly 12 days apart), we compute that day's <em>price/trend ratio</em> &mdash; the closing price divided by the Power Law trend value at that day. We sort all the resulting ratios. The Pth percentile is the ratio level such that historical ratios have been <em>at or below</em> that level P% of the time.</p>
 
             <p>Computed against current <code>PL_DATA</code>, the reference thresholds are:</p>
 
@@ -384,16 +384,16 @@ eleventyComputed:
                         <tr><td>5th</td><td>0.46&times; trend</td><td>Floor zone &mdash; rare deep drawdowns</td></tr>
                         <tr><td>20th</td><td>0.55&times; trend</td><td>Below-trend buying territory <span class="dr-math-tag">Aggressive rebuy</span></td></tr>
                         <tr><td>40th</td><td>0.72&times; trend</td><td>Below trend, common <span class="dr-math-tag">Conservative rebuy</span></td></tr>
-                        <tr><td>50th</td><td>0.87&times; trend</td><td>Historical median <span class="dr-math-tag">Standard rebuy</span></td></tr>
-                        <tr><td>70th</td><td>1.34&times; trend</td><td>Modestly above trend <span class="dr-math-tag">Conservative sell</span></td></tr>
-                        <tr><td>80th</td><td>1.78&times; trend</td><td>Clearly above trend <span class="dr-math-tag">Standard sell</span></td></tr>
+                        <tr><td>50th</td><td>0.85&times; trend</td><td>Historical median <span class="dr-math-tag">Standard rebuy</span></td></tr>
+                        <tr><td>70th</td><td>1.32&times; trend</td><td>Modestly above trend <span class="dr-math-tag">Conservative sell</span></td></tr>
+                        <tr><td>80th</td><td>1.75&times; trend</td><td>Clearly above trend <span class="dr-math-tag">Standard sell</span></td></tr>
                         <tr><td>90th</td><td>2.83&times; trend</td><td>Upper-band approach <span class="dr-math-tag">Aggressive sell</span></td></tr>
-                        <tr><td>95th</td><td>3.81&times; trend</td><td>Historical spike zone</td></tr>
+                        <tr><td>95th</td><td>3.68&times; trend</td><td>Historical spike zone</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <p class="dr-math-note">Note the asymmetry: the historical median (50th percentile) sits at <strong>0.87&times; trend</strong>, not 1.0&times;. Bitcoin has spent slightly more than half its time at-or-below trend. This is consistent with the band-asymmetry posture of the channel itself &mdash; the upper region reflects historical spikes rather than a plateau anchor.</p>
+            <p class="dr-math-note">Note the asymmetry: the historical median (50th percentile) sits at <strong>0.85&times; trend</strong>, not 1.0&times;. Bitcoin has spent slightly more than half its time at-or-below trend. This is consistent with the band-asymmetry posture of the channel itself &mdash; the upper region reflects historical spikes rather than a plateau anchor.</p>
         </div>
 
         <!-- §2: TRIGGER DETECTION STATE MACHINE -->
@@ -435,12 +435,12 @@ eleventyComputed:
             <p>For the default settings (Standard preset: 80th sell, 50th rebuy):</p>
 
             <ul class="dr-math-list">
-                <li>Sell fires near 1.78&times; trend</li>
-                <li>Rebuy fires near 0.87&times; trend</li>
-                <li>Per-cycle multiplier (simplified, assuming trend doesn't change during the cycle): <code>1.78 / 0.87 = 2.05&times;</code></li>
+                <li>Sell fires near 1.75&times; trend</li>
+                <li>Rebuy fires near 0.85&times; trend</li>
+                <li>Per-cycle multiplier (simplified, assuming trend doesn't change during the cycle): <code>1.75 / 0.85 = 2.06&times;</code></li>
             </ul>
 
-            <p>If a 1.0 BTC starting position runs through 4 complete cycles where the trend doesn't grow at all, BTC count compounds: <code>1.0 &rarr; 2.05 &rarr; 4.20 &rarr; 8.61 &rarr; 17.6</code>. The actual historical record produces dramatically smaller multipliers &mdash; sometimes negative ones &mdash; for the reason described next.</p>
+            <p>If a 1.0 BTC starting position runs through 4 complete cycles where the trend doesn't grow at all, BTC count compounds: <code>1.0 &rarr; 2.06 &rarr; 4.24 &rarr; 8.74 &rarr; 18.0</code>. The actual historical record produces dramatically smaller multipliers &mdash; sometimes negative ones &mdash; for the reason described next.</p>
 
             <p class="dr-math-note">In practice, the Power Law trend itself grows during the time between sell and rebuy (typically 3&ndash;4 years). That growth reduces the per-cycle BTC gain, because rebuying at the same percentile means rebuying at a higher absolute price than the sell-time trend would have implied. The day-by-day backtest handles this exactly &mdash; the table on the Calculator tab shows what happens at each historical trigger, including the cycles where the discipline ended with <em>fewer</em> BTC than HODL because the rebuy fired above the prior sell price (visible whenever cumulative BTC falls below 1.00). Realistic per-cycle multipliers in the historical record are typically <strong>0.95&ndash;1.30&times;</strong>, depending on threshold settings and which cycle you look at.</p>
         </div>
