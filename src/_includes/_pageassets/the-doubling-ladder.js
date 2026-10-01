@@ -20,13 +20,15 @@
        or above the level. lead = trendDay − actualDay (days the market
        reached the rung *before* the trend, +early / −late).
 
-     • DEVIATION:  month-end ln(actual / trend), 193 months (July 2010 to
-       August 2026; extended 2026-09-30 from the same series: June's point
-       moved from its June 14 build date to the June 30 close, July and
-       August added, and MONTHLY_HIGH with them).
+     • DEVIATION:  month-end ln(actual / trend), 194 months (July 2010 to
+       September 2026; extended 2026-09-30 from the same series: June's
+       point moved from its June 14 build date to the June 30 close, July
+       and August added, and MONTHLY_HIGH with them; September added
+       2026-10-01: the Sep 30 close $83,629.12 at day 6479, −0.6246; high
+       $86,608 on Sep 22, day 6471).
 
    CHECKSUM (must hold — see verification register):
-       months = 193 · mean ln-dev = +0.0052 · above 80 (41.5%) / below 113 (58.5%)
+       months = 194 · mean ln-dev = +0.0020 · above 80 (41.2%) / below 114 (58.8%)
    ════════════════════════════════════════════════════════════════════ */
 
 var GENESIS_TS = 1230940800;          // Jan 3, 2009 UTC (seconds)
@@ -96,7 +98,7 @@ var DEVIATION = [
   [5749,-0.1782],[5780,-0.1118],[5810,0.1570],[5841,0.0753],[5872,0.1675],[5900,-0.0730],
   [5931,-0.1308],[5961,-0.0245],[5992,0.0440],[6022,0.0563],[6053,0.1102],[6084,0.0010],
   [6114,0.0229],[6145,-0.0610],[6175,-0.2650],[6206,-0.3207],[6237,-0.3993],[6265,-0.6698],
-  [6296,-0.6857],[6326,-0.5854],[6357,-0.6407],[6387,-0.8719],[6418,-0.8264],[6449,-0.6715]
+  [6296,-0.6857],[6326,-0.5854],[6357,-0.6407],[6387,-0.8719],[6418,-0.8264],[6449,-0.6715], [6479, -0.6246]
 ];
 
 // ── MONTHLY_HIGH: [daySinceGenesis (of the month's high), highest daily
@@ -130,7 +132,7 @@ var MONTHLY_HIGH = [
   [5686,68257],[5690,65298],[5748,65888],[5779,72706],[5803,99012],[5828,106156],[5863,106158],
   [5873,102406],[5903,94256],[5960,94998],[5984,111722],[6002,110300],[6045,120001],
   [6067,123359],[6103,117129],[6121,124777],[6148,110602],[6179,93468],[6221,96932],
-  [6240,78680],[6282,74860],[6323,78649],[6337,82146],[6358,73571],[6409,66512],[6446,80273]
+  [6240,78680],[6282,74860],[6323,78649],[6337,82146],[6358,73571],[6409,66512],[6446,80273], [6471, 86608]
 ];
 
 // ── helpers ──────────────────────────────────────────────────────────

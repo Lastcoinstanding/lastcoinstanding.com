@@ -49,8 +49,10 @@ var homeData = {
 // The growth-of-$1 and every-starting-year exhibits grow housing by this
 // index rather than by the new-house median, whose mix shifts (rulings M11,
 // PR 4e). Latest full year only; roll forward each January with homeData.
+// Restated 2026-10-01 from FRED's current vintage (S&P's revision moved
+// 2022–2025 by 0.01–0.02; the rest unchanged at 2 dp).
 var csData = {
-    2013:154.51,2014:164.67,2015:172.15,2016:180.89,2017:191.35,2018:202.43,2019:209.4,2020:222.06,2021:259.96,2022:298.32,2023:305.73,2024:321.35,2025:328.52
+    2013:154.51,2014:164.67,2015:172.15,2016:180.89,2017:191.35,2018:202.43,2019:209.4,2020:222.06,2021:259.96,2022:298.31,2023:305.72,2024:321.33,2025:328.5
 };
 
 var btcData = {
