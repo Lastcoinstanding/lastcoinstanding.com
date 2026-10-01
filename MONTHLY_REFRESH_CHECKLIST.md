@@ -763,6 +763,16 @@ The STRC price is now maintained by the site's first CI automation (SITE_GUIDE �
 - Cross-check the on-page **"official daily close · as of <date>"** against the true last close; if the date is stale by more than a few market days, the Action has silently stopped — investigate the source (Yahoo keyless access can change) and fall back to a hand-updated `src/_data/strcClose.json` until fixed. Alternative sources are noted in `DATA_AUDIT` STRC-1.
 - **Before concluding the Action has stalled, check `git log origin/main -- src/_data/strcClose.json`** (added 2026-09-13, after exactly this false alarm): a local branch behind origin looks identical to a dead scheduler — the bot's commits land on `origin/main` and the local file stays stale until you fast-forward. Also, the early-September runs each recorded the close of the market day *before* the run date, so a one-market-day lag on the page is the Action's normal behaviour, not staleness.
 
+## 7.6. Borrowing against bitcoin: the lenders — the cards (MONTHLY rates, QUARTERLY full card, `/bitcoin-lenders.html`)
+
+Nineteen cards in `src/_data/lenders.json`, each with `asOf` and `sources`. Rates on this page move more than anything else on the site (Ledn's standard rate rose 10.99% → 11.49% between March and September 2026; Strike's 7.75% floor left its calculator; APX cut its liquidation fee to 0% and moved to partial liquidation on 2026-08-25), so:
+
+- **Monthly — the rate line.** Re-read each lender's rate page (the `sources` on the card) and update `rate.headline` / `rate.note`. A change moves the card's `asOf` and gets a Recent Updates entry naming the lender and the move (so the UPDATED chip). `scripts/data-freshness.py` reports the oldest card.
+- **Quarterly — the full card.** LTV lines, cure windows, fees, minimums, custody wording, state lists, track record. Playwright helpers in the QA toolkit (`pw-text.js`, `pw-html.js`) render script-heavy lender pages; Strike's calculator is driven with `pw-calc3.js`, Figure's with `pw-figcalc2.js`; FAQ accordions that aren't in the DOM are read from the page's JSON-LD.
+- **Rules that don't move.** A figure the lender withholds stays *not published*; never estimate. State availability comes only from the lender's own list (`states.type`); a third-party chart is a lead, not a source. Press is used only where the lender publishes nothing, and labelled on the card.
+- **Events to watch** (each is a card edit the same day): a lender pausing withdrawals or liquidating at scale; a regulatory action; a US launch or exit (Hodl Hodl barred US persons in June 2026; Nexo returned in February 2026; Kraken Borrow US launched 2026-09-24); a product the page doesn't have (add a card, never a paragraph).
+- **After any edit**, run the chat-side probe (`ln-qa.js`): parity with the BAS formula at every card, the own-LTV path, filters, NY/TX state verdicts, mobile overflow.
+
 ## 8. Institutional guidance citations — How Much Bitcoin? (quarterly is fine)
 
 The gap ladder and §B cite live institutional positions. Quarterly, verify:
