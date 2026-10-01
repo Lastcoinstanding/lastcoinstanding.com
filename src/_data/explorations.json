@@ -477,6 +477,14 @@
     }
   },
   {
+    "_comment": "Borrowing against bitcoin: the lenders (2026-10-01). The landscape sister of Borrowing Against Your Stack: one card per lender from src/_data/lenders.json. interactive: true (live trigger prices, the reader's-own-LTV control, filters). NO calculator_tile by design — it describes a market, it is not a personal-decision tool (same posture as Bitcoin as Collateral and Living on Bitcoin). Plain nav title per STYLE_GUIDE §10.4; the page H1 is the evocative form.",
+    "slug": "bitcoin-lenders",
+    "title": "Bitcoin Lenders Compared",
+    "category": "numbers",
+    "group": "Living on Bitcoin",
+    "interactive": true
+  },
+  {
     "slug": "bitcoin-backed-mortgages",
     "title": "Bitcoin-Backed Mortgages",
     "category": "numbers",

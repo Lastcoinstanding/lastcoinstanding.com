@@ -204,6 +204,19 @@ def preferred_rates():
            dt.date.fromisoformat(s['asOf']), 35, 45, 'monthly (8-K)', '§0.7', 'preferredRates.json')
 
 
+# /bitcoin-lenders: every card carries the date its lender's pages were read.
+# Rates move monthly (Ledn +0.5pt between March and September 2026), so the
+# oldest card's asOf is the item; the full-card re-read is quarterly (§7.6).
+@safe
+def lender_cards():
+    d = json.loads(read(SRC, '_data', 'lenders.json'))
+    oldest = min(dt.date.fromisoformat(l['asOf']) for l in d['lenders'])
+    stale = [l['name'] for l in d['lenders'] if dt.date.fromisoformat(l['asOf']) == oldest]
+    by_age('Lender cards (src/_data/lenders.json: %d lenders; oldest read)' % len(d['lenders']),
+           oldest, 35, 45, 'monthly (rates) / quarterly (full card)', '§7.6', 'lenders.json',
+           'oldest: ' + ', '.join(stale[:4]) + ('…' if len(stale) > 4 else ''))
+
+
 # ── Quarterly ─────────────────────────────────────────────────────────────────
 @safe
 def metcalfe():

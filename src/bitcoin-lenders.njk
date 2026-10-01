@@ -1,0 +1,174 @@
+---
+layout: base.njk
+permalink: /bitcoin-lenders.html
+slug: bitcoin-lenders
+related:
+  - slug: borrowing-against-your-stack
+    desc: "The argument underneath every card: when borrowing beats selling, why rehypothecation is the biggest variable, the Celsius record, and the loan-health calculator these trigger prices share their arithmetic with."
+  - slug: bitcoin-as-collateral
+    desc: "Why lenders price bitcoin the way they do. The ten properties a lender weighs, scored against Treasuries, property and gold, and the gap between that scorecard and the rate on these cards."
+  - slug: bitcoin-backed-mortgages
+    desc: "The two mortgage cards at the bottom of this page, in depth: how a conforming mortgage can carry bitcoin as collateral, and what the GSE wrapper changes about liquidation."
+  - slug: paper-bitcoin
+    desc: "The custody spectrum behind the ‘Your coins’ line on every card: what it means for a lender, a custodian, an exchange or a wrapper to hold your bitcoin."
+companion: []
+faq:
+  - q: "Which bitcoin lender has the lowest interest rate?"
+    a: "It depends on the loan size and the loan-to-value, and the lowest headline rate is usually attached to the thinnest cushion or to collateral that is not bitcoin. On the cards read today, the lowest published rates sit on the DeFi markets (wrapped bitcoin, no notice before liquidation) and on Lava’s revolving line, which carries a second charge on top of its rate; the bitcoin-only custodial lenders cluster around 9–11% for loans under $250,000. The page lists what each lender publishes and ranks nothing."
+  - q: "What is a trigger price on a bitcoin-backed loan?"
+    a: "The bitcoin price at which a loan hits one of the lender’s loan-to-value lines. A loan is fixed in dollars, so as the price falls the loan-to-value rises; the margin-call price is today’s price times the opening LTV divided by the margin-call LTV, and the liquidation price is the same with the liquidation LTV. A loan opened at 50% LTV with an 85% liquidation line can absorb a 41% fall. The cards compute this from the live price and from each lender’s published lines, the same arithmetic as the loan-health calculator on Borrowing Against Your Stack."
+  - q: "Why does the page mark lenders as bitcoin only?"
+    a: "A lender that accepts only bitcoin has a simpler risk engine and no other asset sharing it; a platform that takes 48 collateral assets is managing something else, and the card says so. The mark is a description, not a verdict: several of the lenders that take other collateral publish clearer terms than some that don’t, and every lender on the page is described the same way."
+  - q: "Are these lenders available in my state?"
+    a: "Only where the lender publishes a list: Figure, SALT, Unchained, Arch, Milo, Coinbase and Kraken do; the state filter uses those lists and nothing else. Lenders that publish no list are left on the page with that said, because an inferred list would be a guess. Hodl Hodl Lend bars US persons outright, and Kraken Flexline is open in the US only to investors with more than $10 million."
+  - q: "Does Last Coin Standing earn anything from these lenders?"
+    a: "No. There are no affiliate or referral links on this page and no lender has paid for a card. Every figure is dated and sourced to the lender’s own pages; where a lender publishes no figure the card says ‘not published’ rather than estimating one. The cards describe; they don’t advise."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-lenders-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-lenders.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/bitcoin-lenders.js' %}"
+---
+{#
+  Borrowing against bitcoin: the lenders — one card per lender, the same
+  fields on every card, rendered from src/_data/lenders.json at build time.
+  The page script (bitcoin-lenders.js) only adds what needs a live price or a
+  reader's input: the trigger-price sentences, the filter chips, the state
+  filter and the reader's-own-LTV control. Without JS the cards still carry
+  every published figure and the price-free drawdown sentence.
+  Design brief: claude/LENDER_LANDSCAPE_DESIGN_2026-09-30 (project);
+  SITE_GUIDE "Borrowing against bitcoin: the lenders".
+#}
+{% include 'components/lenders-data.njk' %}
+
+{% macro ltvDisplay(v, key, ltv) -%}
+  {%- if ltv[key + 'Display'] -%}{{ ltv[key + 'Display'] }}
+  {%- elif v === null or v === undefined -%}not published
+  {%- else -%}{{ (v * 100) | round(1) }}%
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro drawdown(open, thr) -%}{{ (100 * (1 - open / thr)) | round }}{%- endmacro %}
+
+<section class="hero">
+    <h1>Borrowing against bitcoin: <em>the lenders</em></h1>
+    <div class="hero-subtitle">Every lender that takes bitcoin as collateral, one card each: the published rate, the loan-to-value lines, the price that triggers them today, who holds the coins, the terms, and the catch.</div>
+    <p class="subtitle">Nothing here is ranked or recommended. The figures are what each lender publishes, dated; where a lender publishes nothing the card says so. The argument for and against borrowing at all is on <a href="/borrowing-against-your-stack">Borrowing Against Your Stack</a>; this page is the map of who offers it.</p>
+</section>
+
+<main class="content-area">
+    {% include 'components/tool-framing.njk' %}
+
+    <div class="ln-live" id="lnLive" aria-live="polite">
+        <div class="ln-live-price">Bitcoin <strong id="lnPrice">&mdash;</strong> <span class="ln-live-src" id="lnPriceSrc"></span> &middot; terms as read on <strong>{{ lenders.asOfLabel }}</strong></div>
+        <div class="ln-live-ctl" role="group" aria-label="Which loan the trigger prices describe">
+            <span class="ln-live-ctl-label">Trigger prices for</span>
+            <label class="ln-radio"><input type="radio" name="lnMode" value="max" checked> the lender&rsquo;s maximum loan</label>
+            <label class="ln-radio"><input type="radio" name="lnMode" value="own"> my own loan-to-value</label>
+            <span class="ln-own" id="lnOwnWrap">
+                <input type="range" id="lnOwnLtv" min="10" max="80" step="1" value="35" aria-label="Your loan-to-value, percent">
+                <strong id="lnOwnLtvOut">35%</strong>
+            </span>
+        </div>
+    </div>
+
+    <div class="ln-filters" id="lnFilters" aria-label="Filters">
+        <button class="ln-chip on" type="button" data-filter="all">All</button>
+        <button class="ln-chip" type="button" data-filter="bitcoinOnly">Bitcoin only</button>
+        <button class="ln-chip" type="button" data-filter="noRehyp">States no rehypothecation</button>
+        <button class="ln-chip" type="button" data-filter="holdKey">You hold a key</button>
+        <button class="ln-chip" type="button" data-filter="noPriceLiq">No-price-liquidation option</button>
+        <button class="ln-chip" type="button" data-filter="under5k">Under $5,000</button>
+        <label class="ln-state"><span>Available in</span>
+            <select id="lnState" aria-label="US state">
+                <option value="">any state</option>
+                {% set states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'] %}
+                {% for s in states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+            </select>
+        </label>
+        <span class="ln-count" id="lnCount"></span>
+    </div>
+
+    {% for g in lenders.groups %}
+    <section class="ln-group" id="{{ g.id }}" data-group="{{ g.id }}">
+        <h2 class="ln-grp">{{ g.title }}</h2>
+        <p class="ln-grp-sub">{% if g.qualifier %}<span class="ln-tag qual">{{ g.qualifier }}</span> {% endif %}{{ g.sub | replace('Borrowing Against Your Stack → mortgages', '<a href="/bitcoin-backed-mortgages">Bitcoin-Backed Mortgages</a>') | safe }}</p>
+        <div class="ln-grid">
+        {% for l in lenders.lenders %}{% if l.group == g.id %}
+            {% set ltv = l.ltv %}
+            <article class="ln-card" id="lender-{{ l.id }}" data-id="{{ l.id }}"
+                     data-open="{{ ltv.open if ltv.open !== null and ltv.open !== undefined else '' }}"
+                     data-ref="{{ ltv.reference if ltv.reference else '' }}"
+                     data-call="{{ ltv.call if ltv.call !== null and ltv.call !== undefined else '' }}"
+                     data-liq="{{ ltv.liq if ltv.liq !== null and ltv.liq !== undefined else '' }}"
+                     data-bitcoin-only="{{ 'y' if l.filters.bitcoinOnly else 'n' }}"
+                     data-no-rehyp="{{ 'y' if l.filters.noRehyp else 'n' }}"
+                     data-hold-key="{{ 'y' if l.filters.holdKey else 'n' }}"
+                     data-no-price-liq="{{ 'y' if l.filters.noPriceLiq else 'n' }}"
+                     data-under5k="{{ 'y' if l.filters.under5k else 'n' }}"
+                     data-states-type="{{ l.states.type }}"
+                     data-states-list="{{ (l.states.list | join(',')) if l.states.list else '' }}"
+                     data-states-rest="{{ l.states.rest or '' }}">
+                <div class="ln-head">
+                    <div class="ln-head-text">
+                        <h3 class="ln-name">{{ l.name }}</h3>
+                        <div class="ln-model">{{ l.model }}</div>
+                    </div>
+                    <div class="ln-chips">
+                        {% if l.bitcoinOnly %}<span class="ln-tag yes">&#10003; Bitcoin only</span>{% else %}<span class="ln-tag no">Not bitcoin only &middot; {{ l.otherCollateral }}</span>{% endif %}
+                        {% if l.qualifier %}<span class="ln-tag qual">{{ l.qualifier }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="ln-rate"><b{% if l.rate.np %} class="np"{% endif %}>{{ l.rate.headline }}</b><span>{{ l.rate.note | safe }}</span></div>
+                <div class="ln-ltv">
+                    <div><div class="k">Opens at</div><div class="v">{{ ltvDisplay(ltv.open, 'open', ltv) }}</div><div class="p">{{ ltv.openNote | safe }}</div></div>
+                    <div class="call"><div class="k">{{ ltv.callLabel }}</div><div class="v">{{ ltvDisplay(ltv.call, 'call', ltv) }}</div><div class="p">{{ ltv.callNote | safe }}</div></div>
+                    <div class="liq"><div class="k">Liquidates</div><div class="v">{{ ltvDisplay(ltv.liq, 'liq', ltv) }}</div><div class="p">{{ ltv.liqNote | safe }}</div></div>
+                </div>
+                <p class="ln-trig" id="trig-{{ l.id }}">
+                    {%- if l.trig.mode == 'auto' -%}
+                        {%- set base = ltv.open if ltv.open else ltv.reference -%}
+                        {%- if base and (ltv.call or ltv.liq) -%}
+                            {%- if ltv.open %}A maximum loan ({{ (ltv.open * 100) | round }}% LTV){% else %}A 50% loan ({{ l.name }} doesn&rsquo;t publish a maximum){% endif %}
+                            {%- if ltv.call %} {{ ltv.callVerb }} after a <strong>{{ drawdown(base, ltv.call) }}% fall</strong>{% endif %}
+                            {%- if ltv.call and ltv.liq %} and{% endif %}
+                            {%- if ltv.liq %} {{ ltv.liqVerb }} after a <strong>{{ drawdown(base, ltv.liq) }}% fall</strong>{% endif %}.
+                        {%- endif %}
+                        {%- if l.trig.extra %} {{ l.trig.extra | safe }}{% endif -%}
+                    {%- else -%}
+                        {{ l.trig.static | safe }}
+                    {%- endif -%}
+                </p>
+                <dl class="ln-dl">
+                    <dt>Your coins</dt><dd>{{ l.coins | safe }}</dd>
+                    <dt>Terms</dt><dd>{{ l.terms | safe }}</dd>
+                    <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
+                    <dt>Where</dt><dd>{{ l.where | safe }}<span class="ln-state-note" id="state-{{ l.id }}"></span></dd>
+                </dl>
+                <div class="ln-pair">
+                    <div class="plus"><span class="l">Distinguishing</span>{{ l.distinguishing | safe }}</div>
+                    <div class="catch"><span class="l">The catch</span>{{ l.catch | safe }}</div>
+                </div>
+                <div class="ln-foot">Track record: {{ l.track | safe }}. Sources: {% for s in l.sources %}<a href="{{ s }}" rel="nofollow noopener" target="_blank">{{ s | replace('https://', '') | replace('http://', '') | truncate(28, true, '…') }}</a>{% if not loop.last %}, {% endif %}{% endfor %} (read {{ l.asOf }}). <a class="ln-depth" href="{{ l.depth.href }}">Depth: {{ l.depth.label }} &rarr;</a></div>
+            </article>
+        {% endif %}{% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+
+    <p class="ln-empty" id="lnEmpty" hidden>No lender matches every filter. Each chip narrows the list; clear one.</p>
+
+    <section class="ln-prose" id="how-to-read">
+        <h2>How to read a card</h2>
+        <p><strong>The three loan-to-value lines</strong> are the whole mechanism. A loan opens at some fraction of the collateral&rsquo;s value; as bitcoin falls the fraction rises; at the margin-call line the lender asks for more collateral or a repayment, and at the liquidation line it sells. What differs between lenders is the distance between those lines, how long you get to act, and whether the sale is partial (enough to restore the opening ratio) or total. The cards print all three, in the lender&rsquo;s own words where a number would mislead.</p>
+        <p><strong>The trigger prices</strong> turn those lines into a bitcoin price. The loan is fixed in dollars, so a loan opened at 50% LTV with an 85% liquidation line is sold after a 41% fall, at whatever price that is today. The arithmetic is the same as the loan-health calculator on <a href="/borrowing-against-your-stack#loan-health">Borrowing Against Your Stack</a>: trigger price = today&rsquo;s price &times; opening LTV &divide; threshold LTV. Interest that accrues into the loan moves the real trigger slightly higher than the card shows; a lender that quotes its lines on <em>loan plus interest</em> (Firefish) has already done that. The control at the top switches every card from the lender&rsquo;s maximum loan to a loan-to-value of your own.</p>
+        <p><strong>&ldquo;Not published&rdquo;</strong> is a value, not a gap in our reading. Figure doesn&rsquo;t publish its liquidation line; Kraken doesn&rsquo;t publish a rate for Borrow US; Lava shows its liquidation price only inside the app. A card never estimates what the lender withholds, and what a lender withholds is itself something to know about it.</p>
+        <p><strong>The marks.</strong> <span class="ln-tag yes">&#10003; Bitcoin only</span> means the lender takes no other collateral; <span class="ln-tag no">Not bitcoin only</span> names what else shares its risk engine. The dashed <span class="ln-tag qual">qualifier</span> flags a product that isn&rsquo;t an open-use loan against your stack: buying power that can&rsquo;t leave an exchange, a wrapper rather than bitcoin, a mortgage that buys a house. <em>Your coins</em> is the rehypothecation question in one line: who holds them, whether they can be lent on, and whether you can watch the address.</p>
+        <p><strong>Groups, not ranks.</strong> Cards sit with others of the same model and alphabetically within it. There is no sort by rate and no best badge, because an order reads as a recommendation. The lowest rate on the page today belongs to a protocol with no one to call; one of the highest to the lender that has never lost a coin in nine years. Both facts are on their cards.</p>
+    </section>
+
+    <section class="ln-prose" id="what-this-is-not">
+        <h2>What this page is, and isn&rsquo;t</h2>
+        <p>It is a description of a market as the lenders themselves describe it, read on the date each card carries and re-read monthly (rates move most; Ledn&rsquo;s standard rate rose from 10.99% to 11.49% between March and September 2026, and Strike&rsquo;s 7.75% floor left its calculator). It carries no affiliate or referral links and no lender has paid for a card. It is not a recommendation to borrow, or to borrow from anyone: the case for and against is on <a href="/borrowing-against-your-stack">Borrowing Against Your Stack</a>, whose own answer, for most readers most of the time, is probably not.</p>
+        <p>Three lenders&rsquo; own pages disagree with themselves (Arch on states and rates, Debifi on the liquidation fee, Milo on its margin-call trigger). The cards say so rather than picking a side; the lender&rsquo;s app quote is the only figure that binds. If a card is wrong or a term has moved, the <a href="#pfWrap">feedback form</a> below reaches the person who maintains it.</p>
+    </section>
+</main>
