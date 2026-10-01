@@ -31,7 +31,7 @@ TEMPLATE = "og-synthesis.jpg"
 TITLE_REST_LINES = ["Borrowing against", "bitcoin:"]
 TITLE_ACCENT = "the lenders"
 SUBTITLE_LINES = [
-    "Nineteen lenders, one card each: rate, LTV lines,",
+    "Twenty lenders, one card each: rate, LTV lines,",
     "trigger prices today, custody, and the catch.",
 ]
 URL_FOOTER = "LASTCOINSTANDING.COM/BITCOIN-LENDERS"

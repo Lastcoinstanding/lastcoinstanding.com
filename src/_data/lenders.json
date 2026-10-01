@@ -15,8 +15,8 @@
     },
     {
       "id": "multisig",
-      "title": "Multisig: you hold a key",
-      "sub": "The collateral sits in a multisig address you can watch on-chain, and the lender can't move it alone. The price of that is a different liquidation: the coins go to the lender, often all of them, rather than being partly sold."
+      "title": "Multisig and DLC: you hold a key",
+      "sub": "The collateral sits in an on-chain contract you can watch, a multisig or a Discreet Log Contract, and the lender can’t move it alone. The price of that is a different liquidation: the coins go to the lender, often all of them, rather than being partly sold; in a DLC nothing moves until maturity at all."
     },
     {
       "id": "defi",
@@ -698,6 +698,244 @@
       "asOf": "2026-09-30"
     },
     {
+      "id": "cadena",
+      "group": "multisig",
+      "name": "Cadena Bitcoin",
+      "model": "DLC, non-custodial · Cadena Bitcoin S.A. de C.V., El Salvador BSP · lenders are other users",
+      "bitcoinOnly": true,
+      "otherCollateral": "",
+      "qualifier": "Synthetic · you sell your own bitcoin",
+      "rate": {
+        "headline": "13%",
+        "note": "APR all-in: 12% to the lender plus a 1% Cadena fee, paid in bitcoin at maturity (the lender’s dollar target converted at that day’s price)"
+      },
+      "ltv": {
+        "open": 0.5,
+        "call": null,
+        "liq": null,
+        "callLabel": "Margin call",
+        "openNote": "LTV (an 80% option is listed)",
+        "callDisplay": "none",
+        "callNote": "no in-term trigger of any kind",
+        "liqDisplay": "at maturity",
+        "liqNote": "a 50% fall leaves the borrower nothing; the lender absorbs beyond"
+      },
+      "trig": {
+        "mode": "text",
+        "static": "No trigger during the term: the contract settles once, at maturity, when the lender’s dollar target is paid in bitcoin at that day’s price and you receive the residual. At a 50% fall the residual is zero, with no top-up offered on the way down.",
+        "live": "No trigger during the term: the contract settles once, at maturity, when the lender’s dollar target is paid in bitcoin at that day’s price and you receive the residual. At {price} today, a 50% fall to <strong>{px0.5}</strong> leaves a residual of zero, with no top-up offered on the way down."
+      },
+      "coins": "Locked in a Discreet Log Contract together with the lender’s bitcoin; every outcome pre-signed before funding; an independent oracle (DLCP) picks which pre-signed transaction broadcasts; “Cadena holds no key”; the Signer App is open-source; the contract is a mainnet transaction you can watch",
+      "terms": "1 year standard (90 days by lender match; 30 and 180 listed); one settlement at maturity; no monthly payments and no early repayment, “locked for the full term”; 1% fee in bitcoin",
+      "minimum": "$1,000; $1M per contract, syndicated above",
+      "where": "“All 50 US states”, “open globally with the exception of China” (its compare page); KYC through Sumsub; terms under Salvadoran law",
+      "distinguishing": "No custodian and no margin call: both sides’ bitcoin sit in one on-chain contract that neither party nor Cadena can move; the only DLC lender on this page",
+      "catch": "It isn’t a cash loan: you sell your own bitcoin for the money and the contract restores the exposure synthetically, which its own table nonetheless calls “no taxable event”. One settled contract is shown; a one-year lock with no exit; a 50% fall at maturity takes everything",
+      "track": "Founded 2023; one mainnet contract shown (funded Nov 2025, settled May 2026); “servers are currently down” banner on its site when read; no incidents or actions published",
+      "filters": {
+        "bitcoinOnly": true,
+        "noRehyp": true,
+        "holdKey": true,
+        "noPriceLiq": false,
+        "under5k": true
+      },
+      "states": {
+        "type": "all",
+        "note": "“all 50 US states” per Cadena’s compare page"
+      },
+      "depth": {
+        "label": "Collaborative-custody multisig",
+        "href": "/borrowing-against-your-stack#lender-categories"
+      },
+      "sourcesLabel": "cadenabitcoin.com home, compare, security, terms, llms.txt",
+      "sources": [
+        "https://cadenabitcoin.com/",
+        "https://cadenabitcoin.com/compare",
+        "https://cadenabitcoin.com/security",
+        "https://cadenabitcoin.com/terms",
+        "https://cadenabitcoin.com/llms.txt"
+      ],
+      "asOf": "2026-09-30"
+    },
+    {
+      "id": "debifi",
+      "group": "multisig",
+      "name": "Debifi",
+      "model": "3-of-4 multisig · Debifi Development Ltd, Cyprus · lenders are named institutions",
+      "bitcoinOnly": true,
+      "otherCollateral": "",
+      "qualifier": null,
+      "rate": {
+        "headline": "8.5–11%",
+        "note": "APR, fixed per offer; the offer book today: 8.5–10.25% at 50% LTV for $100K+ (Goldstream), 9.5–10% at 60–70% for $20K–$100K; plus 1.0–1.5% origination in BTC"
+      },
+      "ltv": {
+        "open": 0.7,
+        "call": 0.75,
+        "liq": 0.9,
+        "callLabel": "Margin calls",
+        "openDisplay": "30–70%",
+        "openNote": "set by the lender",
+        "callDisplay": "75 / 80 / 85%",
+        "callNote": "add bitcoin or repay",
+        "liqNote": "or stricter per lender; coins go to the lender; 5% fee",
+        "callVerb": "gets its first margin call",
+        "liqVerb": "is liquidated"
+      },
+      "trig": {
+        "mode": "auto",
+        "extra": "At 50% LTV the 90% line is a 44% fall away. An optional 12–48 h “delayed liquidation” cancels if the initial LTV is restored."
+      },
+      "coins": "3-of-4: you, the lender, Debifi, and an independent key holder (AnchorWatch) who signs only if a party won’t; one address per loan to watch; “never re-lent, staked, or traded”",
+      "terms": "1–24 mo; interest monthly to annually per offer, principal at maturity; extension 0.6–1.5%; no early-repayment fee",
+      "minimum": "$20,000; “no limits” above",
+      "where": "“Available globally”; the terms exclude sanctioned countries and Puerto Rico; each lender applies its own KYC",
+      "distinguishing": "A fourth, independent key and a public offer book of named institutional lenders",
+      "catch": "Your lender is whichever fund took the offer, with its own KYC and liquidation line; the FAQ and the terms disagree on the 5% fee base and on manual vs automatic liquidation; your key lives in the Debifi app",
+      "track": "Launched 2022 (press); monthly stats published; no incidents published",
+      "filters": {
+        "bitcoinOnly": true,
+        "noRehyp": true,
+        "holdKey": true,
+        "noPriceLiq": false,
+        "under5k": false
+      },
+      "states": {
+        "type": "unknown",
+        "note": "“available globally”; excludes PR"
+      },
+      "depth": {
+        "label": "Collaborative-custody multisig",
+        "href": "/borrowing-against-your-stack#lender-categories"
+      },
+      "sourcesLabel": "debifi.com FAQ (15 Sep 2026), offers, terms",
+      "sources": [
+        "https://debifi.com/faq",
+        "https://debifi.com/offers",
+        "https://debifi.com/terms-of-service",
+        "https://debifi.com/risks-transparency"
+      ],
+      "asOf": "2026-09-30"
+    },
+    {
+      "id": "firefish",
+      "group": "multisig",
+      "name": "Firefish",
+      "model": "P2P escrow · Firefish Europe s.r.o. · MiCA CASP · investors fund the loans",
+      "bitcoinOnly": true,
+      "otherCollateral": "",
+      "qualifier": null,
+      "rate": {
+        "headline": "from 5%",
+        "note": "set by the investor who takes your offer; 12-month EUR loans “below 9.5% APR” (Q1 2026); full-term interest owed even if repaid early; plus 1.5% p.a. origination in BTC"
+      },
+      "ltv": {
+        "open": 0.5,
+        "call": 0.73,
+        "liq": 0.95,
+        "callLabel": "Margin calls",
+        "openNote": "of loan + full-term interest",
+        "callDisplay": "73 / 79 / 86%",
+        "callNote": "cured only by adding bitcoin",
+        "liqNote": "the <em>entire</em> collateral goes to the liquidator",
+        "callVerb": "gets its first margin call",
+        "liqVerb": "is liquidated"
+      },
+      "trig": {
+        "mode": "auto",
+        "extra": "A touch of 95% “even for only a couple of seconds” counts, and partial repayment doesn’t lower the LTV."
+      },
+      "coins": "3-of-3 escrow: two Firefish oracle keys and your own ephemeral key, which pre-signs the closing transactions and is then discarded; one address per loan to watch; a recovery transaction returns the coins a month after maturity if Firefish disappears",
+      "terms": "3–24 mo; one bullet repayment at maturity; 1.5% p.a. origination; 5% fee on default; EUR, CHF, CZK, PLN, USDC, USDT",
+      "minimum": "€800; tiers to €150K, Pro by arrangement",
+      "where": "Fiat loans in 34 European countries; elsewhere USDC/USDT only. The ineligible list doesn’t name the United States, but the terms make you warrant you’re somewhere Firefish needs no licence: no explicit US statement",
+      "distinguishing": "No party, Firefish included, can redirect the coins once escrowed; investors need no bitcoin knowledge",
+      "catch": "At 95% the whole stack goes, no partial sale; both oracle keys are Firefish’s; full-term interest regardless; Czech law",
+      "track": "Since May 2022; $533M+ processed; zero liquidations through 2025, then ~$2.5M liquidated on 6 Feb 2026 at the disclosed 95%",
+      "filters": {
+        "bitcoinOnly": true,
+        "noRehyp": true,
+        "holdKey": true,
+        "noPriceLiq": false,
+        "under5k": true
+      },
+      "states": {
+        "type": "unknown",
+        "note": "no explicit US statement"
+      },
+      "depth": {
+        "label": "Collaborative-custody multisig",
+        "href": "/borrowing-against-your-stack#lender-categories"
+      },
+      "sourcesLabel": "firefish.io, docs.firefish.io FAQ and legal, fee schedule PDF",
+      "sources": [
+        "https://firefish.io/borrow",
+        "https://docs.firefish.io/faq/borrowing/collateral",
+        "https://docs.firefish.io/firefish-protocol",
+        "https://app.firefish.io/pdf/2026-01-02/fee-schedule.pdf",
+        "https://firefish.io/blog/q1-2026-a-quarter-that-moved"
+      ],
+      "asOf": "2026-09-30"
+    },
+    {
+      "id": "hodlhodl",
+      "group": "multisig",
+      "name": "Hodl Hodl Lend",
+      "model": "P2P 2-of-3 · Hodlex Ltd, Marshall Islands · no KYC",
+      "bitcoinOnly": true,
+      "otherCollateral": "",
+      "qualifier": "US persons barred",
+      "rate": {
+        "headline": "9.9–10.25%",
+        "note": "APR on today’s borrow offers; set by the lender, a fixed sum for the term; plus 1.5% origination in BTC"
+      },
+      "ltv": {
+        "open": 0.7,
+        "call": 0.75,
+        "liq": 0.9,
+        "callLabel": "Margin calls",
+        "openDisplay": "30–70%",
+        "openNote": "80% for L-BTC/WBTC",
+        "callDisplay": "75 / 80 / 85%",
+        "callNote": "add bitcoin or repay",
+        "liqNote": "coins transferred to the lender, surplus returned; 5% fee",
+        "callVerb": "gets its first margin call",
+        "liqVerb": "is liquidated"
+      },
+      "trig": {
+        "mode": "auto"
+      },
+      "coins": "2-of-3: you, the lender, the platform; keys locked by a per-contract payment password that “cannot be restored”; address watchable on-chain",
+      "terms": "1–12 mo; repayment at maturity, partials any time; crypto-to-crypto only (USDT, USDC, L-BTC, WBTC, XAUT)",
+      "minimum": "$50; maximum $25,000 per loan",
+      "where": "Terms effective 4 Jun 2026 bar US citizens, residents and persons located in the US, all states and territories; also Russia, Belarus and sanctioned countries",
+      "distinguishing": "No identity check at all, a $50 minimum, borrower-written terms",
+      "catch": "US persons are excluded (its 2020 post had opened to them); $25K cap; the lender is an anonymous user; a lost payment password loses the collateral",
+      "track": "Hodlex since 2016; Lend since Oct 2020; publishes nothing about 2022; no incidents published",
+      "filters": {
+        "bitcoinOnly": true,
+        "noRehyp": true,
+        "holdKey": true,
+        "noPriceLiq": false,
+        "under5k": true
+      },
+      "states": {
+        "type": "none",
+        "note": "US persons barred"
+      },
+      "depth": {
+        "label": "Collaborative-custody multisig",
+        "href": "/borrowing-against-your-stack#lender-categories"
+      },
+      "sourcesLabel": "lend.hodlhodl.com FAQ, offers, terms of service",
+      "sources": [
+        "https://lend.hodlhodl.com/faq/basics",
+        "https://lend.hodlhodl.com/offers/borrow",
+        "https://lend.hodlhodl.com/terms_of_service"
+      ],
+      "asOf": "2026-09-30"
+    },
+    {
       "id": "unchained",
       "group": "multisig",
       "name": "Unchained",
@@ -765,184 +1003,6 @@
         "https://help.unchained.com/is-my-state-eligible-for-a-loan",
         "https://help.unchained.com/how-is-my-collateral-liquidated",
         "https://www.unchained.com/blog/update-from-our-ceo"
-      ],
-      "asOf": "2026-09-30"
-    },
-    {
-      "id": "firefish",
-      "group": "multisig",
-      "name": "Firefish",
-      "model": "P2P escrow · Firefish Europe s.r.o. · MiCA CASP · investors fund the loans",
-      "bitcoinOnly": true,
-      "otherCollateral": "",
-      "qualifier": null,
-      "rate": {
-        "headline": "from 5%",
-        "note": "set by the investor who takes your offer; 12-month EUR loans “below 9.5% APR” (Q1 2026); full-term interest owed even if repaid early; plus 1.5% p.a. origination in BTC"
-      },
-      "ltv": {
-        "open": 0.5,
-        "call": 0.73,
-        "liq": 0.95,
-        "callLabel": "Margin calls",
-        "openNote": "of loan + full-term interest",
-        "callDisplay": "73 / 79 / 86%",
-        "callNote": "cured only by adding bitcoin",
-        "liqNote": "the <em>entire</em> collateral goes to the liquidator",
-        "callVerb": "gets its first margin call",
-        "liqVerb": "is liquidated"
-      },
-      "trig": {
-        "mode": "auto",
-        "extra": "A touch of 95% “even for only a couple of seconds” counts, and partial repayment doesn’t lower the LTV."
-      },
-      "coins": "3-of-3 escrow: two Firefish oracle keys and your own ephemeral key, which pre-signs the closing transactions and is then discarded; one address per loan to watch; a recovery transaction returns the coins a month after maturity if Firefish disappears",
-      "terms": "3–24 mo; one bullet repayment at maturity; 1.5% p.a. origination; 5% fee on default; EUR, CHF, CZK, PLN, USDC, USDT",
-      "minimum": "€800; tiers to €150K, Pro by arrangement",
-      "where": "Fiat loans in 34 European countries; elsewhere USDC/USDT only. The ineligible list doesn’t name the United States, but the terms make you warrant you’re somewhere Firefish needs no licence: no explicit US statement",
-      "distinguishing": "No party, Firefish included, can redirect the coins once escrowed; investors need no bitcoin knowledge",
-      "catch": "At 95% the whole stack goes, no partial sale; both oracle keys are Firefish’s; full-term interest regardless; Czech law",
-      "track": "Since May 2022; $533M+ processed; zero liquidations through 2025, then ~$2.5M liquidated on 6 Feb 2026 at the disclosed 95%",
-      "filters": {
-        "bitcoinOnly": true,
-        "noRehyp": true,
-        "holdKey": true,
-        "noPriceLiq": false,
-        "under5k": true
-      },
-      "states": {
-        "type": "unknown",
-        "note": "no explicit US statement"
-      },
-      "depth": {
-        "label": "Collaborative-custody multisig",
-        "href": "/borrowing-against-your-stack#lender-categories"
-      },
-      "sourcesLabel": "firefish.io, docs.firefish.io FAQ and legal, fee schedule PDF",
-      "sources": [
-        "https://firefish.io/borrow",
-        "https://docs.firefish.io/faq/borrowing/collateral",
-        "https://docs.firefish.io/firefish-protocol",
-        "https://app.firefish.io/pdf/2026-01-02/fee-schedule.pdf",
-        "https://firefish.io/blog/q1-2026-a-quarter-that-moved"
-      ],
-      "asOf": "2026-09-30"
-    },
-    {
-      "id": "debifi",
-      "group": "multisig",
-      "name": "Debifi",
-      "model": "3-of-4 multisig · Debifi Development Ltd, Cyprus · lenders are named institutions",
-      "bitcoinOnly": true,
-      "otherCollateral": "",
-      "qualifier": null,
-      "rate": {
-        "headline": "8.5–11%",
-        "note": "APR, fixed per offer; the offer book today: 8.5–10.25% at 50% LTV for $100K+ (Goldstream), 9.5–10% at 60–70% for $20K–$100K; plus 1.0–1.5% origination in BTC"
-      },
-      "ltv": {
-        "open": 0.7,
-        "call": 0.75,
-        "liq": 0.9,
-        "callLabel": "Margin calls",
-        "openDisplay": "30–70%",
-        "openNote": "set by the lender",
-        "callDisplay": "75 / 80 / 85%",
-        "callNote": "add bitcoin or repay",
-        "liqNote": "or stricter per lender; coins go to the lender; 5% fee",
-        "callVerb": "gets its first margin call",
-        "liqVerb": "is liquidated"
-      },
-      "trig": {
-        "mode": "auto",
-        "extra": "At 50% LTV the 90% line is a 44% fall away. An optional 12–48 h “delayed liquidation” cancels if the initial LTV is restored."
-      },
-      "coins": "3-of-4: you, the lender, Debifi, and an independent key holder (AnchorWatch) who signs only if a party won’t; one address per loan to watch; “never re-lent, staked, or traded”",
-      "terms": "1–24 mo; interest monthly to annually per offer, principal at maturity; extension 0.6–1.5%; no early-repayment fee",
-      "minimum": "$20,000; “no limits” above",
-      "where": "“Available globally”; the terms exclude sanctioned countries and Puerto Rico; each lender applies its own KYC",
-      "distinguishing": "A fourth, independent key and a public offer book of named institutional lenders",
-      "catch": "Your lender is whichever fund took the offer, with its own KYC and liquidation line; the FAQ and the terms disagree on the 5% fee base and on manual vs automatic liquidation; your key lives in the Debifi app",
-      "track": "Launched 2022 (press); monthly stats published; no incidents published",
-      "filters": {
-        "bitcoinOnly": true,
-        "noRehyp": true,
-        "holdKey": true,
-        "noPriceLiq": false,
-        "under5k": false
-      },
-      "states": {
-        "type": "unknown",
-        "note": "“available globally”; excludes PR"
-      },
-      "depth": {
-        "label": "Collaborative-custody multisig",
-        "href": "/borrowing-against-your-stack#lender-categories"
-      },
-      "sourcesLabel": "debifi.com FAQ (15 Sep 2026), offers, terms",
-      "sources": [
-        "https://debifi.com/faq",
-        "https://debifi.com/offers",
-        "https://debifi.com/terms-of-service",
-        "https://debifi.com/risks-transparency"
-      ],
-      "asOf": "2026-09-30"
-    },
-    {
-      "id": "hodlhodl",
-      "group": "multisig",
-      "name": "Hodl Hodl Lend",
-      "model": "P2P 2-of-3 · Hodlex Ltd, Marshall Islands · no KYC",
-      "bitcoinOnly": true,
-      "otherCollateral": "",
-      "qualifier": "US persons barred",
-      "rate": {
-        "headline": "9.9–10.25%",
-        "note": "APR on today’s borrow offers; set by the lender, a fixed sum for the term; plus 1.5% origination in BTC"
-      },
-      "ltv": {
-        "open": 0.7,
-        "call": 0.75,
-        "liq": 0.9,
-        "callLabel": "Margin calls",
-        "openDisplay": "30–70%",
-        "openNote": "80% for L-BTC/WBTC",
-        "callDisplay": "75 / 80 / 85%",
-        "callNote": "add bitcoin or repay",
-        "liqNote": "coins transferred to the lender, surplus returned; 5% fee",
-        "callVerb": "gets its first margin call",
-        "liqVerb": "is liquidated"
-      },
-      "trig": {
-        "mode": "auto"
-      },
-      "coins": "2-of-3: you, the lender, the platform; keys locked by a per-contract payment password that “cannot be restored”; address watchable on-chain",
-      "terms": "1–12 mo; repayment at maturity, partials any time; crypto-to-crypto only (USDT, USDC, L-BTC, WBTC, XAUT)",
-      "minimum": "$50; maximum $25,000 per loan",
-      "where": "Terms effective 4 Jun 2026 bar US citizens, residents and persons located in the US, all states and territories; also Russia, Belarus and sanctioned countries",
-      "distinguishing": "No identity check at all, a $50 minimum, borrower-written terms",
-      "catch": "US persons are excluded (its 2020 post had opened to them); $25K cap; the lender is an anonymous user; a lost payment password loses the collateral",
-      "track": "Hodlex since 2016; Lend since Oct 2020; publishes nothing about 2022; no incidents published",
-      "filters": {
-        "bitcoinOnly": true,
-        "noRehyp": true,
-        "holdKey": true,
-        "noPriceLiq": false,
-        "under5k": true
-      },
-      "states": {
-        "type": "none",
-        "note": "US persons barred"
-      },
-      "depth": {
-        "label": "Collaborative-custody multisig",
-        "href": "/borrowing-against-your-stack#lender-categories"
-      },
-      "sourcesLabel": "lend.hodlhodl.com FAQ, offers, terms of service",
-      "sources": [
-        "https://lend.hodlhodl.com/faq/basics",
-        "https://lend.hodlhodl.com/offers/borrow",
-        "https://lend.hodlhodl.com/terms_of_service"
       ],
       "asOf": "2026-09-30"
     },
