@@ -219,6 +219,36 @@ eleventyComputed:
     </div>
 
 
+    <!-- ROLLING OUT-OF-SAMPLE RECORD (#116, JM's rulings 2026-10-01) -->
+    <div class="section" id="when-reliable">
+      <h2>When Did the Power Law Become Reliable?</h2>
+      <p class="prose">The chart above lets you test one cutoff at a time. This one runs every cutoff: a fit at the end of each quarter since 2012, each using only the prices that existed then, exactly as the chart above fits them. For each fit it asks two questions. Where does that fit put the trend today, measured against the reference line this site draws? And over the four years after the fit was made, how much of the time did price stay inside the channel that fit would have drawn (0.42&times; to 3&times; its own trend)?</p>
+      <p class="prose">The answer has two halves, and the first matters as much as the second. <strong>Before 2016 the fit was not reliable.</strong> A line fitted in 2014, after the 2013 run, puts today's trend at several times the reference line, and price spent most of the following four years outside the channel it implied. Anyone who trusted it then would have been badly wrong. <strong>From 2016 on, every fit tells nearly the same story</strong>: <span id="roosStableSummary">&mdash;</span></p>
+      <div class="chart-container">
+        <div class="chart-title">Every Cutoff, Tested on What Came After</div>
+        <div class="chart-subtitle">One fit per quarter-end, each using only the data available at the time</div>
+        <div class="chart-wrapper" style="height:260px" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="Where each fit puts today's trend"><canvas id="roosTodayChart" aria-label="Trend today implied by each quarterly fit, as a multiple of the reference line"></canvas></div>
+        <div class="roos-panel-label">Where each fit puts today&rsquo;s trend, as a multiple of the reference line (log scale). Shaded: the 0.68&times;&ndash;1.24&times; range every fit since 2016 has stayed inside.</div>
+        <div class="chart-wrapper" style="height:200px"><canvas id="roosInChart" aria-label="Share of the next four years inside each fit's channel"></canvas></div>
+        <div class="roos-panel-label">Share of the next four years that price spent inside that fit&rsquo;s own channel. Dashed: 80%. Fits made after <span id="roosLastIn4y">&mdash;</span> do not have four years of hindsight yet.</div>
+        <div class="chart-source">Grey: fits made before 2016. Amber: fits made from 2016 on. Every fit is the same log-log least-squares regression as the chart above, recomputed in your browser from the site&rsquo;s price series (<code>PL_DATA</code>). Cutoffs before 2012 rest on too little data to plot: the fit at the end of 2011 puts today&rsquo;s trend at hundreds of times the reference line.</div>
+        <details class="roos-table-wrap">
+          <summary>Show the numbers (one fit per year-end)</summary>
+          <table class="roos-table" id="roosTable"><thead><tr><th>Fit made at</th><th>Exponent <em>b</em></th><th>Trend today, &times; reference</th><th>Next 4 years inside its channel</th></tr></thead><tbody></tbody></table>
+        </details>
+      </div>
+      <p class="prose">The obvious objection is that a curve fitted to the price series is being used to judge the price series. It is, and that is why the second panel matters more than the first. &ldquo;&times; reference&rdquo; compares each fit with a line drawn in hindsight; the share of later prices that landed inside a past fit&rsquo;s channel does not depend on hindsight at all. A second objection is that with hundreds of data points, a new quarter can barely move the fit, so the late stability could be inertia. It isn&rsquo;t only that: two more years of prices sitting at the floor would pull the full-record exponent from about 5.63 to about 5.47 and the trend two years out down by nearly a fifth. The fit can still move. The prices since 2016 simply haven&rsquo;t pushed it.</p>
+      <p class="prose"><strong>What this does not show.</strong> &ldquo;Since 2016&rdquo; covers about two and a half halving cycles. The quarterly fits overlap, so they are many views of the same few cycles, not dozens of independent tests. And a model that has held for a decade can still stop holding. So the page states in advance what would count as it breaking, and checks every month:</p>
+      <div class="roos-tests" id="roosTests">
+        <div class="roos-test" data-test="floor"><div class="roos-test-status">&mdash;</div><div class="roos-test-body"><div class="roos-test-name">1 &middot; A sustained break of the floor</div><div class="roos-test-rule">Price below 0.42&times; the reference trend for more than six months in a row. Not seen since 2016.</div><div class="roos-test-now"></div></div></div>
+        <div class="roos-test" data-test="refit"><div class="roos-test-status">&mdash;</div><div class="roos-test-body"><div class="roos-test-name">2 &middot; A refit that leaves the stable range</div><div class="roos-test-rule">A fit over the whole record putting today&rsquo;s trend outside 0.68&times;&ndash;1.24&times; the reference line, the range every fit since 2016 has stayed inside.</div><div class="roos-test-now"></div></div></div>
+        <div class="roos-test" data-test="channel"><div class="roos-test-status">&mdash;</div><div class="roos-test-body"><div class="roos-test-name">3 &middot; A fit that fails its own channel</div><div class="roos-test-rule">Any fit made since 2016 with less than 80% of its next four years inside its own channel.</div><div class="roos-test-now"></div></div></div>
+      </div>
+      <p class="roos-tests-note">Thresholds fixed on 2026-09-23 and computed live from the same price series as the charts. Ruled in advance so they cannot be moved after the fact.</p>
+      <p class="prose" id="roosRicher"><strong>One more thing a careful reader should know.</strong> The reference line this site draws (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) is the Porkopolis fit, published from the price history its authors had. Fitting the same method to every price through <span class="roos-r-date">&mdash;</span> gives a slightly shallower line (b&nbsp;=&nbsp;<span class="roos-r-b">&mdash;</span>) that puts today&rsquo;s trend about <span class="roos-r-pct">&mdash;</span> lower. Against that line, today&rsquo;s price sits at <span class="roos-r-refit">&mdash;</span> trend rather than <span class="roos-r-canon">&mdash;</span>. So wherever this site says bitcoin is below trend, a fresh fit says it is somewhat less far below.</p>
+    </div>
+
+
     <!-- TIME ABOVE vs BELOW TREND (item d) -->
     <div class="section">
       <h2>Below Trend Is the Normal Condition</h2>
