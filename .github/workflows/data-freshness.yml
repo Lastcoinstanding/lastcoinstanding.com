@@ -1,0 +1,77 @@
+name: Data freshness report
+
+# ────────────────────────────────────────────────────────────────────────────
+# Runs scripts/data-freshness.py (MONTHLY_REFRESH_CHECKLIST §0) on a schedule,
+# so the refresh no longer depends on someone remembering to run it locally.
+# Read-only on the repo: it commits nothing. The full report goes to the job
+# summary; when anything is DUE or OVERDUE it keeps ONE open issue labelled
+# `data-freshness` up to date (created once, then edited in place, so a weekly
+# run does not pile up issues), and closes that issue when nothing is due.
+# Added 2026-10-01 (handoff 2026-10-01 §5 item 8).
+# ────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # Mondays 15:17 UTC (8:17 PT in summer). Off the hour on purpose.
+    - cron: '17 15 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: data-freshness
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run the freshness report
+        id: run
+        run: |
+          python3 scripts/data-freshness.py > report.txt
+          {
+            echo '## Data freshness report'
+            echo
+            echo '```'
+            cat report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          due=$(grep -cE '^(DUE|OVERDUE) ' report.txt || true)
+          echo "due=$due" >> "$GITHUB_OUTPUT"
+          echo "summary=$(tail -n 1 report.txt | cut -d. -f1)" >> "$GITHUB_OUTPUT"
+      - name: Keep one issue in step with the report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DUE: ${{ steps.run.outputs.due }}
+          SUMMARY: ${{ steps.run.outputs.summary }}
+        run: |
+          gh label create data-freshness --color FBCA04 \
+            --description "Opened by the data freshness report" 2>/dev/null || true
+          num=$(gh issue list --label data-freshness --state open --json number --jq '.[0].number // empty')
+          if [ "$DUE" -gt 0 ]; then
+            {
+              echo "The weekly run of \`scripts/data-freshness.py\` found items due."
+              echo "Method for each: MONTHLY_REFRESH_CHECKLIST.md, the section named on its row."
+              echo
+              echo '```'
+              grep -E '^(OVERDUE|DUE|SOON) ' report.txt
+              echo '```'
+              echo
+              echo "$SUMMARY. Full report: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            } > body.md
+            title="Data freshness: $DUE item(s) due"
+            if [ -n "$num" ]; then
+              gh issue edit "$num" --title "$title" --body-file body.md
+            else
+              gh issue create --title "$title" --label data-freshness --body-file body.md
+            fi
+          elif [ -n "$num" ]; then
+            gh issue close "$num" --comment "Nothing due as of this run ($SUMMARY)."
+          fi

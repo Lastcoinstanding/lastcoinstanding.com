@@ -32,6 +32,8 @@ _Added 2026-09-29 after a full-site audit (58 pages; the record is TECH_DEBT "Re
 python3 scripts/data-freshness.py            # or: ... 2026-10-15 to run as if on that date
 ```
 
+**It also runs by itself (from 2026-10-01):** `.github/workflows/data-freshness.yml` runs it every Monday and on demand (Actions → Data freshness report → Run workflow), writes the full report to the run's summary, and keeps one open issue labelled `data-freshness` listing what is DUE or OVERDUE (edited in place each week; closed when nothing is due). It commits nothing.
+
 It reads every data series, dated block and dated string straight from the source and marks each one OK, DUE or OVERDUE against its cadence. It covers what can be checked mechanically. The rows below marked *(judgement)* are not in the report: prose that describes the present, legal status, and event-driven copy.
 
 ### 0.1 Monthly
