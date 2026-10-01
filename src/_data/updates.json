@@ -2,6 +2,12 @@
   {
     "display": "10/1/26",
     "date": "2026-10-01",
+    "page": "/about",
+    "summary": "About: the name explained, the thesis that bitcoin is built to be the last money standing. The site’s line is now “Bitcoin, measured.”"
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
     "page": "/bitcoin-vs-the-stock-market",
     "summary": "Bitcoin vs. the Stock Market: data through September 2026. At five years bitcoin and the S&P 500 are now almost level; a 2021 claim corrected."
   },

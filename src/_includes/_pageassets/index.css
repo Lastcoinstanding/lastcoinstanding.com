@@ -76,6 +76,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     padding: 3.5rem 3rem;
 }
 
+/* The brand line, "Bitcoin, measured." (adopted 2026-10-01, SITE_GUIDE §56.6).
+   Eyebrow register: the site's letterspaced amber caps (cf. .sh-eyebrow), and,
+   like every eyebrow on the site, no terminal period in caps. */
+.hero-eyebrow {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #e09422;
+    margin: 0 0 1rem;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.6);
+}
+
 .hero h1 {
     font-family: var(--font-display);
     font-weight: 500;
