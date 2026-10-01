@@ -141,6 +141,14 @@ input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
 .site-nav .brand { display: inline-flex; align-items: center; gap: 0.5em; }
 .site-nav .brand-mark { height: 1.5em; width: auto; flex: none; display: block; }
 .site-nav .brand-word { display: inline-block; }
+/* The brand line under the wordmark (JM's ruling 2026-10-01, SITE_GUIDE §56.6).
+   A two-line lockup INSIDE the existing row: wordmark + tagline stack to ~30px,
+   well under the 65px desktop / 55px mobile nav height, and the tagline is
+   narrower than the wordmark, so the row's height and width are both unchanged
+   (measured, per page, at 375 / 1100 / 1280 / 1440px). It follows the mark's
+   fence below: hidden in the 769–1099px band where the wordmark already wraps. */
+.site-nav .brand-text { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.site-nav .brand-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; font-size: 1.12em; letter-spacing: 0.02em; text-transform: none; color: rgba(224,148,34,0.85); margin-top: 0.15em; white-space: nowrap; }
 /* The mid-width band, and why the mark steps aside in it.
    MEASURED ON THE DEPLOYED SITE, not inferred: the desktop nav row has no
    headroom. The wordmark ALREADY wraps to two lines somewhere between 900px
@@ -160,6 +168,7 @@ input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
    which owns that decision and carries the measurement table for it. */
 @media (min-width: 769px) and (max-width: 1099px) {
   .site-nav .brand-mark { display: none; }
+  .site-nav .brand-tagline { display: none; }
 }
 .site-nav .nav-links { display: flex; gap: 8px; align-items: center; }
 .site-nav .nav-links a { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
@@ -603,7 +612,7 @@ h1, h2, h3 {
             Work With Me). alt="" because the wordmark beside it already names
             the link; giving the image alt text would make a screen reader
             announce the name twice. -#}
-        <a href="/" class="brand"><img class="brand-mark" src="/lcs-mark.svg" alt="" width="130" height="70" decoding="async"><span class="brand-word">Last Coin Standing</span></a>
+        <a href="/" class="brand"><img class="brand-mark" src="/lcs-mark.svg" alt="" width="130" height="70" decoding="async"><span class="brand-text"><span class="brand-word">Last Coin Standing</span><span class="brand-tagline">Bitcoin, measured.</span></span></a>
             <div class="nav-links">
         {%- set currentCat = "" -%}
         {%- for e in explorations -%}{%- if e.slug == slug -%}{%- set currentCat = e.category -%}{%- endif -%}{%- endfor -%}
