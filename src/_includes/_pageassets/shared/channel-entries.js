@@ -59,6 +59,33 @@
   // 2 years" are never truncated by the edge of the record.
   var elig = (function () { var a = []; for (var i = 0; i < N; i++) if (S[i].d >= TABLE_CUT && S[i].d <= LAST_D - WAIT_CAP) a.push(i); return a; })();
 
+  // ── Direction of approach (ADDITIVE, 2026-10-01; JM's ruling on #115) ──
+  // Price crosses a stretch of the channel twice: falling into it and rising back
+  // through it. An entry's LEG is the sign of its position change over the previous
+  // LEG_W days (interpolated between samples): 'falling' if lower than LEG_W days
+  // earlier, else 'rising'. It uses only data before the entry (no look-ahead).
+  // Method and findings: DIRECTION_AWARE_MATCHING_2026-09-23, scripts/measure-direction-legs.js.
+  // Nothing below changes any existing field: entryMetrics gains `leg`, bandMetrics
+  // gains `legs`; every figure a page already prints is byte-for-byte unchanged.
+  var LEG_W = 60, LEG_GAP = 20, LEG_MIN_N = 10;   // the ruled "loose gate": >20 points apart, >=10 entries each
+  function posAtDay(day) {
+    if (day <= S[0].d) return S[0].pos;
+    for (var i = 1; i < N; i++) { if (S[i].d >= day) { var a = S[i - 1], b = S[i], t = (day - a.d) / (b.d - a.d); return a.pos * (1 - t) + b.pos * t; } }
+    return S[N - 1].pos;
+  }
+  function legAt(pos, day) { return (pos - posAtDay(day - LEG_W) < 0) ? 'falling' : 'rising'; }
+  var LEG = S.map(function (s) { return legAt(s.pos, s.d); });
+  // Halving epochs: the honest count of independent history behind a set (samples
+  // 12 days apart are not independent evidence; cycles are).
+  var HALVINGS = [[2012, 11, 28], [2016, 7, 9], [2020, 5, 11], [2024, 4, 20]].map(function (h) { return (Date.UTC(h[0], h[1] - 1, h[2]) / 1000 - GENESIS_TS) / 86400; });
+  function epochOf(day) { var k = 0; for (var h = 0; h < HALVINGS.length; h++) if (day >= HALVINGS[h]) k++; return k; }
+  function legSummary(M) {
+    var n = M.length, ep = {};
+    if (!n) return { n: 0, paid: null, cycles: 0 };
+    M.forEach(function (m) { ep[epochOf(m.d0)] = 1; });
+    return { n: n, paid: M.filter(function (m) { return m.paid; }).length / n * 100, cycles: Object.keys(ep).length };
+  }
+
   // ── Rebuy targets (v3.2 — How Much Cash's decision-#2 lever) ──
   // The DEFAULT ('first', or any falsy value) is the original first-lower-entry rule:
   // WODN calls bandMetrics/entryMetrics WITHOUT a target and is byte-for-byte unchanged.
@@ -90,7 +117,7 @@
     var ratio = p0 / waitPrice;                                      // coins(wait)/coins(now) = (1/waitPrice)/(1/p0)
     var trough = p0; for (j = i + 1; j < N && S[j].d <= end; j++) if (S[j].p < trough) trough = S[j].p;
     var depth = trough / p0 - 1;                                     // ≤ 0 (target-independent)
-    return { i: i, d0: d0, p0: p0, P: P, waitPrice: waitPrice, waitDay: waitDay, ratio: ratio, paid: ratio > 1, arrived: arrived, waitLen: arrived ? (waitDay - d0) : null, depth: depth, hadDD: depth <= -DD_THRESH };
+    return { i: i, d0: d0, p0: p0, P: P, waitPrice: waitPrice, waitDay: waitDay, ratio: ratio, paid: ratio > 1, arrived: arrived, waitLen: arrived ? (waitDay - d0) : null, depth: depth, hadDD: depth <= -DD_THRESH, leg: LEG[i] };
   }
 
   // Metrics over a sliding band around position P (widen if a high/sparse band is thin).
@@ -122,8 +149,40 @@
       never: M.filter(function (m) { return !m.arrived; }).length / n * 100,
       waitLen: arrivedLens.length ? median(arrivedLens) : null,
       entries: set,
-      metrics: M
+      metrics: M,
+      // Additive (#115): the same matched set split by direction of approach.
+      legs: (function () {
+        var f = legSummary(M.filter(function (m) { return m.leg === 'falling'; }));
+        var r = legSummary(M.filter(function (m) { return m.leg === 'rising'; }));
+        return { W: LEG_W, falling: f, rising: r,
+                 differs: f.n >= LEG_MIN_N && r.n >= LEG_MIN_N && Math.abs(f.paid - r.paid) > LEG_GAP };
+      })()
     };
+  }
+
+  // One sentence, worded identically on every page that uses it. `outcome` is the
+  // page's own name for `paid` ("waiting paid", "the round trip paid"). Returns ''
+  // when the legs agree (the gate): the pooled figure is then a fair summary of
+  // both. The cycle count is printed, not used as a switch (JM's ruling): thinness
+  // is disclosed rather than hidden.
+  function cyc(n) { return n + ' halving cycle' + (n === 1 ? '' : 's'); }
+  function legPart(s) { return Math.round(s.paid) + '% of the time (' + s.n + ' entries, ' + cyc(s.cycles) + ')'; }
+  function thinNote(L) {
+    var c = Math.min(L.falling.cycles, L.rising.cycles);
+    return c <= 2 ? ' One side rests on only ' + cyc(c) + ', so read the split as a pattern, not a rate.' : '';
+  }
+  function legSentence(b, outcome) {
+    if (!b || !b.legs || !b.legs.differs) return '';
+    var L = b.legs;
+    return 'This figure pools two situations. Where price was already falling into this position, ' + outcome + ' ' + legPart(L.falling) +
+      '; where it was rising back through it, ' + legPart(L.rising) + '.' + thinNote(L);
+  }
+  // For a page that knows today's direction (the Rundown): name the reader's own leg first.
+  function legSentenceFor(b, outcome, myLeg) {
+    if (!b || !b.legs || !b.legs.differs || (myLeg !== 'falling' && myLeg !== 'rising')) return '';
+    var L = b.legs, mine = L[myLeg], other = L[myLeg === 'falling' ? 'rising' : 'falling'];
+    return 'This figure pools two situations. Over the past two months price has been ' + (myLeg === 'falling' ? 'falling into' : 'rising through') +
+      ' this position. On that leg, ' + outcome + ' ' + legPart(mine) + ', against ' + Math.round(other.paid) + '% on the other (' + other.n + ' entries, ' + cyc(other.cycles) + ').' + thinNote(L);
   }
 
   window.ChannelEntries = {
@@ -133,6 +192,7 @@
     TABLE_CUT: TABLE_CUT, WAIT_CAP: WAIT_CAP, DROP: DROP, DD_THRESH: DD_THRESH,
     S: S, elig: elig,
     realPriceAt: realPriceAt, median: median, monthYear: monthYear,
-    entryMetrics: entryMetrics, bandMetrics: bandMetrics
+    entryMetrics: entryMetrics, bandMetrics: bandMetrics,
+    LEG_W: LEG_W, legAt: legAt, legSentence: legSentence, legSentenceFor: legSentenceFor
   };
 })();

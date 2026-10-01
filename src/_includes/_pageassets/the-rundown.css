@@ -348,6 +348,7 @@ body { background: var(--bg); color: var(--text); }
 .rd-slider input[type="range"] { flex: 1; accent-color: var(--amber); }
 .rd-slider output { flex: 0 0 auto; font-family: var(--font-d); font-size: 1.05rem; color: var(--amber); min-width: 5.5em; text-align: right; }
 /* 5 · the register line */
+.rd-legs { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-dim); line-height: 1.55; margin: 0 0 0.7rem; padding: 0.5rem 0.8rem; border-left: 2px solid rgba(224,148,34,0.45); background: rgba(255,255,255,0.015); }
 .rd-register { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); line-height: 1.6; margin: auto 0 0.7rem; font-style: italic; }
 /* 6 · the route to the canonical home */
 .rd-route { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-b); font-size: 0.86rem; color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--border-strong); padding-bottom: 1px; }
