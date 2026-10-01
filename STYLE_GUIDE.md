@@ -2231,10 +2231,17 @@ A **description card**: the same fields in the same order on every instance, so 
     <div class="liq"><div class="k">Liquidates</div><div class="v">85%</div><div class="p">partial, back to 65%</div></div>
   </div>
   <p class="ln-trig">At $83,500, a maximum loan (50% LTV) gets a margin call at <strong>$59,600</strong> (−29%) …</p>
-  <dl class="ln-dl"><dt>Your coins</dt><dd>…</dd><dt>Terms</dt><dd>…</dd><dt>Minimum</dt><dd>…</dd><dt>Where</dt><dd>…</dd></dl>
   <div class="ln-pair"><div class="plus"><span class="l">Distinguishing</span>…</div><div class="catch"><span class="l">The catch</span>…</div></div>
-  <div class="ln-foot">Track record: … Sources: … (read 2026-09-30). <a class="ln-depth" href="…">Depth: … →</a></div>
+  <details class="ln-more" data-id="strike">
+    <summary class="ln-more-btn"><span>Terms, custody, where, sources</span><span class="ln-more-arrow">›</span></summary>
+    <div class="ln-more-body">
+      <dl class="ln-dl"><dt>Your coins</dt><dd>…</dd><dt>Terms</dt><dd>…</dd><dt>Minimum</dt><dd>…</dd><dt>Where</dt><dd>…</dd><dt>Track record</dt><dd>…</dd></dl>
+      <div class="ln-foot">Sources, read 2026-09-30: …</div>
+      <a class="ln-depth" href="…">Depth: … →</a>
+    </div>
+  </details>
 </article>
+<dialog class="ln-dialog" id="lnDialog">…</dialog>  <!-- once per page -->
 ```
 
 **Rules.**
@@ -2243,7 +2250,7 @@ A **description card**: the same fields in the same order on every instance, so 
 - **The rate is the lender's headline**, big, with its basis beside it in small type; `b.np` dims a *not published* headline so it doesn't read as a number.
 - **The trigger sentence** is the card's one live element. Price-free at build, priced by script; the verbs and the order are the same in both renderers (SITE_GUIDE §57).
 - **Distinguishing is green, The catch is red, and every card has both.** A card with no catch is a sales card; a card with no distinguishing line is filler.
-- **The foot carries the date the sources were read**, the source links (dotted underline, muted), and one amber *Depth* link to the page that explains the mechanic.
+- **The face is what a reader decides with; the rest is one click away.** Marks, rate, the three lines, the trigger sentence, Distinguishing and The catch stay on the face (JM, 2026-09-30). Everything else lives in a `<details class="ln-more">` whose summary is a quiet amber row at the foot; without JS it expands in place, with JS it opens the page's one `<dialog class="ln-dialog">` in large type (two columns ≥760px: the pair left, the details right; the group name as a crumb; close by ×, Escape, backdrop or Back). The dialog is filled by cloning the card's parts, so it never carries copy of its own. The dated sources (dotted underline, muted) and the one amber *Depth* link are the last things in the detail.
 - Grid: three across ≥1080px, two ≥700px, one below; `align-items: stretch` so a row's cards share a height and the foot sits at the bottom (`margin-top: auto`). At ≤520px the chips drop under the name.
 - Colour through tokens only (`--green`, `--red`, `--amber`, `--text-dim`, …); the page defines them in its `:root`.
 

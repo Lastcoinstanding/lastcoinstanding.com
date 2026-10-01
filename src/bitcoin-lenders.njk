@@ -138,17 +138,28 @@ eleventyComputed:
                         {{ l.trig.static | safe }}
                     {%- endif -%}
                 </p>
-                <dl class="ln-dl">
-                    <dt>Your coins</dt><dd>{{ l.coins | safe }}</dd>
-                    <dt>Terms</dt><dd>{{ l.terms | safe }}</dd>
-                    <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
-                    <dt>Where</dt><dd>{{ l.where | safe }}<span class="ln-state-note" id="state-{{ l.id }}"></span></dd>
-                </dl>
                 <div class="ln-pair">
                     <div class="plus"><span class="l">Distinguishing</span>{{ l.distinguishing | safe }}</div>
                     <div class="catch"><span class="l">The catch</span>{{ l.catch | safe }}</div>
                 </div>
-                <div class="ln-foot">Track record: {{ l.track | safe }}. Sources: {% for s in l.sources %}<a href="{{ s }}" rel="nofollow noopener" target="_blank">{{ s | replace('https://', '') | replace('http://', '') | truncate(28, true, '…') }}</a>{% if not loop.last %}, {% endif %}{% endfor %} (read {{ l.asOf }}). <a class="ln-depth" href="{{ l.depth.href }}">Depth: {{ l.depth.label }} &rarr;</a></div>
+                {#- The rest of the card is one click away. Without JS the <details>
+                    expands in place; with JS the same block opens in the large-type
+                    dialog (#lnDialog) and the URL gains #lender-<id>, so a single
+                    lender is linkable and Back closes it. -#}
+                <details class="ln-more" data-id="{{ l.id }}">
+                    <summary class="ln-more-btn"><span>Terms, custody, where, sources</span><span class="ln-more-arrow" aria-hidden="true">&rsaquo;</span></summary>
+                    <div class="ln-more-body">
+                        <dl class="ln-dl">
+                            <dt>Your coins</dt><dd>{{ l.coins | safe }}</dd>
+                            <dt>Terms</dt><dd>{{ l.terms | safe }}</dd>
+                            <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
+                            <dt>Where</dt><dd>{{ l.where | safe }}<span class="ln-state-note" id="state-{{ l.id }}"></span></dd>
+                            <dt>Track record</dt><dd>{{ l.track | safe }}</dd>
+                        </dl>
+                        <div class="ln-foot">Sources, read {{ l.asOf }}: {% for s in l.sources %}<a href="{{ s }}" rel="nofollow noopener" target="_blank">{{ s | replace('https://', '') | replace('http://', '') | replace('www.', '') | truncate(44, true, '…') }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div>
+                        <a class="ln-depth" href="{{ l.depth.href }}">Depth: {{ l.depth.label }} &rarr;</a>
+                    </div>
+                </details>
             </article>
         {% endif %}{% endfor %}
         </div>
@@ -157,12 +168,18 @@ eleventyComputed:
 
     <p class="ln-empty" id="lnEmpty" hidden>No lender matches every filter. Each chip narrows the list; clear one.</p>
 
+    <dialog class="ln-dialog" id="lnDialog" aria-label="Lender detail">
+        <div class="ln-dialog-bar"><span class="ln-dialog-crumb" id="lnDialogCrumb"></span><button type="button" class="ln-dialog-close" id="lnDialogClose" aria-label="Close">&times;</button></div>
+        <div class="ln-dialog-body" id="lnDialogBody"></div>
+    </dialog>
+
     <section class="ln-prose" id="how-to-read">
         <h2>How to read a card</h2>
         <p><strong>The three loan-to-value lines</strong> are the whole mechanism. A loan opens at some fraction of the collateral&rsquo;s value; as bitcoin falls the fraction rises; at the margin-call line the lender asks for more collateral or a repayment, and at the liquidation line it sells. What differs between lenders is the distance between those lines, how long you get to act, and whether the sale is partial (enough to restore the opening ratio) or total. The cards print all three, in the lender&rsquo;s own words where a number would mislead.</p>
         <p><strong>The trigger prices</strong> turn those lines into a bitcoin price. The loan is fixed in dollars, so a loan opened at 50% LTV with an 85% liquidation line is sold after a 41% fall, at whatever price that is today. The arithmetic is the same as the loan-health calculator on <a href="/borrowing-against-your-stack#loan-health">Borrowing Against Your Stack</a>: trigger price = today&rsquo;s price &times; opening LTV &divide; threshold LTV. Interest that accrues into the loan moves the real trigger slightly higher than the card shows; a lender that quotes its lines on <em>loan plus interest</em> (Firefish) has already done that. The control at the top switches every card from the lender&rsquo;s maximum loan to a loan-to-value of your own.</p>
         <p><strong>&ldquo;Not published&rdquo;</strong> is a value, not a gap in our reading. Figure doesn&rsquo;t publish its liquidation line; Kraken doesn&rsquo;t publish a rate for Borrow US; Lava shows its liquidation price only inside the app. A card never estimates what the lender withholds, and what a lender withholds is itself something to know about it.</p>
         <p><strong>The marks.</strong> <span class="ln-tag yes">&#10003; Bitcoin only</span> means the lender takes no other collateral; <span class="ln-tag no">Not bitcoin only</span> names what else shares its risk engine. The dashed <span class="ln-tag qual">qualifier</span> flags a product that isn&rsquo;t an open-use loan against your stack: buying power that can&rsquo;t leave an exchange, a wrapper rather than bitcoin, a mortgage that buys a house. <em>Your coins</em> is the rehypothecation question in one line: who holds them, whether they can be lent on, and whether you can watch the address.</p>
+        <p><strong>The card and the detail.</strong> A card carries what you decide with: the marks, the rate, the three lines, the trigger sentence, what distinguishes the lender and what the catch is. Terms, custody, minimum, where it operates, track record and the dated sources are one click away, in larger type; the address bar then names the lender, so a single detail can be linked to.</p>
         <p><strong>Groups, not ranks.</strong> Cards sit with others of the same model and alphabetically within it. There is no sort by rate and no best badge, because an order reads as a recommendation. The lowest rate on the page today belongs to a protocol with no one to call; one of the highest to the lender that has never lost a coin in nine years. Both facts are on their cards.</p>
     </section>
 

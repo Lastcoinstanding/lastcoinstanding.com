@@ -17,6 +17,12 @@
    3. Filters. Chips are AND-ed; the state select hides cards whose published
       list excludes the state and marks cards whose lender publishes no list
       (never inferred). Hidden groups collapse; an empty result says so.
+   4. The detail dialog. Each card's <details class="ln-more"> holds terms,
+      custody, where, track record and sources; it expands in place without
+      JS. With JS the summary opens #lnDialog instead, filled with a clone of
+      the whole card (so the trigger sentence is the live one), in larger
+      type, and pushes #lender-<id> so the detail is linkable and Back closes
+      it. A page load with that hash opens the dialog after first render.
 
    Price: TODAY_PRICE (the latest PL_DATA sample) seeds the page, then
    fetchTodayPrice() (shared/power-law-data.js) replaces it with the live
@@ -223,6 +229,62 @@
     };
   }
 
+  // ─── the detail dialog ───
+  var dialog = document.getElementById('lnDialog');
+  var dBody  = document.getElementById('lnDialogBody');
+  var dCrumb = document.getElementById('lnDialogCrumb');
+  var dClose = document.getElementById('lnDialogClose');
+  var canDialog = !!(dialog && typeof dialog.showModal === 'function');
+  if (canDialog) document.body.classList.add('ln-js');
+
+  function groupTitle(card) {
+    var g = card.closest('.ln-group');
+    var h = g && g.querySelector('.ln-grp');
+    return h ? h.textContent : '';
+  }
+  function openDetail(id, pushHash) {
+    var card = document.getElementById('lender-' + id);
+    if (!card || !canDialog) return;
+    var clone = card.cloneNode(true);
+    clone.removeAttribute('id'); clone.classList.remove('ln-card', 'ln-dim'); clone.hidden = false;
+    // ids must stay unique: the live trigger/state nodes keep theirs on the card
+    clone.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+    var more = clone.querySelector('.ln-more'); if (more) more.open = true;
+    dBody.innerHTML = '';
+    while (clone.firstChild) dBody.appendChild(clone.firstChild); // the card's parts become the dialog grid's children
+    dCrumb.textContent = groupTitle(card);
+    dialog.dataset.id = id;
+    if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
+    if (pushHash && location.hash !== '#lender-' + id) history.pushState({ lender: id }, '', location.pathname + location.search + '#lender-' + id);
+  }
+  function closeDetail(viaHistory) {
+    if (!dialog || !dialog.open) return;
+    dialog.close();
+    if (!viaHistory && /^#lender-/.test(location.hash)) history.back();
+  }
+  if (canDialog) {
+    cards.forEach(function (card) {
+      var more = card.querySelector('.ln-more');
+      if (!more) return;
+      more.querySelector('.ln-more-btn').addEventListener('click', function (e) {
+        e.preventDefault(); openDetail(card.dataset.id, true);
+      });
+    });
+    dClose.addEventListener('click', function () { closeDetail(false); });
+    dialog.addEventListener('click', function (e) { if (e.target === dialog) closeDetail(false); }); // backdrop
+    dialog.addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(false); });   // Escape
+    window.addEventListener('popstate', function () {
+      var m = location.hash.match(/^#lender-([a-z0-9-]+)$/);
+      if (m) openDetail(m[1], false); else closeDetail(true);
+    });
+    // trigger sentences re-render into the card; keep an open dialog in step
+    var _renderAll = renderAll;
+    renderAll = function () { _renderAll(); if (dialog.open && dialog.dataset.id) openDetail(dialog.dataset.id, false); };
+  }
+
   renderAll();
   applyFilters();
+  var m0 = canDialog && location.hash.match(/^#lender-([a-z0-9-]+)$/);
+  if (m0) { history.replaceState({ lender: m0[1] }, '', location.href); openDetail(m0[1], false); }
 })();
