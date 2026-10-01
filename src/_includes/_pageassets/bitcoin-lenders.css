@@ -125,7 +125,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
    must not push its value below the neighbours'. Every header reserves two lines
    and sits at the bottom of that box, so one-line and two-line headers end on the
    same baseline; long values stay on one line at a smaller size. */
-.ln-ltv .k { font-size: 0.6rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim); min-height: 2.3em; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 0 0.2rem; line-height: 1.15; }
+.ln-ltv .k { font-size: 0.6rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim); min-height: 2.9em; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 0 0.2rem; line-height: 1.15; }
+.ln-ltv .k .help-tip { vertical-align: baseline; }
 .ln-ltv .v { font-size: 1.12rem; color: var(--text-bright); font-weight: 600; line-height: 1.25; white-space: nowrap; margin-top: 0.15rem; }
 .ln-ltv .v.long { font-size: 0.95rem; letter-spacing: -0.01em; }
 .ln-ltv .v.xlong { font-size: 0.82rem; white-space: normal; overflow-wrap: anywhere; }
@@ -162,6 +163,9 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
     .ln-count { margin-left: 0; width: 100%; }
 }
 @media (max-width: 520px) {
+    .ln-ltv .v { font-size: 1.02rem; }
+    .ln-ltv .v.long { font-size: 0.82rem; letter-spacing: -0.02em; }
+    .ln-ltv .v.xlong { font-size: 0.74rem; }
     .ln-head { flex-wrap: wrap; }
     .ln-chips { flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: 100%; }
     .ln-tag { text-align: left; }
