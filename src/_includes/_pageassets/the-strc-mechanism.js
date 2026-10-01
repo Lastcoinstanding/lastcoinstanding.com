@@ -51,11 +51,11 @@
     // Σ(typical price × volume) ÷ Σ volume, September 2026 (August: $95.45).
     priorMonthVWAP: 98.31,
     priorMonthVWAPLabel: "September 2026 VWAP ≈ $98.31, estimated from daily bars",
-    rateHistory: [             // 8-K-sourced, one row per change
+    rateHistory: [             // 8-K-sourced, one row per month since April 2026 (holds included)
       ["2025-08", 9.00], ["2025-09", 10.00], ["2025-10", 10.25], ["2025-11", 10.50],
       ["2025-12", 10.75], ["2026-01", 11.00], ["2026-02", 11.25], ["2026-03", 11.50],
       ["2026-04", 11.50], ["2026-05", 11.50], ["2026-06", 11.50], ["2026-07", 12.00],
-      ["2026-08", 12.00], ["2026-09", 12.00]
+      ["2026-08", 12.00], ["2026-09", 12.00], ["2026-10", 12.00]
     ],
     claimStack: {              // $B: the Q2 10-Q (filed 2026-08-03) and the weekly 8-Ks since
       seniorConvertsB: 6.70,   // $6,713.7M principal at Jun 30; unsecured, ~0.42% avg coupon, 2028–2032, no coverage triggers
@@ -315,13 +315,22 @@
   }
 
   function renderRateLever() {
-    var latest = STRC_DATA.rateHistory[STRC_DATA.rateHistory.length - 1];
-    var priorChanges = STRC_DATA.rateHistory.length - 1;
+    // rateHistory carries holds as well as changes (one row per month since
+    // April 2026), so "since" is the first month of the current run at the
+    // current rate and "prior changes" counts rows whose rate differs from the
+    // row before. Until 2026-10-01 both were read off the last row, which on
+    // the live page printed "12.00% since Sep 2026 · 13 prior changes" for a
+    // rate held since July after 8 changes.
+    var rh = STRC_DATA.rateHistory, latest = rh[rh.length - 1];
+    var runStart = rh.length - 1;
+    while (runStart > 0 && rh[runStart - 1][1] === latest[1]) runStart--;
+    var priorChanges = 0;
+    for (var ci = 1; ci < rh.length; ci++) if (rh[ci][1] !== rh[ci - 1][1]) priorChanges++;
     // Visible status carries the latest row so the collapsed 12-row log isn't needed
     // to read "where the rate is now" (progressive disclosure).
     setHTML('sbRateStatus',
       statusField('Current annualized rate', pct2(RATE) + ' <span class="sb-mini">semi-monthly, $0.50 × 2</span>')
-      + statusField('History', pct2(RATE) + ' since ' + prettyMonth(latest[0]) + ' · ' + priorChanges + ' prior changes'));
+      + statusField('History', pct2(RATE) + ' since ' + prettyMonth(rh[runStart][0]) + ' · ' + priorChanges + ' prior changes'));
 
     // Bracket dial: framework-says (from prior-month VWAP) vs board-did vs posture.
     var fw;

@@ -2,6 +2,24 @@
   {
     "display": "10/1/26",
     "date": "2026-10-01",
+    "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: the retrospective's house now runs to July 2026 (Case-Shiller 337.306), and the whole index carries S&P's latest revision; every start year's house value moves a little."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/the-doubling-ladder",
+    "summary": "The Doubling Ladder: September 2026 added to the deviation wave and monthly highs (194 months). The mean distance from trend is +0.002 in log terms, still essentially zero; 41.2% of months above the line."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/the-strc-mechanism",
+    "summary": "The STRC Mechanism: Strategy held STRC's dividend at 12.00% for October, the fourth month at that rate, and says it will recommend 12% until STRC trades sustainably near $100. The rate status line now reads correctly: 12.00% since July 2026, after 8 changes."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
     "page": "/bitcoin-lenders",
     "summary": "Bitcoin Lenders Compared, rewritten for a reader new to the vocabulary: a short section on the seven things every card measures, plain-language cards, a ‘How this loan works’ paragraph for every lender, a link to each lender’s own page, and tooltips on the terms that recur."
   },
