@@ -901,7 +901,17 @@
     if (paid < 60) return 'Roughly a coin-flip &mdash; no clear edge to waiting.';
     return 'Waiting more often left you with more coins.';
   }
+  // Direction of approach (#115). The Rundown knows today's direction, so it names
+  // the reader's own leg (the shared engine's legAt, 60 days back). Shown only where
+  // the legs differ; worded by the engine, so it matches WODN and How Much Cash.
+  function renderLegs(id, m, outcome) {
+    var el = document.getElementById(id); if (!el) return;
+    var t = '';
+    if (m && CE.legSentenceFor && CE.legAt) t = CE.legSentenceFor(m, outcome, CE.legAt(livePos(), TODAY_DAYS));
+    el.textContent = t; el.hidden = !t;
+  }
   function renderD1(m) {
+    renderLegs('rdD1Legs', m, 'waiting won');
     if (!m) return;
     var beat = 100 - m.paid;
     setHTML('rdD1Verdict', '<strong>' + wodnVerdict(m.paid) + '</strong> In ' + pct0(m.never) +
@@ -1137,6 +1147,7 @@
      first — so it renders as a supporting card that says what it is and what
      that page does to it. Caught by reading both destinations, not by assuming. */
   function renderR1(m) {
+    renderLegs('rdR1Legs', m, 'the round trip won');
     if (!m) return;
     setHTML('rdR1Verdict',
       'Selling here in the hope of rebuying lower left you with more coins in <strong>' + pct0(m.paid) +

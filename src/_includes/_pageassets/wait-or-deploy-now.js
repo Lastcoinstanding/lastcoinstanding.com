@@ -103,6 +103,8 @@
   // ════════ COMPARATOR RENDER ════════
   function renderComparator() {
     var P = state.pos, m = bandMetrics(matchPos(P));
+    var legsEl = document.getElementById('wdLegs');
+    if (legsEl) { var legTxt = (m && CE.legSentence) ? CE.legSentence(m, 'waiting paid') : ''; legsEl.textContent = legTxt; legsEl.hidden = !legTxt; }
     var posReadout = document.getElementById('wdPosReadout');
     if (posReadout) posReadout.innerHTML = '<strong>' + ratioOf(P).toFixed(2) + '×</strong> trend · <em>' + posLabel(P) + '</em>';
     if (!m) return;

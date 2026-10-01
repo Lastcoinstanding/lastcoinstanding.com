@@ -542,6 +542,15 @@
       (c.isToday ? (todayPriceIsLive(_priceSource) ? 'today' : 'at the ' + lastSampleDateShort() + ' price') : 'at this position') + ' · ' + usdFull(c.P);
   }
 
+  // Direction of approach (#115): the matched set split by whether price was falling
+  // into this position or rising back through it. Shown only where the legs differ
+  // (the shared engine's gate); its wording is the engine's, shared with WODN.
+  function renderLegs(c) {
+    var el = document.getElementById('hcLegs'); if (!el) return;
+    var t = (c.m && CE.legSentence) ? CE.legSentence(c.m, 'the rebuy came in below the sale') : '';
+    el.textContent = t; el.hidden = !t;
+  }
+
   // Provenance caption beneath the card row.
   function renderProvenance(c) {
     var el = document.getElementById('hcSample'); if (!el || !c.m) return;
@@ -991,7 +1000,7 @@
     var c = compute(S_);                // §2: no clamp — slider 2 holds its absolute position independently
     if (!c.m) return;
     renderPos(c); renderRebuyReadout(c); renderVerdictLead(c); renderCards(c); renderStrip(c); renderStack(c); renderAlarm(c); renderTax(c);
-    renderShock(c); renderZone(c); renderProvenance(c); renderEndnote(c); renderInsightNote(c);
+    renderShock(c); renderZone(c); renderProvenance(c); renderLegs(c); renderEndnote(c); renderInsightNote(c);
     syncSliderToState(); placeTodayTick(); syncSlider2(); placeSaleTick();
     updateChannel();
     renderHandoff();
