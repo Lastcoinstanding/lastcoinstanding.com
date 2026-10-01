@@ -257,7 +257,9 @@
     var card = document.getElementById('lender-' + id);
     if (!card || !canDialog) return;
     var clone = card.cloneNode(true);
-    clone.removeAttribute('id'); clone.classList.remove('ln-card', 'ln-dim'); clone.hidden = false;
+    clone.removeAttribute('id'); clone.classList.remove('ln-card', 'ln-dim', 'ln-off'); clone.hidden = false;
+    dBody.classList.toggle('ln-off', card.classList.contains('ln-off')); // the state flag keeps its colour in the dialog
+    dBody.classList.toggle('ln-dim', card.classList.contains('ln-dim'));
     // ids must stay unique: the live trigger/state nodes keep theirs on the card
     clone.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
     var more = clone.querySelector('.ln-more'); if (more) more.open = true;

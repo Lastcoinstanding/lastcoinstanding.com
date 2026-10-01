@@ -224,13 +224,13 @@
       "id": "arch",
       "group": "custodial",
       "name": "Arch",
-      "model": "Custodial · ChainFi, Inc. · NMLS 2637200 · Anchorage custody",
+      "model": "Custodial · ChainFi, Inc. · NMLS 2637200",
       "bitcoinOnly": false,
       "otherCollateral": "ETH, SOL, XRP, gold tokens",
       "qualifier": null,
       "rate": {
         "headline": "7.74–10.49%",
-        "note": "includes the opening fee (0.25–1.49%); the rate depends on loan size, 10.49% under $250,000; paying interest at the end instead of monthly costs about half a point more (Arch’s table of 19 May 2026)"
+        "note": "includes the opening fee (0.25–1.49%); by loan size, 10.49% under $250,000; about half a point more if interest is paid at the end"
       },
       "ltv": {
         "open": 0.6,
@@ -330,13 +330,13 @@
       "id": "salt",
       "group": "custodial",
       "name": "SALT",
-      "model": "Custodial · SALT Lending LLC · NMLS 1711910 · 26 state licences",
+      "model": "Custodial · SALT Lending LLC · NMLS 1711910",
       "bitcoinOnly": false,
       "otherCollateral": "ETH, USDC, USDT, SALT",
       "qualifier": null,
       "rate": {
         "headline": "7.49–10.50%",
-        "note": "fixed for the term; the rate depends on how much of your bitcoin’s value you borrow, not on the loan size: 7.49–8.49% if you borrow 30%, 8.75–9.75% at 50%, 10.50% at 70% (1-year only)"
+        "note": "fixed for the term; by how much of your bitcoin’s value you borrow: 7.49–8.49% at 30%, 8.75–9.75% at 50%, 10.50% at 70% (1-year only)"
       },
       "ltv": {
         "open": 0.7,
@@ -398,13 +398,13 @@
       "id": "apx",
       "group": "custodial",
       "name": "APX",
-      "model": "Custodial · APX Inc., Toronto · FinCEN MSB · BitGo Trust custody",
+      "model": "Custodial · APX Inc., Toronto · FinCEN MSB",
       "bitcoinOnly": false,
       "otherCollateral": "ETH",
       "qualifier": null,
       "rate": {
         "headline": "9.99–11.49%",
-        "note": "fixed for the term; the rate depends on loan size, 11.49% under $100,000; no fee to open, so the rate is the whole cost; a 5-year credit line costs 10.49–11.99%"
+        "note": "fixed for the term; by loan size, 11.49% under $100,000; no fee to open, so the rate is the whole cost; a 5-year credit line 10.49–11.99%"
       },
       "ltv": {
         "open": 0.6,
@@ -463,7 +463,7 @@
       "qualifier": null,
       "rate": {
         "headline": "6.50–8.50%",
-        "note": "fixed for a year; the rate depends on your balance, 8.50% under $250,000; plus a 2% “capital charge” on the year’s highest balance, so the real first-year cost is 8.5–10.5%"
+        "note": "fixed for a year; by balance, 8.50% under $250,000; plus a 2% “capital charge” on the year’s peak balance, so the real first-year cost is 8.5–10.5%"
       },
       "ltv": {
         "open": 0.6,
@@ -597,7 +597,7 @@
       "rate": {
         "headline": "not published",
         "np": true,
-        "note": "variable; a one-time borrowing fee plus daily interest, both shown before you confirm; the interest is collected every 4 hours"
+        "note": "variable; a one-time borrowing fee plus daily interest, both shown before you confirm; collected every 4 hours"
       },
       "ltv": {
         "open": null,
@@ -655,22 +655,22 @@
       "id": "nexo",
       "group": "exchange",
       "name": "Nexo",
-      "model": "Exchange credit line · Nexo US, LLC; lender of record a “Bank Partner” or affiliate; Bakkt wallet",
+      "model": "Exchange credit line · Nexo US, LLC · Bakkt wallet",
       "bitcoinOnly": false,
       "otherCollateral": "33 cryptos",
       "qualifier": null,
       "rate": {
         "headline": "15.9%",
-        "note": "the base rate, variable; 12.9% down to 7.9% for “Wealth Tiers”, which depend on how much of your portfolio is held in Nexo’s own NEXO token; 0.9–2.9% only with NEXO and a loan under 20% of the collateral; repay within 45 days of a draw and the base rate applies"
+        "note": "the base rate, variable; 7.9–12.9% for holders of Nexo’s own NEXO token (its “Wealth Tiers”); under 3% only with NEXO and a loan below 20% of the collateral"
       },
       "ltv": {
         "open": 0.5,
         "call": 0.769,
         "liq": 0.8333,
-        "callLabel": "“Poor” health",
+        "callLabel": "Health band",
         "openNote": "of your bitcoin’s value",
         "callDisplay": "76.9%",
-        "callNote": "Nexo “may” email a margin call; there is no fixed time to act",
+        "callNote": "“Poor” from 76.9%; Nexo “may” email a margin call; no fixed time to act",
         "liqDisplay": "83.33%",
         "liqNote": "Nexo sells part or all of your collateral automatically, with a 2–3.5% fee plus the exchange spread",
         "callVerb": "is rated “Poor”",
@@ -721,7 +721,7 @@
       "id": "cadena",
       "group": "multisig",
       "name": "Cadena Bitcoin",
-      "model": "DLC, non-custodial · Cadena Bitcoin S.A. de C.V., El Salvador BSP · lenders are other users",
+      "model": "DLC, non-custodial · El Salvador BSP",
       "bitcoinOnly": true,
       "otherCollateral": "",
       "qualifier": "Synthetic · you sell your own bitcoin",
@@ -783,13 +783,13 @@
       "id": "debifi",
       "group": "multisig",
       "name": "Debifi",
-      "model": "3-of-4 multisig · Debifi Development Ltd, Cyprus · lenders are named institutions",
+      "model": "3-of-4 multisig · Debifi Development Ltd, Cyprus",
       "bitcoinOnly": true,
       "otherCollateral": "",
       "qualifier": null,
       "rate": {
         "headline": "8.5–11%",
-        "note": "fixed for each offer; today’s offers run 8.5–10.25% for $100,000+ loans at 50% (Goldstream) and 9.5–10% for $20,000–$100,000 at 60–70%; plus 1.0–1.5% to open, taken in bitcoin"
+        "note": "fixed per offer; today 8.5–10.25% for $100,000+ at 50% LTV, 9.5–10% for $20,000–$100,000 at 60–70%; plus 1.0–1.5% to open, in bitcoin"
       },
       "ltv": {
         "open": 0.7,
@@ -845,13 +845,13 @@
       "id": "firefish",
       "group": "multisig",
       "name": "Firefish",
-      "model": "P2P escrow · Firefish Europe s.r.o. · MiCA CASP · investors fund the loans",
+      "model": "P2P escrow · Firefish Europe s.r.o. · MiCA CASP",
       "bitcoinOnly": true,
       "otherCollateral": "",
       "qualifier": null,
       "rate": {
         "headline": "from 5%",
-        "note": "set by the investor who takes your offer; 12-month euro loans were “below 9.5% APR” in early 2026; you owe the full term’s interest even if you repay early; plus a 1.5% yearly opening fee taken in bitcoin"
+        "note": "set by the investor who takes your offer; 12-month euro loans were “below 9.5% APR” in early 2026; full-term interest owed even if repaid early; 1.5% a year to open, in bitcoin"
       },
       "ltv": {
         "open": 0.5,
@@ -967,7 +967,7 @@
       "id": "unchained",
       "group": "multisig",
       "name": "Unchained",
-      "model": "2-of-3 multisig · Unchained Capital, Inc. · NMLS 1900773 · Key Agent: Fortis Bank",
+      "model": "2-of-3 multisig · Unchained Capital, Inc. · NMLS 1900773",
       "bitcoinOnly": true,
       "otherCollateral": "",
       "qualifier": null,
@@ -1040,13 +1040,13 @@
       "id": "coinbase",
       "group": "defi",
       "name": "Coinbase",
-      "model": "Morpho position in cbBTC · Coinbase, Inc. is the interface, not the lender",
+      "model": "Morpho position in cbBTC · Coinbase, Inc. is the interface",
       "bitcoinOnly": false,
       "otherCollateral": "11 assets",
       "qualifier": "Wrapped bitcoin, not bitcoin",
       "rate": {
         "headline": "from 5.1%",
-        "note": "variable, set by the Morpho lending market, plus a Coinbase platform fee whose size isn’t published; a fixed-rate option exists; 2% is added to the loan on the first $250,000 of every draw (1% above), and that fee earns interest too"
+        "note": "variable, set by the Morpho market, plus a Coinbase platform fee (size not published); a fixed-rate option; 2% added to the loan on the first $250,000 of each draw (1% above)"
       },
       "ltv": {
         "open": null,
@@ -1106,13 +1106,13 @@
       "id": "morpho",
       "group": "defi",
       "name": "Morpho direct",
-      "model": "cbBTC/USDC 86% market on Base · a protocol; the app is hosted by a French nonprofit",
+      "model": "cbBTC/USDC market on Base · a protocol, not a company",
       "bitcoinOnly": false,
       "otherCollateral": "cbBTC, WBTC, others",
       "qualifier": "Wrapped bitcoin, not bitcoin",
       "rate": {
         "headline": "4.9%",
-        "note": "variable (the Base market’s 6-hour average on 30 September 2026; the Ethereum market 5.4%); nothing to open; you pay network fees. It is the same lending pool Coinbase’s loans draw on, without Coinbase’s fee"
+        "note": "variable (Base market, 6-hour average, 30 Sep 2026; Ethereum 5.4%); nothing to open, network fees only; the same pool Coinbase’s loans use, without Coinbase’s fee"
       },
       "ltv": {
         "open": null,
@@ -1169,13 +1169,13 @@
       "id": "aave",
       "group": "defi",
       "name": "Aave v3",
-      "model": "Ethereum “Core” market · WBTC or cbBTC · a protocol; the app by Aave Labs",
+      "model": "Ethereum “Core” market · WBTC or cbBTC · a protocol",
       "bitcoinOnly": false,
       "otherCollateral": "any listed asset",
       "qualifier": "Wrapped bitcoin, not bitcoin",
       "rate": {
         "headline": "4.5–15.2%",
-        "note": "variable, set by how much of the pool is borrowed: USDT 4.46%, USDC 15.15% on 30 September 2026, when 99.8% of its pool was lent out and $4 million remained; nothing to open; you pay network fees"
+        "note": "variable, set by how much of the pool is lent: USDT 4.46%, USDC 15.15% on 30 Sep 2026 with 99.8% of its pool lent out; nothing to open, network fees only"
       },
       "ltv": {
         "open": 0.73,
@@ -1331,7 +1331,7 @@
       "id": "better",
       "group": "mortgage",
       "name": "Better + Coinbase",
-      "model": "Fannie Mae-conforming mortgage · Better Mortgage Corp · NMLS 330511 · Coinbase custodies",
+      "model": "Conforming mortgage · Better Mortgage Corp · NMLS 330511",
       "bitcoinOnly": false,
       "otherCollateral": "BTC or USDC",
       "qualifier": "Mortgage · not an open-use loan",

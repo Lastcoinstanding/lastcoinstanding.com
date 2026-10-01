@@ -103,7 +103,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-off .ln-state-flag { color: var(--red); border: 1px solid var(--red-dim); }
 .ln-dim .ln-state-flag { color: var(--amber); border: 1px dashed var(--amber-dim); }
 .ln-dialog-body .ln-state-flag { grid-column: 1 / -1; }
-.ln-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6rem; }
+.ln-dialog-body.ln-off .ln-state-flag { color: var(--red); border: 1px solid var(--red-dim); }
+.ln-dialog-body.ln-dim .ln-state-flag { color: var(--amber); border: 1px dashed var(--amber-dim); }
+.ln-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6rem; min-height: 4.9rem; }
 .ln-head-text { min-width: 0; }
 .ln-name { font-family: var(--font-d); font-size: 1.6rem; font-weight: 600; color: var(--text-bright); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
 .ln-model { font-size: 0.74rem; color: var(--text-dim); margin-top: 0.15rem; line-height: 1.4; }
@@ -113,14 +115,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-tag.no   { color: var(--red);   border: 1px solid var(--red-dim); }
 .ln-tag.qual { color: var(--amber); border: 1px dashed var(--amber-dim); }
 .ln-grp-sub .ln-tag, .ln-prose .ln-tag { font-size: 0.6rem; padding: 0.18rem 0.45rem; vertical-align: middle; }
-.ln-rate { display: flex; align-items: baseline; gap: 0.5rem; }
+.ln-rate { display: flex; align-items: baseline; gap: 0.5rem; min-height: 4.8rem; }
 .ln-rate b { font-size: 1.7rem; color: var(--text-bright); font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; }
 .ln-rate b.np { font-size: 1.15rem; color: var(--text-dim); font-weight: 500; }
 .ln-rate span { font-size: 0.82rem; color: var(--text-dim); line-height: 1.45; }
 .ln-ltv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0.6rem 0; }
 .ln-ltv > div { text-align: center; min-width: 0; }
-.ln-ltv .k { font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
-.ln-ltv .v { font-size: 1.12rem; color: var(--text-bright); font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+/* Alignment (JM, 2026-09-30): a header that wraps (its ? dropping to a second line)
+   must not push its value below the neighbours'. Every header reserves two lines
+   and sits at the bottom of that box, so one-line and two-line headers end on the
+   same baseline; long values stay on one line at a smaller size. */
+.ln-ltv .k { font-size: 0.6rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim); min-height: 2.3em; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 0 0.2rem; line-height: 1.15; }
+.ln-ltv .v { font-size: 1.12rem; color: var(--text-bright); font-weight: 600; line-height: 1.25; white-space: nowrap; margin-top: 0.15rem; }
+.ln-ltv .v.long { font-size: 0.95rem; letter-spacing: -0.01em; }
+.ln-ltv .v.xlong { font-size: 0.82rem; white-space: normal; overflow-wrap: anywhere; }
 .ln-ltv .p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.38; }
 .ln-ltv .call .v { color: var(--amber); }
 .ln-ltv .liq .v { color: var(--red); }
@@ -188,6 +196,10 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .ln-dialog-body .ln-ltv { padding: 0.9rem 0; gap: 0.8rem; }
 .ln-dialog-body .ln-ltv .k { font-size: 0.72rem; }
 .ln-dialog-body .ln-ltv .v { font-size: 1.5rem; }
+.ln-dialog-body .ln-ltv .v.long { font-size: 1.2rem; }
+.ln-dialog-body .ln-ltv .v.xlong { font-size: 1rem; }
+.ln-dialog-body .ln-ltv .k { font-size: 0.7rem; min-height: 0; }
+.ln-dialog-body .ln-head, .ln-dialog-body .ln-rate { min-height: 0; }
 .ln-dialog-body .ln-ltv .p { font-size: 0.86rem; }
 .ln-dialog-body .ln-trig { font-size: 1.02rem; line-height: 1.6; }
 .ln-dialog-body .ln-pair { font-size: 1rem; line-height: 1.6; gap: 0.8rem; align-self: start; align-content: start; }
@@ -242,5 +254,5 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content, .help-tip:focus-within .tip-content { display: block; }
 .help-tip.help-tip-right .tip-content { left: auto; right: 0; }
-.ln-ltv .k .help-tip { margin-left: 0.25rem; width: 13px; height: 13px; font-size: 0.6rem; }
+.ln-ltv .k .help-tip { margin-left: 0; width: 12px; height: 12px; font-size: 0.56rem; flex: 0 0 auto; }
 .ln-dialog .help-tip .tip-content { z-index: 60; }
