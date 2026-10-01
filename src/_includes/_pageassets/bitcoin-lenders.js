@@ -313,3 +313,22 @@
   var m0 = canDialog && location.hash.match(/^#lender-([a-z0-9-]+)$/);
   if (m0) { history.replaceState({ lender: m0[1] }, '', location.href); openDetail(m0[1], false); }
 })();
+
+/* ── The change log's card badges (lenders v2 C, 2026-10-01) ──
+   Each card with a logged change carries a hidden badge naming its newest entry
+   (data-log-*, rendered at build from lenderLog.json). Shown here, against the
+   reader's clock, only while that entry is under 60 days old, so a badge can
+   never outlive its news even if the site goes a while without a deploy. */
+(function(){
+  var WINDOW_DAYS = 60;
+  var WORD = { rate: 'Rate changed', terms: 'Terms changed', availability: 'Availability changed', launch: 'Launched', added: 'Added', removed: 'Removed', exit: 'Exited' };
+  var now = Date.now();
+  document.querySelectorAll('.ln-changed[data-log-date]').forEach(function(b){
+    var t = Date.parse(b.getAttribute('data-log-date') + 'T00:00:00Z');
+    if (!isFinite(t) || (now - t) / 864e5 > WINDOW_DAYS || t > now + 864e5) return;
+    var label = b.getAttribute('data-log-label') || '';
+    b.textContent = (WORD[b.getAttribute('data-log-type')] || 'Changed') + ' ' + label.replace(/ \d{4}$/, '');
+    b.title = 'See What changed, above the cards';
+    b.hidden = false;
+  });
+})();

@@ -2,6 +2,12 @@
   {
     "display": "10/1/26",
     "date": "2026-10-01",
+    "page": "/bitcoin-lenders",
+    "summary": "Bitcoin Lenders Compared: a dated “What changed” log above the cards, a badge on recently changed lenders, and each card’s own history."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
     "page": "/",
     "summary": "Site-wide: the line “Bitcoin, measured.” now sits under the Last Coin Standing name in the header on every page."
   },
