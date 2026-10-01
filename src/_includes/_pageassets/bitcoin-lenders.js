@@ -321,7 +321,7 @@
    never outlive its news even if the site goes a while without a deploy. */
 (function(){
   var WINDOW_DAYS = 60;
-  var WORD = { rate: 'Rate changed', terms: 'Terms changed', availability: 'Availability changed', launch: 'Launched', added: 'Added', removed: 'Removed', exit: 'Exited' };
+  var WORD = { rate: 'Rate changed', terms: 'Terms changed', availability: 'Availability changed', launch: 'Launched', added: 'Added', removed: 'Removed', exit: 'Exited', corrected: 'Corrected' };
   var now = Date.now();
   document.querySelectorAll('.ln-changed[data-log-date]').forEach(function(b){
     var t = Date.parse(b.getAttribute('data-log-date') + 'T00:00:00Z');

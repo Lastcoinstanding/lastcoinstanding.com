@@ -40,8 +40,8 @@
       "otherCollateral": "",
       "qualifier": null,
       "rate": {
-        "headline": "8.75–11.25%",
-        "note": "fixed for the term; the rate depends on how much you borrow: 11.25% under about $250,000, down to 8.75% above $2 million"
+        "headline": "7.49–11.25%",
+        "note": "fixed for the term, set by loan size and when you pay the interest: monthly, 10.50% under $250,000 down to 8% at $2–5 million and 7.49% at $5–10 million; all at the end, 11.25% down to 8.75%. The volatility-proof loan costs 2.95 points more; the credit line is variable, 13.25% today"
       },
       "ltv": {
         "open": 0.5,
@@ -56,12 +56,12 @@
       },
       "trig": {
         "mode": "auto",
-        "extra": "Strike’s 6-month <strong>volatility-proof</strong> loan is different: it opens at 40%, a falling price can never trigger a sale, and it costs about 3 percentage points more; missing a payment can still cost you the collateral."
+        "extra": "Strike’s 6-month <strong>volatility-proof</strong> loan is different: it opens at 40%, a falling price can never trigger a sale, and it costs 2.95 percentage points more; missing a payment can still cost you the collateral."
       },
       "coins": "Strike, or the firms that fund its loans (unnamed “capital providers”), hold your bitcoin in a wallet set aside for you; Strike says it is never lent on again",
-      "terms": "12 months (6 for the volatility-proof loan), or a credit line you can draw on repeatedly; no fees to open, to repay early, or if Strike has to sell",
-      "minimum": "$5,000 in some states; up to $5 million",
-      "where": "“Select US states” for the standard loan; the credit line in 38 states + DC; the volatility-proof loan not in California, New York or Texas",
+      "terms": "12 months (6 for the volatility-proof loan), with interest paid monthly or all at the end, or a credit line you can draw on repeatedly; no fees to open, to repay early, for a late payment, or if Strike has to sell",
+      "minimum": "$10,000 for a personal loan in most states (up to $26,000 in a few); a personal credit line from $5,000 in most states; loans up to $10 million, larger by arrangement",
+      "where": "Personal loans in every state except Delaware, Hawaii and Maryland (business accounts only in Delaware and Maryland), plus DC and Puerto Rico; the personal credit line not in CA, CT, DE, HI, KY, MD, MS, OH, TN or VT; the volatility-proof loan not in CT, DE, MD, NY, PR, SC, TX or WA",
       "distinguishing": "A loan a falling price can’t liquidate (the volatility-proof loan), inside a full bitcoin app",
       "catch": "Small loans pay the highest rate, and your bitcoin may be held by funding partners Strike doesn’t name",
       "track": "Lending since 2025; no custody incident on record",
@@ -70,25 +70,32 @@
         "noRehyp": true,
         "holdKey": false,
         "noPriceLiq": true,
-        "under5k": true
+        "under5k": false
       },
       "states": {
-        "type": "all",
-        "note": "Strike’s March 2026 post: term loans in 50 states + DC + PR; the volatility-proof loan not in CA, NY, TX"
+        "type": "exclude",
+        "list": [
+          "DE",
+          "HI",
+          "MD"
+        ],
+        "note": "personal loans, from Strike’s state table; DE and MD for business accounts only; the credit line and the volatility-proof loan are offered in fewer states"
       },
       "depth": {
         "label": "The four categories of lender",
         "href": "/borrowing-against-your-stack#lender-categories"
       },
-      "sourcesLabel": "strike.me/lending, help center",
+      "sourcesLabel": "strike.me/borrow, help center (rates, margin calls, where available)",
       "sources": [
-        "https://strike.me/lending",
-        "https://strike.me/en/faq/what-is-my-loan-to-value-ratio",
-        "https://strike.me/en/faq/what-are-volatility-proof-loans"
+        "https://strike.me/borrow/",
+        "https://strike.me/support/what-are-the-interest-rates-for-borrowing-against-bitcoin/",
+        "https://strike.me/support/how-do-margin-calls-and-liquidations-happen",
+        "https://strike.me/support/where-is-bitcoin-backed-borrowing-available/",
+        "https://strike.me/support/how-do-i-borrow-against-bitcoin/"
       ],
-      "asOf": "2026-09-30",
-      "site": "https://strike.me/lending",
-      "how": "You send bitcoin to Strike and borrow up to half its value in dollars, at a fixed rate for 12 months or as a credit line you can draw on. Interest is charged on what you borrow; there are no fees to open, to repay early, or if Strike has to sell. If the price falls until the loan is 70% of the collateral’s value, Strike emails a margin call and you have 72 hours to add bitcoin or repay enough to get back under 65%; at 85% it sells just enough bitcoin to get there itself. Strike also offers a 6-month “volatility-proof” loan that opens at 40% and can never be sold because of price, at a higher rate; missing a payment can still cost the collateral. Your bitcoin is held by Strike or the firms that fund its loans, and Strike says it is never lent on again."
+      "asOf": "2026-10-01",
+      "site": "https://strike.me/borrow/",
+      "how": "You send bitcoin to Strike and borrow up to half its value in dollars, at a fixed rate for 12 months or as a credit line you can draw on. Interest is charged on what you borrow, monthly or all at the end (paying monthly is cheaper); there are no fees to open, to repay early, or if Strike has to sell. If the price falls until the loan is 70% of the collateral’s value, Strike emails a margin call and you have 72 hours to add bitcoin or repay enough to get back under 65%; at 85% it sells just enough bitcoin to get there itself. Strike also offers a 6-month “volatility-proof” loan that opens at 40% and can never be sold because of price, for 2.95 percentage points more; missing a payment can still cost the collateral. Your bitcoin is held by Strike or the firms that fund its loans, and Strike says it is never lent on again."
     },
     {
       "id": "ledn",
@@ -121,7 +128,7 @@
       "coins": "Ledn holds your bitcoin as a “custodied loan”: it may pass it to the institution funding the loan or to a ring-fenced vehicle, but no one may lend it out to earn interest; Ledn publishes proof of reserves",
       "terms": "12 months; interest builds up and is due when the loan ends (from 2027, in full at maturity); no penalty for repaying early; a 2% admin fee, waived for US and Canadian borrowers",
       "minimum": "$500",
-      "where": "Not available in about 10 US states, including California and Connecticut (from other lenders’ comparison charts; Ledn publishes no list)",
+      "where": "Not available in California, Connecticut, Hawaii, Nevada, North Dakota, South Dakota, Tennessee, Washington or DC (Ledn’s eligibility tool); Ledn adds that loans may depend on the loan size, the rate or the loan’s purpose",
       "distinguishing": "A $500 minimum, a bitcoin-only lending record back to 2018, and published proof of reserves",
       "catch": "Getting excess bitcoin back during the loan is hard: the loan must be under 30% of the collateral’s value, at least 60 days old, and withdrawals are capped at $100,000 per 60 days",
       "track": "Lending since 2018; paused nothing in 2022",
@@ -133,19 +140,30 @@
         "under5k": true
       },
       "states": {
-        "type": "unknown",
-        "note": "Ledn publishes no US state list; third-party charts show about 10 excluded states including CA and CT"
+        "type": "exclude",
+        "list": [
+          "CA",
+          "CT",
+          "HI",
+          "NV",
+          "ND",
+          "SD",
+          "TN",
+          "WA",
+          "DC"
+        ],
+        "note": "Ledn’s eligibility tool (Dollar Loans), read 1 Oct 2026"
       },
       "depth": {
         "label": "Rehypothecation, the biggest variable",
         "href": "/borrowing-against-your-stack#rehypothecation"
       },
-      "sourcesLabel": "ledn.io/bitcoin-backed-loans, help center",
+      "sourcesLabel": "ledn.io/bitcoin-backed-loans, eligibility tool",
       "sources": [
         "https://ledn.io/bitcoin-backed-loans",
-        "https://help.ledn.io"
+        "https://help.ledn.io/hc/en-us/p/eligibility"
       ],
-      "asOf": "2026-09-30",
+      "asOf": "2026-10-01",
       "site": "https://ledn.io/bitcoin-backed-loans",
       "how": "You send bitcoin to Ledn and borrow up to half its value in dollars for 12 months, with interest building up and due when the loan ends. If the price falls until the loan is 70% and then 75% of the collateral’s value, Ledn emails you to add bitcoin or repay; at 80% it sells automatically, and that sale can’t be reversed. The rate depends on loan size, from 11.49% for small loans to 9.25% above $2 million. Ledn holds the bitcoin as a “custodied loan”: it may pass it to the institution funding the loan, but no one may lend it out, and Ledn publishes proof of reserves. Taking excess bitcoin back during the loan is tightly limited."
     },
