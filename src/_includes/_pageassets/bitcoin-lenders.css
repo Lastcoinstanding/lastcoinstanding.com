@@ -23,6 +23,8 @@
    7. Prose sections
    8. Mobile
    9. The details row and the detail dialog
+  10. The levers section, the lender's-page links, "How this loan works"
+  11. Help-tip (canonical §6.13; copied from BAS, same tokens)
    ─────────────────────────────────────────────── */
 
 /* ─── 1. TOKENS ─── */
@@ -62,7 +64,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-live strong { color: var(--text-bright); font-weight: 600; }
 .ln-live-src { font-size: 0.72rem; color: var(--text-muted); }
 .ln-live-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-.ln-live-ctl-label { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.ln-live-ctl-label { display: inline-flex; align-items: center; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .ln-radio { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text); }
 .ln-radio input { accent-color: var(--amber); margin: 0; }
 .ln-own { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.45; transition: opacity 0.2s; }
@@ -94,7 +96,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 /* ─── 6. THE CARD ─── */
 .ln-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; }
 .ln-card[hidden] { display: none; }
-.ln-card.ln-dim { opacity: 0.55; }
+.ln-card.ln-dim { opacity: 0.62; }
+.ln-card.ln-off { opacity: 0.42; }
+.ln-state-flag { display: none; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.32rem 0.6rem; border-radius: 6px; margin: -0.2rem 0 0.1rem; line-height: 1.35; }
+.ln-state-flag:not(:empty) { display: block; }
+.ln-off .ln-state-flag { color: var(--red); border: 1px solid var(--red-dim); }
+.ln-dim .ln-state-flag { color: var(--amber); border: 1px dashed var(--amber-dim); }
+.ln-dialog-body .ln-state-flag { grid-column: 1 / -1; }
 .ln-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6rem; }
 .ln-head-text { min-width: 0; }
 .ln-name { font-family: var(--font-d); font-size: 1.6rem; font-weight: 600; color: var(--text-bright); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
@@ -122,8 +130,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-dl { display: grid; grid-template-columns: 7rem 1fr; gap: 0.4rem 0.7rem; margin: 0; font-size: 0.86rem; line-height: 1.5; }
 .ln-dl dt { color: var(--text-dim); }
 .ln-dl dd { margin: 0; color: var(--text); }
-.ln-state-note { font-size: 0.8rem; color: var(--amber); margin: -0.2rem 0 0; line-height: 1.4; }
-.ln-state-note:empty { display: none; }
 .ln-pair { display: grid; gap: 0.5rem; font-size: 0.88rem; line-height: 1.5; }
 .ln-pair .l { display: block; font-weight: 600; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.1rem; }
 .ln-pair .plus .l { color: var(--green); }
@@ -206,3 +212,35 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
     .ln-dialog-body .ln-ltv .p { font-size: 0.78rem; }
     .ln-dialog-body .ln-dl { grid-template-columns: 6.5rem 1fr; }
 }
+
+/* ─── 10. THE LEVERS, THE LENDER'S-PAGE LINKS, "HOW THIS LOAN WORKS" ─── */
+.ln-levers { margin: 0 0 1.6rem; padding: 1.2rem 1.4rem 1.1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+.ln-levers-title { font-family: var(--font-d); font-size: 1.45rem; font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; margin: 0 0 0.4rem; }
+.ln-levers-lede { font-size: 0.92rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 1rem; max-width: 80ch; }
+.ln-levers-grid { display: grid; grid-template-columns: 1fr; gap: 0.7rem 1.6rem; margin: 0; }
+.ln-levers-grid > div { min-width: 0; }
+.ln-levers-grid dt { font-family: var(--font-b); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.2rem; }
+.ln-levers-grid dd { margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--text); }
+.ln-levers-grid dd em { color: var(--text-bright); font-style: italic; }
+@media (min-width: 760px) { .ln-levers-grid { grid-template-columns: 1fr 1fr; } }
+.ln-links { display: flex; justify-content: flex-end; }
+.ln-site { font-size: 0.78rem; color: var(--text-dim); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+.ln-site:hover { color: var(--amber); border-color: var(--amber-dim); }
+.ln-site-big { display: inline-block; margin-top: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--amber); border: 1px solid var(--amber-dim); border-bottom: 1px solid var(--amber-dim); border-radius: 8px; padding: 0.45rem 0.8rem; }
+.ln-site-big:hover { background: var(--amber-soft); }
+.ln-how .l { display: block; font-weight: 600; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.3rem; }
+.ln-how p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+.ln-dialog-body .ln-how { grid-column: 1 / -1; }
+.ln-dialog-body .ln-how p { font-size: 1.02rem; line-height: 1.65; }
+.ln-dialog-body .ln-links { display: none; }
+
+/* ─── 11. HELP-TIP (canonical §6.13; same markup and tokens as BAS) ─── */
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--text-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
+.help-tip:hover, .help-tip:focus { color: var(--amber); border-color: var(--amber); outline: none; }
+.help-tip .tip-content { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: min(260px, calc(100vw - 32px)); padding: 0.85rem 1rem; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; line-height: 1.5; color: var(--text); background: var(--bg-card); border: 1px solid var(--amber-glow); border-radius: 5px; box-shadow: 0 4px 18px rgba(0,0,0,0.55); z-index: 50; text-align: left; letter-spacing: 0; text-transform: none; white-space: normal; }
+.help-tip .tip-content strong { color: var(--text-bright); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip:hover .tip-content, .help-tip:focus .tip-content, .help-tip:focus-within .tip-content { display: block; }
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+.ln-ltv .k .help-tip { margin-left: 0.25rem; width: 13px; height: 13px; font-size: 0.6rem; }
+.ln-dialog .help-tip .tip-content { z-index: 60; }

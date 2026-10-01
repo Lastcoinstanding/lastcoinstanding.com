@@ -1,33 +1,33 @@
 {
   "asOf": "2026-09-30",
   "asOfLabel": "30 Sep 2026",
-  "note": "One object per lender card on /bitcoin-lenders. Every figure is what the lender published on each card's asOf, read from its sources. 'not published' is a value, never an estimate. The page computes trigger prices from ltv.open/call/liq and the live bitcoin price (trigger = price × open ÷ threshold; drawdown = 1 − open ÷ threshold), the same arithmetic as Borrowing Against Your Stack's loan-health calculator. ltv.reference marks a lender with no published maximum opening LTV, quoted at a 50% loan. trig.mode 'auto' builds the trigger sentence from the numbers; 'text' uses trig.static at build and trig.live (with {price} {call} {callPct} {liq} {liqPct} placeholders) once the live price is known. filters.* are booleans the filter chips read; states.type is all | include | exclude | unknown | none with states.list where published; states.rest 'unknown' on an exclude list means the lender names exclusions but publishes no list for the rest. Refresh: MONTHLY_REFRESH_CHECKLIST (rates monthly, full card quarterly); DATA_AUDIT LEN-1 to LEN-19.",
+  "note": "One object per lender card on /bitcoin-lenders. Every figure is what the lender published on each card's asOf, read from its sources. 'not published' is a value, never an estimate. The page computes trigger prices from ltv.open/call/liq and the live bitcoin price (trigger = price × open ÷ threshold; drawdown = 1 − open ÷ threshold), the same arithmetic as Borrowing Against Your Stack's loan-health calculator. ltv.reference marks a lender with no published maximum opening LTV, quoted at a 50% loan. trig.mode 'auto' builds the trigger sentence from the numbers; 'text' uses trig.static at build and trig.live (with {price} {call} {callPct} {liq} {liqPct} placeholders) once the live price is known. filters.* are booleans the filter chips read; states.type is all | include | exclude | unknown | none with states.list where published; states.rest 'unknown' on an exclude list means the lender names exclusions but publishes no list for the rest. `site` is the lender's own product page, linked from the card and the detail; `how` is the plain-language 'How this loan works' paragraph shown in the detail (JM, 2026-09-30: write for a reader who doesn't know the vocabulary). Refresh: MONTHLY_REFRESH_CHECKLIST (rates monthly, full card quarterly); DATA_AUDIT LEN-1 to LEN-19.",
   "groups": [
     {
       "id": "custodial",
       "title": "Custodial lenders",
-      "sub": "You hand the lender your bitcoin for the life of the loan. The questions are who holds it, whether it can be lent on, and what a margin call actually does. Coinbase is under DeFi: its loan is a Morpho position in cbBTC behind a Coinbase screen."
+      "sub": "You hand the lender your bitcoin for the life of the loan and get dollars back. The questions that separate these cards: who holds the bitcoin, whether it may be lent on to anyone else<span class=\"help-tip\" tabindex=\"0\">?<span class=\"tip-content\"><strong>Rehypothecation.</strong> A lender using your collateral for its own purposes, lending it on or pledging it, while still owing it back to you. It lets a lender charge less, and it was the mechanism behind the 2022 failures: when the lender’s own borrowers failed, the bitcoin was gone. Every custodial card says what the lender promises about this.</span></span>, and what happens when the price falls. Coinbase is under DeFi, because its loan is a position on a public lending protocol behind a Coinbase screen."
     },
     {
       "id": "exchange",
       "title": "Exchange credit lines and margin",
-      "sub": "Borrowing inside an exchange account. The collateral is an exchange balance, often of many assets, measured by the exchange's own rules. Kraken has two products: a loan you can withdraw (Flexline) and buying power you can't (Borrow US)."
+      "sub": "Borrowing inside an exchange account, against everything you hold there. The exchange decides how much each asset counts (a “haircut”<span class=\"help-tip\" tabindex=\"0\">?<span class=\"tip-content\"><strong>Haircut.</strong> The discount an exchange applies to each asset before counting it as collateral. Bitcoin might count at 90% of its value, a smaller coin at 50%. The result is a “margin level” for the whole account rather than a loan-to-value for one loan.</span></span>) and watches the whole balance rather than one loan. Kraken has two products: a loan you can withdraw (Flexline) and buying power you can’t (Borrow US)."
     },
     {
       "id": "multisig",
       "title": "Multisig and DLC: you hold a key",
-      "sub": "The collateral sits in an on-chain contract you can watch, a multisig or a Discreet Log Contract, and the lender can’t move it alone. The price of that is a different liquidation: the coins go to the lender, often all of them, rather than being partly sold; in a DLC nothing moves until maturity at all."
+      "sub": "The bitcoin sits in an address on the blockchain that you can watch, and the lender cannot move it alone: a multisig<span class=\"help-tip\" tabindex=\"0\">?<span class=\"tip-content\"><strong>Multisig.</strong> An address that needs more than one key to spend from, say two of three. You hold one key, the lender another, an independent party the third, so no single party can take the bitcoin. You can check the address on the blockchain at any time.</span></span> or a Discreet Log Contract<span class=\"help-tip\" tabindex=\"0\">?<span class=\"tip-content\"><strong>Discreet Log Contract (DLC).</strong> A bitcoin contract in which every possible outcome is signed by both parties before any bitcoin moves. At the end, an independent price reporter (an “oracle”) only picks which of the pre-signed outcomes is broadcast; it cannot invent a new one or move the bitcoin.</span></span>. The price of that protection is a different kind of liquidation: the bitcoin itself is handed to the lender, often all of it, rather than part of it being sold; in a DLC nothing moves until the end of the term at all."
     },
     {
       "id": "defi",
       "title": "DeFi: wrapped bitcoin, not bitcoin",
-      "sub": "The collateral is an IOU for bitcoin (cbBTC, WBTC) whose issuer holds the real coins, locked in a lending contract anyone can liquidate. No lender, no KYC, no notice. Coinbase's loan product is the first card: a Morpho position in cbBTC."
+      "sub": "The collateral is not bitcoin but a token standing for it (“wrapped” bitcoin<span class=\"help-tip\" tabindex=\"0\">?<span class=\"tip-content\"><strong>Wrapped bitcoin.</strong> A token on another network, such as cbBTC or WBTC, that its issuer promises is backed one-for-one by real bitcoin it holds. Lending protocols on those networks accept the token, not bitcoin. So the issuer (Coinbase, or the BitGo / BiT Global venture) is a counterparty in the loan whether or not you chose it.</span></span>), whose issuer holds the real coins, locked in a lending program anyone can use. There is no lender to call, no identity check, and no warning before a sale. Coinbase’s loan product is the first card here: it is a position on Morpho behind a Coinbase screen."
     },
     {
       "id": "mortgage",
       "title": "Bitcoin-backed mortgages",
       "qualifier": "A different animal",
-      "sub": "The loan buys a house, and the house is collateral alongside the bitcoin; the money can't be used for anything else, the term is 30 years, and the lender is a mortgage company. Described here for completeness; the mechanics and the tax angle are on Borrowing Against Your Stack → mortgages."
+      "sub": "The loan buys a house, and the house is collateral alongside the bitcoin; the money can’t be used for anything else, the term is 30 years, and the lender is a mortgage company. They are here for completeness; the mechanics and the tax angle are on Borrowing Against Your Stack → mortgages."
     }
   ],
   "lenders": [
@@ -41,29 +41,29 @@
       "qualifier": null,
       "rate": {
         "headline": "8.75–11.25%",
-        "note": "APR, fixed; tiered by loan size (11.25% under ~$250K)"
+        "note": "fixed for the term; the rate depends on how much you borrow: 11.25% under about $250,000, down to 8.75% above $2 million"
       },
       "ltv": {
         "open": 0.5,
         "call": 0.7,
         "liq": 0.85,
         "callLabel": "Margin call",
-        "openNote": "LTV",
-        "callNote": "72 h to cure to 65%",
-        "liqNote": "partial, back to 65%",
+        "openNote": "of your bitcoin’s value",
+        "callNote": "72 hours to add bitcoin or repay until the loan is back under 65%",
+        "liqNote": "Strike sells only enough bitcoin to bring the loan back to 65%",
         "callVerb": "gets a margin call",
         "liqVerb": "is partly liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "The 6-month <strong>Volatility-proof</strong> loan opens at 40%, has no price trigger, and costs about 3 points more; a missed payment can still liquidate it."
+        "extra": "Strike’s 6-month <strong>volatility-proof</strong> loan is different: it opens at 40%, a falling price can never trigger a sale, and it costs about 3 percentage points more; missing a payment can still cost you the collateral."
       },
-      "coins": "Held by Strike or its capital providers, segregated; “no further rehypothecation”",
-      "terms": "12 mo (6 mo volatility-proof) or a revolving line; no origination, prepayment or liquidation fees",
-      "minimum": "$5,000 in some states; up to $5M",
-      "where": "“Select US states”; the line of credit in 38 states + DC; volatility-proof not in CA, NY, TX",
-      "distinguishing": "The only US lender with a loan that can’t be liquidated by price; a full bitcoin app around it",
-      "catch": "Rates are tiered: small loans pay the top rate. Its collateral goes to “capital providers”, whose names Strike doesn’t publish",
+      "coins": "Strike, or the firms that fund its loans (unnamed “capital providers”), hold your bitcoin in a wallet set aside for you; Strike says it is never lent on again",
+      "terms": "12 months (6 for the volatility-proof loan), or a credit line you can draw on repeatedly; no fees to open, to repay early, or if Strike has to sell",
+      "minimum": "$5,000 in some states; up to $5 million",
+      "where": "“Select US states” for the standard loan; the credit line in 38 states + DC; the volatility-proof loan not in California, New York or Texas",
+      "distinguishing": "A loan a falling price can’t liquidate (the volatility-proof loan), inside a full bitcoin app",
+      "catch": "Small loans pay the highest rate, and your bitcoin may be held by funding partners Strike doesn’t name",
       "track": "Lending since 2025; no custody incident on record",
       "filters": {
         "bitcoinOnly": true,
@@ -86,7 +86,9 @@
         "https://strike.me/en/faq/what-is-my-loan-to-value-ratio",
         "https://strike.me/en/faq/what-are-volatility-proof-loans"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://strike.me/lending",
+      "how": "You send bitcoin to Strike and borrow up to half its value in dollars, at a fixed rate for 12 months or as a credit line you can draw on. Interest is charged on what you borrow; there are no fees to open, to repay early, or if Strike has to sell. If the price falls until the loan is 70% of the collateral’s value, Strike emails a margin call and you have 72 hours to add bitcoin or repay enough to get back under 65%; at 85% it sells just enough bitcoin to get there itself. Strike also offers a 6-month “volatility-proof” loan that opens at 40% and can never be sold because of price, at a higher rate; missing a payment can still cost the collateral. Your bitcoin is held by Strike or the firms that fund its loans, and Strike says it is never lent on again."
     },
     {
       "id": "ledn",
@@ -98,7 +100,7 @@
       "qualifier": null,
       "rate": {
         "headline": "9.25–11.49%",
-        "note": "APR; tiered by loan size (11.49% under $250K)"
+        "note": "the rate depends on loan size: 11.49% under $250,000, down to 9.25% above $2 million"
       },
       "ltv": {
         "open": 0.5,
@@ -106,22 +108,22 @@
         "liq": 0.8,
         "callLabel": "Alerts",
         "callDisplay": "70 / 75%",
-        "openNote": "LTV",
-        "callNote": "add collateral or repay",
-        "liqNote": "automatic, irreversible",
+        "openNote": "of your bitcoin’s value",
+        "callNote": "Ledn emails you to add bitcoin or repay; there is no fixed deadline",
+        "liqNote": "Ledn sells automatically; the sale can’t be reversed",
         "callVerb": "is alerted",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "A 0.5% liquidation spread."
+        "extra": "Ledn sells 0.5% below the market price (its “liquidation spread”)."
       },
-      "coins": "“Custodied loan”: verifiable custody; may be re-posted to a funding partner or ring-fenced vehicle, but no one may lend it out",
-      "terms": "12 mo; interest due at close (paid in full at maturity from 2027); no prepayment penalty; 2% admin fee waived for US and Canada",
+      "coins": "Ledn holds your bitcoin as a “custodied loan”: it may pass it to the institution funding the loan or to a ring-fenced vehicle, but no one may lend it out to earn interest; Ledn publishes proof of reserves",
+      "terms": "12 months; interest builds up and is due when the loan ends (from 2027, in full at maturity); no penalty for repaying early; a 2% admin fee, waived for US and Canadian borrowers",
       "minimum": "$500",
-      "where": "Not in about 10 US states, including CA and CT (lender list to confirm at build)",
-      "distinguishing": "The lowest minimum and the longest bitcoin-only lending record (since 2018); proof-of-reserves reporting",
-      "catch": "Retrieving excess collateral needs LTV under 30%, a 60-day-old loan, and is capped at $100K per 60 days",
+      "where": "Not available in about 10 US states, including California and Connecticut (from other lenders’ comparison charts; Ledn publishes no list)",
+      "distinguishing": "A $500 minimum, a bitcoin-only lending record back to 2018, and published proof of reserves",
+      "catch": "Getting excess bitcoin back during the loan is hard: the loan must be under 30% of the collateral’s value, at least 60 days old, and withdrawals are capped at $100,000 per 60 days",
       "track": "Lending since 2018; paused nothing in 2022",
       "filters": {
         "bitcoinOnly": true,
@@ -143,7 +145,9 @@
         "https://ledn.io/bitcoin-backed-loans",
         "https://help.ledn.io"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://ledn.io/bitcoin-backed-loans",
+      "how": "You send bitcoin to Ledn and borrow up to half its value in dollars for 12 months, with interest building up and due when the loan ends. If the price falls until the loan is 70% and then 75% of the collateral’s value, Ledn emails you to add bitcoin or repay; at 80% it sells automatically, and that sale can’t be reversed. The rate depends on loan size, from 11.49% for small loans to 9.25% above $2 million. Ledn holds the bitcoin as a “custodied loan”: it may pass it to the institution funding the loan, but no one may lend it out, and Ledn publishes proof of reserves. Taking excess bitcoin back during the loan is tightly limited."
     },
     {
       "id": "figure",
@@ -155,7 +159,7 @@
       "qualifier": null,
       "rate": {
         "headline": "10.0–12.6%",
-        "note": "APR incl. 1% origination; 8.91% rate at 50% LTV, 11.5% up to 75%"
+        "note": "includes the 1% fee to open; 8.91% interest if you borrow 50% of your bitcoin’s value, 11.5% if you borrow up to 75%"
       },
       "ltv": {
         "open": 0.5,
@@ -163,23 +167,23 @@
         "liq": null,
         "callLabel": "Margin call",
         "openDisplay": "50–75%",
-        "openNote": "LTV, your choice",
-        "callNote": "for a 50% loan (calculator)",
+        "openNote": "your choice",
+        "callNote": "for a loan opened at 50%, according to Figure’s calculator",
         "liqDisplay": "not published",
-        "liqNote": "“cure in the required time”; 2% fee"
+        "liqNote": "Figure says only “cure in the required time”; a 2% fee if it sells"
       },
       "trig": {
         "mode": "text",
-        "live": "At {price}, a 50% loan gets its margin-call warning at <strong>{call}</strong> ({callPct}). A 75% loan is warned after a 6% fall (its 80% line). Optional <strong>Liquidation Protection</strong>, 2% up front, removes price liquidations on 50% BTC loans in 10 states.",
-        "static": "A 50% loan gets its margin-call warning after a 33% fall; a 75% loan after a 6% fall (its 80% line). Optional <strong>Liquidation Protection</strong>, 2% up front, removes price liquidations on 50% BTC loans in 10 states."
+        "live": "At {price}, a loan opened at 50% gets its margin-call warning at <strong>{call}</strong> ({callPct}); one opened at 75% is warned after a 6% fall (its 80% line). For an extra 2% up front, <strong>Liquidation Protection</strong> stops price-triggered sales on 50% bitcoin loans in 10 states.",
+        "static": "A loan opened at 50% gets its margin-call warning after a 33% fall; one opened at 75%, after a 6% fall (its 80% line). For an extra 2% up front, <strong>Liquidation Protection</strong> stops price-triggered sales on 50% bitcoin loans in 10 states."
       },
-      "coins": "Segregated MPC wallet with an address you can watch; Figure states no rehypothecation",
-      "terms": "12 mo interest-only; interest can be deferred to maturity; 1% origination, 2% liquidation fee; rates “change frequently”",
+      "coins": "Held in a wallet set aside for you (a multi-party computation wallet) whose address you can check on the blockchain; Figure says the bitcoin is never lent on",
+      "terms": "12 months, interest only, with the option to defer all the interest to the end; 1% to open, 2% if Figure has to sell; a soft credit check; Figure says rates “change frequently”",
       "minimum": "$5,000",
-      "where": "Not in DC, ID, IL, KY, MD, MS, SD, TX, VT, VA; international via a separate entity",
-      "distinguishing": "A large, state-licensed consumer lender ($11B originated) with a soft credit pull and same-day approval",
-      "catch": "Collateral is locked until full repayment, whatever bitcoin does; the liquidation LTV isn’t published; altcoins share the platform",
-      "track": "Consumer lender since 2018; crypto loans newer; “never lost coin assets or paused withdrawals”",
+      "where": "Not in DC, Idaho, Illinois, Kentucky, Maryland, Mississippi, South Dakota, Texas, Vermont or Virginia; outside the US through a separate entity",
+      "distinguishing": "A large, state-licensed consumer lender ($11 billion of loans made) with same-day approval",
+      "catch": "Your bitcoin stays locked until the loan is fully repaid, whatever the price does; the point at which Figure sells isn’t published; other coins share the platform",
+      "track": "A consumer lender since 2018; crypto loans more recent; says it has “never lost coin assets or paused withdrawals”",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -212,7 +216,9 @@
         "https://figure.com/crypto-backed-loan/crypto-loan-calculator",
         "https://figure.com/crypto-backed-loan/liquidation-protection"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://figure.com/crypto-backed-loan",
+      "how": "You send bitcoin (or ether or solana) to a wallet set aside for you and borrow 50% to 75% of its value for 12 months, interest only, with a 1% fee to open; you can defer all the interest to the end. If the price falls, Figure sends notices to restore the loan’s opening ratio; its calculator implies a 50% loan is warned at 75%, but the point at which Figure sells, and how long you get, aren’t published. For 2% up front in ten states, “Liquidation Protection” stops price-triggered sales on 50% bitcoin loans. The wallet address can be checked on the blockchain, and Figure says the bitcoin is never lent on; it stays locked until the loan is fully repaid."
     },
     {
       "id": "arch",
@@ -224,29 +230,29 @@
       "qualifier": null,
       "rate": {
         "headline": "7.74–10.49%",
-        "note": "APR incl. origination (0.25–1.49%); by loan size, 10.49% under $250K; deferred-interest ~0.5 pt more (table of 19 May 2026)"
+        "note": "includes the opening fee (0.25–1.49%); the rate depends on loan size, 10.49% under $250,000; paying interest at the end instead of monthly costs about half a point more (Arch’s table of 19 May 2026)"
       },
       "ltv": {
         "open": 0.6,
         "call": 0.7,
         "liq": 0.8,
         "callLabel": "Margin call",
-        "openNote": "LTV, or lower by choice",
-        "callNote": "24 h to cure to 60%",
-        "liqNote": "partial, back to 60%; 2% fee",
+        "openNote": "or less if you choose",
+        "callNote": "24 hours to add bitcoin or repay until the loan is back under 60%",
+        "liqNote": "Arch sells only enough to bring the loan back to 60%, with a 2% fee",
         "callVerb": "gets a margin call",
         "liqVerb": "is partly liquidated"
       },
       "trig": {
         "mode": "auto"
       },
-      "coins": "Segregated cold storage at Anchorage Digital Bank, described as bankruptcy-remote; “never rehypothecates”; no watchable address published",
-      "terms": "1–12 mo, rollover at maturity; monthly interest or deferred; no prepayment fee; late fees “may apply”",
-      "minimum": "$5,000 (varies by state); tiers run past $10M",
-      "where": "Arch’s own pages carry three different state lists; the eligibility article (June 2026) lists 44 states + DC + PR, the footer excludes CA, DE, HI, MS, MT, NV, ND, RI, VT",
-      "distinguishing": "The highest opening LTV among the custodial lenders (60%) with a stated 24-hour cure and partial liquidation only back to 60%",
-      "catch": "A 60→70→80 band means a 14% fall triggers the call; Arch’s pages disagree on states, rates and origination, so only the app quote is reliable",
-      "track": "Founded 2022 (press); $75M raised 2024; no incidents or actions published",
+      "coins": "Held at Anchorage Digital Bank in a separate cold-storage account that Arch describes as protected if Arch itself failed; Arch says it never lends your bitcoin on; no address for you to check is published",
+      "terms": "1–12 months, renewable at the end without repaying; interest monthly or at the end; no fee to repay early; late fees “may apply”",
+      "minimum": "$5,000 (varies by state); no published maximum",
+      "where": "Arch’s own pages carry three different state lists: its June 2026 eligibility article names 44 states + DC + Puerto Rico; its site footer instead excludes California, Delaware, Hawaii, Mississippi, Montana, Nevada, North Dakota, Rhode Island and Vermont",
+      "distinguishing": "Opens at 60% with a stated 24-hour window to fix a margin call and a sale that only trims the loan back to 60%; the bitcoin is held at a federally chartered bank",
+      "catch": "Starting at 60% means a 14% fall already triggers the margin call; Arch’s pages disagree with each other on states, rates and fees, so only the quote in its app is reliable",
+      "track": "Founded 2022 (press); raised $75 million in 2024; no incidents or actions published",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -316,7 +322,9 @@
         "https://help.archlending.com/en/articles/9948814-when-do-i-get-margin-called-or-partially-liquidated",
         "https://help.archlending.com/en/articles/9945241-am-i-an-eligible-borrower"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://www.archlending.com/",
+      "how": "You send bitcoin to Arch, which holds it at Anchorage Digital Bank, and borrow up to 60% of its value for 1 to 12 months, renewable. Interest is paid monthly or at the end; the rate depends on loan size and includes an opening fee. If the price falls until the loan is 70% of the collateral’s value you have 24 hours to add bitcoin or repay back to 60%; at 80% Arch sells just enough to get there, with a 2% fee. Arch says it never lends your bitcoin on. Its own pages disagree on which states it serves and on some rates, so the quote in its app is the one that counts."
     },
     {
       "id": "salt",
@@ -328,7 +336,7 @@
       "qualifier": null,
       "rate": {
         "headline": "7.49–10.50%",
-        "note": "APR, fixed for the term, by LTV tier not size: 30% LTV 7.49% (1 yr) to 8.49% (5 yr); 50% 8.75–9.75%; 70% 10.50% (1 yr only)"
+        "note": "fixed for the term; the rate depends on how much of your bitcoin’s value you borrow, not on the loan size: 7.49–8.49% if you borrow 30%, 8.75–9.75% at 50%, 10.50% at 70% (1-year only)"
       },
       "ltv": {
         "open": 0.7,
@@ -336,25 +344,25 @@
         "liq": 0.9091,
         "callLabel": "Margin call",
         "openDisplay": "30 / 50 / 70%",
-        "openNote": "LTV tiers",
+        "openNote": "you pick one of three levels",
         "callDisplay": "83.33%",
-        "callNote": "notices at 75 and 88%; no cure window stated",
+        "callNote": "warnings at 75% and 88% too; no fixed time to act",
         "liqDisplay": "90.91%",
-        "liqNote": "“margin event”: sold (5%) or converted to USDC (3%)",
+        "liqNote": "SALT sells (5% fee) or converts your bitcoin to dollars (3% fee), whichever you chose in advance",
         "callVerb": "gets a margin call",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "At 50% LTV the margin event comes after a 45% fall. <strong>Stabilization</strong> converts collateral to USDC at the trigger instead of selling it; 2% to convert back once LTV is under 83.33%."
+        "extra": "If you borrowed 50%, the margin event comes after a 45% fall. <strong>Stabilization</strong> converts your bitcoin to a dollar stablecoin at the trigger instead of selling it; converting back costs 2% once the loan is under 83.33%."
       },
-      "coins": "“No rehypothecation”; custodian not named on product pages (a 2024 post names BitGo Trust); collateral “may be transferred between custodial solutions”, so no fixed address to watch",
-      "terms": "1, 3 or 5 yr; interest-only, amortising, or accrued to maturity; 0% origination and prepayment; 1.5% on crypto payments off autopay",
-      "minimum": "$5,000; maximum not published",
-      "where": "Every US state except NY, ND, SD, plus DC and PR; also Canada, UK, Switzerland, UAE, Australia and others",
-      "distinguishing": "Fixed 3- and 5-year terms, and Stabilization in place of a sale",
-      "catch": "The 90.91% trigger leaves little room and costs 3–5% plus 2% to re-enter; SALT paused withdrawals on 15 Nov 2022 and its California licence was suspended until Jan 2025",
-      "track": "Founded 2016; SEC token settlement 2020 ($250K); withdrawals paused Nov 2022, $64M recapitalisation Feb 2023; CA licence reinstated 2025 under a DFPI consent order; “zero customer funds lost”",
+      "coins": "SALT says it never lends your bitcoin on; it doesn’t name its custodian on its product pages (a 2024 post names BitGo Trust) and says collateral “may be transferred between custodial solutions”, so there is no fixed address to watch",
+      "terms": "1, 3 or 5 years; pay interest monthly, interest and principal monthly, or let the interest build to the end; no fee to open or to repay early; 1.5% on crypto payments made off autopay",
+      "minimum": "$5,000; no published maximum",
+      "where": "Every US state except New York, North Dakota and South Dakota, plus DC and Puerto Rico; also Canada, the UK, Switzerland, the UAE, Australia and others",
+      "distinguishing": "Fixed 3- and 5-year terms, and the option to have bitcoin converted to dollars rather than sold at the trigger",
+      "catch": "The trigger at 90.91% leaves little room and costs 3–5% plus 2% to re-enter; SALT froze withdrawals in November 2022 and its California licence was suspended until January 2025",
+      "track": "Founded 2016; settled with the SEC in 2020 over its token sale ($250,000); froze withdrawals in November 2022 and was recapitalised in February 2023; California licence reinstated in 2025 under a regulator’s consent order; says “zero customer funds lost”",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -382,7 +390,9 @@
         "https://saltlending.com/california-dfpi-notice/",
         "https://saltlending.com/ca-dfpi-resolution/"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://saltlending.com/personal/",
+      "how": "You send bitcoin to SALT and borrow 30%, 50% or 70% of its value for 1, 3 or 5 years at a fixed rate; the smaller the share you borrow, the lower the rate. You can pay interest monthly, pay interest and principal monthly, or let the interest build to the end. SALT warns you at 75%, 83.33% and 88% of the collateral’s value, with no fixed time to act; at 90.91% it either sells your bitcoin (5% fee) or, if you chose “Stabilization” in advance, converts it to a dollar stablecoin instead (3% fee, and 2% to convert back once the loan is under 83.33%). SALT says it never lends your bitcoin on, but doesn’t name its custodian on its product pages and may move the bitcoin between custodians."
     },
     {
       "id": "apx",
@@ -394,29 +404,29 @@
       "qualifier": null,
       "rate": {
         "headline": "9.99–11.49%",
-        "note": "fixed for the term, by loan size (11.49% under $100K); $0 origination, so APR = rate; line of credit 10.49–11.99%"
+        "note": "fixed for the term; the rate depends on loan size, 11.49% under $100,000; no fee to open, so the rate is the whole cost; a 5-year credit line costs 10.49–11.99%"
       },
       "ltv": {
         "open": 0.6,
         "call": 0.8,
         "liq": 0.9,
         "callLabel": "Warning",
-        "openNote": "LTV, 20–60% by choice",
-        "callNote": "notices every 6 h; “no margin call”, no cure period",
-        "liqNote": "partial, back to 85%; 0% fee since 25 Aug 2026",
+        "openNote": "you choose, between 20% and 60%",
+        "callNote": "notices every 6 hours; APX sets no deadline to act and makes no margin call as such",
+        "liqNote": "APX sells only enough to bring the loan back to 85%, with no fee (since 25 Aug 2026)",
         "callVerb": "gets its warning",
         "liqVerb": "is partly liquidated"
       },
       "trig": {
         "mode": "auto"
       },
-      "coins": "Segregated cold wallet per client at BitGo Trust, visible on-chain; “never pooled or rehypothecated”. Its own risk disclosure: in an APX insolvency a borrower’s claim “could be treated as unsecured”",
-      "terms": "3–60 mo, extendable; interest-only, amortised or deferred; closing early costs a minimum of three months’ interest",
-      "minimum": "$25,000 for US borrowers (C$10,000 in Canada); “no fixed maximum”",
-      "where": "“Residents of the U.S. and Canada”; US borrowers are paid in USDC only; no US state list or state licence published; the Canadian regulatory relief (CSA, April 2025) covers Canadians only",
-      "distinguishing": "The highest liquidation line of the custodial lenders (90%), partial to 85%, no fee",
-      "catch": "For a US borrower the regulatory cover is an MSB registration, the payout is USDC, the minimum is $25K, and the insolvency language above",
-      "track": "Founded 2022 by the ex-Coinberry team; CSA exemptive relief April 2025; no incidents published; not operating in 2022",
+      "coins": "Held in a cold-storage wallet set aside for you at BitGo Trust, whose address you can check on the blockchain; APX says it never pools or lends your bitcoin on. Its own risk disclosure adds that if APX went bankrupt your claim “could be treated as unsecured”",
+      "terms": "3–60 months, extendable; pay interest monthly, repay in instalments, or defer everything to the end; closing early costs at least three months’ interest",
+      "minimum": "$25,000 for US borrowers (C$10,000 in Canada); no fixed maximum",
+      "where": "US and Canadian residents; US borrowers are paid in the USDC stablecoin rather than dollars; no US state list or state licence is published; APX’s Canadian regulatory relief (April 2025) covers Canadians only",
+      "distinguishing": "A sale line of 90% that only trims the loan back to 85%, with no fee, and a wallet set aside for you that you can check",
+      "catch": "For a US borrower the regulatory cover is a money-services registration, the payout is a stablecoin, the minimum is $25,000, and APX’s own risk disclosure says your claim could be treated as unsecured if APX failed",
+      "track": "Founded 2022 by the former Coinberry team; Canadian regulatory relief April 2025; no incidents published; not operating in 2022",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -439,7 +449,9 @@
         "https://apxlending.com/collateral-risk-disclosure",
         "https://help.apxlending.com/hc/en-us/articles/45014457352339-What-happens-if-APX-goes-bankrupt"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://apxlending.com/loans",
+      "how": "You send bitcoin or ether to a cold-storage wallet set aside for you at BitGo Trust, whose address you can check, and borrow 20% to 60% of its value for 3 to 60 months at a fixed rate; US borrowers are paid in the USDC stablecoin. Interest accrues daily and is billed monthly, or can be deferred to the end; closing early costs at least three months’ interest. APX makes no margin call as such: it sends notices from 80% and, at 90%, sells only enough bitcoin to bring the loan back to 85%, with no fee. APX says it never pools or lends your bitcoin on, while its own risk disclosure warns that in an APX bankruptcy your claim could be treated as unsecured."
     },
     {
       "id": "lava",
@@ -451,30 +463,30 @@
       "qualifier": null,
       "rate": {
         "headline": "6.50–8.50%",
-        "note": "fixed for a year, by balance (8.50% under $250K), plus a 2% “capital charge” on the year’s peak balance: a real first-year cost of 8.5–10.5%"
+        "note": "fixed for a year; the rate depends on your balance, 8.50% under $250,000; plus a 2% “capital charge” on the year’s highest balance, so the real first-year cost is 8.5–10.5%"
       },
       "ltv": {
         "open": 0.6,
         "call": null,
         "liq": null,
         "callLabel": "Margin call",
-        "openNote": "per draw",
+        "openNote": "each time you draw",
         "callDisplay": "none",
-        "callNote": "“notifications and warnings” as LTV rises",
+        "callNote": "“notifications and warnings” as the loan grows against the collateral",
         "liqDisplay": "not published",
-        "liqNote": "a price shown in the app when you draw; full, nothing returned"
+        "liqNote": "a price shown in the app when you draw; if it is hit, Lava sells everything and returns nothing"
       },
       "trig": {
         "mode": "text",
-        "static": "The liquidation price is shown in the app at each draw, not on the site. When it is hit “your line of credit will be liquidated in full” and “Lava does not return any collateral”: the excess is kept as the liquidation fee."
+        "static": "Lava shows the liquidation price inside the app at each draw, not on its site. If that price is hit, “your line of credit will be liquidated in full” and “Lava does not return any collateral”: whatever is left over is kept as the liquidation fee."
       },
-      "coins": "“Never lent out, traded, or otherwise rehypothecated”; custody wording varies: the FAQ says a “distributed key protocol … with institutional-grade custodians”, the terms call the wallet “purely self-custodial”; no watchable address published",
-      "terms": "No term, no maturity, no monthly payments; draw again up to the limit; no origination or early-repayment fee",
-      "minimum": "$100; bespoke above $25M",
+      "coins": "Lava says your bitcoin is “never lent out, traded, or otherwise rehypothecated”. How it is held is described two ways: the FAQ says keys are split across “institutional-grade custodians”, the terms call the wallet “purely self-custodial”; no address for you to check is published",
+      "terms": "No end date and no monthly payments; repay when you like and draw again up to your limit; no fee to open or to repay early",
+      "minimum": "$100; bespoke terms above $25 million",
       "where": "“Available globally”; no US state list or licence published",
-      "distinguishing": "The lowest minimum and the only revolving line with no payments and no end date",
-      "catch": "A liquidation takes the whole position and returns nothing, at a trigger the site doesn’t publish; the capital charge is a second interest rate",
-      "track": "Line of credit since Nov 2025; $200M raised Nov 2025; did not exist in 2022; no incidents published",
+      "distinguishing": "The lowest minimum among the custodial lenders ($100), and a credit line with no payments and no end date",
+      "catch": "A liquidation takes everything and returns nothing, at a trigger the site doesn’t publish; the 2% capital charge is a second interest rate",
+      "track": "The credit line since November 2025; raised $200 million in November 2025; did not exist in 2022; no incidents published",
       "filters": {
         "bitcoinOnly": true,
         "noRehyp": true,
@@ -497,7 +509,9 @@
         "https://www.lava.xyz/faq/what-are-the-interest-rates-on-lava",
         "https://www.lava.xyz/termsofservice"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://www.lava.xyz/bloc",
+      "how": "You deposit bitcoin with Lava and open a credit line you can draw on at up to 60% of its value, repay when you like, and draw again; there are no monthly payments and no end date. The rate is fixed for a year and depends on your balance, and Lava adds a 2% “capital charge” on the year’s highest balance. Lava makes no margin calls: it warns you as the loan grows against the collateral and shows a liquidation price in the app when you draw. If that price is hit, Lava sells everything and returns nothing; the excess is kept as the fee. Lava says the bitcoin is never lent on, and describes how it is held in two different ways."
     },
     {
       "id": "kraken-flexline",
@@ -506,10 +520,10 @@
       "model": "Exchange · Payward, Inc.",
       "bitcoinOnly": false,
       "otherCollateral": "48 assets",
-      "qualifier": "Loan · cash out",
+      "qualifier": "A loan you can withdraw",
       "rate": {
         "headline": "7–25%",
-        "note": "APR, fixed for the term; BTC short-term borrows under 10%"
+        "note": "fixed for the term you choose; short bitcoin loans can price under 10%"
       },
       "ltv": {
         "open": null,
@@ -517,23 +531,23 @@
         "liq": null,
         "callLabel": "Margin call",
         "openDisplay": "haircut",
-        "openNote": "per-asset, in-app",
+        "openNote": "Kraken discounts each asset by a set percentage and shows your limit in the app",
         "callDisplay": "80%",
-        "callNote": "of Kraken’s margin level",
+        "callNote": "of Kraken’s “margin level”, a health measure across your whole Pro account",
         "liqDisplay": "40%",
-        "liqNote": "of Kraken’s margin level"
+        "liqNote": "of the same measure; Kraken sells automatically"
       },
       "trig": {
         "mode": "text",
-        "static": "No LTV trigger to convert into a price: Kraken measures a margin level across your whole Pro account with per-asset haircuts, and shows the liquidation threshold in the app before you confirm. Kraken’s own illustration starts at 40% LTV."
+        "static": "There is no loan-to-value line to turn into a price: Kraken measures the health of your whole Kraken Pro account, after discounting each asset, and shows the liquidation threshold in the app before you confirm. Kraken’s own illustration starts at 40% of the collateral’s value."
       },
-      "coins": "Stay in your Kraken Pro main wallet, inside its proof-of-reserves; exchange custody, not segregated for you",
-      "terms": "2 days to 2 years; 0.5% origination; interest every 4 hours; early-termination fee; proceeds in USDC, USDG, BTC and others",
-      "minimum": "$75,000 (US); $100,000 in DE and MN",
-      "where": "US: 40 states + DC, and only for Eligible Contract Participants (roughly $10M invested, or a $10M-asset entity); not in CA, NY, MA, CT and 7 others",
-      "distinguishing": "Fixed rates for terms as short as two days, and the only one here where a short bitcoin borrow can price under 10%",
-      "catch": "For US individuals it is effectively a $10M-net-worth product; the collateral is an exchange balance, and 47 other assets share the risk engine",
-      "track": "Exchange since 2011, “never breached”; Flexline since Feb 2026 (US June 2026)",
+      "coins": "They stay in your Kraken Pro main wallet, covered by Kraken’s proof of reserves; this is exchange custody, not a wallet set aside for you",
+      "terms": "2 days to 2 years; 0.5% to open; interest charged every 4 hours; a fee for ending early; the loan is paid out in USDC, USDG, bitcoin or other assets",
+      "minimum": "$75,000 (US); $100,000 in Delaware and Minnesota",
+      "where": "US: 40 states + DC, and only for “eligible contract participants”, roughly individuals with more than $10 million invested or firms with $10 million in assets; not in California, New York, Massachusetts, Connecticut and 7 others",
+      "distinguishing": "Fixed rates for terms as short as two days, paid out in your choice of stablecoin, bitcoin or other assets",
+      "catch": "For a US individual it is in practice a product for the very wealthy; the collateral is an exchange balance, and 47 other assets share Kraken’s risk engine",
+      "track": "Kraken has run an exchange since 2011 and says it has never been breached; Flexline since February 2026 (US June 2026)",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": false,
@@ -568,7 +582,9 @@
         "https://blog.kraken.com/product/flexline",
         "https://support.kraken.com/articles/flexline-faq"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://www.kraken.com/pro/flexline",
+      "how": "Inside a Kraken Pro account, you borrow against the assets you hold there, at a fixed rate for a term from two days to two years, and can withdraw the loan to a bank. Kraken doesn’t use a loan-to-value line: it discounts each asset by a set percentage and tracks a “margin level” across your whole account, calling at 80% of that measure and selling at 40%; the app shows your liquidation threshold before you confirm. The collateral stays in your exchange wallet. In the US the product is open only to “eligible contract participants”, roughly people with more than $10 million invested, in 40 states, with a $75,000 minimum."
     },
     {
       "id": "kraken-borrow",
@@ -581,7 +597,7 @@
       "rate": {
         "headline": "not published",
         "np": true,
-        "note": "variable; a one-time borrow fee plus daily interest, both shown before you confirm; collected every 4 hours"
+        "note": "variable; a one-time borrowing fee plus daily interest, both shown before you confirm; the interest is collected every 4 hours"
       },
       "ltv": {
         "open": null,
@@ -589,23 +605,23 @@
         "liq": null,
         "callLabel": "Margin call",
         "openDisplay": "up to 3×",
-        "openNote": "your cash + eligible assets",
+        "openNote": "your cash plus eligible assets, counted at a discount",
         "callDisplay": "“Caution”",
-        "callNote": "threshold not published",
+        "callNote": "a health status; the threshold isn’t published",
         "liqDisplay": "“At risk”",
-        "liqNote": "automatic, “without additional notice”"
+        "liqNote": "Kraken sells automatically, “without additional notice”"
       },
       "trig": {
         "mode": "text",
-        "static": "No price to quote: Kraken publishes a health status, not an LTV. Its own example: $100 of cash buys $400 of crypto; the $300 borrowed is 75% of what you then hold, so the position starts nearer a liquidation than any loan on this page. Sales can leave a balance still owed."
+        "static": "There is no price to quote: Kraken publishes a health status, not a loan-to-value line. Its own example: $100 of cash buys $400 of crypto, so the $300 borrowed is 75% of what you then hold, closer to a forced sale than any loan on this page. A sale can leave you still owing money."
       },
-      "coins": "The crypto bought with borrowed dollars is held at Kraken Derivatives US and can’t be withdrawn or sent until repaid; you can sell it",
-      "terms": "No repayment deadline, no minimum payment; repay in USD (free) or by selling any asset (conversion fee); a trading fee on the cash part",
+      "coins": "The crypto bought with borrowed dollars is held at Kraken Derivatives US and can’t be withdrawn or sent until you repay; you can sell it",
+      "terms": "No repayment deadline and no minimum payment; repay in dollars (free) or by selling any asset (conversion fee); the normal trading fee applies to the cash part of a purchase",
       "minimum": "Not stated",
-      "where": "48 states, not NY or ME; <em>not</em> for Eligible Contract Participants (over $10M invested), the reverse of Flexline",
-      "distinguishing": "The Kraken product an ordinary US customer can actually use, launched 24 Sep 2026; no term, no minimum payment",
-      "catch": "It isn’t a loan against your stack: the borrowed dollars can only buy more crypto on Kraken. It is leverage, and losses “may exceed the initial investment”",
-      "track": "Spot margin via NinjaTrader Clearing; product 6 days old",
+      "where": "48 states, not New York or Maine; <em>not</em> for “eligible contract participants” (over $10 million invested), the reverse of Flexline",
+      "distinguishing": "The Kraken product an ordinary US customer can actually use, launched 24 September 2026; no term and no minimum payment",
+      "catch": "It isn’t a loan against your bitcoin: the borrowed dollars can only buy more crypto on Kraken. It is leverage, and Kraken warns that losses “may exceed the initial investment”",
+      "track": "Spot margin through NinjaTrader Clearing; launched 24 September 2026",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": false,
@@ -631,7 +647,9 @@
         "https://blog.kraken.com/product/borrow/us-customers",
         "https://support.kraken.com/articles/borrow-us"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://www.kraken.com/features/borrow",
+      "how": "Kraken Borrow US is buying power, not a loan you can withdraw: when you buy crypto for more than your cash balance, Kraken lends the difference, up to three times the value of your eligible assets, and the crypto you buy with it is held as security until you repay. The borrowed dollars can only buy more crypto on Kraken. There is no repayment deadline and no minimum payment; you pay a one-time borrowing fee plus daily interest at a rate shown before you confirm and not published. Kraken shows a health status rather than a loan-to-value line; at “At risk” it sells automatically, and losses can exceed what you put in. It is available in 48 states to customers who are not “eligible contract participants”, the opposite of Flexline."
     },
     {
       "id": "nexo",
@@ -643,31 +661,31 @@
       "qualifier": null,
       "rate": {
         "headline": "15.9%",
-        "note": "base, variable; 12.9% to 7.9% by “Wealth Tier”, which means the share of your portfolio held in NEXO token; 0.9–2.9% only with NEXO and LTV under 20%; repay within 45 days and the base rate applies"
+        "note": "the base rate, variable; 12.9% down to 7.9% for “Wealth Tiers”, which depend on how much of your portfolio is held in Nexo’s own NEXO token; 0.9–2.9% only with NEXO and a loan under 20% of the collateral; repay within 45 days of a draw and the base rate applies"
       },
       "ltv": {
         "open": 0.5,
         "call": 0.769,
         "liq": 0.8333,
         "callLabel": "“Poor” health",
-        "openNote": "LTV for BTC",
+        "openNote": "of your bitcoin’s value",
         "callDisplay": "76.9%",
-        "callNote": "“may receive margin call emails”; no cure window",
+        "callNote": "Nexo “may” email a margin call; there is no fixed time to act",
         "liqDisplay": "83.33%",
-        "liqNote": "automatic sale of part or all; 2–3.5% fee + spread",
+        "liqNote": "Nexo sells part or all of your collateral automatically, with a 2–3.5% fee plus the exchange spread",
         "callVerb": "is rated “Poor”",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto"
       },
-      "coins": "Pooled exchange “credit wallet” in multi-sig cold storage with Bakkt and Fireblocks; whether it may be lent or re-pledged: not published for the US; no watchable address",
-      "terms": "No fixed term; 1-year maturity auto-extended; no scheduled payments; repay in crypto (0.26% + spread) or stablecoins/USD (0%)",
-      "minimum": "$50 (stablecoin) or $500 (bank); $2M per day",
+      "coins": "Held in a pooled exchange “credit wallet”, in multi-signature cold storage with Bakkt and Fireblocks; whether Nexo may lend it on or re-pledge it isn’t published for the US; no address for you to check",
+      "terms": "No fixed term; a 1-year maturity that renews automatically; no scheduled payments; repay in crypto (0.26% fee plus spread) or in stablecoins or dollars (free)",
+      "minimum": "$50 (stablecoin) or $500 (bank); up to $2 million a day",
       "where": "Accounts not in New York or American Samoa; the credit line “may not be available in your jurisdiction”; no state list",
-      "distinguishing": "100+ collateral assets in one credit line, a $50 minimum, and sub-1% rates for large NEXO-token holders at low LTV",
-      "catch": "Without NEXO token the rate is 15.9%; auto-sale at 83.33% with no cure window; Nexo US is not the lender of record",
-      "track": "Since 2018; left the US Dec 2022; Jan 2023 $45M settlement with the SEC and states over its Earn product, without admitting or denying; returned Feb 2026 via Bakkt",
+      "distinguishing": "More than 100 collateral assets in one credit line, a $50 minimum, and rates under 1% for large NEXO-token holders who borrow little",
+      "catch": "Without Nexo’s own token the rate is 15.9%; Nexo sells automatically at 83.33% with no time to act; Nexo US is not the lender of record",
+      "track": "Since 2018; left the US in December 2022; in January 2023 paid $45 million to the SEC and the states over its interest-earning product, without admitting or denying the findings; returned to the US in February 2026 through Bakkt",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": false,
@@ -695,7 +713,9 @@
         "https://nexo.com/blog/nexo-returns-to-the-us",
         "https://www.sec.gov/news/press-release/2023-11"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://nexo.com/borrow",
+      "how": "You hold crypto in a Nexo account and draw a credit line against it, up to 50% of the value of bitcoin, with no fixed term and no scheduled payments. Interest compounds daily at a rate that depends on how much of your portfolio is held in Nexo’s own NEXO token: 15.9% with none, down to 7.9%, and under 3% only with NEXO and a loan under 20% of the collateral. Nexo may email a margin call as the loan passes 71%, 77% and 83.33% of the collateral’s value, but at 83.33% it sells part or all of your crypto automatically, with a fee of 2% to 3.5% plus the spread, and no time to act. The collateral sits in a pooled exchange wallet; whether Nexo may lend it on isn’t published for the US. Nexo returned to the US in February 2026 after paying $45 million to regulators in 2023."
     },
     {
       "id": "cadena",
@@ -707,31 +727,31 @@
       "qualifier": "Synthetic · you sell your own bitcoin",
       "rate": {
         "headline": "13%",
-        "note": "APR all-in: 12% to the lender plus a 1% Cadena fee, paid in bitcoin at maturity (the lender’s dollar target converted at that day’s price)"
+        "note": "all-in: 12% to the lender plus a 1% Cadena fee, paid in bitcoin at the end of the term (the lender’s dollar target converted at that day’s price)"
       },
       "ltv": {
         "open": 0.5,
         "call": null,
         "liq": null,
         "callLabel": "Margin call",
-        "openNote": "LTV (an 80% option is listed)",
+        "openNote": "of your bitcoin’s value (an 80% option is listed)",
         "callDisplay": "none",
-        "callNote": "no in-term trigger of any kind",
+        "callNote": "no trigger of any kind during the term",
         "liqDisplay": "at maturity",
-        "liqNote": "a 50% fall leaves the borrower nothing; the lender absorbs beyond"
+        "liqNote": "a 50% fall leaves you nothing; the lender absorbs anything beyond"
       },
       "trig": {
         "mode": "text",
         "static": "No trigger during the term: the contract settles once, at maturity, when the lender’s dollar target is paid in bitcoin at that day’s price and you receive the residual. At a 50% fall the residual is zero, with no top-up offered on the way down.",
         "live": "No trigger during the term: the contract settles once, at maturity, when the lender’s dollar target is paid in bitcoin at that day’s price and you receive the residual. At {price} today, a 50% fall to <strong>{px0.5}</strong> leaves a residual of zero, with no top-up offered on the way down."
       },
-      "coins": "Locked in a Discreet Log Contract together with the lender’s bitcoin; every outcome pre-signed before funding; an independent oracle (DLCP) picks which pre-signed transaction broadcasts; “Cadena holds no key”; the Signer App is open-source; the contract is a mainnet transaction you can watch",
-      "terms": "1 year standard (90 days by lender match; 30 and 180 listed); one settlement at maturity; no monthly payments and no early repayment, “locked for the full term”; 1% fee in bitcoin",
-      "minimum": "$1,000; $1M per contract, syndicated above",
-      "where": "“All 50 US states”, “open globally with the exception of China” (its compare page); KYC through Sumsub; terms under Salvadoran law",
+      "coins": "Locked in a Discreet Log Contract together with the lender’s bitcoin; every outcome is signed before funding; an independent price reporter (the DLCP oracle) picks which pre-signed transaction is broadcast at the end; “Cadena holds no key”; the Signer App is open-source; the contract is a mainnet transaction you can watch",
+      "terms": "1 year as standard (90 days if a lender agrees; 30 and 180 are listed); one settlement at the end; no monthly payments and no early repayment, “locked for the full term”; the 1% fee is taken in bitcoin",
+      "minimum": "$1,000; $1 million per contract, split across several above that",
+      "where": "“All 50 US states” and “open globally with the exception of China” (its compare page); identity check through Sumsub; terms under Salvadoran law",
       "distinguishing": "No custodian and no margin call: both sides’ bitcoin sit in one on-chain contract that neither party nor Cadena can move; the only DLC lender on this page",
-      "catch": "It isn’t a cash loan: you sell your own bitcoin for the money and the contract restores the exposure synthetically, which its own table nonetheless calls “no taxable event”. One settled contract is shown; a one-year lock with no exit; a 50% fall at maturity takes everything",
-      "track": "Founded 2023; one mainnet contract shown (funded Nov 2025, settled May 2026); “servers are currently down” banner on its site when read; no incidents or actions published",
+      "catch": "It isn’t a cash loan: you sell your own bitcoin for the money and the contract restores the exposure, which Cadena’s own table nonetheless calls “no taxable event”. One settled contract is shown; a one-year lock with no exit; a 50% fall at the end takes everything",
+      "track": "Founded 2023; one mainnet contract shown (funded November 2025, settled May 2026); a “servers are currently down” banner on its site when read; no incidents or actions published",
       "filters": {
         "bitcoinOnly": true,
         "noRehyp": true,
@@ -755,7 +775,9 @@
         "https://cadenabitcoin.com/terms",
         "https://cadenabitcoin.com/llms.txt"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://cadenabitcoin.com/",
+      "how": "You and a lender each commit bitcoin to a Discreet Log Contract on the blockchain, in which every possible outcome is signed in advance; Cadena holds no key, and an independent oracle only chooses which pre-signed transaction settles. The lender never pays you cash: you sell your own bitcoin separately for the money, and the contract gives you back the exposure through the locked collateral. At maturity, one year as standard, the lender’s dollar target (the principal plus 12%) is paid out of the pool in bitcoin at that day’s price and you receive whatever remains. There are no margin calls, no payments and no early exit; at a 50% fall your residual is zero, and below that the lender absorbs the loss. The borrower pays a 1% fee, in bitcoin."
     },
     {
       "id": "debifi",
@@ -767,7 +789,7 @@
       "qualifier": null,
       "rate": {
         "headline": "8.5–11%",
-        "note": "APR, fixed per offer; the offer book today: 8.5–10.25% at 50% LTV for $100K+ (Goldstream), 9.5–10% at 60–70% for $20K–$100K; plus 1.0–1.5% origination in BTC"
+        "note": "fixed for each offer; today’s offers run 8.5–10.25% for $100,000+ loans at 50% (Goldstream) and 9.5–10% for $20,000–$100,000 at 60–70%; plus 1.0–1.5% to open, taken in bitcoin"
       },
       "ltv": {
         "open": 0.7,
@@ -777,22 +799,22 @@
         "openDisplay": "30–70%",
         "openNote": "set by the lender",
         "callDisplay": "75 / 80 / 85%",
-        "callNote": "add bitcoin or repay",
-        "liqNote": "or stricter per lender; coins go to the lender; 5% fee",
+        "callNote": "add bitcoin or repay part of the loan",
+        "liqNote": "or a stricter line set by the lender; the bitcoin goes to the lender, less a 5% fee",
         "callVerb": "gets its first margin call",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "At 50% LTV the 90% line is a 44% fall away. An optional 12–48 h “delayed liquidation” cancels if the initial LTV is restored."
+        "extra": "If you borrowed 50%, the 90% line is a 44% fall away. An optional 12–48 hour delay can be set, during which restoring the opening ratio cancels the liquidation."
       },
-      "coins": "3-of-4: you, the lender, Debifi, and an independent key holder (AnchorWatch) who signs only if a party won’t; one address per loan to watch; “never re-lent, staked, or traded”",
-      "terms": "1–24 mo; interest monthly to annually per offer, principal at maturity; extension 0.6–1.5%; no early-repayment fee",
-      "minimum": "$20,000; “no limits” above",
-      "where": "“Available globally”; the terms exclude sanctioned countries and Puerto Rico; each lender applies its own KYC",
-      "distinguishing": "A fourth, independent key and a public offer book of named institutional lenders",
-      "catch": "Your lender is whichever fund took the offer, with its own KYC and liquidation line; the FAQ and the terms disagree on the 5% fee base and on manual vs automatic liquidation; your key lives in the Debifi app",
-      "track": "Launched 2022 (press); monthly stats published; no incidents published",
+      "coins": "Locked in an address that needs three of four keys: yours, the lender’s, Debifi’s, and an independent key holder’s (AnchorWatch) who signs only if a party refuses to; one address per loan to watch on the blockchain; Debifi says the bitcoin is “never re-lent, staked, or traded”",
+      "terms": "1–24 months; interest monthly to yearly depending on the offer, principal at the end; 0.6–1.5% to extend; no fee to repay early",
+      "minimum": "$20,000; no upper limit",
+      "where": "“Available globally”; the terms exclude sanctioned countries and Puerto Rico; each lender runs its own identity checks",
+      "distinguishing": "A fourth, independent key, and a public list of named institutional lenders with their offers",
+      "catch": "Your lender is whichever fund took your offer, with its own identity checks and its own liquidation line; Debifi’s FAQ and its terms disagree on what the 5% fee is charged on and on whether liquidation is manual or automatic; your key lives in Debifi’s app",
+      "track": "Launched 2022 (press); publishes monthly statistics; no incidents published",
       "filters": {
         "bitcoinOnly": true,
         "noRehyp": true,
@@ -815,7 +837,9 @@
         "https://debifi.com/terms-of-service",
         "https://debifi.com/risks-transparency"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://debifi.com/",
+      "how": "You post a request and one of Debifi’s named institutional lenders funds it in stablecoins or bank money. Your bitcoin goes into an address that needs three of four keys: yours, the lender’s, Debifi’s, and an independent key holder’s, so neither side can move it alone. You borrow 30% to 70% of its value for 1 to 24 months, paying interest monthly to yearly and the principal at the end, with 1% to 1.5% to open. Margin calls come at 75%, 80% and 85%; at 90%, or a stricter line the lender sets, the bitcoin is released to the lender at Debifi’s price feed, less a 5% fee, with any surplus returned. An optional 12–48 hour delay lets you cancel a liquidation by restoring the opening ratio."
     },
     {
       "id": "firefish",
@@ -827,31 +851,31 @@
       "qualifier": null,
       "rate": {
         "headline": "from 5%",
-        "note": "set by the investor who takes your offer; 12-month EUR loans “below 9.5% APR” (Q1 2026); full-term interest owed even if repaid early; plus 1.5% p.a. origination in BTC"
+        "note": "set by the investor who takes your offer; 12-month euro loans were “below 9.5% APR” in early 2026; you owe the full term’s interest even if you repay early; plus a 1.5% yearly opening fee taken in bitcoin"
       },
       "ltv": {
         "open": 0.5,
         "call": 0.73,
         "liq": 0.95,
         "callLabel": "Margin calls",
-        "openNote": "of loan + full-term interest",
+        "openNote": "of the loan plus all its interest",
         "callDisplay": "73 / 79 / 86%",
-        "callNote": "cured only by adding bitcoin",
-        "liqNote": "the <em>entire</em> collateral goes to the liquidator",
+        "callNote": "emails; only adding bitcoin helps, repaying part of the loan doesn’t",
+        "liqNote": "your <em>entire</em> collateral goes to the investor",
         "callVerb": "gets its first margin call",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "A touch of 95% “even for only a couple of seconds” counts, and partial repayment doesn’t lower the LTV."
+        "extra": "Touching 95% “even for only a couple of seconds” counts."
       },
-      "coins": "3-of-3 escrow: two Firefish oracle keys and your own ephemeral key, which pre-signs the closing transactions and is then discarded; one address per loan to watch; a recovery transaction returns the coins a month after maturity if Firefish disappears",
-      "terms": "3–24 mo; one bullet repayment at maturity; 1.5% p.a. origination; 5% fee on default; EUR, CHF, CZK, PLN, USDC, USDT",
-      "minimum": "€800; tiers to €150K, Pro by arrangement",
-      "where": "Fiat loans in 34 European countries; elsewhere USDC/USDT only. The ineligible list doesn’t name the United States, but the terms make you warrant you’re somewhere Firefish needs no licence: no explicit US statement",
-      "distinguishing": "No party, Firefish included, can redirect the coins once escrowed; investors need no bitcoin knowledge",
-      "catch": "At 95% the whole stack goes, no partial sale; both oracle keys are Firefish’s; full-term interest regardless; Czech law",
-      "track": "Since May 2022; $533M+ processed; zero liquidations through 2025, then ~$2.5M liquidated on 6 Feb 2026 at the disclosed 95%",
+      "coins": "Locked in an escrow that needs three signatures: two keys belong to Firefish’s oracles and one is a temporary key of yours that pre-signs every way the loan can end, then is thrown away; one address per loan to watch on the blockchain; a recovery transaction returns your bitcoin a month after maturity if Firefish disappears",
+      "terms": "3–24 months; one repayment at the end; 1.5% a year to open, taken in bitcoin; a 5% fee if you default; loans in euros, Swiss francs, Czech koruna, Polish złoty, USDC or USDT",
+      "minimum": "€800; tiers up to €150,000, more by arrangement",
+      "where": "Bank-currency loans in 34 European countries; elsewhere stablecoins only. Firefish’s list of banned countries doesn’t name the United States, but its terms make you promise you live somewhere it needs no licence: no explicit US statement",
+      "distinguishing": "Once the bitcoin is in escrow no one, Firefish included, can send it anywhere except one of the pre-signed endings; investors need no bitcoin knowledge",
+      "catch": "At 95% the whole collateral is lost, with no partial sale; both oracle keys belong to Firefish; the full term’s interest is owed whatever happens; Czech law",
+      "track": "Since May 2022; more than $533 million processed; no liquidations through 2025, then about $2.5 million liquidated on 6 February 2026 at the disclosed 95%",
       "filters": {
         "bitcoinOnly": true,
         "noRehyp": true,
@@ -875,7 +899,9 @@
         "https://app.firefish.io/pdf/2026-01-02/fee-schedule.pdf",
         "https://firefish.io/blog/q1-2026-a-quarter-that-moved"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://firefish.io/borrow",
+      "how": "You post an offer, an investor takes it, and your bitcoin goes into an escrow address on the blockchain. The escrow needs three signatures: two belong to Firefish’s oracles and one is a temporary key of yours that pre-signs every way the loan can end and is then deleted, so no one can send the bitcoin anywhere else. You receive the loan in euros, another European currency or a stablecoin, borrowing up to half of what the loan plus its full interest comes to, and repay in one sum at the end; the full term’s interest is owed even if you repay early. Firefish emails margin calls at 73%, 79% and 86%, which only adding bitcoin can fix; if the loan touches 95% of the collateral’s value, even for seconds, the entire collateral goes to the investor."
     },
     {
       "id": "hodlhodl",
@@ -887,7 +913,7 @@
       "qualifier": "US persons barred",
       "rate": {
         "headline": "9.9–10.25%",
-        "note": "APR on today’s borrow offers; set by the lender, a fixed sum for the term; plus 1.5% origination in BTC"
+        "note": "set by the lender as a fixed sum for the whole term; today’s offers 9.9–10.25%; plus 1.5% to open, taken in bitcoin"
       },
       "ltv": {
         "open": 0.7,
@@ -895,23 +921,23 @@
         "liq": 0.9,
         "callLabel": "Margin calls",
         "openDisplay": "30–70%",
-        "openNote": "80% for L-BTC/WBTC",
+        "openNote": "up to 80% for Liquid or wrapped bitcoin",
         "callDisplay": "75 / 80 / 85%",
-        "callNote": "add bitcoin or repay",
-        "liqNote": "coins transferred to the lender, surplus returned; 5% fee",
+        "callNote": "add bitcoin or repay part",
+        "liqNote": "the bitcoin is transferred to the lender; anything over the debt comes back to you; 5% fee",
         "callVerb": "gets its first margin call",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto"
       },
-      "coins": "2-of-3: you, the lender, the platform; keys locked by a per-contract payment password that “cannot be restored”; address watchable on-chain",
-      "terms": "1–12 mo; repayment at maturity, partials any time; crypto-to-crypto only (USDT, USDC, L-BTC, WBTC, XAUT)",
-      "minimum": "$50; maximum $25,000 per loan",
-      "where": "Terms effective 4 Jun 2026 bar US citizens, residents and persons located in the US, all states and territories; also Russia, Belarus and sanctioned countries",
-      "distinguishing": "No identity check at all, a $50 minimum, borrower-written terms",
-      "catch": "US persons are excluded (its 2020 post had opened to them); $25K cap; the lender is an anonymous user; a lost payment password loses the collateral",
-      "track": "Hodlex since 2016; Lend since Oct 2020; publishes nothing about 2022; no incidents published",
+      "coins": "Locked in an address that needs two of three keys: yours, the lender’s and the platform’s; the keys are protected by a per-contract “payment password” that “cannot be restored”; you can watch the address on the blockchain",
+      "terms": "1–12 months; repay at the end, with partial repayments allowed any time; crypto only (USDT, USDC, Liquid bitcoin, wrapped bitcoin, tokenised gold), no bank money",
+      "minimum": "$50; at most $25,000 per loan",
+      "where": "Terms effective 4 June 2026 bar US citizens, residents and anyone located in the US, all states and territories; also Russia, Belarus and sanctioned countries",
+      "distinguishing": "No identity check, a $50 minimum, and loan terms you write yourself",
+      "catch": "US persons are excluded (its 2020 post had opened to them); $25,000 cap; the lender is an anonymous user; lose the payment password and the collateral is lost",
+      "track": "Hodlex since 2016; the lending service since October 2020; publishes nothing about 2022; no incidents published",
       "filters": {
         "bitcoinOnly": true,
         "noRehyp": true,
@@ -933,7 +959,9 @@
         "https://lend.hodlhodl.com/offers/borrow",
         "https://lend.hodlhodl.com/terms_of_service"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://lend.hodlhodl.com/",
+      "how": "A peer-to-peer market with no identity check: another user lends you stablecoins or crypto against bitcoin locked in an address that needs two of three keys: yours, the lender’s and the platform’s. You borrow 30% to 70% of its value for 1 to 12 months at a rate the lender set, fixed as a sum for the term, with 1.5% to open. Margin calls come at 75%, 80% and 85%; at 90% the bitcoin is handed to the lender at the platform’s price, less 5%, and anything over the debt comes back. Loans are capped at $25,000, and since June 2026 the terms bar anyone in the United States."
     },
     {
       "id": "unchained",
@@ -945,32 +973,32 @@
       "qualifier": null,
       "rate": {
         "headline": "14.18%",
-        "note": "APR: 12.00% interest + 2.00% origination, one rate at every size (as of Nov 2025)"
+        "note": "12% interest plus a 2% opening fee, the same at every loan size (as of November 2025)"
       },
       "ltv": {
         "open": 0.5,
         "call": 0.6667,
         "liq": 0.8333,
         "callLabel": "Violation",
-        "openNote": "LTV (200% CTP)",
+        "openNote": "of your bitcoin’s value (Unchained calls it 200% collateral-to-principal)",
         "callDisplay": "66.7%",
-        "callNote": "150% CTP; 24 h to cure",
+        "callNote": "24 hours to add bitcoin or repay",
         "liqDisplay": "83.3%",
-        "liqNote": "120% CTP; sold to repay and <em>close</em> the loan; 2% fee",
+        "liqNote": "Unchained sells enough to repay the whole loan and closes it, with a 2% fee",
         "callVerb": "is in violation",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "A sale at the 120% line closes the whole loan, not just the shortfall; the remainder is returned."
+        "extra": "A sale at that line repays and closes the entire loan rather than trimming it; whatever bitcoin is left comes back to you."
       },
-      "coins": "In a 2-of-3 address: you, Unchained, and the Key Agent; you verify the address on your own hardware wallet; “does NOT rehypothecate”; held in a sub-trust Unchained calls bankruptcy-remote",
-      "terms": "360 days; 12 interest-only payments every 30 days, principal at maturity; no prepayment penalty; commercial purpose only",
-      "minimum": "$150,000 for entities; $500,000 for individuals and trusts “in most cases”; $1M in Vermont",
-      "where": "US only; not LA, MT, NV, NM, NY, ND, SD, PR; MI, MS, OH entities only",
-      "distinguishing": "You hold a key and watch the address; lending since June 2017 with “zero lost bitcoin”",
-      "catch": "The most expensive rate and largest minimum on the page; commercial purpose only; a 24-hour cure; the foreclosure sale closes the loan",
-      "track": "First loan June 2017; $1B+ originated; Nov 2022: no FTX exposure but funding “materially constrained”, ~15% layoffs",
+      "coins": "Held in a 2-of-3 multisignature address: one key is yours, one is Unchained’s, one belongs to an independent “key agent” (Fortis Bank); you verify the address on your own hardware wallet; Unchained says it never lends your bitcoin on, and the loan sits in a subsidiary it describes as protected if it failed",
+      "terms": "360 days; 12 interest-only payments, one every 30 days, with the principal due at the end; no penalty for repaying early; loans must be for a business purpose",
+      "minimum": "$150,000 for companies; $500,000 for individuals and trusts “in most cases”; $1 million in Vermont",
+      "where": "US only; not Louisiana, Montana, Nevada, New Mexico, New York, North Dakota, South Dakota or Puerto Rico; in Michigan, Mississippi and Ohio, companies only",
+      "distinguishing": "You hold one of the three keys and can watch the address yourself; lending since June 2017 with “zero lost bitcoin”",
+      "catch": "One of the highest rates and the largest minimum on the page; business purpose only; a 24-hour window to fix a violation; the sale at the line closes the whole loan",
+      "track": "First loan June 2017; more than $1 billion lent; in November 2022 said it had no FTX exposure but that funding was “materially constrained”, with about 15% of staff let go",
       "filters": {
         "bitcoinOnly": true,
         "noRehyp": true,
@@ -1004,7 +1032,9 @@
         "https://help.unchained.com/how-is-my-collateral-liquidated",
         "https://www.unchained.com/blog/update-from-our-ceo"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://unchained.com/loans",
+      "how": "You and Unchained put your bitcoin into an address that needs two of three keys: yours, Unchained’s, and an independent bank’s. You can check the address on your own hardware wallet, and Unchained says it never lends the bitcoin on. You borrow up to half its value for 360 days at 12% plus a 2% fee, paying interest every 30 days and the principal at the end; loans must be for a business purpose, with a $500,000 minimum for individuals. If the price falls until the loan is two-thirds of the collateral’s value, you have 24 hours to add bitcoin or repay; at 83%, Unchained sells enough to repay the whole loan and closes it, returning what is left."
     },
     {
       "id": "coinbase",
@@ -1016,7 +1046,7 @@
       "qualifier": "Wrapped bitcoin, not bitcoin",
       "rate": {
         "headline": "from 5.1%",
-        "note": "variable, set by the Morpho market, plus a Coinbase platform fee (amount not published); fixed-rate option; a 2% processing fee on the first $250K of every draw (1% above), added to principal"
+        "note": "variable, set by the Morpho lending market, plus a Coinbase platform fee whose size isn’t published; a fixed-rate option exists; 2% is added to the loan on the first $250,000 of every draw (1% above), and that fee earns interest too"
       },
       "ltv": {
         "open": null,
@@ -1027,23 +1057,23 @@
         "openDisplay": "not published",
         "openNote": "the app shows your maximum",
         "callDisplay": "77.4%",
-        "callNote": "an email; no cure window",
+        "callNote": "an email; no deadline to act",
         "liqDisplay": "86%",
-        "liqNote": "the required amount sold; 4.38% penalty",
+        "liqNote": "enough is sold to restore the loan, with a 4.38% penalty",
         "callVerb": "is rated “Danger”",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "Fixed-rate loans are liquidated at maturity if unpaid, at any LTV. “Coinbase cannot prevent your collateral from being liquidated on Morpho.”"
+        "extra": "A fixed-rate loan is sold at maturity if unpaid, whatever the price. Coinbase says it “cannot prevent your collateral from being liquidated on Morpho”."
       },
-      "coins": "Your BTC leaves your Coinbase account, becomes cbBTC (Coinbase’s wrapper; the real coins are held by Coinbase) and is locked in a Morpho contract on Base; Coinbase says it has no access to it",
-      "terms": "Variable: no term, no due dates. Fixed: repaid in full at maturity, early repayment doesn’t reduce interest. Processing fee charged again on every top-up draw",
-      "minimum": "Not published; up to 5,000,000 USDC against BTC",
-      "where": "US excluding New York; limited UK",
-      "distinguishing": "The biggest brand on the page and the thinnest cushion: an on-chain position with an 86% line",
-      "catch": "Interest accrues into the LTV, there is no margin call, and the collateral is a wrapper on a protocol Coinbase doesn’t control; the 2% fee recurs",
-      "track": "Launched Jan 2025 (BTC only, $100K cap), since widened; the earlier “Coinbase Borrow” USD line stopped new loans May 2023; no lending incidents published",
+      "coins": "Your bitcoin leaves your Coinbase account and becomes cbBTC, Coinbase’s token standing for bitcoin it holds, locked in a Morpho lending contract on the Base network; Coinbase says it has no access to it there",
+      "terms": "Variable loans: no term and no due dates. Fixed loans: repaid in full at maturity, and repaying early doesn’t reduce the interest. The 2% fee is charged again every time you draw more",
+      "minimum": "Not published; up to 5,000,000 USDC against bitcoin",
+      "where": "US except New York; limited access in the UK",
+      "distinguishing": "The biggest brand on the page, and a loan that is really a position on a public lending protocol, with an 86% line and no margin call",
+      "catch": "Interest is added to the loan, there is no margin call, and the collateral is a token on a protocol Coinbase doesn’t control; the 2% fee recurs",
+      "track": "Launched January 2025 (bitcoin only, $100,000 cap), since widened; the earlier “Coinbase Borrow” dollar loans stopped in May 2023; no lending incidents published",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -1068,7 +1098,9 @@
         "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/fee",
         "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/collateral"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://www.coinbase.com/borrow",
+      "how": "You ask Coinbase for a loan; it converts your bitcoin into cbBTC, its own token standing for bitcoin it holds, and locks it in a Morpho lending contract on the Base network, from which you borrow USDC. A variable loan has no term or due dates and a rate set by that market plus a Coinbase fee; a fixed loan is repaid in full at maturity, or sold whatever the price. Coinbase adds 2% to the loan on every draw. There is no margin call: Coinbase emails a “Danger” warning from 77.4% of the collateral’s value, and at 86% the contract sells enough to restore the loan, with a 4.38% penalty. Coinbase says it cannot stop that sale, because it doesn’t control the protocol."
     },
     {
       "id": "morpho",
@@ -1080,7 +1112,7 @@
       "qualifier": "Wrapped bitcoin, not bitcoin",
       "rate": {
         "headline": "4.9%",
-        "note": "variable (6-hour average, Base market, 30 Sep 2026); the Ethereum market 5.4%; no origination; gas only. The same pool Coinbase’s loans draw on, without Coinbase’s fee"
+        "note": "variable (the Base market’s 6-hour average on 30 September 2026; the Ethereum market 5.4%); nothing to open; you pay network fees. It is the same lending pool Coinbase’s loans draw on, without Coinbase’s fee"
       },
       "ltv": {
         "open": null,
@@ -1091,23 +1123,23 @@
         "openDisplay": "any",
         "openNote": "up to 86%",
         "callDisplay": "none",
-        "callNote": "no notice of any kind",
+        "callNote": "no warning of any kind",
         "liqDisplay": "86%",
-        "liqNote": "anyone may liquidate any amount; 4.38% penalty",
+        "liqNote": "anyone may sell any amount of your collateral, keeping a 4.38% penalty",
         "callVerb": "gets a margin call",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "A 70% loan is liquidated after a 19% fall. The oracle price, not the exchange price, decides."
+        "extra": "A loan at 70% is liquidated after a 19% fall. The protocol’s price feed (its “oracle”), not the exchange price, decides."
       },
-      "coins": "cbBTC in the Morpho contract; the real bitcoin is held by Coinbase; the position is visible on-chain; Coinbase’s own story says the collateral is not rehypothecated",
-      "terms": "Open-ended; interest accrues into the position; no fees beyond gas (a fee switch of up to 25% of interest exists)",
-      "minimum": "None; bounded by the pool’s liquidity ($166M at read)",
-      "where": "No KYC; sanctioned territories only; the terms leave it to you to know whether you may use it",
-      "distinguishing": "The lowest rate and penalty on the page",
-      "catch": "No notice, a thin line, a wrapper that depends on Coinbase, and a protocol with no one to call",
-      "track": "Markets since Sep 2024; realized bad debt 0; a 2025 front-end bug intercepted by a white hat (press); core contracts immutable",
+      "coins": "cbBTC (Coinbase’s token standing for bitcoin it holds) locked in the Morpho contract; the position is visible on the blockchain; Coinbase’s own account of the integration says the collateral is not lent on",
+      "terms": "No end date; interest is added to the loan; no fees beyond network fees (the protocol could switch on a fee of up to 25% of interest)",
+      "minimum": "None; limited by how much the pool has to lend ($166 million at read)",
+      "where": "No identity check; only sanctioned territories are excluded; the terms leave it to you to know whether you may use it",
+      "distinguishing": "Among the lowest rates and penalties on the page (4.38%), and the same pool as Coinbase’s loans without Coinbase’s fee",
+      "catch": "No warning, a thin margin, a token that depends on Coinbase, and a protocol with no one to call",
+      "track": "These markets since September 2024; no bad debt recorded; a 2025 website bug was intercepted by a security researcher before funds were lost (press); the core contracts cannot be changed",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -1129,7 +1161,9 @@
         "https://docs.morpho.org/learn/concepts/liquidation/",
         "https://morpho.org/stories/coinbase/"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://app.morpho.org/base/borrow",
+      "how": "You connect your own wallet to the Morpho app and deposit cbBTC, Coinbase’s token standing for bitcoin it holds, into a market that lends USDC against it, up to 86% of its value. There is no identity check, no term and no fees beyond the network’s; interest at a variable rate is added to the loan. There is no warning of any kind: the moment the loan passes 86% of the collateral’s value at the protocol’s price feed, anyone may sell any amount of it and keep a 4.38% penalty. Coinbase’s own loan product uses this same market, with its fee on top."
     },
     {
       "id": "aave",
@@ -1141,31 +1175,31 @@
       "qualifier": "Wrapped bitcoin, not bitcoin",
       "rate": {
         "headline": "4.5–15.2%",
-        "note": "variable, set by utilisation: USDT 4.46%, USDC 15.15% at 99.8% utilisation on 30 Sep 2026, with $4M left to borrow; no origination; gas only"
+        "note": "variable, set by how much of the pool is borrowed: USDT 4.46%, USDC 15.15% on 30 September 2026, when 99.8% of its pool was lent out and $4 million remained; nothing to open; you pay network fees"
       },
       "ltv": {
         "open": 0.73,
         "call": null,
         "liq": 0.78,
         "callLabel": "Margin call",
-        "openNote": "LTV maximum",
+        "openNote": "the most you can borrow",
         "callDisplay": "none",
-        "callNote": "health factor only",
-        "liqNote": "anyone may liquidate; 5% penalty (7.5% cbBTC)",
+        "callNote": "a “health factor” you must watch yourself",
+        "liqNote": "anyone may sell your collateral, keeping a 5% penalty (7.5% for cbBTC)",
         "callVerb": "gets a margin call",
         "liqVerb": "is liquidated"
       },
       "trig": {
         "mode": "auto",
-        "extra": "A 50% loan is liquidated after a 36% fall. Up to half the debt is liquidated above health factor 0.95, all of it below."
+        "extra": "A loan at 50% is liquidated after a 36% fall. Up to half the debt is sold off while the health factor is above 0.95, all of it below."
       },
-      "coins": "WBTC (custodied by the BitGo / BiT Global venture) or cbBTC (Coinbase) in the pool contract, where it is itself lent out to other borrowers; fully visible on-chain",
-      "terms": "No term; interest accrues into the debt; no fees beyond gas and the penalty",
-      "minimum": "None; bounded by borrow caps and liquidity",
-      "where": "No KYC; sanctioned territories only; the US is not named",
-      "distinguishing": "The only place here where the collateral is lent to other borrowers by design",
-      "catch": "A 73% loan is 6% from liquidation; the stablecoin can run dry or spike (USDC 15% today); a 5–7.5% penalty with no notice; the wrapper’s custodian is a counterparty you didn’t choose",
-      "track": "Since 2020; Nov 2022 ~$1.7M CRV bad debt covered; Apr 2026 rsETH incident, $191M borrowed against unbacked collateral, reserves frozen within 90 minutes",
+      "coins": "WBTC (a token issued by the BitGo / BiT Global venture) or cbBTC (Coinbase’s) in the pool contract, where it is itself lent out to other borrowers; everything is visible on the blockchain",
+      "terms": "No end date; interest is added to the loan; no fees beyond network fees and the penalty",
+      "minimum": "None; limited by borrowing caps and what the pool has to lend",
+      "where": "No identity check; only sanctioned territories excluded; the US is not named",
+      "distinguishing": "The only place on the page where your collateral is lent to other borrowers by design",
+      "catch": "A loan at 73% is 6% from liquidation; the dollar side can run dry or spike (USDC 15% today); a 5–7.5% penalty with no warning; the token’s issuer is a counterparty you didn’t choose",
+      "track": "Since 2020; about $1.7 million of bad debt in November 2022, covered; in April 2026 about $191 million was borrowed against collateral that turned out to be unbacked (the rsETH incident), with the affected markets frozen within 90 minutes",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": false,
@@ -1187,7 +1221,9 @@
         "https://aave.com/faq",
         "https://governance.aave.com/t/rseth-incident-report-april-20-2026/24580"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://app.aave.com/",
+      "how": "You connect your own wallet to the Aave app and deposit WBTC or cbBTC, tokens issued by firms that hold the real bitcoin, into a pool that lends them out and lets you borrow dollars (USDC or USDT) against them, up to 73% of their value. Interest at a variable rate, set by how much of the pool is lent, is added to the loan; there is no term and no identity check. The pool watches a “health factor” rather than sending margin calls: once the loan passes 78% of the collateral’s value, anyone may sell up to half of it, or all of it below a lower threshold, keeping a 5% to 7.5% penalty. The dollar side can run short: on the day read, 99.8% of the USDC pool was lent out and borrowing it cost 15%."
     },
     {
       "id": "milo",
@@ -1196,10 +1232,10 @@
       "model": "30-yr crypto mortgage · Milo Credit, LLC · NMLS 1811449",
       "bitcoinOnly": false,
       "otherCollateral": "ETH",
-      "qualifier": "A different animal · mortgage",
+      "qualifier": "Mortgage · not an open-use loan",
       "rate": {
         "headline": "7–9%",
-        "note": "fixed for 30 years, interest-only; the calculator today 7.950% on a $500K purchase; fees “about 2% to 4%” of the loan"
+        "note": "fixed for 30 years, interest only; the calculator quoted 7.950% on a $500,000 purchase; fees “about 2% to 4%” of the loan"
       },
       "ltv": {
         "open": 1.0,
@@ -1207,24 +1243,24 @@
         "liq": null,
         "callLabel": "Margin call",
         "openDisplay": "100%",
-        "openNote": "of the price, with crypto pledged 1:1 to the loan",
+        "openNote": "of the home’s price, with bitcoin pledged equal to the whole loan",
         "callDisplay": "−65 to −69%",
-        "callNote": "a fall in the <em>collateral</em> of “about 69%” (FAQ) or 65% (blog); no countdown",
+        "callNote": "a fall in the bitcoin of “about 69%” (FAQ) or 65% (blog); no countdown",
         "liqDisplay": "not published",
-        "liqNote": "“disclosed in your loan documents”; only the shortfall sold"
+        "liqNote": "“disclosed in your loan documents”; only the shortfall is sold"
       },
       "trig": {
         "mode": "text",
-        "live": "At {price}, the margin call Milo describes comes at roughly <strong>{px0.31}–{px0.35}</strong>, a 65–69% fall in bitcoin, because the house is collateral too. The liquidation line is in the loan documents, not on the site. Excess collateral can be withdrawn above ~125% of the loan.",
-        "static": "The margin call Milo describes comes after a 65–69% fall in bitcoin, because the house is collateral too. The liquidation line is in the loan documents, not on the site. Excess collateral can be withdrawn above ~125% of the loan."
+        "live": "At {price}, the margin call Milo describes comes at roughly <strong>{px0.31}–{px0.35}</strong>, a 65–69% fall, because the house is collateral too. The point at which Milo would sell is in the loan documents, not on its site. Bitcoin above about 125% of the loan can be withdrawn.",
+        "static": "The margin call Milo describes comes only after a 65–69% fall in bitcoin, because the house is collateral too. The point at which Milo would sell is in the loan documents, not on its site. Bitcoin above about 125% of the loan can be withdrawn."
       },
-      "coins": "BitGo or Coinbase Custody, a sub-account in your name; no rehypothecation, staking or stablecoin conversion; locked “for the entire duration of the loan”",
-      "terms": "30-yr fixed, interest-only; principal at sale, refinance or prepayment; some loans carry a prepayment penalty up to three years; credit score ≥ 660; USD payments only",
-      "minimum": "$275,000; up to $5M (higher case by case)",
-      "where": "37 states + DC per Milo’s state checker; not AK, AR, ID, KS, KY, MI, MN, NE, NV, NH, OR, SD, VT, PR",
-      "distinguishing": "100% financing with no cash down against a 1:1 pledge, fixed for 30 years",
-      "catch": "The coins are locked until the house is sold or refinanced; the liquidation threshold is in the loan documents; Milo’s own pages disagree on the trigger and the rate range",
-      "track": "Founded 2018; “$100M+ crypto mortgages”; “no margin calls to date” through the 2022 drawdown; no actions published",
+      "coins": "Held by BitGo or Coinbase Custody in a sub-account in your name; not lent on, staked or converted; locked “for the entire duration of the loan”",
+      "terms": "30-year fixed, interest only; the principal is repaid when you sell, refinance or choose to; some loans carry a prepayment penalty for up to three years; a credit score of 660 or more; payments in dollars only",
+      "minimum": "$275,000; up to $5 million (more case by case)",
+      "where": "37 states + DC per Milo’s state checker; not Alaska, Arkansas, Idaho, Kansas, Kentucky, Michigan, Minnesota, Nebraska, Nevada, New Hampshire, Oregon, South Dakota, Vermont or Puerto Rico",
+      "distinguishing": "Buy a home with no cash down by pledging bitcoin equal to the loan, fixed for 30 years",
+      "catch": "The bitcoin is locked until the house is sold or refinanced; the point of sale is in the loan documents; Milo’s own pages disagree on the trigger and the rate range",
+      "track": "Founded 2018; “$100 million+” of crypto mortgages; “no margin calls to date”, including through the 2022 fall; no actions published",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -1287,7 +1323,9 @@
         "https://www.milo.io/rates/purchase-a-home/",
         "https://www.milo.io/blog/bitcoin-mortgage-complete-guide-2026/"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://www.milo.io/mortgage/crypto-backed-mortgage/",
+      "how": "Milo lends you up to the full price of a home, with bitcoin pledged equal to the loan and held by BitGo or Coinbase Custody for the life of the mortgage. The loan is a 30-year fixed, interest-only mortgage at 7–9%, with the principal repaid when you sell, refinance or choose to; fees are 2–4% of the loan. Because the house is collateral too, a margin call comes only after bitcoin falls about 65–69%, and the point at which Milo would sell is in the loan documents rather than on its site. Bitcoin above about 125% of the loan can be withdrawn; the rest cannot be lent on, staked or converted. A separate Milo mortgage counts bitcoin as reserves, with no pledge at all."
     },
     {
       "id": "better",
@@ -1296,11 +1334,11 @@
       "model": "Fannie Mae-conforming mortgage · Better Mortgage Corp · NMLS 330511 · Coinbase custodies",
       "bitcoinOnly": false,
       "otherCollateral": "BTC or USDC",
-      "qualifier": "A different animal · mortgage",
+      "qualifier": "Mortgage · not an open-use loan",
       "rate": {
         "headline": "not published",
         "np": true,
-        "note": "whatever conforming rate Better quotes, on both loans; 15- or 30-yr fixed; Coinbase One members get a 1% lender credit up to $10K"
+        "note": "whatever ordinary mortgage rate Better quotes, applied to both loans; 15- or 30-year fixed; Coinbase One members get a 1% lender credit up to $10,000"
       },
       "ltv": {
         "open": 0.4,
@@ -1308,23 +1346,23 @@
         "liq": null,
         "callLabel": "Margin call",
         "openDisplay": "40%",
-        "openNote": "bitcoin counts at 40% of value (250% collateral)",
+        "openNote": "bitcoin counts at 40% of its value (you pledge 2.5× the down-payment loan)",
         "callDisplay": "none",
         "callNote": "“price volatility has absolutely no impact”",
         "liqDisplay": "none by price",
-        "liqNote": "only after 60 days’ delinquency"
+        "liqNote": "only after 60 days of missed payments"
       },
       "trig": {
         "mode": "text",
-        "static": "No price trigger at all: the pledged bitcoin is sold only if you are 60 days behind on payments; foreclosure on the house from day 180. The price can fall to zero without a call."
+        "static": "No price trigger at all: the pledged bitcoin is sold only if you fall 60 days behind on payments, and foreclosure on the house begins at 180 days. The price can fall to zero without a call."
       },
-      "coins": "Held by Better in its own Coinbase Prime account until the <em>whole</em> mortgage is repaid or refinanced, not just the down-payment loan. Whether Better may reuse the coins is not on its pages; press reports it may, keeping equivalent bitcoin on hand",
-      "terms": "Two loans at closing: a conforming first mortgage plus a down-payment loan secured by the crypto and a second lien, same rate and term, one payment; FICO ≥ 680 and full Fannie Mae underwriting",
-      "minimum": "Not published (a conforming first lien)",
+      "coins": "Held by Better in its own account at Coinbase Prime until the <em>whole</em> mortgage is repaid or refinanced, not just the down-payment loan; whether Better may reuse the bitcoin isn’t on its pages, though press reports it may while keeping an equal amount on hand",
+      "terms": "Two loans signed together: an ordinary Fannie Mae-conforming mortgage plus a down-payment loan secured by the bitcoin and a second claim on the home, at the same rate and term, with one monthly payment; a credit score of 680 or more and full income underwriting",
+      "minimum": "Not published (the first loan is a conforming mortgage)",
       "where": "“Select states and jurisdictions”, no list",
-      "distinguishing": "The only product on the page with no price-driven liquidation, on a standard GSE mortgage",
-      "catch": "You still qualify on income and credit like any conforming borrower; only 40% of the bitcoin counts; the coins stay pledged for the life of the mortgage, and the rehypothecation answer is press-only",
-      "track": "Announced Mar 2026; first loan Jun 2026; general availability 26 Aug 2026; no incidents on this product",
+      "distinguishing": "No price-driven sale at any point, on a standard government-backed mortgage",
+      "catch": "You still qualify on income and credit like any conforming borrower; only 40% of the bitcoin counts; the bitcoin stays pledged for the life of the mortgage, and the question of reuse is answered only in the press",
+      "track": "Announced March 2026; first loan June 2026; generally available since 26 August 2026; no incidents on this product",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": false,
@@ -1347,7 +1385,9 @@
         "https://help.coinbase.com/en/coinbase/mortgages/crypto-backed-mortgages",
         "https://www.coindesk.com/business/2026/09/06/better-and-coinbase-s-bitcoin-backed-mortgages-can-reuse-borrowers-collateral"
       ],
-      "asOf": "2026-09-30"
+      "asOf": "2026-09-30",
+      "site": "https://better.com/crypto-backed-mortgages",
+      "how": "Better writes an ordinary Fannie Mae-conforming mortgage plus a second loan for the down payment, secured by bitcoin pledged through Coinbase and counted at 40% of its value, at the same rate and term with one monthly payment. You qualify on income and credit like any conforming borrower. The bitcoin price has no effect on either loan: the bitcoin is sold only if you fall 60 days behind on payments, and the house itself can be foreclosed from 180 days. Better holds the bitcoin in its own Coinbase Prime account until the whole mortgage is repaid or refinanced; whether it may reuse the bitcoin meanwhile isn’t stated on its pages."
     }
   ]
 }

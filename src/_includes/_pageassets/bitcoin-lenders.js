@@ -170,7 +170,7 @@
 
   function applyFilters() {
     var st = stateSel ? stateSel.value : '';
-    var shown = 0;
+    var shown = 0, off = 0, unk = 0;
     cards.forEach(function (card) {
       var ok = true;
       Object.keys(active).forEach(function (k) {
@@ -178,19 +178,26 @@
         var attr = { bitcoinOnly: 'bitcoinOnly', noRehyp: 'noRehyp', holdKey: 'holdKey', noPriceLiq: 'noPriceLiq', under5k: 'under5k' }[k];
         if (attr && card.dataset[attr] !== 'y') ok = false;
       });
-      var note = document.getElementById('state-' + card.dataset.id);
+      // The state select annotates rather than hides (JM, 2026-09-30): a lender
+      // that doesn't serve the reader's state stays on the page, greyed, with a
+      // flag saying so; a lender that publishes no list is greyed less, with a
+      // flag saying that. Only the chips hide cards.
+      var flag = document.getElementById('flag-' + card.dataset.id);
       var v = stateVerdict(card, st);
-      if (v === 'no') ok = false;
+      card.classList.toggle('ln-off', ok && v === 'no');
       card.classList.toggle('ln-dim', ok && v === 'unknown');
-      if (note) note.textContent = (ok && v === 'unknown') ? 'Availability in ' + st + ': not published by the lender' : '';
+      if (flag) flag.textContent = !ok ? '' : v === 'no' ? 'Not available in ' + st
+                                   : v === 'unknown' ? st + ': availability not published by the lender' : '';
       card.hidden = !ok;
-      if (ok) shown++;
+      if (ok) { shown++; if (v === 'no') off++; else if (v === 'unknown') unk++; }
     });
     groups.forEach(function (g) {
       var any = g.querySelectorAll('.ln-card:not([hidden])').length > 0;
       g.hidden = !any;
     });
-    if (countEl) countEl.textContent = shown + ' of ' + cards.length + ' lenders';
+    if (countEl) countEl.textContent = st
+      ? (shown - off - unk) + ' of ' + shown + ' available in ' + st + (unk ? ' \u00b7 ' + unk + ' not published' : '') + (off ? ' \u00b7 ' + off + ' not available' : '')
+      : shown + ' of ' + cards.length + ' lenders';
     if (emptyEl) emptyEl.hidden = shown > 0;
     if (stateLab) stateLab.classList.toggle('on', !!st);
   }
@@ -224,7 +231,7 @@
       trigger: function (price, open, thr) { return price * open / thr; },
       drawdown: function (open, thr) { return 1 - open / thr; },
       cards: function () {
-        return cards.map(function (c) { return { id: c.dataset.id, hidden: !!c.hidden, dim: c.classList.contains('ln-dim'), trig: (document.getElementById('trig-' + c.dataset.id) || {}).textContent }; });
+        return cards.map(function (c) { return { id: c.dataset.id, hidden: !!c.hidden, dim: c.classList.contains('ln-dim'), off: c.classList.contains('ln-off'), flag: (document.getElementById('flag-' + c.dataset.id) || {}).textContent, trig: (document.getElementById('trig-' + c.dataset.id) || {}).textContent }; });
       }
     };
   }
@@ -256,6 +263,9 @@
     var more = clone.querySelector('.ln-more'); if (more) more.open = true;
     dBody.innerHTML = '';
     while (clone.firstChild) dBody.appendChild(clone.firstChild); // the card's parts become the dialog grid's children
+    // "How this loan works" reads first, full width, above the two columns
+    var how = dBody.querySelector('.ln-how'), trig = dBody.querySelector('.ln-trig');
+    if (how && trig && trig.parentNode === dBody) dBody.insertBefore(how, trig.nextSibling);
     dCrumb.textContent = groupTitle(card);
     dialog.dataset.id = id;
     if (!dialog.open) dialog.showModal();
