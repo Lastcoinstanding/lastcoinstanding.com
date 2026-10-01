@@ -256,6 +256,9 @@
     var more = clone.querySelector('.ln-more'); if (more) more.open = true;
     dBody.innerHTML = '';
     while (clone.firstChild) dBody.appendChild(clone.firstChild); // the card's parts become the dialog grid's children
+    // "How this loan works" reads first, full width, above the two columns
+    var how = dBody.querySelector('.ln-how'), trig = dBody.querySelector('.ln-trig');
+    if (how && trig && trig.parentNode === dBody) dBody.insertBefore(how, trig.nextSibling);
     dCrumb.textContent = groupTitle(card);
     dialog.dataset.id = id;
     if (!dialog.open) dialog.showModal();

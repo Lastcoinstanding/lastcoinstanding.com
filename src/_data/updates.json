@@ -3,6 +3,12 @@
     "display": "10/1/26",
     "date": "2026-10-01",
     "page": "/bitcoin-lenders",
+    "summary": "Bitcoin Lenders Compared, rewritten for a reader new to the vocabulary: a short section on the seven things every card measures, plain-language cards, a ‘How this loan works’ paragraph for every lender, a link to each lender’s own page, and tooltips on the terms that recur."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/bitcoin-lenders",
     "summary": "Bitcoin Lenders Compared: a twentieth card, Cadena Bitcoin, the only DLC lender on the page: no custodian and no margin call, but you sell your own bitcoin for the cash and the contract restores the exposure. The ‘You hold a key’ group is now ‘Multisig and DLC’."
   },
   {

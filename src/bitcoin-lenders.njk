@@ -71,6 +71,25 @@ eleventyComputed:
         </div>
     </div>
 
+    {#- The levers: the seven things every card measures, for a reader who has
+        not met the vocabulary. JM, 2026-09-30: the page is complex and the cards
+        were too casual about it; orient the reader before the cards. Always
+        visible, compact; the §6.13 tooltips carry the terms that recur below. -#}
+    <section class="ln-levers" id="levers" aria-labelledby="leversTitle">
+        <h2 id="leversTitle" class="ln-levers-title">Before the cards: the seven things every card measures</h2>
+        <p class="ln-levers-lede">A bitcoin-backed loan is simpler than its vocabulary. You pledge bitcoin, you borrow dollars against it, and the only question that matters is what happens when the price moves. Every card describes that with the same seven measures.</p>
+        <dl class="ln-levers-grid">
+            <div><dt>Loan-to-value (LTV)</dt><dd>How much you borrow compared with what your bitcoin is worth. Borrow $50,000 against $100,000 of bitcoin and you are at 50%. The loan is fixed in dollars, so when the price falls the percentage rises; every line on a card is one of these percentages.</dd></div>
+            <div><dt>The margin call</dt><dd>The percentage at which the lender asks you to add bitcoin or repay part of the loan. The <em>cure window</em> is how long you get: 72 hours at Strike, 24 at Arch and Unchained, no fixed time at several others, and none at all where the lender simply sells.</dd></div>
+            <div><dt>Liquidation</dt><dd>The percentage at which the lender sells. <em>Partial</em> means it sells only enough to bring the loan back to its opening level; <em>total</em> means the whole collateral goes. The multisig lenders hand the bitcoin itself to the lender; the DeFi markets let anyone sell it and keep a penalty.</dd></div>
+            <div><dt>The trigger price</dt><dd>Each line turned into a bitcoin price: today&rsquo;s price &times; the opening LTV &divide; the line. A loan at 50% with an 85% line is sold after a 41% fall, whatever the price is today. Interest added to the loan moves the real trigger a little higher. The control above switches every card to a loan-to-value of your own.</dd></div>
+            <div><dt>The rate</dt><dd><em>APR</em> is the yearly cost, including any opening fee where the lender quotes it that way. <em>Fixed</em> holds for the term; <em>variable</em> moves. Most lenders charge less for bigger loans; SALT charges by how much of the value you borrow; Cadena is paid in bitcoin at the end.</dd></div>
+            <div><dt>Your coins</dt><dd>Who holds the bitcoin while the loan runs, whether you can watch the address, and whether the lender may lend it on to anyone else. That last practice, <em>rehypothecation</em>, is what sank Celsius, BlockFi and Voyager in 2022: the collateral was lent to borrowers who failed. Each card says what the lender promises.</dd></div>
+            <div><dt>Term and repayment</dt><dd>How long the loan runs and the shape of the payments: interest monthly or at the end, the principal at the end, or no end date at all. Some loans can&rsquo;t be repaid early: Firefish still charges the full term&rsquo;s interest, Cadena is locked.</dd></div>
+            <div><dt>&ldquo;Not published&rdquo;</dt><dd>A value, not a gap in our reading. Where a lender withholds a figure (Figure&rsquo;s liquidation line, Kraken Borrow&rsquo;s rate, Lava&rsquo;s liquidation price) the card says so rather than guessing, and that is itself something to know about the lender.</dd></div>
+        </dl>
+    </section>
+
     <div class="ln-filters" id="lnFilters" aria-label="Filters">
         <button class="ln-chip on" type="button" data-filter="all">All</button>
         <button class="ln-chip" type="button" data-filter="bitcoinOnly">Bitcoin only</button>
@@ -120,9 +139,9 @@ eleventyComputed:
                 </div>
                 <div class="ln-rate"><b{% if l.rate.np %} class="np"{% endif %}>{{ l.rate.headline }}</b><span>{{ l.rate.note | safe }}</span></div>
                 <div class="ln-ltv">
-                    <div><div class="k">Opens at</div><div class="v">{{ ltvDisplay(ltv.open, 'open', ltv) }}</div><div class="p">{{ ltv.openNote | safe }}</div></div>
-                    <div class="call"><div class="k">{{ ltv.callLabel }}</div><div class="v">{{ ltvDisplay(ltv.call, 'call', ltv) }}</div><div class="p">{{ ltv.callNote | safe }}</div></div>
-                    <div class="liq"><div class="k">Liquidates</div><div class="v">{{ ltvDisplay(ltv.liq, 'liq', ltv) }}</div><div class="p">{{ ltv.liqNote | safe }}</div></div>
+                    <div><div class="k">Opens at<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Opens at.</strong> The most you can borrow as a share of your bitcoin&rsquo;s value on the day the loan starts. A loan is fixed in dollars, so this share rises as the price falls.</span></span></div><div class="v">{{ ltvDisplay(ltv.open, 'open', ltv) }}</div><div class="p">{{ ltv.openNote | safe }}</div></div>
+                    <div class="call"><div class="k">{{ ltv.callLabel }}<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>The warning line.</strong> The share at which the lender asks you to add bitcoin or repay part of the loan, in whatever words the lender uses (margin call, alert, violation, a health status). The small line under it says how long you get.</span></span></div><div class="v">{{ ltvDisplay(ltv.call, 'call', ltv) }}</div><div class="p">{{ ltv.callNote | safe }}</div></div>
+                    <div class="liq"><div class="k">Liquidates<span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content"><strong>Liquidates.</strong> The share at which the lender sells, or hands the bitcoin to the lender. <em>Partial</em> means only enough to restore the loan; <em>total</em> means all of it. &ldquo;Not published&rdquo; means the lender doesn&rsquo;t say.</span></span></div><div class="v">{{ ltvDisplay(ltv.liq, 'liq', ltv) }}</div><div class="p">{{ ltv.liqNote | safe }}</div></div>
                 </div>
                 <p class="ln-trig" id="trig-{{ l.id }}">
                     {%- if l.trig.mode == 'auto' -%}
@@ -147,11 +166,15 @@ eleventyComputed:
                     expands in place; with JS the same block opens in the large-type
                     dialog (#lnDialog) and the URL gains #lender-<id>, so a single
                     lender is linkable and Back closes it. -#}
+                <div class="ln-links">
+                    <a class="ln-site" href="{{ l.site }}" rel="nofollow noopener" target="_blank">{{ l.name }}&rsquo;s own page <span aria-hidden="true">&nearr;</span></a>
+                </div>
                 <details class="ln-more" data-id="{{ l.id }}">
-                    <summary class="ln-more-btn"><span>Terms, custody, where, sources</span><span class="ln-more-arrow" aria-hidden="true">&rsaquo;</span></summary>
+                    <summary class="ln-more-btn"><span>How it works, terms, custody, where, sources</span><span class="ln-more-arrow" aria-hidden="true">&rsaquo;</span></summary>
                     <div class="ln-more-body">
+                        <div class="ln-how"><span class="l">How this loan works</span><p>{{ l.how | safe }}</p><a class="ln-site ln-site-big" href="{{ l.site }}" rel="nofollow noopener" target="_blank">Read it in {{ l.name }}&rsquo;s own words <span aria-hidden="true">&nearr;</span></a></div>
                         <dl class="ln-dl">
-                            <dt>Your coins</dt><dd>{{ l.coins | safe }}</dd>
+                            <dt>Your coins<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Your coins.</strong> Who holds the bitcoin during the loan, whether you can watch the address on the blockchain, and whether the lender may lend it on (rehypothecation). The 2022 failures were all failures of this.</span></span></dt><dd>{{ l.coins | safe }}</dd>
                             <dt>Terms</dt><dd>{{ l.terms | safe }}</dd>
                             <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
                             <dt>Where</dt><dd>{{ l.where | safe }}</dd>
@@ -176,11 +199,8 @@ eleventyComputed:
 
     <section class="ln-prose" id="how-to-read">
         <h2>How to read a card</h2>
-        <p><strong>The three loan-to-value lines</strong> are the whole mechanism. A loan opens at some fraction of the collateral&rsquo;s value; as bitcoin falls the fraction rises; at the margin-call line the lender asks for more collateral or a repayment, and at the liquidation line it sells. What differs between lenders is the distance between those lines, how long you get to act, and whether the sale is partial (enough to restore the opening ratio) or total. The cards print all three, in the lender&rsquo;s own words where a number would mislead.</p>
-        <p><strong>The trigger prices</strong> turn those lines into a bitcoin price. The loan is fixed in dollars, so a loan opened at 50% LTV with an 85% liquidation line is sold after a 41% fall, at whatever price that is today. The arithmetic is the same as the loan-health calculator on <a href="/borrowing-against-your-stack#loan-health">Borrowing Against Your Stack</a>: trigger price = today&rsquo;s price &times; opening LTV &divide; threshold LTV. Interest that accrues into the loan moves the real trigger slightly higher than the card shows; a lender that quotes its lines on <em>loan plus interest</em> (Firefish) has already done that. The control at the top switches every card from the lender&rsquo;s maximum loan to a loan-to-value of your own.</p>
-        <p><strong>&ldquo;Not published&rdquo;</strong> is a value, not a gap in our reading. Figure doesn&rsquo;t publish its liquidation line; Kraken doesn&rsquo;t publish a rate for Borrow US; Lava shows its liquidation price only inside the app. A card never estimates what the lender withholds, and what a lender withholds is itself something to know about it.</p>
-        <p><strong>The marks.</strong> <span class="ln-tag yes">&#10003; Bitcoin only</span> means the lender takes no other collateral; <span class="ln-tag no">Not bitcoin only</span> names what else shares its risk engine. The dashed <span class="ln-tag qual">qualifier</span> flags a product that isn&rsquo;t an open-use loan against your stack: buying power that can&rsquo;t leave an exchange, a wrapper rather than bitcoin, a mortgage that buys a house. <em>Your coins</em> is the rehypothecation question in one line: who holds them, whether they can be lent on, and whether you can watch the address.</p>
-        <p><strong>The card and the detail.</strong> A card carries what you decide with: the marks, the rate, the three lines, the trigger sentence, what distinguishes the lender and what the catch is. Terms, custody, minimum, where it operates, track record and the dated sources are one click away, in larger type; the address bar then names the lender, so a single detail can be linked to.</p>
+        <p>A card&rsquo;s face carries what you decide with: the marks, the rate, the three lines, the trigger sentence, what distinguishes the lender and what the catch is. The row at the foot opens the rest in larger type: how the loan works in plain words, who holds your coins, the terms, the minimum, where the lender operates, its record, and the dated sources, with a link to the lender&rsquo;s own page so you can read its description in its own words. The address bar then names the lender, so a single detail can be linked to.</p>
+        <p><strong>The marks.</strong> <span class="ln-tag yes">&#10003; Bitcoin only</span> means the lender takes no other collateral; <span class="ln-tag no">Not bitcoin only</span> names what else shares its risk engine. The dashed <span class="ln-tag qual">qualifier</span> flags a product that isn&rsquo;t an open-use loan against your bitcoin: buying power that can&rsquo;t leave an exchange, a token standing for bitcoin, a mortgage that buys a house, a contract in which you sell your own bitcoin for the cash.</p>
         <p><strong>Groups, not ranks.</strong> Cards sit with others of the same model and alphabetically within it. There is no sort by rate and no best badge, because an order reads as a recommendation. The lowest rate on the page today belongs to a protocol with no one to call; one of the highest to the lender that has never lost a coin in nine years. Both facts are on their cards.</p>
     </section>
 
