@@ -61,7 +61,7 @@ eleventyComputed:
     <div class="ln-live" id="lnLive" aria-live="polite">
         <div class="ln-live-price">Bitcoin <strong id="lnPrice">&mdash;</strong> <span class="ln-live-src" id="lnPriceSrc"></span> &middot; terms as read on <strong>{{ lenders.asOfLabel }}</strong></div>
         <div class="ln-live-ctl" role="group" aria-label="Which loan the trigger prices describe">
-            <span class="ln-live-ctl-label">Trigger prices for</span>
+            <span class="ln-live-ctl-label">Trigger prices for<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Which loan the cards describe.</strong> Each card&rsquo;s trigger sentence works out the bitcoin price at which one loan hits the lender&rsquo;s lines. <em>The lender&rsquo;s maximum loan</em> uses each lender&rsquo;s own opening loan-to-value, so every card shows the lender&rsquo;s own numbers. <em>My own loan-to-value</em> recomputes every card for a loan of the size you set, so you can compare lenders on the same loan. It changes the trigger sentences only; nothing else on the page moves.</span></span></span>
             <label class="ln-radio"><input type="radio" name="lnMode" value="max" checked> the lender&rsquo;s maximum loan</label>
             <label class="ln-radio"><input type="radio" name="lnMode" value="own"> my own loan-to-value</label>
             <span class="ln-own" id="lnOwnWrap">
@@ -127,6 +127,7 @@ eleventyComputed:
                      data-states-type="{{ l.states.type }}"
                      data-states-list="{{ (l.states.list | join(',')) if l.states.list else '' }}"
                      data-states-rest="{{ l.states.rest or '' }}">
+                <div class="ln-state-flag" id="flag-{{ l.id }}" aria-live="polite"></div>
                 <div class="ln-head">
                     <div class="ln-head-text">
                         <h3 class="ln-name">{{ l.name }}</h3>
@@ -157,7 +158,6 @@ eleventyComputed:
                         {{ l.trig.static | safe }}
                     {%- endif -%}
                 </p>
-                <p class="ln-state-note" id="state-{{ l.id }}"></p>
                 <div class="ln-pair">
                     <div class="plus"><span class="l">Distinguishing</span>{{ l.distinguishing | safe }}</div>
                     <div class="catch"><span class="l">The catch</span>{{ l.catch | safe }}</div>

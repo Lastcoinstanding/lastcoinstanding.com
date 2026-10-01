@@ -64,7 +64,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-live strong { color: var(--text-bright); font-weight: 600; }
 .ln-live-src { font-size: 0.72rem; color: var(--text-muted); }
 .ln-live-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.9rem; }
-.ln-live-ctl-label { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.ln-live-ctl-label { display: inline-flex; align-items: center; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .ln-radio { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text); }
 .ln-radio input { accent-color: var(--amber); margin: 0; }
 .ln-own { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.45; transition: opacity 0.2s; }
@@ -96,7 +96,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 /* ─── 6. THE CARD ─── */
 .ln-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; }
 .ln-card[hidden] { display: none; }
-.ln-card.ln-dim { opacity: 0.55; }
+.ln-card.ln-dim { opacity: 0.62; }
+.ln-card.ln-off { opacity: 0.42; }
+.ln-state-flag { display: none; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.32rem 0.6rem; border-radius: 6px; margin: -0.2rem 0 0.1rem; line-height: 1.35; }
+.ln-state-flag:not(:empty) { display: block; }
+.ln-off .ln-state-flag { color: var(--red); border: 1px solid var(--red-dim); }
+.ln-dim .ln-state-flag { color: var(--amber); border: 1px dashed var(--amber-dim); }
+.ln-dialog-body .ln-state-flag { grid-column: 1 / -1; }
 .ln-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6rem; }
 .ln-head-text { min-width: 0; }
 .ln-name { font-family: var(--font-d); font-size: 1.6rem; font-weight: 600; color: var(--text-bright); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
@@ -124,8 +130,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-dl { display: grid; grid-template-columns: 7rem 1fr; gap: 0.4rem 0.7rem; margin: 0; font-size: 0.86rem; line-height: 1.5; }
 .ln-dl dt { color: var(--text-dim); }
 .ln-dl dd { margin: 0; color: var(--text); }
-.ln-state-note { font-size: 0.8rem; color: var(--amber); margin: -0.2rem 0 0; line-height: 1.4; }
-.ln-state-note:empty { display: none; }
 .ln-pair { display: grid; gap: 0.5rem; font-size: 0.88rem; line-height: 1.5; }
 .ln-pair .l { display: block; font-weight: 600; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.1rem; }
 .ln-pair .plus .l { color: var(--green); }
