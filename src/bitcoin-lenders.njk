@@ -97,7 +97,7 @@ eleventyComputed:
     <section class="ln-log" id="what-changed" aria-labelledby="lnLogTitle">
         <div class="ln-log-head">
             <h2 id="lnLogTitle" class="ln-log-title">What changed</h2>
-            <p class="ln-log-lede">Lenders change their terms more often than anything else on this site. Every card is re-read against the lender&rsquo;s own pages each month for its rate and each quarter in full, and every check is logged here, newest first, with whatever it found.{% if lenderLogIndex.nextCheckLabel %} Next check: <strong>{{ lenderLogIndex.nextCheckLabel }}</strong>.{% endif %}</p>
+            <p class="ln-log-lede">Lenders change their terms more often than anything else on this site. Every card is re-read in full against the lender&rsquo;s own pages each month, and every check is logged here, newest first, with whatever it found.{% if lenderLogIndex.nextCheckLabel %} Next check: <strong>{{ lenderLogIndex.nextCheckLabel }}</strong>.{% endif %}</p>
         </div>
         {% macro logItem(e) -%}
             <li class="ln-log-item ln-log-{{ e.kind }}">
