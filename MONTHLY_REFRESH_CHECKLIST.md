@@ -43,6 +43,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | Power Law price series `PL_DATA` (also the live-price fallback) | `shared/power-law-data.js` | daily close | §1 |
 | Equity comparators `SP500_TR_DATA`, `NDQ_TR_DATA` (Day-28 rows) | `shared/tr-comparator-data.js` | Yahoo `^SP500TR`, QQQ adjusted close | §1 |
 | Bitcoin month-end closes `BTC_MONTHLY` | `shared/btc-monthly-data.js` | Yahoo BTC-USD | §1 |
+| The Power Law's three falsifiability tests (live on `/the-power-law#when-reliable`; read the statuses) | `the-power-law.js` | computed from `PL_DATA` | §9.8a |
 | Values computed once from `PL_DATA` and stored: `TREND_RATIO_PERCENTILES`; Disciplined Rebalancing's percentile table; What Daily Conviction Bought's FAQ and meta figures; the hurdle-rate meta line; Allocation Sizing's "about 0.44× today" tooltip | several | recompute from `PL_DATA` | §9.8 |
 | As-of callouts, captions and hand-typed callout values (Bitcoin vs. the Stock Market §1/§3 and its "Through August 2026" returns; the Horizon's "through August 2026") | several `.njk` | recompute | §3, §4 |
 | Case-Shiller, Zillow rents and values | `shared/housing-monthly-data.js` | FRED, Zillow | §9.4 |
@@ -989,6 +990,16 @@ Some figures were computed from the price series once and written into the sourc
 - **The Bitcoin Hurdle Rate**: the head meta ("near 30% over ten years"; it falls about a point a year) and the forty-year figure (njk ~24).
 - **Allocation Sizing**: the tooltip "about 0.44× today" (njk ~70). Prefer rewriting it without a number, since the live figure is on the page.
 - **Anything else in prose that states today's multiple or growth rate**: `grep -rni "× today\|currently ~\|currently about\|currently below trend" src/*.njk`.
+
+## 9.8a. The Power Law's falsifiability tests (MONTHLY, with §1; from 2026-10-01)
+
+`/the-power-law#when-reliable` states three conditions under which the Power Law would count as breaking down, and computes them live from `PL_DATA` (JM's rulings, 2026-10-01; measurement `ROLLING_OOS_FITS_2026-09-23`). After each §1 append, open the page and read the three status lines; for the numbers, `node scripts/measure-rolling-oos.js` (or the page with `?qa` → `window.roosQA`, which must agree with the script).
+
+1. **A sustained break of the floor:** price below 0.42× the reference trend for more than six months in a row (runs measured in elapsed time between `PL_DATA` samples, since 2016-01-01). At 2026-10-01: one sample since 2016, 2023-01-06 at 0.418×.
+2. **A refit that leaves the stable range:** the full-record fit's implied trend today outside 0.68×–1.24× the reference line. At 2026-10-01: 0.91× (b = 5.630).
+3. **A fit that fails its own channel:** any 2016+ quarterly fit with less than 80% of its next four years inside 0.42×–3.0× its own trend. At 2026-10-01: weakest 83% (Q2 2017), 26 fits with full hindsight; one more fit gains its four years each quarter.
+
+**The thresholds are fixed as ruled. Never re-derive them from new data**, or the tests stop being tests. A status that turns to "Broken" is a page event: record it in DATA_AUDIT, tell JM, and rewrite the section's copy (it says the fit has held since 2016) in the same commit. The section's other live figures (the 2016+ ranges, the ~9% "reads richer" note) move by themselves.
 
 ## 9.9. The Doubling Ladder: its own series (QUARTERLY, from 2026-09-29)
 

@@ -484,3 +484,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* stat strip kicker (c) */
 .pl-stat-kick{font-family:var(--font-b);font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:.35rem}
 .pl-stat .pl-stat-num{margin-bottom:0}
+/* ─── Rolling out-of-sample record (#when-reliable, 2026-10-01) ─── */
+.roos-panel-label{font-size:.8rem;color:var(--text-dim);line-height:1.5;margin:.35rem 0 1.1rem}
+.roos-table-wrap{margin-top:1rem;font-size:.85rem;color:var(--text-dim)}
+.roos-table-wrap summary{cursor:pointer;color:var(--amber);font-size:.82rem}
+.roos-table{width:100%;border-collapse:collapse;margin-top:.7rem;font-variant-numeric:tabular-nums}
+.roos-table th,.roos-table td{padding:.4rem .6rem;border-bottom:1px solid var(--border);text-align:right}
+.roos-table th:first-child,.roos-table td:first-child{text-align:left}
+.roos-table th{font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.roos-table td{color:var(--text-body)}
+.roos-table tr.roos-pre td{color:var(--text-muted)}
+.roos-tests{display:flex;flex-direction:column;gap:.6rem;margin:1.2rem 0 .5rem}
+.roos-test{display:flex;gap:1rem;align-items:flex-start;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:.85rem 1rem}
+.roos-test-status{flex:none;min-width:92px;font-size:.78rem;font-weight:600;color:#6fbf73;text-transform:uppercase;letter-spacing:.5px;padding-top:.1rem}
+.roos-test.roos-broken{border-color:var(--red-dim)}
+.roos-test.roos-broken .roos-test-status{color:var(--red)}
+.roos-test-name{font-family:var(--font-d);font-size:1.15rem;font-weight:600;color:var(--text-bright);margin-bottom:.2rem}
+.roos-test-rule{font-size:.86rem;color:var(--text-dim);line-height:1.55}
+.roos-test-now{font-size:.86rem;color:var(--text-body);line-height:1.55;margin-top:.35rem}
+.roos-test-now strong{color:var(--red)}
+.roos-tests-note{font-size:.8rem;color:var(--text-muted);margin:0 0 1.5rem;font-style:italic}
+@media (max-width:600px){ .roos-test{flex-direction:column;gap:.35rem} .roos-test-status{min-width:0} }

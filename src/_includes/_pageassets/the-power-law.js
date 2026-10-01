@@ -1374,3 +1374,164 @@
   // data-chart-copy attribute on .channel-chart-wrapper (see chart-copy.js).
 })();
 
+
+// ═══════ ROLLING OUT-OF-SAMPLE RECORD (#when-reliable) ═══════
+// Added 2026-10-01 on JM's rulings (#116; measurement ROLLING_OOS_FITS_2026-09-23,
+// scripts/measure-rolling-oos.js, whose method this mirrors exactly). One fit per
+// quarter-end from 2012-Q1 to 2024-Q4, each the page's log-log OLS over PL_DATA
+// [first .. cutoff]. Per fit: b; todayX = fitted trend / reference trend at the
+// LAST SAMPLE; in4y = share of samples in the 4 years after the cutoff inside
+// 0.42x–3.0x the fitted trend (null until 4 years have elapsed). Everything is
+// computed at load, so the section and its three falsifiability tests stay
+// current with each PL_DATA refresh; nothing here is a stored figure.
+// The thresholds (0.42x for > 6 months; 0.68–1.24x; 80%) are FIXED as ruled on
+// 2026-09-23 — never re-derive them from the data, or the tests stop being tests.
+(function(){
+  var cTop = document.getElementById('roosTodayChart');
+  var cBot = document.getElementById('roosInChart');
+  if(!cTop || !cBot || typeof Chart === 'undefined' || typeof PL_DATA === 'undefined') return;
+  function $(id){ return document.getElementById(id); }
+
+  var BAND_LO = 0.68, BAND_HI = 1.24, IN_MIN = 80, FLOOR = 0.42, CEIL = 3.0, FLOOR_RUN_DAYS = 182.6;
+  var YEAR = 365.25, LAST = PL_DATA[PL_DATA.length-1][0];
+  function dayOf(y, m){ return Math.floor((Date.UTC(y, m, 1)/1000 - GENESIS_TS)/86400); } // m 0-based
+  function fit(cut){
+    var sx=0,sy=0,sxy=0,sx2=0,n=0;
+    for(var i=0;i<PL_DATA.length;i++){ var d=PL_DATA[i]; if(d[0]<=cut && d[1]>0){ var lx=Math.log(d[0]), ly=Math.log(d[1]); sx+=lx; sy+=ly; sxy+=lx*ly; sx2+=lx*lx; n++; } }
+    var b=(n*sxy-sx*sy)/(n*sx2-sx*sx); return {a:Math.exp((sy-b*sx)/n), b:b, n:n};
+  }
+  function canon(d){ return PL_A * Math.pow(d, PL_B); }
+  function dateStr(d, opt){ return new Date((GENESIS_TS + d*86400)*1000).toLocaleDateString('en-US', opt || {year:'numeric', month:'short', day:'numeric', timeZone:'UTC'}); }
+
+  var rows = [];
+  for(var y=2012; y<=2024; y++) for(var q=1; q<=4; q++){
+    var cut = dayOf(q===4 ? y+1 : y, q===4 ? 0 : q*3), f = fit(cut);
+    var tr = (function(f){ return function(d){ return f.a*Math.pow(d, f.b); }; })(f);
+    var h4 = cut + 4*YEAR, inN=0, tot=0;
+    if(h4 <= LAST){ for(var i=0;i<PL_DATA.length;i++){ var s=PL_DATA[i]; if(s[0]>cut && s[0]<=h4){ var m=s[1]/tr(s[0]); tot++; if(m>=FLOOR && m<=CEIL) inN++; } } }
+    rows.push({ label:'Q'+q+' '+y, y:y, q:q, x:y + q/4, b:f.b, todayX: tr(LAST)/canon(LAST),
+                in4y: (h4<=LAST && tot) ? Math.round(inN/tot*100) : null, modern: y >= 2016 });
+  }
+  var modern = rows.filter(function(r){ return r.modern; });
+  var modernIn = modern.filter(function(r){ return r.in4y !== null; });
+  var bMin = Math.min.apply(null, modern.map(function(r){return r.b;})), bMax = Math.max.apply(null, modern.map(function(r){return r.b;}));
+  var tMin = Math.min.apply(null, modern.map(function(r){return r.todayX;})), tMax = Math.max.apply(null, modern.map(function(r){return r.todayX;}));
+  var worst = modernIn.reduce(function(w, r){ return (!w || r.in4y < w.in4y) ? r : w; }, null);
+  var inMax = Math.max.apply(null, modernIn.map(function(r){return r.in4y;}));
+  var lastIn = rows.filter(function(r){ return r.in4y !== null; }).pop();
+
+  if($('roosStableSummary')) $('roosStableSummary').innerHTML =
+    'across all ' + modern.length + ' quarterly fits from 2016 to 2024, the exponent stayed between <strong>' + bMin.toFixed(2) + '</strong> and <strong>' + bMax.toFixed(2) +
+    '</strong>, the trend each fit implies for today stayed between <strong>' + tMin.toFixed(2) + '&times;</strong> and <strong>' + tMax.toFixed(2) +
+    '&times;</strong> the reference line, and every fit with four years of hindsight saw <strong>' + worst.in4y + '% to ' + inMax + '%</strong> of those years inside its own channel. A curve fitted in 2016, 2018 or 2020, on the data available then, drew nearly the line drawn today, and later prices stayed inside it.';
+  if($('roosLastIn4y') && lastIn) $('roosLastIn4y').textContent = lastIn.label;
+
+  // ── charts: two panels, one time axis (no dual y-scales) ──
+  var GREY = 'rgba(150,140,130,0.75)', AMBER = 'rgba(224,148,34,0.95)';
+  function col(r){ return r.modern ? AMBER : GREY; }
+  var xScale = { type:'linear', min:2012, max:2025.25, offset:false, grid:{color:'rgba(255,255,255,0.04)'},
+    ticks:{ color:'#706860', font:{size:10}, stepSize:1, maxRotation:0, autoSkip:false,
+      callback:function(v){ var every = (this.chart && this.chart.width < 560) ? 4 : 2; return (v % every === 0) ? String(v) : ''; } } };
+  // 2016 divider + label: era is shown by position and text, not colour alone
+  var divider = { id:'roosDivider', afterDatasetsDraw:function(ch){
+    var xs = ch.scales.x, ya = ch.chartArea, px = xs.getPixelForValue(2016), g = ch.ctx;
+    g.save(); g.strokeStyle='rgba(255,255,255,0.18)'; g.setLineDash([3,4]); g.beginPath(); g.moveTo(px, ya.top); g.lineTo(px, ya.bottom); g.stroke();
+    if(ch.canvas.id === 'roosTodayChart'){ g.setLineDash([]); g.fillStyle='#908880'; g.font='11px Inter, sans-serif';
+      g.textAlign='right'; g.fillText('Before 2016', px-8, ya.top+14); g.textAlign='left'; g.fillText('2016 on', px+8, ya.top+14); }
+    g.restore(); } };
+  var tip = { backgroundColor:'rgba(10,9,8,0.95)', titleColor:'#f2eee8', bodyColor:'#d0c8c0', borderColor:'rgba(247,147,26,0.3)', borderWidth:1, padding:10, displayColors:false };
+  function tipLines(r){
+    return ['Exponent b: ' + r.b.toFixed(2), 'Trend today: ' + r.todayX.toFixed(2) + '× the reference line',
+            'Next 4 years inside its channel: ' + (r.in4y===null ? 'not yet known' : r.in4y + '%')];
+  }
+  var Y_MAX = 16;
+  new Chart(cTop, {
+    type:'line',
+    data:{ datasets:[
+      { label:'Stable range (0.68×–1.24×)', data:[{x:2016,y:BAND_HI},{x:2025.25,y:BAND_HI}], borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(111,191,115,0.10)' },
+      { label:'_band_lo', data:[{x:2016,y:BAND_LO},{x:2025.25,y:BAND_LO}], borderWidth:0, pointRadius:0, fill:false },
+      { label:'Reference line', data:[{x:2012,y:1},{x:2025.25,y:1}], borderColor:'rgba(255,255,255,0.22)', borderDash:[4,4], borderWidth:1, pointRadius:0, fill:false },
+      { label:'Trend today implied by the fit', data: rows.map(function(r){ return {x:r.x, y:Math.min(r.todayX, Y_MAX), r:r}; }),
+        borderColor:'rgba(224,148,34,0.35)', borderWidth:1.5, pointRadius:3.5, pointHoverRadius:6,
+        pointBackgroundColor: rows.map(col), pointBorderColor:'#0a0908', pointBorderWidth:1,
+        pointStyle: rows.map(function(r){ return r.todayX > Y_MAX ? 'triangle' : 'circle'; }), fill:false, tension:0 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'nearest', axis:'x', intersect:false},
+      scales:{ x: xScale, y:{ type:'logarithmic', min:0.3, max:Y_MAX, grid:{color:'rgba(255,255,255,0.04)'}, afterFit:function(ax){ ax.width = 44; },
+        afterBuildTicks:function(ax){ ax.ticks = [0.5,1,2,4,8,16].map(function(v){ return {value:v}; }); },
+        ticks:{ color:'#706860', font:{size:10}, callback:function(v){ return v+'×'; } } } },
+      plugins:{ legend:{display:false}, tooltip: Object.assign({}, tip, { filter:function(it){ return it.datasetIndex===3; },
+        callbacks:{ title:function(it){ return 'Fit made at the end of ' + it[0].raw.r.label; }, label:function(it){ return tipLines(it.raw.r); } } }) } },
+    plugins:[divider]
+  });
+  var inRows = rows.filter(function(r){ return r.in4y !== null; });
+  // Bars on a linear time axis need an explicit width: about half a quarter's
+  // spacing, so they never touch at any width (updated on resize).
+  function barW(w){ return Math.max(1.5, Math.min(7, (w || cBot.parentNode.clientWidth) / ((2025.25 - 2012) * 4) * 0.55)); }
+  new Chart(cBot, {
+    type:'bar',
+    data:{ datasets:[
+      { label:'80% threshold', type:'line', data:[{x:2012,y:IN_MIN},{x:2025.25,y:IN_MIN}], borderColor:'rgba(255,255,255,0.3)', borderDash:[4,4], borderWidth:1, pointRadius:0, fill:false },
+      { label:'Next 4 years inside the fit’s channel', data: inRows.map(function(r){ return {x:r.x, y:r.in4y, r:r}; }),
+        backgroundColor: inRows.map(col), borderRadius:{topLeft:2, topRight:2}, barThickness:barW(), borderSkipped:'bottom' }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'nearest', axis:'x', intersect:false},
+      onResize:function(ch, size){ ch.data.datasets[1].barThickness = barW(size.width); },
+      scales:{ x: xScale, y:{ min:0, max:100, grid:{color:'rgba(255,255,255,0.04)'}, afterFit:function(ax){ ax.width = 44; }, ticks:{ color:'#706860', font:{size:10}, stepSize:25, callback:function(v){ return v+'%'; } } } },
+      plugins:{ legend:{display:false}, tooltip: Object.assign({}, tip, { filter:function(it){ return it.datasetIndex===1; },
+        callbacks:{ title:function(it){ return 'Fit made at the end of ' + it[0].raw.r.label; }, label:function(it){ return tipLines(it.raw.r); } } }) } },
+    plugins:[divider]
+  });
+
+  // ── table view (year-end fits) ──
+  var tb = document.querySelector('#roosTable tbody');
+  if(tb) tb.innerHTML = rows.filter(function(r){ return r.q===4; }).map(function(r){
+    return '<tr' + (r.modern ? '' : ' class="roos-pre"') + '><td>End of ' + r.y + '</td><td>' + r.b.toFixed(2) + '</td><td>' + r.todayX.toFixed(2) + '&times;</td><td>' + (r.in4y===null ? 'not yet' : r.in4y + '%') + '</td></tr>';
+  }).join('');
+
+  // ── the three falsifiability tests ──
+  function setTest(key, holding, html){
+    var el = document.querySelector('.roos-test[data-test="' + key + '"]'); if(!el) return;
+    el.classList.toggle('roos-broken', !holding);
+    el.querySelector('.roos-test-status').innerHTML = holding ? '<span aria-hidden="true">&#10003;</span> Holding' : '<span aria-hidden="true">&#10005;</span> Broken';
+    el.querySelector('.roos-test-now').innerHTML = html;
+  }
+  // (1) runs below the floor since 2016, measured in elapsed time between samples
+  var s2016 = dayOf(2016, 0), runs = [], cur = null;
+  for(var k=0;k<PL_DATA.length;k++){ var p=PL_DATA[k]; if(p[0] < s2016) continue;
+    var m1 = p[1]/canon(p[0]);
+    if(m1 < FLOOR){ if(!cur) cur = {a:p[0], b:p[0], min:m1, n:0}; cur.b = p[0]; cur.n++; cur.min = Math.min(cur.min, m1); }
+    else if(cur){ runs.push(cur); cur = null; } }
+  var open = cur; if(cur) runs.push(cur);
+  var longest = runs.reduce(function(w, r){ return (!w || (r.b-r.a) > (w.b-w.a)) ? r : w; }, null);
+  var floorBroken = runs.some(function(r){ return (r.b - r.a) > FLOOR_RUN_DAYS; });
+  setTest('floor', !floorBroken,
+    !longest ? 'No sample since 2016 has closed below the floor.' :
+    'Longest stretch below the floor since 2016: ' + (longest.n===1 ? 'a single sample, ' + dateStr(longest.a) : longest.n + ' samples over ' + Math.round((longest.b-longest.a)/30.44) + ' months, from ' + dateStr(longest.a)) +
+    ' (lowest ' + longest.min.toFixed(3) + '&times;).' + (open ? ' <strong>Price is below the floor now</strong>, since ' + dateStr(open.a) + '.' : ''));
+  // (2) the full-record refit
+  var full = fit(LAST), fullX = (full.a*Math.pow(LAST, full.b))/canon(LAST);
+  setTest('refit', fullX >= BAND_LO && fullX <= BAND_HI,
+    'A fit over every price through ' + dateStr(LAST) + ' puts today&rsquo;s trend at ' + fullX.toFixed(2) + '&times; the reference line.');
+  // (3) weakest 2016+ fit with four years of hindsight
+  setTest('channel', worst.in4y >= IN_MIN,
+    'Weakest so far: ' + worst.in4y + '%, the fit made at the end of ' + worst.label + ' (' + modernIn.length + ' fits have four years of hindsight).');
+
+  // ── "reads richer" note: live price against the reference line and a fresh fit ──
+  function renderRicher(){
+    var box = $('roosRicher'); if(!box) return;
+    var d = (typeof TODAY_DAYS !== 'undefined') ? TODAY_DAYS : LAST, px = (typeof TODAY_PRICE !== 'undefined') ? TODAY_PRICE : PL_DATA[PL_DATA.length-1][1];
+    var refitT = full.a*Math.pow(d, full.b), canonT = canon(d);
+    function put(cls, v){ var e = box.querySelector('.' + cls); if(e) e.innerHTML = v; }
+    put('roos-r-date', dateStr(LAST));
+    put('roos-r-b', full.b.toFixed(2));
+    put('roos-r-pct', Math.round((1 - refitT/canonT)*100) + '%');
+    put('roos-r-refit', (px/refitT).toFixed(2) + '&times;');
+    put('roos-r-canon', (px/canonT).toFixed(2) + '&times;');
+  }
+  renderRicher();
+  if(typeof fetchTodayPrice === 'function'){ fetchTodayPrice(function(){ renderRicher(); }); }
+
+  // QA hook (?qa): the figures the measurement script prints, for parity checks.
+  try{ if(/[?&]qa\b/.test(location.search)) window.roosQA = { rows:rows, bRange:[bMin,bMax], todayRange:[tMin,tMax], worst:worst, fullB:full.b, fullX:fullX, floorRuns:runs }; }catch(e){}
+})();

@@ -555,6 +555,11 @@ Tab 1 has a small interactive widget — **"Project a Future Date"** (`#projSlid
 - PAGR concept: "Proportional Annual Growth Rate" as alternative to CAGR — concept discussed but not yet coined on the page (risk of premature neologism)
 - ~~Homepage carousel slot for Power Law page~~ — completed (slide 10, video deployed).
 
+
+### 11.x When did the Power Law become reliable? (`#when-reliable`, 2026-10-01)
+
+A section after the out-of-sample chart, on JM's rulings of 2026-10-01 (#116). It sweeps the chart's single cutoff: one fit per quarter-end 2012-Q1 to 2024-Q4, each the page's own log-log OLS over `PL_DATA` up to that cutoff, and shows two panels on one time axis (no dual y-scales): the trend each fit implies today as a multiple of the reference line (log, with the 0.68–1.24× band shaded from 2016), and the share of the next four years inside each fit's own 0.42–3.0× channel (dashed 80%). Grey before 2016, amber after, with a labelled divider so era is never colour alone; a year-end table view; tooltips per fit. Then the honest limits (≈2.5 cycles; overlapping fits; the stress test that two years at the floor would move b 5.63 → 5.47), the **three falsifiability tests with live Holding/Broken status** (thresholds fixed on 2026-09-23; MONTHLY_REFRESH §9.8a), and the **"reads richer" note**: a fresh full-record fit (b 5.63) puts today's trend ~9% below the reference line, so price reads less far below trend than the site's channel says, computed against the live price. Every figure is computed at load; nothing is stored. `?qa` → `window.roosQA` must agree with `scripts/measure-rolling-oos.js`.
+
 ## 12. What Money Has To Be (`/what-money-has-to-be.html`)
 
 The site's most foundational concept page. Thesis: a good money must simultaneously serve as Store of Value (persistence across time), Medium of Exchange (movement across space), and Unit of Account (shared measurement). These three functions are structurally coupled — unbundling degrades each. Bitcoin is the first money to deliver all three simultaneously.
