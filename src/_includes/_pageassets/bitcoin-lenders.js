@@ -242,6 +242,10 @@
     var h = g && g.querySelector('.ln-grp');
     return h ? h.textContent : '';
   }
+  // Did THIS page push the #lender- entry? Only then may closing use
+  // history.back(); after a deep-link load there is no earlier entry on this
+  // page and Back would leave it (Claude Code's preview finding, 2026-09-30).
+  var pushedHash = false;
   function openDetail(id, pushHash) {
     var card = document.getElementById('lender-' + id);
     if (!card || !canDialog) return;
@@ -256,12 +260,20 @@
     dialog.dataset.id = id;
     if (!dialog.open) dialog.showModal();
     dialog.scrollTop = 0;
-    if (pushHash && location.hash !== '#lender-' + id) history.pushState({ lender: id }, '', location.pathname + location.search + '#lender-' + id);
+    if (pushHash && location.hash !== '#lender-' + id) {
+      history.pushState({ lender: id }, '', location.pathname + location.search + '#lender-' + id);
+      pushedHash = true;
+    }
   }
   function closeDetail(viaHistory) {
     if (!dialog || !dialog.open) return;
     dialog.close();
-    if (!viaHistory && /^#lender-/.test(location.hash)) history.back();
+    if (viaHistory) { pushedHash = false; return; }
+    if (/^#lender-/.test(location.hash)) {
+      if (pushedHash) history.back();                                   // popstate finishes the job
+      else history.replaceState(null, '', location.pathname + location.search); // a deep link: stay here
+    }
+    pushedHash = false;
   }
   if (canDialog) {
     cards.forEach(function (card) {
@@ -276,7 +288,8 @@
     dialog.addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(false); });   // Escape
     window.addEventListener('popstate', function () {
       var m = location.hash.match(/^#lender-([a-z0-9-]+)$/);
-      if (m) openDetail(m[1], false); else closeDetail(true);
+      if (m) openDetail(m[1], false);
+      else { closeDetail(true); writeUrl(); } // the earlier entry predates any slider move: re-write ltv= to match the page
     });
     // trigger sentences re-render into the card; keep an open dialog in step
     var _renderAll = renderAll;

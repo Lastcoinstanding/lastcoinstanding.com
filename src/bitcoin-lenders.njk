@@ -138,6 +138,7 @@ eleventyComputed:
                         {{ l.trig.static | safe }}
                     {%- endif -%}
                 </p>
+                <p class="ln-state-note" id="state-{{ l.id }}"></p>
                 <div class="ln-pair">
                     <div class="plus"><span class="l">Distinguishing</span>{{ l.distinguishing | safe }}</div>
                     <div class="catch"><span class="l">The catch</span>{{ l.catch | safe }}</div>
@@ -153,7 +154,7 @@ eleventyComputed:
                             <dt>Your coins</dt><dd>{{ l.coins | safe }}</dd>
                             <dt>Terms</dt><dd>{{ l.terms | safe }}</dd>
                             <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
-                            <dt>Where</dt><dd>{{ l.where | safe }}<span class="ln-state-note" id="state-{{ l.id }}"></span></dd>
+                            <dt>Where</dt><dd>{{ l.where | safe }}</dd>
                             <dt>Track record</dt><dd>{{ l.track | safe }}</dd>
                         </dl>
                         <div class="ln-foot">Sources, read {{ l.asOf }}: {% for s in l.sources %}<a href="{{ s }}" rel="nofollow noopener" target="_blank">{{ s | replace('https://', '') | replace('http://', '') | replace('www.', '') | truncate(44, true, '…') }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div>
