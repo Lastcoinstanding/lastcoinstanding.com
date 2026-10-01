@@ -641,6 +641,12 @@ _Cluster opened 2026-08-21 (JM). Three pages live — **The Bitcoin Retirement**
 
 ### Tools & suite plumbing
 
+- [ ] **"Measure in BTC": a bitcoin-denominated view on the comparison tools.**
+  Surfaced 2026-10-01 alongside the denominator essay: the claim made something a reader can do. A toggle that re-prices the comparison in bitcoin: the median house (the Gallery already carries a BTC-per-house line), the S&P 500, a salary, a rental property's income.
+  - **Candidates:** Bitcoin vs. Real Estate, Bitcoin vs. Rental Property, Bitcoin vs. the Stock Market, the Gallery; possibly a standalone "priced in bitcoin" page.
+  - **Open design questions:** month-end `BTC_MONTHLY` vs `PL_DATA` as the series; log scale by default (a BTC-priced asset falls by orders of magnitude, which reads as a crash on a linear axis); how to say plainly that the view is historical pricing, not a forecast.
+  - **Compliance read before build:** historical re-pricing, not performance, but it sits beside performance comparisons; run it through the marketing-rule pass.
+
 - [x] **WODN position receiver — enable the underwater-manager handoff from How Much Cash. SHIPPED 2026-08-09 (branch `feat/wodn-position-receiver`, `2d945a7`).**
   Surfaced 2026-07-16 during the How Much Cash v3.3 build (addendum A2).
   - **Concept:** teach `/wait-or-deploy-now` to read its slider position from a URL param (it currently encodes nothing in URL state). Then How Much Cash's underwater-manager block ("the target never came → deciding when to redeploy is Wait-or-Deploy's question") can carry **today's channel position** into WODN, so the reader lands on the deploy-or-wait question already at their spot — suite carry pattern (senders speak the receiver's vocabulary).
@@ -677,6 +683,12 @@ _Cluster opened 2026-08-21 (JM). Three pages live — **The Bitcoin Retirement**
 _(**Retirement-funds-to-bitcoin mechanics** moved 2026-08-21 to the new **Retirement family** cluster above — the entry itself had always flagged that as its likely home.)_
 
 ### Thesis, arguments & essays
+
+- [ ] **"Bitcoin is the denominator": a dated thesis essay (Substack-first, then an on-site companion). JM's to write.**
+  Surfaced 2026-10-01 in the tagline discussion (SITE_GUIDE §56.6). Declined as a masthead because it contradicts About's "Why USD?" on every page; kept as a *dated* declaration, which can age into foresight in a way an undated slogan can't. JM's view: fantastical-sounding now, increasingly prescient over the years.
+  - **Outline (draft):** (1) *The honest start:* this site measures bitcoin in dollars, and About says why; that is where the world is today. (2) *What a denominator is:* unit of account, money's third function and historically the last to move (store of value, then medium of exchange, then unit of account). (3) *It is already happening at the edges:* companies reporting per-share bitcoin; prices quoted in sats; the "does it beat bitcoin?" question as a hurdle rate; this site's own comparisons that put a house, the S&P 500 or a salary against bitcoin. (4) *The steelman for the dollar:* a unit of account needs short-run price stability; contracts, wages and taxes are written in it; bitcoin's volatility is the obstacle, not a detail. (5) *What would have to be true for the flip,* as dated, checkable signposts, in the spirit of the Power Law page's falsifiability work. (6) *Close:* "Written in October 2026."
+  - **Connections:** About ("Why USD?"), The Fixed Pie, What Money Has to Be, The Bitcoin Migration and The Bitcoin Hurdle Rate (the pages already using the word or the idea); the "Measure in BTC" feature below.
+  - **Verify at build:** every adoption figure in (3) sourced and dated; no claim that the unit-of-account shift is under way at scale unless measured.
 
 - [ ] **The Big Long — the paper-vs-physical thesis (Darkside). Substack-first umbrella; multiple pieces.**
   Surfaced 2026-08-02. Credit **@DarkSide2030** by name — already in the credited macro/philosophy circle (`X_STRATEGY_PLAYBOOK` §6), so crediting is house habit *and* a relationship-layer win.
