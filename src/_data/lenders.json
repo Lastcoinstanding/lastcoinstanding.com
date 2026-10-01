@@ -62,7 +62,7 @@
       "terms": "12 months (6 for the volatility-proof loan), or a credit line you can draw on repeatedly; no fees to open, to repay early, or if Strike has to sell",
       "minimum": "$5,000 in some states; up to $5 million",
       "where": "“Select US states” for the standard loan; the credit line in 38 states + DC; the volatility-proof loan not in California, New York or Texas",
-      "distinguishing": "The only US lender with a loan that a falling price can’t liquidate, inside a full bitcoin app",
+      "distinguishing": "A loan a falling price can’t liquidate (the volatility-proof loan), inside a full bitcoin app",
       "catch": "Small loans pay the highest rate, and your bitcoin may be held by funding partners Strike doesn’t name",
       "track": "Lending since 2025; no custody incident on record",
       "filters": {
@@ -122,7 +122,7 @@
       "terms": "12 months; interest builds up and is due when the loan ends (from 2027, in full at maturity); no penalty for repaying early; a 2% admin fee, waived for US and Canadian borrowers",
       "minimum": "$500",
       "where": "Not available in about 10 US states, including California and Connecticut (from other lenders’ comparison charts; Ledn publishes no list)",
-      "distinguishing": "The lowest minimum on the page, and the longest bitcoin-only lending record (since 2018)",
+      "distinguishing": "A $500 minimum, a bitcoin-only lending record back to 2018, and published proof of reserves",
       "catch": "Getting excess bitcoin back during the loan is hard: the loan must be under 30% of the collateral’s value, at least 60 days old, and withdrawals are capped at $100,000 per 60 days",
       "track": "Lending since 2018; paused nothing in 2022",
       "filters": {
@@ -250,7 +250,7 @@
       "terms": "1–12 months, renewable at the end without repaying; interest monthly or at the end; no fee to repay early; late fees “may apply”",
       "minimum": "$5,000 (varies by state); no published maximum",
       "where": "Arch’s own pages carry three different state lists: its June 2026 eligibility article names 44 states + DC + Puerto Rico; its site footer instead excludes California, Delaware, Hawaii, Mississippi, Montana, Nevada, North Dakota, Rhode Island and Vermont",
-      "distinguishing": "Lets you borrow more against your bitcoin (60%) than the other custodial lenders, with a stated 24-hour window to fix a margin call and a sale that only trims the loan back to 60%",
+      "distinguishing": "Opens at 60% with a stated 24-hour window to fix a margin call and a sale that only trims the loan back to 60%; the bitcoin is held at a federally chartered bank",
       "catch": "Starting at 60% means a 14% fall already triggers the margin call; Arch’s pages disagree with each other on states, rates and fees, so only the quote in its app is reliable",
       "track": "Founded 2022 (press); raised $75 million in 2024; no incidents or actions published",
       "filters": {
@@ -424,8 +424,8 @@
       "terms": "3–60 months, extendable; pay interest monthly, repay in instalments, or defer everything to the end; closing early costs at least three months’ interest",
       "minimum": "$25,000 for US borrowers (C$10,000 in Canada); no fixed maximum",
       "where": "US and Canadian residents; US borrowers are paid in the USDC stablecoin rather than dollars; no US state list or state licence is published; APX’s Canadian regulatory relief (April 2025) covers Canadians only",
-      "distinguishing": "The most room before a sale among the custodial lenders (90%), and the sale only trims the loan, with no fee",
-      "catch": "For a US borrower the regulatory cover is a money-services registration, the payout is a stablecoin, the minimum is $25,000, and there is APX’s own bankruptcy wording above",
+      "distinguishing": "A sale line of 90% that only trims the loan back to 85%, with no fee, and a wallet set aside for you that you can check",
+      "catch": "For a US borrower the regulatory cover is a money-services registration, the payout is a stablecoin, the minimum is $25,000, and APX’s own risk disclosure says your claim could be treated as unsecured if APX failed",
       "track": "Founded 2022 by the former Coinberry team; Canadian regulatory relief April 2025; no incidents published; not operating in 2022",
       "filters": {
         "bitcoinOnly": false,
@@ -484,7 +484,7 @@
       "terms": "No end date and no monthly payments; repay when you like and draw again up to your limit; no fee to open or to repay early",
       "minimum": "$100; bespoke terms above $25 million",
       "where": "“Available globally”; no US state list or licence published",
-      "distinguishing": "The lowest minimum on the page, and the only credit line with no payments and no end date",
+      "distinguishing": "The lowest minimum among the custodial lenders ($100), and a credit line with no payments and no end date",
       "catch": "A liquidation takes everything and returns nothing, at a trigger the site doesn’t publish; the 2% capital charge is a second interest rate",
       "track": "The credit line since November 2025; raised $200 million in November 2025; did not exist in 2022; no incidents published",
       "filters": {
@@ -545,7 +545,7 @@
       "terms": "2 days to 2 years; 0.5% to open; interest charged every 4 hours; a fee for ending early; the loan is paid out in USDC, USDG, bitcoin or other assets",
       "minimum": "$75,000 (US); $100,000 in Delaware and Minnesota",
       "where": "US: 40 states + DC, and only for “eligible contract participants”, roughly individuals with more than $10 million invested or firms with $10 million in assets; not in California, New York, Massachusetts, Connecticut and 7 others",
-      "distinguishing": "Fixed rates for terms as short as two days, and the only product here where a short bitcoin loan can cost under 10%",
+      "distinguishing": "Fixed rates for terms as short as two days, paid out in your choice of stablecoin, bitcoin or other assets",
       "catch": "For a US individual it is in practice a product for the very wealthy; the collateral is an exchange balance, and 47 other assets share Kraken’s risk engine",
       "track": "Kraken has run an exchange since 2011 and says it has never been breached; Flexline since February 2026 (US June 2026)",
       "filters": {
@@ -935,7 +935,7 @@
       "terms": "1–12 months; repay at the end, with partial repayments allowed any time; crypto only (USDT, USDC, Liquid bitcoin, wrapped bitcoin, tokenised gold), no bank money",
       "minimum": "$50; at most $25,000 per loan",
       "where": "Terms effective 4 June 2026 bar US citizens, residents and anyone located in the US, all states and territories; also Russia, Belarus and sanctioned countries",
-      "distinguishing": "No identity check at all, a $50 minimum, and loan terms you write yourself",
+      "distinguishing": "No identity check, a $50 minimum, and loan terms you write yourself",
       "catch": "US persons are excluded (its 2020 post had opened to them); $25,000 cap; the lender is an anonymous user; lose the payment password and the collateral is lost",
       "track": "Hodlex since 2016; the lending service since October 2020; publishes nothing about 2022; no incidents published",
       "filters": {
@@ -997,7 +997,7 @@
       "minimum": "$150,000 for companies; $500,000 for individuals and trusts “in most cases”; $1 million in Vermont",
       "where": "US only; not Louisiana, Montana, Nevada, New Mexico, New York, North Dakota, South Dakota or Puerto Rico; in Michigan, Mississippi and Ohio, companies only",
       "distinguishing": "You hold one of the three keys and can watch the address yourself; lending since June 2017 with “zero lost bitcoin”",
-      "catch": "The most expensive rate and the largest minimum on the page; business purpose only; a 24-hour window to fix a violation; the sale at the line closes the whole loan",
+      "catch": "One of the highest rates and the largest minimum on the page; business purpose only; a 24-hour window to fix a violation; the sale at the line closes the whole loan",
       "track": "First loan June 2017; more than $1 billion lent; in November 2022 said it had no FTX exposure but that funding was “materially constrained”, with about 15% of staff let go",
       "filters": {
         "bitcoinOnly": true,
@@ -1071,7 +1071,7 @@
       "terms": "Variable loans: no term and no due dates. Fixed loans: repaid in full at maturity, and repaying early doesn’t reduce the interest. The 2% fee is charged again every time you draw more",
       "minimum": "Not published; up to 5,000,000 USDC against bitcoin",
       "where": "US except New York; limited access in the UK",
-      "distinguishing": "The biggest brand on the page and the thinnest safety margin: a position on a public lending protocol with an 86% line",
+      "distinguishing": "The biggest brand on the page, and a loan that is really a position on a public lending protocol, with an 86% line and no margin call",
       "catch": "Interest is added to the loan, there is no margin call, and the collateral is a token on a protocol Coinbase doesn’t control; the 2% fee recurs",
       "track": "Launched January 2025 (bitcoin only, $100,000 cap), since widened; the earlier “Coinbase Borrow” dollar loans stopped in May 2023; no lending incidents published",
       "filters": {
@@ -1137,7 +1137,7 @@
       "terms": "No end date; interest is added to the loan; no fees beyond network fees (the protocol could switch on a fee of up to 25% of interest)",
       "minimum": "None; limited by how much the pool has to lend ($166 million at read)",
       "where": "No identity check; only sanctioned territories are excluded; the terms leave it to you to know whether you may use it",
-      "distinguishing": "The lowest rate and the smallest penalty on the page",
+      "distinguishing": "Among the lowest rates and penalties on the page (4.38%), and the same pool as Coinbase’s loans without Coinbase’s fee",
       "catch": "No warning, a thin margin, a token that depends on Coinbase, and a protocol with no one to call",
       "track": "These markets since September 2024; no bad debt recorded; a 2025 website bug was intercepted by a security researcher before funds were lost (press); the core contracts cannot be changed",
       "filters": {
@@ -1360,7 +1360,7 @@
       "terms": "Two loans signed together: an ordinary Fannie Mae-conforming mortgage plus a down-payment loan secured by the bitcoin and a second claim on the home, at the same rate and term, with one monthly payment; a credit score of 680 or more and full income underwriting",
       "minimum": "Not published (the first loan is a conforming mortgage)",
       "where": "“Select states and jurisdictions”, no list",
-      "distinguishing": "The only product on the page with no price-driven sale at all, on a standard government-backed mortgage",
+      "distinguishing": "No price-driven sale at any point, on a standard government-backed mortgage",
       "catch": "You still qualify on income and credit like any conforming borrower; only 40% of the bitcoin counts; the bitcoin stays pledged for the life of the mortgage, and the question of reuse is answered only in the press",
       "track": "Announced March 2026; first loan June 2026; generally available since 26 August 2026; no incidents on this product",
       "filters": {
