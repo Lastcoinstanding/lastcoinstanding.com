@@ -90,6 +90,35 @@ eleventyComputed:
         </dl>
     </section>
 
+    {#- The dated change log (lenders v2 C, JM's rulings 2026-10-01). Rendered from
+        src/_data/lenderLog.json via lenderLogIndex.js; every monthly re-read is
+        logged even when nothing changed, so a quiet month reads as checked, not
+        neglected. Procedure: MONTHLY_REFRESH_CHECKLIST §7.6. -#}
+    <section class="ln-log" id="what-changed" aria-labelledby="lnLogTitle">
+        <div class="ln-log-head">
+            <h2 id="lnLogTitle" class="ln-log-title">What changed</h2>
+            <p class="ln-log-lede">Lenders change their terms more often than anything else on this site. Every card is re-read against the lender&rsquo;s own pages each month for its rate and each quarter in full, and every check is logged here, newest first, with whatever it found.{% if lenderLogIndex.nextCheckLabel %} Next check: <strong>{{ lenderLogIndex.nextCheckLabel }}</strong>.{% endif %}</p>
+        </div>
+        {% macro logItem(e) -%}
+            <li class="ln-log-item ln-log-{{ e.kind }}">
+                <time datetime="{{ e.date }}">{{ e.label }}</time>
+                <span class="ln-log-who">{% if e.lender %}<a href="#lender-{{ e.lender }}">{{ e.name }}</a>{% elif e.kind == 'check' %}Cards checked{% else %}This page{% endif %}</span>
+                <span class="ln-log-text">{{ e.text | safe }}{% if e.source %} <a class="ln-log-src" href="{{ e.source }}" rel="nofollow noopener" target="_blank">Source <span aria-hidden="true">&nearr;</span></a>{% endif %}</span>
+            </li>
+        {%- endmacro %}
+        <ol class="ln-log-list">
+            {% for e in lenderLogIndex.entries %}{% if loop.index <= 5 %}{{ logItem(e) }}{% endif %}{% endfor %}
+        </ol>
+        {% if lenderLogIndex.entries.length > 5 %}
+        <details class="ln-log-more">
+            <summary>Earlier ({{ lenderLogIndex.entries.length - 5 }})</summary>
+            <ol class="ln-log-list">
+                {% for e in lenderLogIndex.entries %}{% if loop.index > 5 %}{{ logItem(e) }}{% endif %}{% endfor %}
+            </ol>
+        </details>
+        {% endif %}
+    </section>
+
     <div class="ln-filters" id="lnFilters" aria-label="Filters">
         <button class="ln-chip on" type="button" data-filter="all">All</button>
         <button class="ln-chip" type="button" data-filter="bitcoinOnly">Bitcoin only</button>
@@ -136,6 +165,7 @@ eleventyComputed:
                     <div class="ln-chips">
                         {% if l.bitcoinOnly %}<span class="ln-tag yes">&#10003; Bitcoin only</span>{% else %}<span class="ln-tag no">Not bitcoin only &middot; {{ l.otherCollateral }}</span>{% endif %}
                         {% if l.qualifier %}<span class="ln-tag qual">{{ l.qualifier }}</span>{% endif %}
+                        {%- set lg = lenderLogIndex.byLender[l.id] %}{% if lg and lg.length %}<a class="ln-tag ln-changed" href="#what-changed" data-log-date="{{ lg[0].date }}" data-log-type="{{ lg[0].type }}" data-log-label="{{ lg[0].label }}" hidden></a>{% endif %}
                     </div>
                 </div>
                 <div class="ln-rate"><b{% if l.rate.np %} class="np"{% endif %}>{{ l.rate.headline }}</b><span>{{ l.rate.note | safe }}</span></div>
@@ -179,6 +209,8 @@ eleventyComputed:
                             <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
                             <dt>Where</dt><dd>{{ l.where | safe }}</dd>
                             <dt>Track record</dt><dd>{{ l.track | safe }}</dd>
+                            {%- set lg = lenderLogIndex.byLender[l.id] %}{% if lg and lg.length %}
+                            <dt>Changes logged</dt><dd><ul class="ln-hist">{% for e in lg %}<li><time datetime="{{ e.date }}">{{ e.label }}</time> {{ e.text | safe }}{% if e.source %} <a href="{{ e.source }}" rel="nofollow noopener" target="_blank">source</a>{% endif %}</li>{% endfor %}</ul></dd>{% endif %}
                         </dl>
                         <div class="ln-foot">Sources, read {{ l.asOf }}: {% for s in l.sources %}<a href="{{ s }}" rel="nofollow noopener" target="_blank">{{ s | replace('https://', '') | replace('http://', '') | replace('www.', '') | truncate(44, true, '…') }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div>
                         <a class="ln-depth" href="{{ l.depth.href }}">Depth: {{ l.depth.label }} &rarr;</a>

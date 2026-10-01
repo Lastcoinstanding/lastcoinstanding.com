@@ -260,3 +260,24 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .help-tip.help-tip-right .tip-content { left: auto; right: 0; }
 .ln-ltv .k .help-tip { margin-left: 0; width: 12px; height: 12px; font-size: 0.56rem; flex: 0 0 auto; }
 .ln-dialog .help-tip .tip-content { z-index: 60; }
+/* ── What changed: the dated change log (2026-10-01) ── */
+.ln-log{margin:2rem 0 1.5rem;padding:1.4rem 1.6rem;border:1px solid rgba(255,255,255,0.07);border-radius:10px;background:rgba(255,255,255,0.015)}
+.ln-log-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.55rem;font-weight:500;color:#f2eee8;margin:0 0 .4rem}
+.ln-log-lede{font-family:'Inter',sans-serif;font-size:.88rem;line-height:1.6;color:rgba(255,255,255,0.55);margin:0 0 1rem;max-width:860px}
+.ln-log-lede strong{color:rgba(255,255,255,0.8);font-weight:600}
+.ln-log-list{list-style:none;margin:0;padding:0}
+.ln-log-item{display:grid;grid-template-columns:7.2rem 9.5rem 1fr;gap:.25rem 1rem;padding:.6rem 0;border-top:1px solid rgba(255,255,255,0.06);font-family:'Inter',sans-serif;font-size:.86rem;line-height:1.55}
+.ln-log-item time{color:rgba(255,255,255,0.45);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ln-log-who{color:#e09422;font-weight:600}
+.ln-log-who a{color:#e09422;text-decoration:none;border-bottom:1px dotted rgba(224,148,34,0.5)}
+.ln-log-check .ln-log-who{color:rgba(255,255,255,0.6)}
+.ln-log-text{color:rgba(255,255,255,0.75)}
+.ln-log-src{color:rgba(224,148,34,0.85);white-space:nowrap;font-size:.8rem;text-decoration:none}
+.ln-log-more{margin-top:.4rem;font-family:'Inter',sans-serif;font-size:.82rem}
+.ln-log-more summary{cursor:pointer;color:rgba(224,148,34,0.9);padding:.4rem 0}
+@media (max-width:700px){.ln-log{padding:1.1rem 1rem}.ln-log-item{grid-template-columns:1fr;gap:.1rem}.ln-log-who{font-size:.84rem}}
+.ln-tag.ln-changed{color:#e09422;border-color:rgba(224,148,34,0.45);background:rgba(224,148,34,0.08);text-decoration:none}
+.ln-hist{margin:0;padding-left:1rem}
+.ln-hist li{margin:.15rem 0}
+.ln-hist time{color:rgba(255,255,255,0.5);margin-right:.3rem}
+.ln-tag.ln-changed[hidden]{display:none}

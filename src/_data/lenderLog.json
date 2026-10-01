@@ -1,0 +1,23 @@
+{
+  "note": "The dated change log on /bitcoin-lenders (JM's rulings 2026-10-01: a section above the cards plus card badges and per-card history; seeded with the changes the 2026-09-30 research found with exact, sourced dates; every monthly re-read logged even when nothing changed). Newest entries may go anywhere: the index (lenderLogIndex.js) sorts by date. kind: 'check' (a re-read of the cards; give read and changed counts) | 'page' (a card added or removed) | 'lender' (something the lender changed). type, for kind 'lender' or 'page': 'rate' | 'terms' | 'availability' | 'launch' | 'added' | 'removed' | 'exit'. lender: the card id in lenders.json. source: the lender's own page for the change. Procedure: MONTHLY_REFRESH_CHECKLIST §7.6.",
+  "nextCheck": "2026-10-31",
+  "nextCheckLabel": "31 Oct 2026",
+  "entries": [
+    { "date": "2026-10-01", "kind": "page", "type": "added", "lender": "cadena",
+      "text": "Added to the page: Cadena Bitcoin, the only Discreet Log Contract lender here. Twenty cards." },
+    { "date": "2026-09-30", "kind": "check", "read": 19, "changed": null,
+      "text": "Page published. All nineteen cards read from each lender’s own pages, every figure dated." },
+    { "date": "2026-09-24", "kind": "lender", "type": "launch", "lender": "kraken-borrow",
+      "text": "Kraken Borrow launched in the US: buying power on Kraken, not a cash loan you can withdraw.",
+      "source": "https://blog.kraken.com/product/borrow/us-customers" },
+    { "date": "2026-08-25", "kind": "lender", "type": "terms", "lender": "apx",
+      "text": "APX cut its liquidation fee to 0% and moved to partial liquidation: it now sells only enough bitcoin to bring the loan back to 85%.",
+      "source": "https://apxlending.com/blog/zero-fee-partial-liquidations" },
+    { "date": "2026-06-04", "kind": "lender", "type": "availability", "lender": "hodlhodl",
+      "text": "Hodl Hodl Lend’s new terms bar US citizens, residents and anyone in the US, reversing its 2020 opening to US users.",
+      "source": "https://lend.hodlhodl.com/terms_of_service" },
+    { "date": "2026-02-16", "kind": "lender", "type": "availability", "lender": "nexo",
+      "text": "Nexo returned to the US through Bakkt, three years after leaving.",
+      "source": "https://nexo.com/blog/nexo-returns-to-the-us" }
+  ]
+}

@@ -478,6 +478,12 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 ### Collateral & credit cluster
 
+- [ ] **Bitcoin Lenders Compared: v2 candidates** (from the 2026-10-01 handoff, in its order of value; JM decides). **C shipped 2026-10-01** (the dated *What changed* log, badges and per-card history; SITE_GUIDE §57).
+  - **A. "How often would this trigger have fired?"** For each priced card, the share of month-ends since 2017 (or 2020) at which a maximum loan would have hit the call and liquidation lines within 12 months, client-side from `BTC_MONTHLY`. Drawdown history, not performance, but needs the pair's hypothetical-history framing and a compliance read.
+  - **B. "My loan" mode.** Stack and loan amount in the live line; each card shows the dollars of bitcoin sold at its trigger and the year's interest. BAS's engine has the math.
+  - **D. A country select** beside the state select. Lower: the audience is US-first.
+  - **E. Essays that point at the page:** a Substack piece in the "one vocabulary" voice; *Bitcoin as pristine collateral* (the 80% collateralisation figure needs real sourcing first).
+
 > **RULING — no hub page; file by type (JM, 2026-08-08).** A filing/classification decision only — nothing here is promoted, designed or built by this ruling.
 >
 > **Decision: no collateral-hub page.** The "six entries needing an architecture" framing overstated it — the six are not six pages but roughly **two site builds, two essays, a research task and a page extension** (several entries already say so in their own text: "task, not a page"; "possibly an essay angle + a page extension rather than a new page"). And the site already has the hub: the **"Living on Bitcoin" nav group** (Borrowing Against Your Stack, Bitcoin-Backed Mortgages, Living on Bitcoin, Bitcoin and Fixed Income, STRC Below Par). A collateral-hub page would compete with it and stack a second organising layer over the same material. What a hub would have provided is achieved instead by **discipline** — consistent vocabulary ("bitcoin-backed credit" throughout, per the MSTR entry) and each piece cross-linking its neighbours.
