@@ -5,7 +5,9 @@
 //   bal  = non-zero-balance addresses (Coin Metrics AdrBalCnt) — the
 //          preferred ownership proxy. These cells are exact OLS fits.
 //   act  = active addresses (Blockchain.com Charts) — activity, not
-//          ownership. Recomputed June 2026 directly from Blockchain.com
+//          ownership. Recomputed September 2026 (both proxies; the
+//          holders cells on Coin Metrics' current vintage, which revised
+//          AdrBalCnt down ~1% since 2015) directly from Blockchain.com
 //          active-address + price series, OLS on log-log, over the same
 //          era boundaries used for the holders fit (calibrated against
 //          the exact AdrBalCnt values). See SITE_GUIDE §20 + credits [5].
@@ -15,16 +17,16 @@
 // crash boundary); ETF era = 2024→present; full = 2011→present.
 const FITS = {
   bal: {
-    all:    {beta:1.84, r2:0.95, label:'Full history · holders'},
-    retail: {beta:1.48, r2:0.82, label:'Retail era · holders'},
-    inst:   {beta:3.14, r2:0.78, label:'Institutional onset · holders'},
-    etf:    {beta:2.86, r2:0.09, label:'ETF era · holders'},
+    all:    {beta:1.83, r2:0.94, label:'Full history · holders'},
+    retail: {beta:1.49, r2:0.83, label:'Retail era · holders'},
+    inst:   {beta:3.08, r2:0.78, label:'Institutional onset · holders'},
+    etf:    {beta:1.12, r2:0.02, label:'ETF era · holders'},
   },
   act: {
-    all:    {beta:2.09, r2:0.81, label:'Full history · active addr', unstable:true},
-    retail: {beta:1.37, r2:0.90, label:'Retail era · active addr'},
-    inst:   {beta:0.59, r2:0.02, label:'Institutional onset · active addr'},
-    etf:    {beta:-0.19,r2:0.01, label:'ETF era · active addr', inverted:true},
+    all:    {beta:2.11, r2:0.81, label:'Full history · active addr', unstable:true},
+    retail: {beta:1.38, r2:0.90, label:'Retail era · active addr'},
+    inst:   {beta:0.62, r2:0.03, label:'Institutional onset · active addr'},
+    etf:    {beta:-0.10,r2:0.00, label:'ETF era · active addr', inverted:true},
   }
 };
 let cur={proxy:'bal', era:'all'};

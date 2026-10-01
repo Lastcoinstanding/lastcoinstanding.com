@@ -2,6 +2,54 @@
   {
     "display": "10/1/26",
     "date": "2026-10-01",
+    "page": "/bitcoin-vs-the-stock-market",
+    "summary": "Bitcoin vs. the Stock Market: data through September 2026. At five years bitcoin and the S&P 500 are now almost level; a 2021 claim corrected."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/the-gallery",
+    "summary": "The Gallery: the affordability chart adds 2025 (Demographia’s 2026 edition); most 2021 entries trailed over five years, not all, as it said."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: the affordability chart adds 2025 from Demographia’s 2026 edition; Greater London eased to 8.5×, the US to 4.5×."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: Strategy’s treasury (847,666 BTC) and USD Reserve ($5.02B) updated to September 27."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/bitcoin-and-metcalfes-law",
+    "summary": "Bitcoin & Metcalfe’s Law: chart data through September 2026 on Coin Metrics’ revised holder counts; exponents re-measured (full history 1.83)."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/what-daily-conviction-bought",
+    "summary": "What Daily Conviction Bought: the $30-a-day FAQ restated at the September 30 price: about $107,000 put in, worth about $950,000."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/disciplined-rebalancing",
+    "summary": "Disciplined Rebalancing: the Math tab’s percentile table now matches the calculator (median 0.85× trend); results unchanged."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
+    "page": "/the-bitcoin-horizon",
+    "summary": "The Bitcoin Horizon: monthly closes through September 2026; the sixty-four-month finding is unchanged."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
     "page": "/borrowing-against-your-stack",
     "summary": "Borrowing Against Your Stack: Corrected the lender categories. The page no longer names three current platforms as lending out borrowers’ collateral, which their published terms don’t confirm. The risk itself, and the 2022 failures it caused, are unchanged; the lenders page records what each lender’s own terms say."
   },
