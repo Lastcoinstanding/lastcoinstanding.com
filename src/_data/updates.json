@@ -8,6 +8,12 @@
   {
     "display": "10/1/26",
     "date": "2026-10-01",
+    "page": "/the-power-law",
+    "summary": "The Power Law: every past fit tested on what came after (unreliable before 2016, stable since), plus three live tests of what would break it."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
     "page": "/about",
     "summary": "About: the name explained, the thesis that bitcoin is built to be the last money standing. The site’s line is now “Bitcoin, measured.”"
   },
