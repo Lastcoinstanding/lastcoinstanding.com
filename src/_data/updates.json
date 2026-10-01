@@ -2,6 +2,12 @@
   {
     "display": "10/1/26",
     "date": "2026-10-01",
+    "page": "/borrowing-against-your-stack",
+    "summary": "Borrowing Against Your Stack: Corrected the lender categories. The page no longer names three current platforms as lending out borrowers’ collateral, which their published terms don’t confirm. The risk itself, and the 2022 failures it caused, are unchanged; the lenders page records what each lender’s own terms say."
+  },
+  {
+    "display": "10/1/26",
+    "date": "2026-10-01",
     "page": "/bitcoin-vs-real-estate",
     "summary": "Bitcoin vs. Real Estate: the retrospective's house now runs to July 2026 (Case-Shiller 337.306), and the whole index carries S&P's latest revision; every start year's house value moves a little."
   },

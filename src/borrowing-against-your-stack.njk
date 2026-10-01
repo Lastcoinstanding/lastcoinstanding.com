@@ -4,7 +4,7 @@ permalink: /borrowing-against-your-stack.html
 slug: borrowing-against-your-stack
 related:
   - slug: bitcoin-lenders
-    desc: "The companion map: nineteen lenders, one card each, with the published rate, the loan-to-value lines, the bitcoin price that triggers them today, who holds the coins, and the catch. The categories argued here, lender by lender."
+    desc: "The companion map: twenty lenders, one card each, with the published rate, the loan-to-value lines, the bitcoin price that triggers them today, who holds the coins, and the catch. The categories argued here, lender by lender."
   - slug: bitcoin-as-collateral
     desc: "Why lenders price bitcoin the way they do. The collateral argument underneath this calculator: the ten properties a lender actually weighs, scored against Treasuries, property and gold, and the gap between that scorecard and the rate you are quoted."
   - slug: the-power-law
@@ -138,7 +138,7 @@ eleventyComputed:
             <p class="prose"><strong>Approaches we cover briefly for completeness but don't take seriously:</strong></p>
             <ul class="negative-space-list">
                 <li><strong>DeFi via wrapped BTC</strong> (Aave, Morpho, Compound, Euler, etc.) &mdash; the April 2026 Kelp DAO / Aave / Arbitrum cascade demonstrated definitively that these systems are centralized in practice. Detailed below.</li>
-                <li><strong>Rehypothecating CeFi</strong> (Nexo, Binance Loans, Matrixport) &mdash; the structural failure mode that produced every catastrophic collapse of 2022.</li>
+                <li><strong>Rehypothecating CeFi</strong> &mdash; lenders that re-lend your collateral to fund a lower rate: the structural failure mode behind the lending collapses of 2022 (Celsius, BlockFi, Genesis, Voyager).</li>
                 <li><strong>Predatory-LTV platforms</strong> (YouHodler-style 90/97 LTV) &mdash; included only as a concrete example of what aggressive terms look like on paper.</li>
             </ul>
 
@@ -190,11 +190,11 @@ eleventyComputed:
 
             <p class="prose">This page treats DeFi as a confirmation of dismissal rather than a risk to manage. The category's failures aren't the reason to avoid it; the <em>response to those failures</em> is.</p>
 
-            <p class="prose"><strong>Rehypothecating CeFi.</strong> Nexo, Binance Loans, Matrixport. These platforms subsidize their headline rates (Nexo advertises borrowing rates as low as 2.9%) by lending out user collateral to third parties &mdash; generating yield on assets that don't belong to them, with the profit funding the lower stated rates. <em>This is the structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager between 2022 and 2023.</em> Subsidized rates aren't a benefit; they're a signal that the lender is making money somewhere structural &mdash; and that somewhere is your collateral commingled with other obligations.</p>
+            <p class="prose"><strong>Rehypothecating CeFi.</strong> A lender that lends its borrowers&rsquo; collateral on to third parties earns yield on assets that don&rsquo;t belong to it, and can use that income to fund a lower headline rate. <em>This is the structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager between 2022 and 2023.</em> A rate well below the rest of the market isn&rsquo;t a benefit on its own; it&rsquo;s a question about where the lender makes its money, and one possible answer is your collateral, commingled with other obligations. This page doesn&rsquo;t name current lenders as doing this, because none publishes that it does. The test is what a lender puts in writing: each card on <a href="/bitcoin-lenders">the lenders page</a> records whether the lender&rsquo;s own terms rule out lending your coins on, and where they are silent (Nexo&rsquo;s US terms, for one, don&rsquo;t say either way), the card says so. Silence isn&rsquo;t proof that a lender re-lends collateral, but it isn&rsquo;t the written promise you want either.</p>
 
             <p class="prose"><strong>Predatory-LTV platforms.</strong> YouHodler offers up to 90% opening LTV with a 97% liquidation threshold &mdash; a ~7% drawdown to liquidation. These platforms exist legally and have customers; the only useful purpose served by mentioning them on this page is to make concrete what aggressive terms look like on paper, so readers can pattern-match against them when they appear elsewhere.</p>
 
-            <p class="prose"><em>Lender by lender.</em> The categories above are the argument; the companion page <a href="/bitcoin-lenders">Borrowing against bitcoin: the lenders</a> is the map &mdash; one card per lender, nineteen of them, with the published rate, the three loan-to-value lines, the bitcoin price that triggers each one today, who holds the coins, the minimum, where it operates, and the catch. Figures there are read from each lender&rsquo;s own pages and dated, so where a rate quoted in this essay has moved since it was written, the card is the current figure.</p>
+            <p class="prose"><em>Lender by lender.</em> The categories above are the argument; the companion page <a href="/bitcoin-lenders">Borrowing against bitcoin: the lenders</a> is the map &mdash; one card per lender, twenty of them, with the published rate, the three loan-to-value lines, the bitcoin price that triggers each one today, who holds the coins, the minimum, where it operates, and the catch. Figures there are read from each lender&rsquo;s own pages and dated, so where a rate quoted in this essay has moved since it was written, the card is the current figure.</p>
         </div>
 
         <div class="section" id="rehypothecation">
@@ -409,7 +409,7 @@ eleventyComputed:
                         </div>
                         <div class="bas-calc-preset-wrap">
                             <button type="button" class="bas-calc-preset bas-calc-preset-warning" data-rate="3" data-threshold="80">Rehypothecating &asymp; 3%</button>
-                            <span class="help-tip help-tip-preset help-tip-warning" tabindex="0">?<span class="tip-content">Platforms that subsidise low headline rates by re-lending your collateral to third parties (Nexo, Binance Loans, Matrixport). <strong>The structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager.</strong> Included as an option so you can see the subsidy effect; the page doesn't recommend it. <a href="#question">See Question tab &rsaquo;</a></span></span>
+                            <span class="help-tip help-tip-preset help-tip-warning" tabindex="0">?<span class="tip-content">Lenders that fund a low headline rate by re-lending your collateral to third parties. <strong>The structural failure mode that took down Celsius, BlockFi, Genesis, and Voyager.</strong> Included as an option so you can see the subsidy effect; the page doesn't recommend it, and names no current lender as doing it, since none publishes that it does. <a href="#question">See Question tab &rsaquo;</a></span></span>
                         </div>
                     </div>
                     <div class="bas-calc-field-hint">Click a preset (sets both rate and liquidation LTV for that category) or drag either slider to override. The rehypothecating preset is included to make the subsidy visible &mdash; <em>that subsidy is the failure mode the Question tab argues against.</em></div>

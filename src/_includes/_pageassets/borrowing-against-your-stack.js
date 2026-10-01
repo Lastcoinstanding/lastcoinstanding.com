@@ -629,7 +629,7 @@
       name: 'Rehypothecating CeFi',
       apr: 3.0,
       tone: 'bad',
-      examples: 'Nexo, Binance Loans, Matrixport',
+      examples: 'Celsius, BlockFi (failed 2022)',
       note: 'Cheap rate, structural failure mode.',
       dismissed: 'Not recommended &mdash; see Question tab.'
     }
