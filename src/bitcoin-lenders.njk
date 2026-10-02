@@ -165,16 +165,16 @@ eleventyComputed:
                     <div class="ln-chips">
                         {% if l.bitcoinOnly %}<span class="ln-tag yes">&#10003; Bitcoin only</span>{% else %}<span class="ln-tag no">Not bitcoin only &middot; {{ l.otherCollateral }}</span>{% endif %}
                         {% if l.qualifier %}<span class="ln-tag qual">{{ l.qualifier }}</span>{% endif %}
-                        {%- set lg = lenderLogIndex.byLender[l.id] %}{% if lg and lg.length %}<a class="ln-tag ln-changed" href="#what-changed" data-log-date="{{ lg[0].date }}" data-log-type="{{ lg[0].type }}" data-log-label="{{ lg[0].label }}" hidden></a>{% endif %}
+                        {%- set lg = lenderLogIndex.byLender[l.id] %}{% if lg and lg.length %}<a class="ln-tag ln-changed" href="#what-changed" data-log-date="{{ lg[0].date }}" data-log-type="{{ lg[0].type }}" data-log-label="{{ lg[0].label }}"{% if lg[0].changes %} data-log-changes="{{ lg[0].changes | dump | escape }}"{% endif %} hidden><span class="ln-pulse" aria-hidden="true"></span><span class="ln-changed-t"></span></a>{% endif %}
                     </div>
                 </div>
-                <div class="ln-rate"><b{% if l.rate.np %} class="np"{% endif %}>{{ l.rate.headline }}</b><span>{{ l.rate.note | safe }}</span></div>
+                <div class="ln-rate" data-f="rate"><b{% if l.rate.np %} class="np"{% endif %}>{{ l.rate.headline }}</b><span>{{ l.rate.note | safe }}</span></div>
                 <div class="ln-ltv">
-                    <div><div class="k">Opens at<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Opens at.</strong> The most you can borrow as a share of your bitcoin&rsquo;s value on the day the loan starts. A loan is fixed in dollars, so this share rises as the price falls.</span></span></div>{% set _d = ltvDisplay(ltv.open, 'open', ltv) | trim %}<div class="v{% if _d.length > 11 %} xlong{% elif _d.length > 7 %} long{% endif %}">{{ _d }}</div><div class="p">{{ ltv.openNote | safe }}</div></div>
-                    <div class="call"><div class="k">{{ ltv.callLabel }}<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>The warning line.</strong> The share at which the lender asks you to add bitcoin or repay part of the loan, in whatever words the lender uses (margin call, alert, violation, a health status). The small line under it says how long you get.</span></span></div>{% set _d = ltvDisplay(ltv.call, 'call', ltv) | trim %}<div class="v{% if _d.length > 11 %} xlong{% elif _d.length > 7 %} long{% endif %}">{{ _d }}</div><div class="p">{{ ltv.callNote | safe }}</div></div>
-                    <div class="liq"><div class="k">Liquidates<span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content"><strong>Liquidates.</strong> The share at which the lender sells, or hands the bitcoin to the lender. <em>Partial</em> means only enough to restore the loan; <em>total</em> means all of it. &ldquo;Not published&rdquo; means the lender doesn&rsquo;t say.</span></span></div>{% set _d = ltvDisplay(ltv.liq, 'liq', ltv) | trim %}<div class="v{% if _d.length > 11 %} xlong{% elif _d.length > 7 %} long{% endif %}">{{ _d }}</div><div class="p">{{ ltv.liqNote | safe }}</div></div>
+                    <div data-f="open"><div class="k">Opens at<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Opens at.</strong> The most you can borrow as a share of your bitcoin&rsquo;s value on the day the loan starts. A loan is fixed in dollars, so this share rises as the price falls.</span></span></div>{% set _d = ltvDisplay(ltv.open, 'open', ltv) | trim %}<div class="v{% if _d.length > 11 %} xlong{% elif _d.length > 7 %} long{% endif %}">{{ _d }}</div><div class="p">{{ ltv.openNote | safe }}</div></div>
+                    <div class="call" data-f="call"><div class="k">{{ ltv.callLabel }}<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>The warning line.</strong> The share at which the lender asks you to add bitcoin or repay part of the loan, in whatever words the lender uses (margin call, alert, violation, a health status). The small line under it says how long you get.</span></span></div>{% set _d = ltvDisplay(ltv.call, 'call', ltv) | trim %}<div class="v{% if _d.length > 11 %} xlong{% elif _d.length > 7 %} long{% endif %}">{{ _d }}</div><div class="p">{{ ltv.callNote | safe }}</div></div>
+                    <div class="liq" data-f="liq"><div class="k">Liquidates<span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content"><strong>Liquidates.</strong> The share at which the lender sells, or hands the bitcoin to the lender. <em>Partial</em> means only enough to restore the loan; <em>total</em> means all of it. &ldquo;Not published&rdquo; means the lender doesn&rsquo;t say.</span></span></div>{% set _d = ltvDisplay(ltv.liq, 'liq', ltv) | trim %}<div class="v{% if _d.length > 11 %} xlong{% elif _d.length > 7 %} long{% endif %}">{{ _d }}</div><div class="p">{{ ltv.liqNote | safe }}</div></div>
                 </div>
-                <p class="ln-trig" id="trig-{{ l.id }}">
+                <p class="ln-trig" id="trig-{{ l.id }}" data-f="trig">
                     {%- if l.trig.mode == 'auto' -%}
                         {%- set base = ltv.open if ltv.open else ltv.reference -%}
                         {%- if base and (ltv.call or ltv.liq) -%}
@@ -197,6 +197,7 @@ eleventyComputed:
                     dialog (#lnDialog) and the URL gains #lender-<id>, so a single
                     lender is linkable and Back closes it. -#}
                 <div class="ln-links">
+                    {%- set ck = lenderLogIndex.checked[l.id] %}{% if ck %}<span class="ln-checked" title="Last read against {{ l.name }}&rsquo;s own pages">Checked <time datetime="{{ ck.date }}">{{ ck.label }}</time></span>{% endif %}
                     <a class="ln-site" href="{{ l.site }}" rel="nofollow noopener" target="_blank">{{ l.name }}&rsquo;s own page <span aria-hidden="true">&nearr;</span></a>
                 </div>
                 <details class="ln-more" data-id="{{ l.id }}">
@@ -204,11 +205,11 @@ eleventyComputed:
                     <div class="ln-more-body">
                         <div class="ln-how"><span class="l">How this loan works</span><p>{{ l.how | safe }}</p><a class="ln-site ln-site-big" href="{{ l.site }}" rel="nofollow noopener" target="_blank">Read it in {{ l.name }}&rsquo;s own words <span aria-hidden="true">&nearr;</span></a></div>
                         <dl class="ln-dl">
-                            <dt>Your coins<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Your coins.</strong> Who holds the bitcoin during the loan, whether you can watch the address on the blockchain, and whether the lender may lend it on (rehypothecation). The 2022 failures were all failures of this.</span></span></dt><dd>{{ l.coins | safe }}</dd>
-                            <dt>Terms</dt><dd>{{ l.terms | safe }}</dd>
-                            <dt>Minimum</dt><dd>{{ l.minimum | safe }}</dd>
-                            <dt>Where</dt><dd>{{ l.where | safe }}</dd>
-                            <dt>Track record</dt><dd>{{ l.track | safe }}</dd>
+                            <dt>Your coins<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Your coins.</strong> Who holds the bitcoin during the loan, whether you can watch the address on the blockchain, and whether the lender may lend it on (rehypothecation). The 2022 failures were all failures of this.</span></span></dt><dd data-f="coins">{{ l.coins | safe }}</dd>
+                            <dt>Terms</dt><dd data-f="terms">{{ l.terms | safe }}</dd>
+                            <dt>Minimum</dt><dd data-f="minimum">{{ l.minimum | safe }}</dd>
+                            <dt>Where</dt><dd data-f="where">{{ l.where | safe }}</dd>
+                            <dt>Track record</dt><dd data-f="track">{{ l.track | safe }}</dd>
                             {%- set lg = lenderLogIndex.byLender[l.id] %}{% if lg and lg.length %}
                             <dt>Changes logged</dt><dd><ul class="ln-hist">{% for e in lg %}<li><time datetime="{{ e.date }}">{{ e.label }}</time> {{ e.text | safe }}{% if e.source %} <a href="{{ e.source }}" rel="nofollow noopener" target="_blank">source</a>{% endif %}</li>{% endfor %}</ul></dd>{% endif %}
                         </dl>

@@ -314,21 +314,57 @@
   if (m0) { history.replaceState({ lender: m0[1] }, '', location.href); openDetail(m0[1], false); }
 })();
 
-/* ── The change log's card badges (lenders v2 C, 2026-10-01) ──
+/* ── The change log's card badges and highlights (lenders v2 C, 2026-10-01;
+   the fresh-change marker, JM 2026-10-01) ──
    Each card with a logged change carries a hidden badge naming its newest entry
-   (data-log-*, rendered at build from lenderLog.json). Shown here, against the
-   reader's clock, only while that entry is under 60 days old, so a badge can
-   never outlive its news even if the site goes a while without a deploy. */
+   (data-log-*, rendered at build from lenderLog.json). For FRESH_DAYS after that
+   entry, against the reader's clock, the badge shows with a pulsing dot (the
+   §6.23 halo) and each line the entry names in `changes` is highlighted, with
+   "was …" beside it when the old value is short. Afterwards the badge and the
+   highlights go; the dated entry stays in What changed and the card's history.
+   Computed in the browser, so a marker can never outlive its news even if the
+   site goes a while without a deploy. */
 (function(){
-  var WINDOW_DAYS = 60;
+  var FRESH_DAYS = 14;
+  var WAS_MAX = 40;   // longer old values go in the tooltip only
   var WORD = { rate: 'Rate changed', terms: 'Terms changed', availability: 'Availability changed', launch: 'Launched', added: 'Added', removed: 'Removed', exit: 'Exited', corrected: 'Corrected' };
   var now = Date.now();
+  var fresh = {};   // card id -> {changes, label}
+
+  function mark(root, changes, label) {
+    changes.forEach(function (c) {
+      var el = root.querySelector('[data-f="' + c.field + '"]');
+      if (!el || el.classList.contains('ln-hl')) return;
+      el.classList.add('ln-hl');
+      el.title = (c.was ? 'Was ' + c.was + ' before ' : 'Changed ') + label;
+      // the trigger sentence is re-rendered as the price moves, so it keeps only the class and tooltip
+      if (!c.was || c.was.length > WAS_MAX || c.field === 'trig') return;
+      var host = c.field === 'rate' ? el.querySelector('b')
+               : (c.field === 'open' || c.field === 'call' || c.field === 'liq') ? el.querySelector('.v')
+               : el;
+      if (!host) return;
+      var w = document.createElement('span');
+      w.className = 'ln-was';
+      w.textContent = 'was ' + c.was;
+      host.appendChild(w);
+    });
+  }
+
   document.querySelectorAll('.ln-changed[data-log-date]').forEach(function(b){
     var t = Date.parse(b.getAttribute('data-log-date') + 'T00:00:00Z');
-    if (!isFinite(t) || (now - t) / 864e5 > WINDOW_DAYS || t > now + 864e5) return;
-    var label = b.getAttribute('data-log-label') || '';
-    b.textContent = (WORD[b.getAttribute('data-log-type')] || 'Changed') + ' ' + label.replace(/ \d{4}$/, '');
+    if (!isFinite(t) || (now - t) / 864e5 > FRESH_DAYS || t > now + 864e5) return;
+    var label = (b.getAttribute('data-log-label') || '').replace(/ \d{4}$/, '');
+    var txt = b.querySelector('.ln-changed-t') || b;
+    txt.textContent = (WORD[b.getAttribute('data-log-type')] || 'Changed') + ' ' + label;
     b.title = 'See What changed, above the cards';
     b.hidden = false;
+    var card = b.closest('.ln-card');
+    var changes = [];
+    try { changes = JSON.parse(b.getAttribute('data-log-changes') || '[]'); } catch (e) { changes = []; }
+    if (card) { card.classList.add('ln-fresh'); mark(card, changes, label); fresh[card.getAttribute('data-id')] = { changes: changes, label: label }; }
   });
+
+  // A dialog opened from the URL before this ran holds an unmarked clone of its card.
+  var dlg = document.getElementById('lnDialog'), body = document.getElementById('lnDialogBody');
+  if (dlg && body && dlg.open && fresh[dlg.dataset.id]) mark(body, fresh[dlg.dataset.id].changes, fresh[dlg.dataset.id].label);
 })();

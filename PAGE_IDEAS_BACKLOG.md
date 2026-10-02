@@ -478,10 +478,11 @@ Captured during the merge pass, because the backlog is now large enough that the
 
 ### Collateral & credit cluster
 
-- [ ] **Bitcoin Lenders Compared: v2 candidates** (from the 2026-10-01 handoff, in its order of value; JM decides). **C shipped 2026-10-01** (the dated *What changed* log, badges and per-card history; SITE_GUIDE §57).
+- [ ] **Bitcoin Lenders Compared: v2 candidates** (from the 2026-10-01 handoff, in its order of value; JM decides). **C shipped 2026-10-01** (the dated *What changed* log, badges and per-card history; SITE_GUIDE §57), and with it the weekly page watch and the 14-day fresh-change marker (JM's ruling the same day).
   - **A. "How often would this trigger have fired?"** For each priced card, the share of month-ends since 2017 (or 2020) at which a maximum loan would have hit the call and liquidation lines within 12 months, client-side from `BTC_MONTHLY`. Drawdown history, not performance, but needs the pair's hypothetical-history framing and a compliance read.
   - **B. "My loan" mode.** Stack and loan amount in the live line; each card shows the dollars of bitcoin sold at its trigger and the year's interest. BAS's engine has the math.
   - **D. A country select** beside the state select. Lower: the audience is US-first.
+  - **F. Each lender's other products (tracked, not built; JM 2026-10-01).** Lenders sell more than the one product a card describes (Strike's credit line and volatility-proof loan, SALT's stabilization, APX's line of credit, Lava Prime, Arch's Perpetual Income). Today they live in sentences on the card. JM: a long tail that is hard to track and expose, so it stays a backlog item; revisit if B ("my loan" mode) is built, since B would need a product picker anyway.
   - **E. Essays that point at the page:** a Substack piece in the "one vocabulary" voice; *Bitcoin as pristine collateral* (the 80% collateralisation figure needs real sourcing first).
 
 > **RULING — no hub page; file by type (JM, 2026-08-08).** A filing/classification decision only — nothing here is promoted, designed or built by this ruling.
@@ -805,6 +806,8 @@ _Shipped 2026-09-29: the revision entry moved to Promoted / shipped. The pair co
 ### Real-estate series
 
 _Opened 2026-09-27 (JM). The pair above plus the pages that extend it, each answering one housing question on the pair's shared engine, linked by the series strip (`components/real-estate-series.njk`, design §11, P9). Standing canon: "a family earns a hub before nav grows" (`SITE_GUIDE §49`). The retirement family built its hub when its fourth spoke shipped (`SITE_GUIDE §53`). With both entries below, this series reaches **four spokes, the same threshold**, so the hub question comes due then, not before._
+
+_**Order and the family (JM, 2026-10-01).** Spoke three (the homeowner, below) is next; **Compare Housing Plans is high priority immediately after it.** At four spokes the series gets the retirement treatment: a family hub page, the pages grouped together in the nav, and a homepage family strip like the retirement one (JM wants real estate vs. bitcoin called out as a section on the homepage). Bitcoin-Backed Mortgages is **not** counted as a spoke to reach four sooner (proposed and declined: wait for the four pages); it stays a neighbour, linked from the hub._
 
 - [ ] **Compare Housing Plans: two independently configured housing plans, side by side.** Surfaced 2026-09-27 (JM).
   - **Pattern:** Compare Retirement Plans (`COMPARE_RETIREMENT_PLANS_DESIGN.md`; `SITE_GUIDE §52`), applied to housing:

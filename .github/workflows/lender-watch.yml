@@ -1,0 +1,94 @@
+name: Lender page watch
+
+# ────────────────────────────────────────────────────────────────────────────
+# Weekly: has any lender's own page changed? (JM 2026-10-01; MONTHLY_REFRESH
+# §7.6; SITE_GUIDE §57.) Runs scripts/lender-watch.mjs over every page a
+# /bitcoin-lenders card cites and compares the lines that carry terms with the
+# previous run's snapshot, kept as a run artifact (90 days), not in the repo.
+#
+# Read-only on the repo: it commits nothing and never edits a card. A change it
+# finds is a lead for a person: read the lender's page, edit lenders.json, log
+# it in lenderLog.json with `changes` (that is what readers see, as the card's
+# 14-day "changed" marker). When pages changed it opens ONE issue labelled
+# `lender-watch`, or comments on the open one; quiet weeks only write the job
+# summary. Pages it couldn't read (Cloudflare challenges) are listed for the
+# monthly re-read.
+# ────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # Mondays 15:47 UTC (8:47 PT in summer), after the data freshness report. Off the hour on purpose.
+    - cron: '47 15 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+concurrency:
+  group: lender-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install a browser (Playwright, outside the site's dependencies)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund playwright@1 >/dev/null
+          npx playwright install --with-deps chromium
+      - name: Fetch last week's snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?name=lender-watch-state&per_page=1" \
+            --jq '.artifacts[0] | select(.expired == false) | .workflow_run.id' || true)
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" -n lender-watch-state -D prev || echo "No usable snapshot; this run is a new baseline."
+          else
+            echo "No earlier snapshot; this run is the baseline."
+          fi
+      - name: Read every cited page and compare
+        id: watch
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/pw/node_modules/playwright
+        run: |
+          prev=""
+          [ -f prev/state.json ] && prev="--prev prev/state.json"
+          node scripts/lender-watch.mjs $prev --out out > /dev/null
+          cat out/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the snapshot for next week
+        uses: actions/upload-artifact@v4
+        with:
+          name: lender-watch-state
+          path: out/state.json
+          retention-days: 90
+      - name: Open or update the lender-watch issue
+        if: steps.watch.outputs.changed != '0' && steps.watch.outputs.baseline == 'no'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANGED: ${{ steps.watch.outputs.changed }}
+        run: |
+          gh label create lender-watch --color E09422 \
+            --description "Opened by the weekly lender page watch" 2>/dev/null || true
+          {
+            cat out/report.md
+            echo
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > body.md
+          num=$(gh issue list --label lender-watch --state open --json number --jq '.[0].number // empty')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file body.md
+            gh issue edit "$num" --title "Lender pages changed: $CHANGED this week ($(date -u +%F))"
+          else
+            gh issue create --title "Lender pages changed: $CHANGED this week ($(date -u +%F))" \
+              --label lender-watch --body-file body.md
+          fi

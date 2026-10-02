@@ -281,3 +281,28 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .ln-hist li{margin:.15rem 0}
 .ln-hist time{color:rgba(255,255,255,0.5);margin-right:.3rem}
 .ln-tag.ln-changed[hidden]{display:none}
+
+/* ─── The fresh-change marker (JM 2026-10-01) ───
+   For 14 days after a logged change (bitcoin-lenders.js, FRESH_DAYS) the card's
+   badge carries a pulsing dot (the canonical halo, STYLE_GUIDE §6.23) and the
+   changed lines are highlighted, with "was …" when the old value is short.
+   Every card also says when it was last read against the lender's own pages. */
+.ln-tag.ln-changed { display: inline-flex; align-items: center; gap: 0.4rem; }
+.ln-pulse { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #e09422; flex: 0 0 auto; }
+.ln-pulse::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #e09422; opacity: 0.45; animation: ln-pulse-halo 2.2s ease-out infinite; pointer-events: none; }
+@keyframes ln-pulse-halo {
+  0%   { transform: scale(0.35); opacity: 0.55; }
+  100% { transform: scale(3.2);  opacity: 0; }
+}
+.ln-card.ln-fresh { border-color: rgba(224,148,34,0.45); }
+.ln-hl { background: rgba(224,148,34,0.09); box-shadow: inset 2px 0 0 #e09422; border-radius: 4px; }
+.ln-rate.ln-hl, .ln-trig.ln-hl, dd.ln-hl { padding-left: 0.45rem; }
+.ln-ltv > .ln-hl { padding-left: 0.35rem; }
+.ln-was { display: block; margin-top: 0.15rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0; color: #e09422; text-decoration: line-through; text-decoration-color: rgba(224,148,34,0.55); text-transform: none; line-height: 1.3; }
+.ln-rate .ln-was, .ln-ltv .ln-was { font-size: 0.68rem; }
+dd .ln-was { display: inline; margin: 0 0 0 0.4rem; }
+.ln-checked { margin-right: auto; font-size: 0.72rem; color: var(--text-dim); white-space: nowrap; }
+.ln-links { align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) {
+  .ln-pulse::before { animation: none; opacity: 0.25; transform: scale(1.8); }
+}
