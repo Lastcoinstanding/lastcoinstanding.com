@@ -148,7 +148,11 @@ input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
    (measured, per page, at 375 / 1100 / 1280 / 1440px). It follows the mark's
    fence below: hidden in the 769–1099px band where the wordmark already wraps. */
 .site-nav .brand-text { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
-.site-nav .brand-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; font-size: 1.12em; letter-spacing: 0.02em; text-transform: none; color: rgba(224,148,34,0.85); margin-top: 0.15em; white-space: nowrap; }
+/* Tagline: Inter italic, not Cormorant (JM 2026-10-02, legibility). Cormorant's
+   thin strokes and small x-height broke up at ~14px under the wordmark; Inter is
+   the site's text face, so its italic holds at 12px. Full amber, not 85%. Pages
+   that load Inter italic 400 but not 500 fall back to 400, which reads the same. */
+.site-nav .brand-tagline { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-style: italic; font-weight: 500; font-size: 0.95em; letter-spacing: 0.03em; text-transform: none; color: #e09422; margin-top: 0.15em; white-space: nowrap; }
 /* The mid-width band, and why the mark steps aside in it.
    MEASURED ON THE DEPLOYED SITE, not inferred: the desktop nav row has no
    headroom. The wordmark ALREADY wraps to two lines somewhere between 900px
