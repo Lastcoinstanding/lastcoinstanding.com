@@ -306,3 +306,14 @@ dd .ln-was { display: inline; margin: 0 0 0 0.4rem; }
 @media (prefers-reduced-motion: reduce) {
   .ln-pulse::before { animation: none; opacity: 0.25; transform: scale(1.8); }
 }
+
+/* ─── The controls panel (JM 2026-10-01) ───
+   The live price, the date read, the filters and the trigger control in one
+   panel directly above the cards, so the assumptions sit with the data. */
+.ln-live.ln-controls { display: block; padding: 0.95rem 1.1rem 0.85rem; margin: 2rem 0 1.6rem; }
+.ln-controls .ln-live-price { margin: 0 0 0.75rem; }
+.ln-controls .ln-filters { margin: 0 0 0.85rem; }
+.ln-controls .ln-live-ctl { padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.ln-own-of { font-size: 0.78rem; color: var(--text-dim); margin-left: -0.15rem; }
+.ln-live-hint { margin: 0.5rem 0 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; max-width: 60rem; }
+.ln-live-hint strong { color: var(--text); }

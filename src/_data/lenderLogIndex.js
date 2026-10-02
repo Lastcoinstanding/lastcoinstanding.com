@@ -44,5 +44,11 @@ for (const e of entries) {
   (e.changes || []).forEach((c) => { if (FIELDS.indexOf(c.field) < 0) throw new Error('lenderLog: unknown field ' + c.field + ' (one of ' + FIELDS.join(', ') + ')'); });
 }
 
-module.exports = { entries, byLender, latest: entries[0] || null, lastCheck, checked,
+// The span of those dates, for the line above the cards ("30 Sep – 1 Oct 2026").
+const ds = Object.values(checked).map((c) => c.date).sort();
+const lo = ds[0], hi = ds[ds.length - 1];
+const checkedRange = !lo ? '' : lo === hi ? label(lo)
+  : (lo.slice(0, 4) === hi.slice(0, 4) ? label(lo).replace(/ \d{4}$/, '') : label(lo)) + ' – ' + label(hi);
+
+module.exports = { entries, byLender, latest: entries[0] || null, lastCheck, checked, checkedRange,
   nextCheck: log.nextCheck, nextCheckLabel: log.nextCheckLabel };

@@ -99,6 +99,20 @@
     out.innerHTML = html;
   }
 
+  // The plain-words line under the control: a what-if in dollars, so a reader
+  // without a loan (most readers) can see what the share means.
+  var hintEl = document.getElementById('lnOwnHint');
+  function renderHint() {
+    if (!hintEl) return;
+    if (state.mode !== 'own') {
+      hintEl.innerHTML = 'Each card shows its lender&rsquo;s own largest loan. To compare lenders on the same loan, pick a share of your bitcoin&rsquo;s value. It&rsquo;s a what-if; no loan needed.';
+      return;
+    }
+    var k = Math.round(state.own * 100);
+    hintEl.innerHTML = 'A what-if; no loan needed. At <strong>' + k + '%</strong>, that is $' + (k * 1000).toLocaleString('en-US') +
+      ' borrowed against $100,000 of bitcoin. The smaller the share, the further the price can fall before a lender acts; above a lender&rsquo;s maximum, its card says so.';
+  }
+
   function renderAll() {
     if (state.price) {
       priceEl.textContent = money(state.price);
@@ -106,6 +120,7 @@
     }
     live.setAttribute('data-mode', state.mode);
     ownOut.textContent = pctNum(state.own);
+    renderHint();
     cards.forEach(renderTrigger);
   }
 
@@ -327,7 +342,7 @@
 (function(){
   var FRESH_DAYS = 14;
   var WAS_MAX = 40;   // longer old values go in the tooltip only
-  var WORD = { rate: 'Rate changed', terms: 'Terms changed', availability: 'Availability changed', launch: 'Launched', added: 'Added', removed: 'Removed', exit: 'Exited', corrected: 'Corrected' };
+  var WORD = { rate: 'Rate changed', terms: 'Terms changed', availability: 'Availability changed', launch: 'Launched', added: 'Added', removed: 'Removed', exit: 'Exited', updated: 'Updated' };
   var now = Date.now();
   var fresh = {};   // card id -> {changes, label}
 

@@ -58,19 +58,6 @@ eleventyComputed:
 <main class="content-area">
     {% include 'components/tool-framing.njk' %}
 
-    <div class="ln-live" id="lnLive" aria-live="polite">
-        <div class="ln-live-price">Bitcoin <strong id="lnPrice">&mdash;</strong> <span class="ln-live-src" id="lnPriceSrc"></span> &middot; terms as read on <strong>{{ lenders.asOfLabel }}</strong></div>
-        <div class="ln-live-ctl" role="group" aria-label="Which loan the trigger prices describe">
-            <span class="ln-live-ctl-label">Trigger prices for<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Which loan the cards describe.</strong> Each card&rsquo;s trigger sentence works out the bitcoin price at which one loan hits the lender&rsquo;s lines. <em>The lender&rsquo;s maximum loan</em> uses each lender&rsquo;s own opening loan-to-value, so every card shows the lender&rsquo;s own numbers. <em>My own loan-to-value</em> recomputes every card for a loan of the size you set, so you can compare lenders on the same loan. It changes the trigger sentences only; nothing else on the page moves.</span></span></span>
-            <label class="ln-radio"><input type="radio" name="lnMode" value="max" checked> the lender&rsquo;s maximum loan</label>
-            <label class="ln-radio"><input type="radio" name="lnMode" value="own"> my own loan-to-value</label>
-            <span class="ln-own" id="lnOwnWrap">
-                <input type="range" id="lnOwnLtv" min="10" max="80" step="1" value="35" aria-label="Your loan-to-value, percent">
-                <strong id="lnOwnLtvOut">35%</strong>
-            </span>
-        </div>
-    </div>
-
     {#- The levers: the seven things every card measures, for a reader who has
         not met the vocabulary. JM, 2026-09-30: the page is complex and the cards
         were too casual about it; orient the reader before the cards. Always
@@ -119,21 +106,37 @@ eleventyComputed:
         {% endif %}
     </section>
 
-    <div class="ln-filters" id="lnFilters" aria-label="Filters">
-        <button class="ln-chip on" type="button" data-filter="all">All</button>
-        <button class="ln-chip" type="button" data-filter="bitcoinOnly">Bitcoin only</button>
-        <button class="ln-chip" type="button" data-filter="noRehyp">States no rehypothecation</button>
-        <button class="ln-chip" type="button" data-filter="holdKey">You hold a key</button>
-        <button class="ln-chip" type="button" data-filter="noPriceLiq">No-price-liquidation option</button>
-        <button class="ln-chip" type="button" data-filter="under5k">Under $5,000</button>
-        <label class="ln-state"><span>Available in</span>
-            <select id="lnState" aria-label="US state">
-                <option value="">any state</option>
-                {% set states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'] %}
-                {% for s in states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
-            </select>
-        </label>
-        <span class="ln-count" id="lnCount"></span>
+    {#- The controls sit with the cards they change (JM, 2026-10-01: the price,
+        the date read and the trigger control felt separated from the data).
+        One panel: the context line, the filters, the trigger control. -#}
+    <div class="ln-live ln-controls" id="lnLive">
+        <div class="ln-live-price" aria-live="polite">Bitcoin <strong id="lnPrice">&mdash;</strong> <span class="ln-live-src" id="lnPriceSrc"></span> &middot; each card read from the lender&rsquo;s own pages, <strong>{{ lenderLogIndex.checkedRange or lenders.asOfLabel }}</strong>; the date is on every card</div>
+        <div class="ln-filters" id="lnFilters" aria-label="Filters">
+            <button class="ln-chip on" type="button" data-filter="all">All</button>
+            <button class="ln-chip" type="button" data-filter="bitcoinOnly">Bitcoin only</button>
+            <button class="ln-chip" type="button" data-filter="noRehyp">States no rehypothecation</button>
+            <button class="ln-chip" type="button" data-filter="holdKey">You hold a key</button>
+            <button class="ln-chip" type="button" data-filter="noPriceLiq">No-price-liquidation option</button>
+            <button class="ln-chip" type="button" data-filter="under5k">Under $5,000</button>
+            <label class="ln-state"><span>Available in</span>
+                <select id="lnState" aria-label="US state">
+                    <option value="">any state</option>
+                    {% set states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'] %}
+                    {% for s in states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                </select>
+            </label>
+            <span class="ln-count" id="lnCount"></span>
+        </div>
+        <div class="ln-live-ctl" role="group" aria-label="The loan the trigger prices describe">
+            <span class="ln-live-ctl-label">Trigger prices if you borrow<span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Which loan the cards describe.</strong> Each card works out the bitcoin price at which a loan would reach the lender&rsquo;s warning line and its sale line. By default that is the largest loan each lender allows. Choose <em>a share I pick</em> to put the same loan through every lender: borrowing a smaller share of your bitcoin&rsquo;s value means the price can fall further before anything happens. You don&rsquo;t need a loan to use it; it is a what-if, and it changes only the trigger sentences.</span></span></span>
+            <label class="ln-radio"><input type="radio" name="lnMode" value="max" checked> the most each lender allows</label>
+            <label class="ln-radio"><input type="radio" name="lnMode" value="own"> a share I pick</label>
+            <span class="ln-own" id="lnOwnWrap">
+                <input type="range" id="lnOwnLtv" min="10" max="80" step="1" value="35" aria-label="The share of your bitcoin&rsquo;s value borrowed, percent">
+                <strong id="lnOwnLtvOut">35%</strong><span class="ln-own-of">of your bitcoin&rsquo;s value</span>
+            </span>
+        </div>
+        <p class="ln-live-hint" id="lnOwnHint">Each card shows its lender&rsquo;s own largest loan. To compare lenders on the same loan, pick a share of your bitcoin&rsquo;s value. It&rsquo;s a what-if; no loan needed.</p>
     </div>
 
     {% for g in lenders.groups %}
