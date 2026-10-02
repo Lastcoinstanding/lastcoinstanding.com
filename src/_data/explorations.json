@@ -238,6 +238,19 @@
     }
   },
   {
+    "_comment": "Bitcoin vs. Paying Down the Mortgage (2026-10-02): the homeowner, step three of the real-estate series (tenant · landlord · homeowner), on the pair's shared engine. Group 'Bitcoin vs. Other Assets' beside the pair; the series earns its hub, nav grouping and homepage strip at four pages (JM 2026-10-01; Compare Housing Plans is next). Tile position 85 lands it between BvRP (80) and the next tile (90).",
+    "slug": "bitcoin-vs-paying-down-the-mortgage",
+    "title": "BTC vs. Paying Down the Mortgage",
+    "category": "numbers",
+    "group": "Bitcoin vs. Other Assets",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Spare cash and a mortgage &mdash; pay the loan off faster, or hold bitcoin? The growth bitcoin needs to win, and how often it has.",
+      "preview_kind": "svg",
+      "position": 85
+    }
+  },
+  {
     "slug": "lump-sum-or-ladder-in",
     "title": "Lump Sum or Ladder In?",
     "category": "numbers",

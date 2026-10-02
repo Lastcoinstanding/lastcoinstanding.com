@@ -1382,6 +1382,113 @@
     return { rows: o ? o.rows : [], cards: o };
   }
 
+  // ═══════════════════════════════════════════════════════════════════
+  // Bitcoin vs. Paying Down the Mortgage — the homeowner (series step 3)
+  // MORTGAGE_PAYDOWN_DESIGN_2026-10-01.md (JM's rulings 2026-10-01: all
+  // nine as recommended). Two households, the same house, the same loan,
+  // the same cash out every month (M2):
+  //   pay    — the extra cash (and any lump sum) goes to principal; once the
+  //            loan is gone, the whole freed payment goes into bitcoin;
+  //   hold   — the loan runs on schedule; the extra cash (and the lump sum)
+  //            go into bitcoin; if the loan ends inside the horizon, the
+  //            freed payment goes into bitcoin too.
+  // The house is the same in both, so it drops out: the comparison is the
+  // bitcoin held minus the loan still owed. Month by month, 365.25-day
+  // years for the price path (M10). Bitcoin is bought at the month's price
+  // less the trading cost; "if sold" sells at the horizon less the trading
+  // cost and pays btcSaleTax on the gain over cost. With the deduction on,
+  // each month's interest × interestSavingRate comes back as cash and is
+  // invested in bitcoin, in both households.
+  //   i: { balance, ratePct, yearsLeft, extra, lump, horizon, scenario,
+  //        tp (tax profile), btcTxPct, growth (optional: a flat yearly
+  //        rate that replaces the scenario path; the hurdle search uses it) }
+  function paydownPrice(i, t){
+    if (i.growth !== undefined && i.growth !== null) return Math.pow(1 + i.growth, t);
+    return scenarioGrowthFactor(i.scenario || 'stay', t, i.horizon);
+  }
+  function paydownProjection(i){
+    var H = Math.max(1, Math.round(numOr(i.horizon, 10))), months = H * 12;
+    var B0 = Math.max(0, numOr(i.balance, 0)), mr = numOr(i.ratePct, 0) / 100 / 12;
+    var n = Math.max(1, Math.round(numOr(i.yearsLeft, 25) * 12));
+    var P = B0 > 0 ? mortgagePayment(B0, numOr(i.ratePct, 0), n / 12, 'le0') : 0;
+    var X = Math.max(0, numOr(i.extra, 0)), L = Math.max(0, numOr(i.lump, 0));
+    var tx = numOr(i.btcTxPct, PAIR_DEFAULTS.btcTxPct) / 100;
+    var tp = i.tp || bvreTaxProfile({});
+    var ded = interestSavingRate(tp, B0);
+    function hh(){ return { bal: B0, units: 0, basis: 0, interest: 0, payoff: null }; }
+    var a = hh(), b = hh();   // a: pay it down; b: hold bitcoin
+    function buy(h, cash, price){ if (cash > 0) { h.units += cash * (1 - tx) / price; h.basis += cash; } }
+    // Month 0: the lump sum.
+    var p0 = paydownPrice(i, 0);
+    var toLoan = Math.min(L, a.bal); a.bal -= toLoan; buy(a, L - toLoan, p0);
+    if (a.bal <= 1e-6 && B0 > 0) { a.bal = 0; a.payoff = 0; }
+    buy(b, L, p0);
+    function step(h, budget, toPrincipalMax, price){
+      // budget: the cash this household spends this month on the loan and bitcoin
+      var spare = budget;
+      if (h.bal > 0) {
+        var int = h.bal * mr; h.interest += int;
+        var owe = h.bal + int, pay = Math.min(owe, toPrincipalMax);
+        h.bal = owe - pay; spare -= pay;
+        if (h.bal <= 1e-6) { h.bal = 0; if (h.payoff === null) h.payoff = h._m; }
+        buy(h, int * ded, price);   // the deduction's tax saving, if any
+      }
+      buy(h, spare, price);
+    }
+    var rows = [], snap = function(m){
+      var price = paydownPrice(i, m / 12);
+      function v(h){ var val = h.units * price, proceeds = val * (1 - tx), tax = btcSaleTax(tp, proceeds, h.basis).tax;
+        return { balance: h.bal, btcValue: val, basis: h.basis, units: h.units, interest: h.interest,
+                 held: val - h.bal, ifSold: proceeds - tax - h.bal, tax: tax }; }
+      return { month: m, year: m / 12, price: price, pay: v(a), hold: v(b) };
+    };
+    rows.push(snap(0));
+    for (var m = 1; m <= months; m++) {
+      var price = paydownPrice(i, (m - 0.5) / 12);   // bought mid-month
+      a._m = m; b._m = m;
+      // Both households spend P + X every month while either loan runs.
+      step(a, P + X, P + X, price);   // all of it may go to the loan
+      step(b, P + X, P, price);       // only the scheduled payment goes to the loan
+      if (m % 12 === 0) rows.push(snap(m));
+    }
+    var end = rows[rows.length - 1];
+    return { payment: P, months: months, horizon: H, dedRate: ded,
+             payoffPay: a.payoff, payoffHold: b.payoff,
+             rows: rows, end: end,
+             diffIfSold: end.hold.ifSold - end.pay.ifSold,
+             diffHeld: end.hold.held - end.pay.held };
+  }
+  // The hurdle: the flat yearly bitcoin growth at which the two households
+  // end level, if sold after tax (or held, before tax). Bisection; the
+  // difference rises with growth because Hold owns its bitcoin earlier.
+  function paydownHurdle(i, basis){
+    var key = basis === 'held' ? 'diffHeld' : 'diffIfSold';
+    function f(g){ var j = {}; for (var k in i) j[k] = i[k]; j.growth = g; return paydownProjection(j)[key]; }
+    var lo = -0.95, hi = 3;
+    if (f(lo) >= 0) return lo;
+    if (f(hi) <= 0) return null;
+    for (var k = 0; k < 70; k++) { var mid = (lo + hi) / 2; if (f(mid) > 0) hi = mid; else lo = mid; }
+    return (lo + hi) / 2;
+  }
+  // The hurdle's record: over every run of `years` between two month-end
+  // closes in BTC_MONTHLY (2011 on), how often bitcoin's average yearly
+  // growth beat `rate`. Hypothetical history, not a forecast; the runs overlap.
+  function hurdleHistory(rate, years, series){
+    var S = series || (typeof BTC_MONTHLY !== 'undefined' ? BTC_MONTHLY : null);
+    if (!S || !S.length) return null;
+    var k = Math.round(years * 12), out = { years: years, rate: rate, count: 0, beat: 0, worst: null, best: null, worstStart: null, first: null, last: null };
+    for (var j = 0; j + k < S.length; j++) {
+      var c = Math.pow(S[j + k][1] / S[j][1], 12 / k) - 1;
+      out.count++; if (c > rate) out.beat++;
+      if (out.worst === null || c < out.worst) { out.worst = c; out.worstStart = S[j][0]; }
+      if (out.best === null || c > out.best) out.best = c;
+      if (out.first === null) out.first = S[j][0];
+      out.last = S[j + k][0];
+    }
+    out.share = out.count ? out.beat / out.count : null;
+    return out;
+  }
+
   window.RealEstateModel = {
     // shared primitives
     mortgagePayment: mortgagePayment,
@@ -1441,6 +1548,11 @@
     calcWealthTrajectory: calcWealthTrajectory,
     ledgerRental: function(s, scenarioOverride){ return { rows: calcWealthTrajectory(s, scenarioOverride), cards: computeAll(s) }; },
     rentalLedger: rentalLedger,
-    calcIfSoldTrajectory: calcIfSoldTrajectory
+    calcIfSoldTrajectory: calcIfSoldTrajectory,
+    // Bitcoin vs. Paying Down the Mortgage (series step 3)
+    interestSavingRate: interestSavingRate,
+    paydownProjection: paydownProjection,
+    paydownHurdle: paydownHurdle,
+    hurdleHistory: hurdleHistory
   };
 })();
