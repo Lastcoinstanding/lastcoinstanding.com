@@ -412,7 +412,7 @@
         hidden: !legendVisibility[0]
       },
       {
-        label: 'Bitcoin · Stay at today\u2019s multiple',
+        label: 'Bitcoin · Today\u2019s gap persists',
         data: pathStay,
         borderColor: CHART_COLORS.stay,
         backgroundColor: CHART_COLORS.stay,
@@ -425,7 +425,7 @@
         hidden: !legendVisibility[1]
       },
       {
-        label: 'Bitcoin · Trend',
+        label: 'Bitcoin · Reverts to trend',
         data: pathTrend,
         borderColor: CHART_COLORS.trend,
         backgroundColor: CHART_COLORS.trend,
@@ -438,7 +438,7 @@
         hidden: !legendVisibility[2]
       },
       {
-        label: 'Bitcoin · Upper',
+        label: 'Bitcoin · Peaks at 2.5\u00d7 trend',
         data: pathUpper,
         borderColor: CHART_COLORS.upper,
         backgroundColor: CHART_COLORS.upper,
@@ -453,7 +453,7 @@
       },
       {
         // Floor (M3): drawn faintly on every chart; bold when selected.
-        label: 'Bitcoin · Floor',
+        label: 'Bitcoin · Drifts to the floor',
         data: pathFloor,
         borderColor: primary('floor') ? CHART_COLORS.floor : CHART_COLORS.floorFaint,
         backgroundColor: primary('floor') ? CHART_COLORS.floor : CHART_COLORS.floorFaint,
@@ -544,9 +544,9 @@
     if (scenario === 'stay') {
       var mult = currentBTCMultiple();
       var base = 'Bitcoin keeps today\u2019s multiple of the Power Law trend (' + mult.toFixed(2) + '\u00d7), so it grows at the trend\u2019s own rate from today\u2019s price. No reversion is assumed in either direction. This is the default.';
-      if (mult < 0.95) return base + ' Bitcoin is below trend today, so this assumes the gap stays open; Trend assumes it closes.';
-      if (mult > 1.05) return base + ' Bitcoin is above trend today, so this assumes the premium persists; Trend assumes it closes.';
-      return base + ' Bitcoin is close to trend today, so this and Trend give similar results.';
+      if (mult < 0.95) return base + ' Bitcoin is below trend today, so this assumes the gap stays open; Reverts to trend assumes it closes.';
+      if (mult > 1.05) return base + ' Bitcoin is above trend today, so this assumes the premium persists; Reverts to trend assumes it closes.';
+      return base + ' Bitcoin is close to trend today, so this and Reverts to trend give similar results.';
     }
     if (scenario === 'trend') {
       return 'Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing.';
@@ -575,13 +575,13 @@
         tip: chartBasis === 'held'
           ? 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Held: the property\u2019s market value, less the mortgage, before selling costs and the exit tax.'
           : 'Net wealth if you keep the rental and sell it that year: after-tax cash flow to date, plus the sale after selling costs, the mortgage and the exit tax.' },
-      { idx: 4, label: 'Bitcoin \u00b7 Floor', color: CHART_COLORS.floor, dashed: true,  // dotted on the chart
+      { idx: 4, label: 'Bitcoin \u00b7 Drifts to the floor', color: CHART_COLORS.floor, dashed: true,  // dotted on the chart
         tip: scenarioTipHTML('floor') },
-      { idx: 1, label: 'Bitcoin \u00b7 Stay at today\u2019s multiple', color: CHART_COLORS.stay,
+      { idx: 1, label: 'Bitcoin \u00b7 Today\u2019s gap persists', color: CHART_COLORS.stay,
         tip: scenarioTipHTML('stay') },
-      { idx: 2, label: 'Bitcoin \u00b7 Trend', color: CHART_COLORS.trend,
+      { idx: 2, label: 'Bitcoin \u00b7 Reverts to trend', color: CHART_COLORS.trend,
         tip: scenarioTipHTML('trend') },
-      { idx: 3, label: 'Bitcoin \u00b7 Upper', color: CHART_COLORS.upper,
+      { idx: 3, label: 'Bitcoin \u00b7 Peaks at 2.5\u00d7 trend', color: CHART_COLORS.upper,
         dashed: true,  // visually less confident — matches dashed chart line
         tip: scenarioTipHTML('upper') },
       { idx: 5, label: 'Difference', color: CHART_COLORS.diff,
@@ -633,10 +633,10 @@
   }
 
   function scenarioLabel(scenario){
-    if (scenario === 'floor') return 'Floor';
-    if (scenario === 'trend') return 'Trend';
-    if (scenario === 'upper') return 'Upper';
-    return 'Stay at today\u2019s multiple';
+    if (scenario === 'floor') return 'Drifts to the floor';
+    if (scenario === 'trend') return 'Reverts to trend';
+    if (scenario === 'upper') return 'Peaks at 2.5\u00d7 trend';
+    return 'Today\u2019s gap persists';
   }
 
   // Path-specific plain-English description rendered below the path
@@ -818,7 +818,7 @@
     RealEstateGrid.render(document.getElementById('calc-grid'), {
       axes: [
         { id: 'scen', label: 'Scenario \u00d7 home prices',
-          rows: { label: 'Bitcoin', items: [['floor', 'Floor'], ['stay', 'Stay'], ['trend', 'Trend']].map(function(x){ return { label: x[1], v: x[0] }; }) },
+          rows: { label: 'Bitcoin', items: [['floor', 'Drifts to the floor'], ['stay', 'Today\u2019s gap persists'], ['trend', 'Reverts to trend']].map(function(x){ return { label: x[1], v: x[0] }; }) },
           cols: { label: 'Home prices a year', items: [{ label: 'Long run ' + pc(LR), v: LR }, { label: 'Yours ' + pc(s.appreciationPct), v: s.appreciationPct }, { label: 'Yours + 2 pts ' + pc(s.appreciationPct + 2), v: s.appreciationPct + 2 }] } },
         { id: 'hy', label: 'Holding period \u00d7 net yield',
           rows: { label: 'Holding period', items: hs.map(function(h){ return { label: h + ' years', v: h }; }) },
@@ -832,7 +832,7 @@
         return inFrame(r.path.ifSold.afterTax, t.holdingYears) - inFrame(r.keep.ifSold.afterTax, t.holdingYears);
       },
       mine: function(pair){ if (pair === 'hy') return [1, 1]; var k = ['floor', 'stay', 'trend'].indexOf(s.btcScenario); return k < 0 ? null : [k, 1]; },
-      note: 'Each cell: your path minus keeping the rental, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. Upper isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
+      note: 'Each cell: your path minus keeping the rental, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. <em>Peaks at 2.5&times; trend</em> isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
     });
   }
 

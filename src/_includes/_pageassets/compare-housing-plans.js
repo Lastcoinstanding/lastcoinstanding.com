@@ -37,7 +37,7 @@
     cheaper: { a: { kind: 'now' }, b: { kind: 'now', price: 300000 } },
     rent:    { a: { kind: 'now' }, b: { kind: 'rent' } }
   };
-  var SC_NAME = { floor: 'Floor', stay: 'Stay at today’s multiple', trend: 'Trend', upper: 'Upper' };
+  var SC_NAME = { floor: 'Drifts to the floor', stay: 'Today’s gap persists', trend: 'Reverts to trend', upper: 'Peaks at 2.5× trend' };
   var st = { scenario: 'stay', display: 'real' };
 
   // ─── inputs ───
@@ -165,7 +165,7 @@
         var r = M.housingCompare(input(a, b, s, p.over)), g = p.g !== undefined ? p.g : Math.pow(r.priceEnd / btcNow(), 1 / H) - 1, dd = r.diffAfter / Dh;
         return '<tr' + (p.k === st.scenario ? ' class="mine"' : '') + '><td>' + p.label + '</td><td>' + pctS(g) + '</td><td>' + usd(r.plans[0].end.after / Dh) + '</td><td>' + usd(r.plans[1].end.after / Dh) +
           '</td><td class="' + (dd > 0.5 ? 'pos' : dd < -0.5 ? 'neg' : '') + '">' + (dd > 0 ? '+' : '') + usd(dd) + '</td></tr>';
-      }).join('') + '</tbody><caption>Everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', today’s dollars' : '') + '. The first two rows are plain what-ifs; the four scenarios are Power Law paths, not forecasts. Even Floor assumes bitcoin keeps to the model’s lower line, and its price has closed below that line before.</caption>';
+      }).join('') + '</tbody><caption>Everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', today’s dollars' : '') + '. The first two rows are plain what-ifs; the four scenarios are Power Law paths, not forecasts. Even <em>Drifts to the floor</em> assumes bitcoin keeps to the model’s lower line, and its price has closed below that line before.</caption>';
 
     // Chart
     var basis = chartCtl ? chartCtl.basis() : 'ifsold', key = basis === 'held' ? 'held' : 'after';

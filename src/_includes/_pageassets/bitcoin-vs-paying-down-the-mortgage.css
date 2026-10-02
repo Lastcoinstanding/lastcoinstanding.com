@@ -96,6 +96,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .mp-card .sumnote { display: block; font-size: 0.68rem; color: var(--text-muted); }
 .mp-card dd { margin: 0; text-align: right; color: var(--text); font-variant-numeric: tabular-nums; }
 .mp-card dd.neg { color: var(--red); }
+/* Cards, JM review 2026-10-02: the loan owed is neutral on both cards (it is
+   owed either way), the extra paid off is the pay-down household's gain in
+   green, the bitcoin's tax and cost stay red, and the rows sum to the bold
+   net position. Non-summing facts sit below a rule. */
+.mp-card dd.pos { color: var(--green); }
+.mp-card dt.net, .mp-card dd.net { font-weight: 600; color: var(--text-bright); border-top: 1px solid var(--border-lt); padding-top: 0.3rem; margin-top: 0.15rem; }
+.mp-card .facts { margin-top: 0.7rem; padding-top: 0.55rem; border-top: 1px dashed var(--border); font-size: 0.8rem; }
+.mp-card .facts dt, .mp-card .facts dd { color: var(--text-dim); }
+.mp-card .facts dd.pos { color: var(--green); }
+/* Scenario table heading (JM: the table needed a title). */
+.mp-h3 { font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--text-bright); margin: 1.6rem 0 0.25rem; }
+.mp-table-sub { font-size: 0.86rem; color: var(--text-dim); line-height: 1.6; margin: 0 0 0.6rem; max-width: 72ch; }
+.mp-calc a:not(.re-seg-btn), .mp-table caption a, .mp-hurdle a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+.mp-table td .help-tip, .mp-table th .help-tip { margin-left: 0.3rem; }
 .mp-diff { font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 1rem 0 1.2rem; }
 .mp-diff strong { color: var(--text-bright); }
 .mp-diff .ahead-hold { color: var(--btc); }
@@ -147,4 +161,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 @media (max-width: 420px) {
     .mp-inputs, .mp-assume-body { grid-template-columns: 1fr; }
     .mp-check { grid-column: span 1; }
+}
+
+/* Phone grid (2026-10-02): this page's grid can carry four value columns (3%,
+   5%, 7% and the reader's own rate), where the shared grid was sized for three;
+   at 390px the figures ran into each other. Smaller figures, page-scoped. */
+@media (max-width: 560px) {
+    #mpGrid .re-grid-v { font-size: 0.62rem; letter-spacing: -0.02em; white-space: nowrap; }
+    #mpGrid .re-grid td { padding-left: 0.05rem; padding-right: 0.05rem; }
+    #mpGrid .re-grid-w { font-size: 0.54rem; }
+    #mpGrid .re-grid th:first-child { width: 25%; }
+    #mpGrid .re-grid th:first-child, #mpGrid .re-grid td:first-child { font-size: 0.66rem; }
 }

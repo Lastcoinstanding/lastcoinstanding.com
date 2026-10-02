@@ -21,7 +21,22 @@
   var DEF = { bal: 240000, mrate: 4.4, yrsleft: 23, extra: 500, lump: 0, horizon: 10,
               btctx: (M.PAIR_DEFAULTS && M.PAIR_DEFAULTS.btcTxPct) || 0.5, pscenario: 'stay', displaymode: 'real',
               tax: 'us', bracket: '24', state: 'OTHER', acct: 'taxable', ded: false };
-  var SC_NAME = { floor: 'Floor', stay: 'Stay at today’s multiple', trend: 'Trend', upper: 'Upper' };
+  // Scenario names (JM review 2026-10-02, the series' shared vocabulary): what
+  // each path does, in words, rather than the channel's line names.
+  var SC_NAME = { floor: 'Drifts to the floor', stay: 'Today’s gap persists', trend: 'Reverts to trend', upper: 'Peaks at 2.5× trend' };
+  var PL_LINK = '<a href="/the-power-law">Power Law</a>';
+  var SC_PHRASE = { floor: 'drifts down to its ' + PL_LINK + ' floor', stay: 'keeps today’s gap to its ' + PL_LINK + ' trend',
+                    trend: 'reverts to its ' + PL_LINK + ' trend', upper: 'peaks at 2.5× its ' + PL_LINK + ' trend at the end' };
+  // Today's price, as the engine reads it (live price, else the last Power Law sample).
+  function spotNow() {
+    if (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0) return TODAY_PRICE;
+    return (typeof PL_DATA !== 'undefined' && PL_DATA.length) ? PL_DATA[PL_DATA.length - 1][1] : null;
+  }
+  var UPPER_TIP = '<span class="help-tip" tabindex="0">?<span class="tip-content">A peak, not a level: this path ends at a cycle-top multiple of the trend, so an average a year says little about it. Past tops have faded within months. If bitcoin ever reached a level like this, selling some to clear the mortgage would lock in the gain.</span></span>';
+  // Upside lines beside the hurdle (JM): both Power Law paths while bitcoin sits
+  // well below its trend, only the trend path otherwise (where reverting would
+  // be the cautious case).
+  var BELOW_TREND = 0.8;
   var st = { scenario: DEF.pscenario, display: DEF.displaymode };
 
   // ─── inputs ───
@@ -120,7 +135,7 @@
     // Assumptions summary line
     $('mpAssumeHint').textContent = (v.tax === 'none' ? 'no capital-gains tax' : v.bracket + '% bracket, ' + (el.state.options[el.state.selectedIndex] || {}).text) +
       (v.acct === 'advantaged' ? ', tax-advantaged account' : '') + (v.ded ? ', deducting interest' : '') + ' · trading cost ' + v.btctx + '% · ' +
-      (st.display === 'real' ? 'today’s dollars' : 'future dollars');
+      (st.display === 'real' ? 'real (today’s $)' : 'nominal (future $)');
     $('mpDeflLine').textContent = st.display === 'real'
       ? 'Divided by inflation at ' + inflPct() + '% a year, the site’s setting; ' + usd(100000) + ' in ' + H + ' years is ' + usd(100000 / D) + ' today.'
       : 'Dollars of each future year, before inflation.';
@@ -138,34 +153,60 @@
       hv.innerHTML = 'Your mortgage costs ' + v.mrate + '%. Over ' + H + (H === 1 ? ' year' : ' years') + ', holding bitcoin ends ahead if bitcoin averages more than <strong>' + pct(hAfter) + '</strong> a year.';
       hs.innerHTML = 'That is after the tax on selling the bitcoin at the end' + (v.tax === 'none' || v.acct === 'advantaged' ? ' (none, in your setting)' : '') +
         ' and the ' + v.btctx + '% trading cost. Before tax, held rather than sold: <strong>' + pct(hHeld) + '</strong>.' + ded +
-        ' If bitcoin goes nowhere, holding ends <strong>' + usd(-flat.diffIfSold / D) + '</strong> behind; the scenarios and the record are below.';
+        ' If bitcoin goes nowhere, holding ends <strong>' + usd(-flat.diffIfSold / D) + '</strong> behind' + upside() + ' The paths and the record are below.';
     }
+    function aheadBy(d) { return Math.abs(d) < 1 ? 'level' : '<strong>' + usd(Math.abs(d)) + '</strong> ' + (d > 0 ? 'ahead' : 'behind'); }
+    function upside() {
+      var m = (typeof M.currentBTCMultiple === 'function') ? M.currentBTCMultiple() : 1;
+      var dt = scDiff('trend') / D, ds = scDiff('stay') / D;
+      if (isFinite(m) && m < BELOW_TREND) return '. If it keeps today’s gap to its ' + PL_LINK + ' trend, holding ends ' + aheadBy(ds) + '; if it reverts to the trend, ' + aheadBy(dt) + money() + '.';
+      return '. If it reverts to its ' + PL_LINK + ' trend, holding ends ' + aheadBy(dt) + money() + '.';
+    }
+    function money() { return st.display === 'real' ? ' (today’s dollars)' : ' (future dollars)'; }
 
     // Scenario chips
     document.querySelectorAll('.mp-chip').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-scenario') === st.scenario); });
 
     // The two households
     var e = R.end, ap = R.payoffPay, ah = R.payoffHold, P = R.payment;
+    // Cards (JM review 2026-10-02): the rows sum to the net position, the loan
+    // owed is neutral on both, the extra paid off ahead of schedule is shown
+    // as the pay-down household's gain, and interest paid moved to the ledger
+    // (on its own it read as a cost of holding without the gain beside it).
+    var aheadOfSchedule = Math.max(0, e.hold.balance - e.pay.balance) / D;
     function card(kind, h, payoff) {
-      var pay = kind === 'pay';
+      var pay = kind === 'pay', yrs = H + (H === 1 ? ' year' : ' years');
+      var lumpTxt = v.lump > 0 ? ' and ' + usd(v.lump) + ' today' : '';
       var sub = pay
-        ? 'Puts ' + usd(v.extra) + ' a month' + (v.lump > 0 ? ' and ' + usd(v.lump) + ' today' : '') + ' on the loan. ' +
-          (payoff !== null ? 'Paid off in ' + payoffDate(payoff) + ' (' + monthsText(payoff) + '), then ' + usd(P + v.extra) + ' a month into bitcoin.' : 'Still paying it off at the end of ' + H + (H === 1 ? ' year.' : ' years.'))
-        : 'Buys ' + usd(v.extra) + ' of bitcoin a month' + (v.lump > 0 ? ' and ' + usd(v.lump) + ' today' : '') + ', and pays the ' + usd(P) + ' loan payment on schedule' +
-          (payoff !== null ? ' until it ends in ' + payoffDate(payoff) + ', then all of it into bitcoin.' : '.');
+        ? 'Adds ' + usd(v.extra) + ' a month' + lumpTxt + ' to pay down the mortgage faster; the monthly payment becomes ' + usd(P + v.extra) + '. ' +
+          (payoff !== null ? 'Paid off in ' + payoffDate(payoff) + ' (' + monthsText(payoff) + '), then ' + usd(P + v.extra) + ' a month into bitcoin.' : 'Still paying it off at the end of ' + yrs + '.')
+        : 'Buys ' + usd(v.extra) + ' of bitcoin a month' + lumpTxt + ' and pays the ' + usd(P) + ' mortgage payment on schedule' +
+          (payoff !== null ? ' until the loan ends in ' + payoffDate(payoff) + ', then all of it into bitcoin.' : '.');
+      var noBtc = h.btcValue < 0.5, cost = h.tax + h.btcValue * v.btctx / 100;
+      var cap = 'net position after ' + yrs + (noBtc
+        ? ': no bitcoin bought yet, so just the loan still owed'
+        : ': the bitcoin, sold after tax, less the loan still owed') + (st.display === 'real' ? ', in today’s dollars' : ', in future dollars');
+      var extraOff = pay ? aheadOfSchedule : 0;
       return '<div class="mp-card ' + kind + '"><h3>' + (pay ? 'Pay it down' : 'Hold bitcoin') + '</h3><p class="sub">' + sub + '</p>' +
-        '<div class="big">' + usd(h.ifSold / D) + '</div><div class="big-k">what is left after ' + H + (H === 1 ? ' year' : ' years') + ' if the bitcoin is sold, after tax, and the rest of the loan is paid off' + (h.ifSold < 0 ? ' (below zero: the bitcoin wouldn’t cover the loan)' : '') + '</div>' +
-        '<dl><dt>Loan still owed</dt><dd' + (h.balance > 0.5 ? ' class="neg"' : '') + '>' + (h.balance > 0.5 ? '−' + usd(h.balance / D) : 'paid off') + '</dd>' +
+        '<div class="big">' + usd(h.ifSold / D) + '</div><div class="big-k">' + cap + '</div>' +
+        '<dl><dt>Loan still owed</dt><dd>' + (h.balance > 0.5 ? '−' + usd(h.balance / D) : 'paid off') + '</dd>' +
         '<dt>Bitcoin, value</dt><dd>' + usd(h.btcValue / D) + '</dd>' +
-        '<dt>Paid for that bitcoin <span class="sumnote">sum, dollars of each year</span></dt><dd>' + usd(h.basis) + '</dd>' +
-        '<dt>Tax and cost on a sale</dt><dd' + (h.tax > 0.5 ? ' class="neg"' : '') + '>' + (h.tax + h.btcValue * v.btctx / 100 > 0.5 ? '−' + usd((h.tax + h.btcValue * v.btctx / 100) / D) : '$0') + '</dd>' +
-        '<dt>Interest paid on the loan <span class="sumnote">sum, dollars of each year</span></dt><dd>' + usd(h.interest) + '</dd></dl></div>';
+        '<dt>Tax and cost on a sale</dt><dd' + (cost > 0.5 ? ' class="neg"' : '') + '>' + (cost > 0.5 ? '−' + usd(cost / D) : '$0') + '</dd>' +
+        '<dt class="net">Net position</dt><dd class="net">' + usd(h.ifSold / D) + '</dd></dl>' +
+        '<dl class="facts"><dt>Loan paid off ahead of schedule</dt><dd' + (extraOff > 0.5 ? ' class="pos"' : '') + '>' + (extraOff > 0.5 ? '+' : '') + usd(extraOff) + '</dd>' +
+        '<dt>Paid for the bitcoin <span class="sumnote">sum, dollars of each year</span></dt><dd>' + usd(h.basis) + '</dd></dl></div>';
     }
     $('mpCards').innerHTML = card('pay', e.pay, ap) + card('hold', e.hold, ah);
+    // The sentence under the cards (JM review): the path in prices, not a flat
+    // growth rate, since the Power Law's rate slows over time.
     var d = R.diffIfSold / D, mult = M.effectiveCAGR(st.scenario, H);
+    // rows[].price is the path's growth factor from today (1 at the start).
+    var spot = spotNow(), f1 = R.rows[R.rows.length - 1].price / (R.rows[0].price || 1), yEnd = new Date().getFullYear() + H;
+    var priceTxt = spot ? 'its price goes from ' + usdK(spot) + ' today to about ' + usdK(spot * f1) + ' in ' + yEnd : 'its price grows to ' + yEnd;
     $('mpDiff').innerHTML = hasExtra
-      ? 'Under <strong>' + SC_NAME[st.scenario] + '</strong>, where bitcoin averages about ' + pctS(mult) + ' a year over the ' + H + (H === 1 ? ' year' : ' years') + ', ' +
-        (Math.abs(d) < 1 ? 'the two households end level.' : '<strong class="' + (d > 0 ? 'ahead-hold' : 'ahead-pay') + '">' + (d > 0 ? 'holding bitcoin' : 'paying it down') + ' ends ' + usd(Math.abs(d)) + ' ahead</strong>, if sold after tax' + (st.display === 'real' ? ', in today’s dollars.' : '.')) +
+      ? 'If bitcoin ' + SC_PHRASE[st.scenario] + ', ' + priceTxt +
+        (st.scenario === 'upper' ? ', at the peak' : ': about ' + pctS(mult) + ' a year on average' + (st.scenario === 'floor' ? '' : ', the rate slowing as it goes')) + ' (prices before inflation). ' +
+        (Math.abs(d) < 1 ? 'The two households end level.' : '<strong class="' + (d > 0 ? 'ahead-hold' : 'ahead-pay') + '">' + (d > 0 ? 'Holding bitcoin' : 'Paying it down') + ' ends ' + usd(Math.abs(d)) + ' ahead</strong>, if sold after tax' + (st.display === 'real' ? ', in today’s dollars.' : ', in future dollars.')) +
         ' Held rather than sold: ' + (R.diffHeld / D >= 0 ? 'holding ahead by ' : 'paying down ahead by ') + usd(Math.abs(R.diffHeld / D)) + '.'
       : '';
 
@@ -174,12 +215,14 @@
     var rows = [{ k: 'half', label: 'Bitcoin halves over the ' + H + (H === 1 ? ' year' : ' years'), g: halfG, diff: half.diffIfSold },
                 { k: 'flat', label: 'Bitcoin goes nowhere', g: 0, diff: flat.diffIfSold }]
       .concat(['floor', 'stay', 'trend', 'upper'].map(function (s) { return { k: s, label: SC_NAME[s] + (s === 'upper' ? ' (stress test)' : ''), g: cagr(s), diff: scDiff(s) }; }));
+    $('mpScenSub').innerHTML = 'Each row reruns the whole calculation with a different path for bitcoin’s price: two plain what-ifs, then the four ' + PL_LINK +
+      ' paths. The last column is how far holding bitcoin ends ahead of paying down (or behind, in blue), if sold after ' + H + (H === 1 ? ' year' : ' years') + ', after tax' + (st.display === 'real' ? ', in today’s dollars.' : ', in future dollars.');
     $('mpScenTable').innerHTML = '<thead><tr><th>Bitcoin path</th><th>Averages a year</th><th>' + (hAfter !== null ? 'Against the hurdle' : '') + '</th><th>Holding minus paying down</th></tr></thead><tbody>' +
       rows.map(function (r) {
         var dd = r.diff / D;
-        return '<tr' + (r.k === st.scenario ? ' class="mine"' : '') + '><td>' + r.label + '</td><td>' + pctS(r.g) + '</td><td>' +
+        return '<tr' + (r.k === st.scenario ? ' class="mine"' : '') + '><td>' + r.label + '</td><td>' + (r.k === 'upper' ? 'n/a' + UPPER_TIP : pctS(r.g)) + '</td><td>' +
           (hAfter !== null ? (r.g > hAfter ? 'above' : 'below') : '') + '</td><td class="' + (dd > 0.5 ? 'pos' : dd < -0.5 ? 'neg' : '') + '">' + (dd > 0 ? '+' : '') + usd(dd) + '</td></tr>';
-      }).join('') + '</tbody><caption>If sold after ' + H + (H === 1 ? ' year' : ' years') + ', after tax' + (st.display === 'real' ? ', today’s dollars' : '') + '. The first two rows are plain what-ifs. The four scenarios are paths drawn from the Power Law, not forecasts; even Floor assumes bitcoin keeps to the model’s lower line, and its price has closed below that line before.</caption>';
+      }).join('') + '</tbody><caption>If sold after ' + H + (H === 1 ? ' year' : ' years') + ', after tax' + (st.display === 'real' ? ', today’s dollars' : '') + '. The first two rows are plain what-ifs. The four paths are drawn from the ' + PL_LINK + ', not forecasts; even <em>Drifts to the floor</em> assumes bitcoin keeps to the model’s lower line, and <a href="/the-bitcoin-floor">its price has closed below that line before</a>.</caption>';
 
     // Chart
     var basis = chartCtl ? chartCtl.basis() : 'ifsold', key = basis === 'held' ? 'held' : 'ifSold';
@@ -199,7 +242,7 @@
       var rates = [3, 5, 7].concat([v.mrate]).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort(function (a, b) { return a - b; });
       var hors = [5, 10, 20].concat([H]).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort(function (a, b) { return a - b; });
       var gridScen = ['flat', 'floor', 'stay', 'trend'];
-      var gName = function (s) { return s === 'flat' ? 'Goes nowhere' : SC_NAME[s].replace(' at today’s multiple', ''); };
+      var gName = function (s) { return s === 'flat' ? 'Goes nowhere' : SC_NAME[s]; };
       window.RealEstateGrid.render($('mpGrid'), {
         axes: [
           { id: 'rate', label: 'Scenario × mortgage rate', rows: { label: 'Scenario', items: gridScen.map(function (s) { return { label: gName(s), v: s }; }) },
@@ -220,7 +263,7 @@
         },
         ahead: ['Holding ahead', 'Paying down ahead'],
         frame: '(holding minus paying down, if sold, after tax' + (st.display === 'real' ? ', today’s dollars' : '') + ')',
-        note: 'Every cell is the whole calculation rerun with one or two inputs changed and the rest as you set them. <em>Goes nowhere</em> holds bitcoin’s price flat; the other rows are Power Law paths. Orange: holding bitcoin ends ahead; blue: paying down does. The outlined cell is yours.'
+        note: 'Every cell is the whole calculation rerun with one or two inputs changed and the rest as you set them. <em>Goes nowhere</em> holds bitcoin’s price flat; the other rows are paths from the ' + PL_LINK + ' (see the scenario buttons above). Orange: holding bitcoin ends ahead; blue: paying down does. The outlined cell is yours.'
       });
     } else if ($('mpGrid')) $('mpGrid').innerHTML = '';
 
@@ -264,11 +307,15 @@
     $('mpHistRate').textContent = pct(h) + ' a year, your hurdle';
     var lens = [1, 3, 5, 10]; if (lens.indexOf(H) < 0) lens.push(H); lens.sort(function (a, b) { return a - b; });
     var any = null;
-    t.innerHTML = '<thead><tr><th>Length of stretch</th><th>Stretches</th><th>Beat ' + pct(h) + ' a year</th><th>Worst yearly average</th></tr></thead><tbody>' +
+    var tipP = '<span class="help-tip" tabindex="0">?<span class="tip-content">Every start month from January 2011 that has a full period of this length after it, each ending at a later month-end close. The periods overlap, so they are not independent tries.</span></span>';
+    t.innerHTML = '<thead><tr><th>Length of period</th><th>Periods tested' + tipP + '</th><th>Beat ' + pct(h) + ' a year</th><th>Worst yearly average</th></tr></thead><tbody>' +
       lens.map(function (n) {
         var x = M.hurdleHistory(h, n); if (!x || !x.count) return '<tr><td>' + n + ' years</td><td colspan="3">Too few months in the record</td></tr>';
         any = any || x;
-        if (n === 1) $('mpHistWorst1').textContent = 'about ' + Math.round(-x.worst * 100) + '%';
+        if (n === 1) {
+          $('mpHistWorst1').textContent = 'about ' + Math.round(-x.worst * 100) + '%';
+          $('mpHistShort').textContent = 'One-year periods fell short ' + Math.round((1 - x.share) * 100) + '% of the time';
+        }
         return '<tr' + (n === H ? ' class="mine"' : '') + '><td>' + n + (n === 1 ? ' year' : ' years') + (n === H ? ' (yours)' : '') + '</td><td>' + x.count + '</td><td>' + Math.round(x.share * 100) + '%</td><td>' + pctS(x.worst) + '</td></tr>';
       }).join('') + '</tbody>';
     if (any) $('mpHistSpan').textContent = any.first.slice(0, 4) + ' to ' + any.last;

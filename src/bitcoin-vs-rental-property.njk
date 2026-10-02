@@ -611,8 +611,9 @@ eleventyComputed:
     <p class="calc-deflator-line"><span id="rpDeflatorLine">Showing <strong>Real</strong> values: today&rsquo;s dollars, deflated at 6.5% a year (M2 growth). At that rate, $100,000 ten years from now buys what $53,273 buys today, so Real shows $53,273 where Nominal shows $100,000.</span> <a href="#rpBaseline" class="calc-deflator-change" id="rpDeflatorChange">Change it</a></p>
 
     <!-- Bitcoin scenario picker (chips above chart). One set on both pages
-         (rulings M3, PR 4c): Floor · Stay at today's multiple (default) ·
-         Trend · Upper, each moving bitcoin's multiple of the Power Law trend
+         (rulings M3, PR 4c): Drifts to the floor · Today's gap persists (default) ·
+         Reverts to trend · Peaks at 2.5× trend (renamed 2026-10-02; were Floor ·
+         Stay at today's multiple · Trend · Upper), each moving bitcoin's multiple of the Power Law trend
          in a straight line from today's to a target at the horizon end. -->
     <div class="calc-cagr-picker">
       <div class="calc-cagr-picker-row">
@@ -628,32 +629,32 @@ eleventyComputed:
       </div>
       <div class="calc-cagr-chips" id="calc-cagr-chips">
         <button class="calc-cagr-chip" data-scenario="floor">
-          <span class="calc-cagr-chip-name">Floor
+          <span class="calc-cagr-chip-name">Drifts to the floor
             <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="floor">?<span class="tip-content"></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
           <span class="calc-cagr-chip-sub">ends at 0.42&times; trend</span>
         </button>
         <button class="calc-cagr-chip active" data-scenario="stay">
-          <span class="calc-cagr-chip-name">Stay at today&rsquo;s <span class="calc-cagr-chip-nowrap">multiple
+          <span class="calc-cagr-chip-name">Today&rsquo;s gap <span class="calc-cagr-chip-nowrap">persists
             <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="stay">?<span class="tip-content"></span></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
           <span class="calc-cagr-chip-sub">no reversion either way</span>
         </button>
         <button class="calc-cagr-chip" data-scenario="trend">
-          <span class="calc-cagr-chip-name">Trend
+          <span class="calc-cagr-chip-name">Reverts to trend
             <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="trend">?<span class="tip-content"></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
           <span class="calc-cagr-chip-sub">ends at 1&times; trend</span>
         </button>
         <button class="calc-cagr-chip" data-scenario="upper">
-          <span class="calc-cagr-chip-name">Upper
+          <span class="calc-cagr-chip-name">Peaks at 2.5&times; trend
             <span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="upper">?<span class="tip-content"></span></span>
           </span>
           <span class="calc-cagr-chip-rate">&mdash;</span>
-          <span class="calc-cagr-chip-sub">ends at 2.5&times; trend</span>
+          <span class="calc-cagr-chip-sub">a stress test</span>
         </button>
       </div>
       <p class="calc-chips-frame" id="calc-chips-frame" hidden>Growth rates are nominal; the differences are in today&rsquo;s dollars.</p>
@@ -897,7 +898,7 @@ eleventyComputed:
   </div>
 
   <p style="margin-top:1.6rem;font-size:0.85rem;color:var(--ink-dim);font-style:italic">
-    <strong>Model simplifications:</strong> Bitcoin scenarios are anchored to the site&rsquo;s Power Law model and dynamically recalibrate to bitcoin&rsquo;s current multiple-of-trend. Each scenario moves bitcoin&rsquo;s multiple of the trend in a straight line from today&rsquo;s to its target over the holding period, a simplification: in the record, reversion has been irregular in timing. The default, Stay at today&rsquo;s multiple, assumes no reversion. Return of capital is tax-deferred, not tax-free: the calculator lowers each instrument&rsquo;s basis by its distributions, and once the basis is used up (after about eight years at current STRC/SATA rates) taxes later distributions as long-term gains in the year paid. The gain left in the lower basis falls due at a sale, which these held values don&rsquo;t yet show. Cash received along the way (the kept rental&rsquo;s cash flow, the yield portfolio&rsquo;s distributions) is added up at face value and earns nothing while held, on every path; in the Real view it is deflated with the rest of each year&rsquo;s total, so it loses purchasing power at the deflator&rsquo;s rate. State taxes simplified to a single rate per state, applied to rental income, lending interest and gains. HELOC modeled as interest-only with balloon repayment.
+    <strong>Model simplifications:</strong> Bitcoin scenarios are anchored to the site&rsquo;s Power Law model and dynamically recalibrate to bitcoin&rsquo;s current multiple-of-trend. Each scenario moves bitcoin&rsquo;s multiple of the trend in a straight line from today&rsquo;s to its target over the holding period, a simplification: in the record, reversion has been irregular in timing. The default, Today&rsquo;s gap persists, assumes no reversion. Return of capital is tax-deferred, not tax-free: the calculator lowers each instrument&rsquo;s basis by its distributions, and once the basis is used up (after about eight years at current STRC/SATA rates) taxes later distributions as long-term gains in the year paid. The gain left in the lower basis falls due at a sale, which these held values don&rsquo;t yet show. Cash received along the way (the kept rental&rsquo;s cash flow, the yield portfolio&rsquo;s distributions) is added up at face value and earns nothing while held, on every path; in the Real view it is deflated with the rest of each year&rsquo;s total, so it loses purchasing power at the deflator&rsquo;s rate. State taxes simplified to a single rate per state, applied to rental income, lending interest and gains. HELOC modeled as interest-only with balloon repayment.
   </p>
 </section>
 

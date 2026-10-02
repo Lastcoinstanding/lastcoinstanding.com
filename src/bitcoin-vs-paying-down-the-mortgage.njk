@@ -10,7 +10,7 @@ related:
   - slug: the-bitcoin-horizon
     desc: "The history behind the hurdle table: bitcoin's average yearly growth over every holding period, and how the spread narrows as the period lengthens."
   - slug: the-power-law
-    desc: "The growth model behind the Floor, Stay and Trend scenarios this page projects with."
+    desc: "The growth model behind the four bitcoin paths this page projects with."
   - slug: compare-housing-plans
     desc: "Before you own: two housing plans side by side, buy now or later, 20% down or 10% with the difference in bitcoin."
 companion: []
@@ -41,7 +41,7 @@ eleventyComputed:
 #}
 <section class="hero">
     <h1>Bitcoin vs. <em>Paying Down the Mortgage</em></h1>
-    <div class="hero-subtitle">The homeowner&rsquo;s question: a mortgage at a fixed rate and some spare cash each month. Pay the loan off faster, or hold bitcoin?</div>
+    <div class="hero-subtitle">The homeowner&rsquo;s question: a mortgage at a fixed rate and some spare cash each month. Pay the loan off faster, or buy bitcoin instead?</div>
     <p class="subtitle">The page doesn&rsquo;t choose for you. It shows what each path does to the numbers under stated assumptions, the yearly growth bitcoin would need for holding to come out ahead, how often bitcoin has managed it, and the risks on both sides.</p>
 </section>
 
@@ -66,12 +66,12 @@ eleventyComputed:
             <span class="mp-in mp-in-usd"><input id="mpExtra" type="text" inputmode="numeric" value="500" aria-label="Extra cash each month, dollars"></span></label>
         <label class="mp-field"><span class="k">Lump sum now <span class="opt">optional</span><span class="help-tip" tabindex="0">?<span class="tip-content">A sum you have today, such as a bonus or savings above your emergency fund. One household puts it on the loan; the other buys bitcoin with it.</span></span></span>
             <span class="mp-in mp-in-usd"><input id="mpLump" type="text" inputmode="numeric" value="0" aria-label="Lump sum now, dollars"></span></label>
-        <label class="mp-field"><span class="k">Years to compare<span class="help-tip" tabindex="0">?<span class="tip-content">How far ahead both households are followed, 1 to 30 years. The hurdle and the history table follow it.</span></span></span>
+        <label class="mp-field"><span class="k">Years to compare<span class="help-tip" tabindex="0">?<span class="tip-content">How many years from today to compare the two households, 1 to 30. The hurdle and the history table use the same number.</span></span></span>
             <span class="mp-in"><input id="mpHorizon" type="text" inputmode="numeric" value="10" aria-label="Years to compare"></span></label>
     </div>
 
     <details class="mp-assume" id="mpAssume">
-        <summary><span>Tax, costs and how the dollars are shown</span> <span class="mp-assume-hint" id="mpAssumeHint"></span></summary>
+        <summary><span>Assumptions: tax, costs and how the dollars are shown</span> <span class="mp-assume-hint" id="mpAssumeHint"></span></summary>
         <div class="mp-assume-body">
             <label class="mp-field"><span class="k">Federal bracket</span>
                 <select id="mpBracket" aria-label="Federal tax bracket"><option value="12">12%</option><option value="22">22%</option><option value="24" selected>24%</option><option value="32">32%</option><option value="35">35%</option><option value="37">37%</option></select></label>
@@ -85,7 +85,7 @@ eleventyComputed:
             <label class="mp-field"><span class="k">Bitcoin trading cost</span>
                 <span class="mp-in mp-in-pct"><input id="mpTx" type="text" inputmode="decimal" value="0.5" aria-label="Bitcoin trading cost, percent of each purchase or sale"></span></label>
             <div class="mp-field"><span class="k">Dollars shown</span>
-                <div class="re-seg" role="group" aria-label="Dollars shown"><button type="button" class="re-seg-btn active" data-display="real" aria-pressed="true">Today&rsquo;s dollars</button><button type="button" class="re-seg-btn" data-display="nominal" aria-pressed="false">Future dollars</button></div>
+                <div class="re-seg" role="group" aria-label="Dollars shown"><button type="button" class="re-seg-btn active" data-display="real" aria-pressed="true">Real (today&rsquo;s $)</button><button type="button" class="re-seg-btn" data-display="nominal" aria-pressed="false">Nominal (future $)</button></div>
                 <span class="mp-small" id="mpDeflLine"></span></div>
         </div>
     </details>
@@ -97,17 +97,19 @@ eleventyComputed:
     </div>
 
     <div class="mp-scen" role="group" aria-label="Bitcoin scenario">
-        <span class="mp-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">The same four scenarios as the other real-estate pages, from the Power Law: <strong>Floor</strong> falls to the channel&rsquo;s lower bound; <strong>Stay</strong> keeps today&rsquo;s position against the trend (the default, no reversion either way); <strong>Trend</strong> closes the gap to the trend line; <strong>Upper</strong> is a stress test at 2.5&times; the trend. Each is a path, not a promise.</span></span></span>
-        <button type="button" class="mp-chip" data-scenario="floor">Floor</button>
-        <button type="button" class="mp-chip on" data-scenario="stay">Stay at today&rsquo;s multiple</button>
-        <button type="button" class="mp-chip" data-scenario="trend">Trend</button>
-        <button type="button" class="mp-chip" data-scenario="upper">Upper</button>
+        <span class="mp-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Four paths for bitcoin&rsquo;s price from the <a href="/the-power-law">Power Law</a>, the long-run trend bitcoin&rsquo;s price has followed. Each moves bitcoin from where it sits today against that trend, in a straight line, to a target at the end of the years compared. <strong>Drifts to the floor</strong>: down to the model&rsquo;s lower line, 0.42&times; the trend. <strong>Today&rsquo;s gap persists</strong> (the default): bitcoin keeps today&rsquo;s distance from the trend and grows at the trend&rsquo;s own rate, which slows over time. <strong>Reverts to trend</strong>: the gap closes by the end. <strong>Peaks at 2.5&times; trend</strong>: a stress test that ends at a cycle-top level. The same four paths as the other real-estate pages. Each is a path, not a promise.</span></span></span>
+        <button type="button" class="mp-chip" data-scenario="floor">Drifts to the floor</button>
+        <button type="button" class="mp-chip on" data-scenario="stay">Today&rsquo;s gap persists</button>
+        <button type="button" class="mp-chip" data-scenario="trend">Reverts to trend</button>
+        <button type="button" class="mp-chip" data-scenario="upper">Peaks at 2.5&times; trend</button>
     </div>
 
     <div class="mp-cards" id="mpCards"></div>
     <p class="mp-diff" id="mpDiff"></p>
 
-    <div class="mp-table-wrap"><table class="mp-table" id="mpScenTable" aria-label="Each scenario against the hurdle"></table></div>
+    <h3 class="mp-h3" id="mpScenTitle">Every bitcoin path, against your hurdle</h3>
+    <p class="mp-table-sub" id="mpScenSub"></p>
+    <div class="mp-table-wrap"><table class="mp-table" id="mpScenTable" aria-labelledby="mpScenTitle"></table></div>
 
     <div class="re-chart-block" id="mpChartBlock">
         <div class="re-chart-head">
@@ -123,9 +125,9 @@ eleventyComputed:
 
 <section class="mp-prose" id="history" aria-labelledby="mpHistTitle">
     <h2 class="mp-h2" id="mpHistTitle">The hurdle against bitcoin&rsquo;s record</h2>
-    <p>The scenarios above are paths a model draws. The record is what bitcoin did. Across every stretch between two month-end closes since January 2011, how often did bitcoin&rsquo;s average yearly growth clear <strong id="mpHistRate">the hurdle</strong>?</p>
+    <p>The scenarios above are paths a model draws. The record is what bitcoin did. Across every period between two month-end closes since January 2011, how often did bitcoin&rsquo;s average yearly growth clear <strong id="mpHistRate">the hurdle</strong>?</p>
     <div class="mp-table-wrap"><table class="mp-table" id="mpHistTable" aria-label="How often bitcoin cleared the hurdle"></table></div>
-    <p class="mp-small">Hypothetical history, not a forecast and not a performance record. The stretches overlap, so they are not independent tries; they all come from one asset&rsquo;s first fifteen years, which include its adoption from almost nothing; and a long-period record that has never failed is a short record, not a guarantee. Month-end closes from the site&rsquo;s own series, <span id="mpHistSpan">2011 to the latest month</span>. Shorter stretches failed often, and the worst year in the record fell <span id="mpHistWorst1">about 74%</span>.</p>
+    <p class="mp-small">Hypothetical history, not a forecast and not a performance record. The periods overlap, so they are not independent tries; they all come from one asset&rsquo;s first fifteen years, which include its adoption from almost nothing; and a long-period record that has never failed is a short record, not a guarantee. Month-end closes from the site&rsquo;s own series, <span id="mpHistSpan">2011 to the latest month</span>. <span id="mpHistShort">Shorter periods failed more often</span>, and the worst year in the record fell <span id="mpHistWorst1">about 74%</span>.</p>
 </section>
 
 <section class="mp-prose" id="risks" aria-labelledby="mpRiskTitle">
@@ -136,14 +138,14 @@ eleventyComputed:
             <ul>
                 <li><strong>It doesn&rsquo;t lower the payment you owe.</strong> Extra principal shortens the loan, but the monthly bill stays the same until the loan is gone, unless the lender recasts it. In a month when cash is short, prepaid money doesn&rsquo;t help.</li>
                 <li><strong>The money is locked in the house.</strong> Getting it back means a home-equity loan, at about 7.3% today (Bankrate&rsquo;s average, September 2026), or selling.</li>
-                <li><strong>Inflation works for the borrower.</strong> A fixed-rate loan shrinks in real terms every year. Paying it off early gives that up; the <em>today&rsquo;s dollars</em> view shows the effect.</li>
+                <li><strong>Inflation works for the borrower.</strong> A fixed-rate loan shrinks in real terms every year. Paying it off early gives that up; the <em>Real (today&rsquo;s $)</em> view shows the effect.</li>
                 <li><strong>It is the certain return.</strong> Every dollar of principal earns exactly the mortgage rate, with no drawdowns and, for most owners, no tax. That is the case for it.</li>
             </ul>
         </div>
         <div class="mp-risk">
             <h3>Holding bitcoin</h3>
             <ul>
-                <li><strong>It can fall a long way.</strong> Between month-end closes bitcoin has fallen 73% or more four times: 83% in 2011, 81% in 2013&ndash;15, 76% in 2017&ndash;19 and 73% in 2021&ndash;22. The lows within those months were deeper. The <em>Floor</em> scenario shows a sustained low path.</li>
+                <li><strong>It can fall a long way.</strong> Between month-end closes bitcoin has fallen 73% or more four times: 83% in 2011, 81% in 2013&ndash;15, 76% in 2017&ndash;19 and 73% in 2021&ndash;22. The lows within those months were deeper. The <em>Drifts to the floor</em> scenario shows a sustained low path.</li>
                 <li><strong>A forced sale at the bottom.</strong> If you need cash during a fall, you sell at a loss. Holding works only if you can wait.</li>
                 <li><strong>Behaviour.</strong> Holding through a deep fall is harder than a model makes it look.</li>
                 <li><strong>Tax.</strong> Gains are taxed when sold; the interest saved by prepaying is, for most owners, a tax-free return. The hurdle already includes this.</li>
@@ -160,7 +162,7 @@ eleventyComputed:
         <li><strong>Bitcoin&rsquo;s price</strong> follows the chosen scenario from today&rsquo;s price, the same paths as <a href="/bitcoin-vs-real-estate">Bitcoin vs. Real Estate</a> and <a href="/bitcoin-vs-rental-property">Bitcoin vs. Rental Property</a>. Each purchase pays the trading cost, and so does a sale.</li>
         <li><strong>The hurdle</strong> is found by search: the steady yearly growth at which the two households end level, after the tax on a sale at the end (and, beside it, before tax).</li>
         <li><strong>Tax</strong> is on the gain over what was paid, at your federal long-term rate, your state&rsquo;s rate and the 3.8% net investment income tax where the bracket brings it in. With the deduction on, the interest&rsquo;s tax saving is invested in bitcoin by both households.</li>
-        <li><strong>Today&rsquo;s dollars</strong> divide each year&rsquo;s values by inflation compounded to that year, at the site&rsquo;s inflation setting (the same one every calculator uses). Sums over the years, the interest paid and what the bitcoin cost, stay in the dollars of each year and say so.</li>
+        <li><strong>Real (today&rsquo;s $)</strong> divides each year&rsquo;s values by inflation compounded to that year, at the site&rsquo;s inflation setting (the same one every calculator uses). Sums over the years, the interest paid and what the bitcoin cost, stay in the dollars of each year and say so.</li>
         <li><strong>Not modelled:</strong> a recast or refinance, private mortgage insurance, escrow for property tax and insurance (the same in both households), a home-equity loan, and lending the bitcoin out. The house&rsquo;s value is the same in both households and is left out.</li>
         <li><strong>Defaults</strong> come from the Federal Housing Finance Agency&rsquo;s National Mortgage Database, second quarter of 2026 (released 30 September 2026): the average outstanding balance, the average rate and the average age of a loan.</li>
     </ul>
