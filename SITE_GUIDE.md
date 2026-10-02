@@ -2072,7 +2072,7 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 | Group (= panel column) | Pages |
 |---|---|
 | Models & Trends (7) | Bitcoin & The Power Law · Bitcoin & Metcalfe’s Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? · The Bitcoin Floor |
-| Bitcoin vs. Other Assets (4) | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property · BTC vs. Paying Down the Mortgage |
+| Bitcoin vs. Other Assets (5) | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property · BTC vs. Paying Down the Mortgage · Compare Housing Plans |
 | Positioning & Strategy (14) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · Bitcoin Escape Velocity · Compare Retirement Plans · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
 | Living on Bitcoin (6) | Borrowing Against Your Stack · Bitcoin Lenders Compared · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income · The STRC Mechanism |
 
@@ -3427,4 +3427,20 @@ The fence is the part to read before touching this. The wordmark **already** wra
 **Series.** The strip gained its third step (*The homeowner · Pay it down?*); BvRE and BvRP link to it in `related`. The hub, nav grouping and homepage strip wait for the fourth page, Compare Housing Plans (JM, 2026-10-01; Bitcoin-Backed Mortgages is not counted). Homepage: Latest card (the Dashboard rotated off Latest and moved to the head of The Numbers, its only homepage card) and a card in The Numbers after BvRP.
 
 **Open.** v1.1: a "looking back" mode (ruling 7); a split of the extra between the two (ruling 4); the carousel slide (§13); a compliance read of the hurdle and history table before any promotion.
+
+## 59. Compare Housing Plans (`/compare-housing-plans.html`)
+
+**Added 2026-10-02.** Step four of the real-estate series and its fourth page: two housing plans side by side, the Compare Retirement Plans pattern (§52) on the pair's engine. JM's ordering (2026-10-01): high priority after the mortgage page; with it the series earns its hub, nav grouping and homepage strip (the next PR).
+
+**The plans.** Each column: *Buy today*, *Rent, then buy* (in a chosen year) or *Rent the whole time*; its own home price, down payment and 30-year rate. Presets: buy now vs. buy in 3 years (the default), 20% vs. 10% down, this house vs. a $300,000 one, buy vs. rent.
+
+**The engine: `RealEstateModel.housingCompare`.** Both plans in one monthly loop, because equal cash out couples them: both start with the larger plan's up-front need; each month both spend the dearer plan's housing cost (`cashRule: 'max'`) and the cheaper plan buys bitcoin with the difference. A plan that buys later rents the same house at market rent, then buys at that year's price, selling bitcoin for the down payment and closing; money it doesn't have comes from income and is subtracted (and shown). Owning costs, taxes on both sales and the bitcoin price path are bvreProjection's. `cashRule: 'a'` lets plan A set the budget: with A buying and B renting the same house that is bvreProjection exactly, and `chpQA()` checks the house, the bitcoin and both cash-out totals to the cent, plus identical plans → identical results. `growth` gives the plain what-ifs (halves; goes nowhere) shown above the four scenarios, with the Floor caveat in the caption.
+
+**Defaults.** House $415,000 and the costs: `PAIR_DEFAULTS`. Rate **7.0%**, Freddie Mac PMMS 7.03% on 2026-09-24 (BvRP-24; DATA_AUDIT CHP-1). BvRE's own projection default is 6.8% with no row (TECH_DEBT). Home appreciation reads the sitewide `homeApprNominal` (no write-back).
+
+**URL.** `a_kind` (now|later|rent), `a_price`, `a_down`, `a_rate`, `a_year`, and `b_…`, from the first commit; shared: the series' carried names through `RealEstateCarry`, plus `closing`, `ptax`, `maint`, `ded`.
+
+**Not modelled, said on the page:** private mortgage insurance under 20% down (its absence flatters the smaller down payment; TECH_DEBT), moving costs, renters' insurance, refinancing.
+
+**Homepage.** Latest card (Bitcoin as Collateral rotates off; it keeps its category card and carousel slide) and a Numbers card after the mortgage page. Strip step 4 (*Two plans · Which way in?*); related links from BvRE, BvRP, the mortgage page and Compare Retirement Plans.
 
