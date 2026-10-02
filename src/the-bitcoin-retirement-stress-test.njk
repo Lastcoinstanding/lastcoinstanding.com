@@ -40,14 +40,21 @@ eleventyComputed:
 
 <main class="content-area">
 
+  {# Retirement family strip, first in the main column (moved from the foot
+     2026-10-02; SITE_GUIDE §53.1). Carries its own scoped styles. #}
+  {% include 'components/retirement-family.njk' %}
+
   {% include 'components/tool-framing.njk' %}
 
   <!-- ════════ WHERE THIS SITS IN THE FAMILY ════════
        Was a "Part 2 of 2" call-out from the two-page era; the family is four
-       questions now (Build → Size → Choose → Stress), coherence F4 2026-09-23. -->
+       questions now (Build → Size → Choose → Stress), coherence F4 2026-09-23.
+       Trimmed 2026-10-02 when the family strip moved to the top of the page
+       directly above it: the strip names the four questions, so this keeps
+       only the "build a plan first" advice. -->
   <div class="st-partnote">
-    <span class="st-partnote-tag">The fourth question</span>
-    <p>The last of the four retirement questions. <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> builds the plan on the upside path, <a href="/bitcoin-escape-velocity">Escape Velocity</a> sizes it, and <a href="/compare-retirement-plans">Compare Retirement Plans</a> chooses between options; this page takes the plan you chose and drops a bear market into it. If you have not built a plan yet, start with the retirement calculator: this exploration is far more useful once you have, and its link carries your numbers here.</p>
+    <span class="st-partnote-tag">Start with a plan</span>
+    <p>This page takes the plan you chose and drops a bear market into it. If you have not built a plan yet, start with <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a>: this exploration is far more useful once you have, and its link carries your numbers here.</p>
   </div>
 
   <!-- ════════ 1. INTRO ════════ -->
@@ -278,9 +285,5 @@ eleventyComputed:
     </div>
   </section>
 
-  {# Retirement family strip — the four questions of the funnel with this page
-     marked. Shared component; it carries its own scoped styles, so adding it
-     to a page is one include and no stylesheet edit. See SITE_GUIDE §53. #}
-  {% include 'components/retirement-family.njk' %}
 
 </main>

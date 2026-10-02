@@ -42,6 +42,11 @@
 {#- Homepage variant: `{% set rfam_home = true %}` before the include. See the
     .rfam--home rules below. Only the homepage sets it. -#}
 {%- set onHome = (rfam_home == true) -%}
+{#- On a spoke the strip sits at the TOP of the page (2026-10-02, JM: the same
+    treatment as the real-estate series, so a reader knows the other three
+    questions exist before starting). `rfam--top` swaps the old foot spacing
+    for the real-estate strip's. The hub and homepage keep their own. -#}
+{%- set onSpoke = (not onHub) and (not onHome) -%}
 <style>
 /* One cohesive object containing four. The frame is deliberately LOWER
    contrast than the tool cards inside it — the cards are the things being
@@ -71,6 +76,8 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
    mobile tap target pushed it off the text (defect fixed 2026-09-21). */
 .rfam-foot a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
 .rfam-foot a:hover { text-decoration-color: var(--amber, #e09422); }
+/* SPOKE VARIANT (top of page, 2026-10-02): the .rser spacing. */
+.rfam.rfam--top { margin: 0 auto 2rem; padding: 0.9rem 1.1rem 1rem; }
 /* HOMEPAGE VARIANT (`rfam_home`, Treatment A 2026-09-21) — the fifth-surface
    case, SITE_GUIDE §53.1. On the homepage the strip is a section, not a boxed
    object: no frame, no icon, centered header on the hero's 64rem column, a
@@ -114,7 +121,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
   { slug: 'compare-retirement-plans',          step: 'Choose', q: 'Which of my options?',               t: 'Two complete plans, side by side.' },
   { slug: 'the-bitcoin-retirement-stress-test', step: 'Stress', q: 'Does it survive bad luck?',          t: 'The plan you picked, under a crash.' }
 ] -%}
-<nav class="rfam{% if onHome %} rfam--home{% endif %}" aria-label="The retirement decision funnel">
+<nav class="rfam{% if onHome %} rfam--home{% endif %}{% if onSpoke %} rfam--top{% endif %}" aria-label="The retirement decision funnel">
   <div class="rfam-head">
     {%- if not onHub and not onHome %}
     <span class="rfam-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-retirement.njk' %}</span>
