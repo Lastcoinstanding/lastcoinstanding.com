@@ -251,6 +251,19 @@
     }
   },
   {
+    "_comment": "Compare Housing Plans (2026-10-02): step four of the real-estate series, the Compare Retirement Plans pattern on the pair's engine (housingCompare, parity with bvreProjection to the cent). With it the series has four pages: the hub, nav grouping and homepage strip follow (JM 2026-10-01). Tile 87, after the mortgage page (85).",
+    "slug": "compare-housing-plans",
+    "title": "Compare Housing Plans",
+    "category": "numbers",
+    "group": "Bitcoin vs. Other Assets",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Two housing plans side by side &mdash; buy now or later, 20% down or 10% with the difference in bitcoin, this house or a cheaper one.",
+      "preview_kind": "svg",
+      "position": 87
+    }
+  },
+  {
     "slug": "lump-sum-or-ladder-in",
     "title": "Lump Sum or Ladder In?",
     "category": "numbers",

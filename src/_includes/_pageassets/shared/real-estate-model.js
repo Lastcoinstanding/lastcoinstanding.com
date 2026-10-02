@@ -1489,6 +1489,146 @@
     return out;
   }
 
+  // ═══════════════════════════════════════════════════════════════════
+  // Compare Housing Plans — two housing plans, side by side (series step 4)
+  // PAGE_IDEAS_BACKLOG "Compare Housing Plans"; the Compare Retirement Plans
+  // pattern (SITE_GUIDE §52) on the pair's engine. Two households start with
+  // the same savings and spend the same every month (equal cash out, M2):
+  //   - Savings at the start: the larger of the two plans' up-front needs.
+  //     Each plan pays its own up front (a down payment plus closing costs,
+  //     if it buys today) and puts the rest into bitcoin.
+  //   - Each month both spend what the dearer plan's housing costs that
+  //     month (cashRule 'max'); the cheaper plan buys bitcoin with the
+  //     difference. cashRule 'a' makes plan A set the budget, so the other
+  //     plan sells bitcoin when its costs run higher; with A buying and B
+  //     renting the same house, that is bvreProjection exactly (parity QA).
+  //   - A plan that buys later rents the house it will buy (market rent:
+  //     its price today ÷ 12 ÷ price-to-rent, growing at rent growth) and,
+  //     at the start of its purchase year, buys at that year's price,
+  //     paying the down payment and closing costs by selling bitcoin.
+  //   - Owning costs P&I + property tax + insurance + maintenance, the last
+  //     three following the home's value, stepped once a year, less the
+  //     mortgage-interest deduction if on: bvreProjection's costs.
+  //   - Money a plan needs and doesn't have (bitcoin run out) comes from
+  //     income: it is reported and counted against that plan's end value.
+  //   - The end: each plan's house if sold, after selling costs, the loan
+  //     and tax (homeSaleTax, years owned), plus its bitcoin if sold, after
+  //     the trading cost and tax (btcSaleTax). Bitcoin's price follows the
+  //     scenario path exactly as bvreProjection's.
+  //   i: { horizonYrs, btcNow, scenario, homeApprNominal, rentGrowth (|null),
+  //        inflRate, closingPct, propTaxPct, insurancePer400K, maintPct,
+  //        sellPct, btcTxPct, tp (tax profile), cashRule 'max'|'a',
+  //        plans: [ { kind 'buy'|'rent', buyYear (0 = today), homePrice,
+  //                   dpf (0..1; 1 = cash), mortRate } ×2 ] }
+  function housingCompare(i){
+    var D = PAIR_DEFAULTS;
+    var H = i.horizonYrs, n = Math.round(H * 12);
+    var g = i.homeApprNominal / 100;
+    var rg = ((i.rentGrowth === null || i.rentGrowth === undefined) ? i.homeApprNominal : i.rentGrowth) / 100;
+    var tx = i.btcTxPct / 100, btcNow = i.btcNow;
+    var tp = i.tp || bvreTaxProfile({});
+    var per400 = numOr(i.insurancePer400K, D.insurancePer400K);
+    var d0 = (Date.now() / 1000 - GENESIS_TS) / 86400;
+    var mult0 = btcNow / plPrice(d0);
+    // i.growth (optional): a flat yearly rate from today's price instead of the scenario path (the page's plain what-ifs)
+    var flat = i.growth !== undefined && i.growth !== null;
+    function priceAt(m){ return flat ? btcNow * Math.pow(1 + i.growth, m / 12) : scenarioMultiple(i.scenario, mult0, m / n) * plPrice(d0 + (m / 12) * 365.25); }
+    var rule = i.cashRule === 'a' ? 'a' : 'max';
+
+    var P = i.plans.map(function(q){
+      var buyM = q.kind === 'buy' ? Math.max(0, Math.round(numOr(q.buyYear, 0))) * 12 : Infinity;
+      return { q: q, buyM: buyM, owned: false, bal: 0, mr: q.mortRate / 100 / 12, pi: 0, save: 0, loan: 0,
+               homeBasis: 0, buyPrice: null, boughtAtMonth: null, btc: 0, basis: 0, realized: 0, shortfall: 0,
+               cum: 0, upfront0: 0, rent0: q.homePrice / (12 * D.priceToRent), ins0: per400 * q.homePrice / 400000,
+               t: { interest: 0, principal: 0, tax: 0, ins: 0, maint: 0, rent: 0, saving: 0, bought: 0, sold: 0 },
+               rows: [], first: null };
+    });
+    function buy(S, m){   // purchase at the start of month m+1 (m = 12 × buyYear)
+      var k = m / 12, price = S.q.homePrice * Math.pow(1 + g, k);
+      var cash = S.q.dpf >= 1;
+      var down = cash ? price : price * S.q.dpf, closing = price * i.closingPct / 100;
+      S.loan = cash ? 0 : price - down; S.bal = S.loan;
+      S.pi = S.loan > 0 ? mortgagePayment(S.loan, S.q.mortRate, 30, 'le0') : 0;
+      S.save = interestSavingRate(tp, S.loan);
+      S.owned = true; S.buyPrice = price; S.homeBasis = price + closing; S.boughtAtMonth = m;
+      S.down = down; S.closing = closing;
+      return down + closing;
+    }
+    // Up front, today
+    P.forEach(function(S){ if (S.buyM === 0) S.upfront0 = buy(S, 0); });
+    var savings = rule === 'a' ? P[0].upfront0 : Math.max(P[0].upfront0, P[1].upfront0);
+    P.forEach(function(S){
+      var spare = savings - S.upfront0;
+      if (spare > 0) { S.btc = spare * (1 - tx) / btcNow; S.basis = spare; }
+      else if (spare < 0) S.shortfall += -spare;
+      S.cum = savings;
+    });
+    function sellFor(S, need, price){   // sell bitcoin for `need` dollars, average cost; the rest from income
+      if (need <= 0) return;
+      var sell = need / (price * (1 - tx));
+      if (sell <= S.btc) {
+        var out = S.btc > 0 ? S.basis * sell / S.btc : 0;
+        S.realized += need - out; S.basis -= out; S.btc -= sell; S.t.sold += need;
+      } else {
+        var cover = S.btc * price * (1 - tx);
+        S.realized += cover - S.basis; S.basis = 0; S.t.sold += cover;
+        S.shortfall += need - cover; S.btc = 0;
+      }
+    }
+    function snap(S, m, price){
+      var yrs = m / 12, homeV = S.owned ? S.q.homePrice * Math.pow(1 + g, yrs) : 0;
+      var sc = homeV * i.sellPct / 100, hPre = S.owned ? homeV - sc - S.bal : 0;
+      var ht = S.owned ? homeSaleTax(tp, homeV, sc, S.homeBasis, (m - S.boughtAtMonth) / 12).tax : 0;
+      var bv = S.btc * price, bPre = bv * (1 - tx), bt = btcSaleTax(tp, bPre, S.basis, S.realized).tax;
+      return { month: m, year: yrs, owned: S.owned, homeValue: homeV, balance: S.bal, sellCosts: sc,
+               houseHeld: S.owned ? homeV - S.bal : 0, houseIfSold: hPre, houseTax: ht, houseAfter: hPre - ht,
+               btcHeld: S.btc, btcValue: bv, btcIfSold: bPre, btcTax: bt, btcAfter: bPre - bt, btcBasis: S.basis,
+               shortfall: S.shortfall, cumCashOut: S.cum,
+               held: (S.owned ? homeV - S.bal : 0) + bv - S.shortfall,
+               after: hPre - ht + bPre - bt - S.shortfall };
+    }
+    P.forEach(function(S){ S.rows.push(snap(S, 0, btcNow)); });
+    for (var m = 1; m <= n; m++) {
+      var k = Math.floor((m - 1) / 12), price = priceAt(m);
+      var costs = P.map(function(S){
+        if (!S.owned && S.buyM === m - 1 && m - 1 > 0) { var need = buy(S, m - 1); sellFor(S, need, price); }
+        var c;
+        if (S.owned) {
+          var vk = S.q.homePrice * Math.pow(1 + g, k);
+          var interest = 0, principal = 0;
+          if (S.bal > 0) { interest = S.bal * S.mr; principal = Math.min(S.pi - interest, S.bal); S.bal -= principal; if (S.bal < 1e-6) S.bal = 0; }
+          var tax = vk * i.propTaxPct / 100 / 12, ins = S.ins0 * Math.pow(1 + g, k) / 12, maint = vk * i.maintPct / 100 / 12;
+          var saving = interest * S.save;
+          c = interest + principal + tax + ins + maint - saving;
+          S.t.interest += interest; S.t.principal += principal; S.t.tax += tax; S.t.ins += ins; S.t.maint += maint; S.t.saving += saving;
+          if (!S.first) S.first = { kind: 'own', cost: c, pi: interest + principal, tax: tax, ins: ins, maint: maint };
+        } else {
+          c = S.rent0 * Math.pow(1 + rg, k); S.t.rent += c;
+          if (!S.first) S.first = { kind: 'rent', cost: c };
+        }
+        return c;
+      });
+      var budget = rule === 'a' ? costs[0] : Math.max(costs[0], costs[1]);
+      P.forEach(function(S, j){
+        var diff = budget - costs[j];
+        if (diff > 0) { S.btc += diff * (1 - tx) / price; S.basis += diff; S.t.bought += diff; }
+        else if (diff < 0) sellFor(S, -diff, price);
+        S.cum += budget;
+        if (m % 12 === 0 || m === n) S.rows.push(snap(S, m, price));
+      });
+    }
+    var out = P.map(function(S){
+      var e = S.rows[S.rows.length - 1];
+      return { plan: S.q, end: e, rows: S.rows, first: S.first, totals: S.t, savings: savings, upfront0: S.upfront0,
+               boughtAtMonth: S.boughtAtMonth, buyPrice: S.buyPrice, down: S.down || 0, closing: S.closing || 0,
+               loan: S.loan, pi: S.pi, shortfall: S.shortfall, cumCashOut: S.cum };
+    });
+    var defl = deflator(i.inflRate, H);
+    return { plans: out, deflator: defl, months: n, savings: savings, rule: rule,
+             diffAfter: out[1].end.after - out[0].end.after, diffHeld: out[1].end.held - out[0].end.held,
+             priceEnd: priceAt(n), impliedGrowthPct: (Math.pow(priceAt(n) / btcNow, 1 / H) - 1) * 100 };
+  }
+
   window.RealEstateModel = {
     // shared primitives
     mortgagePayment: mortgagePayment,
@@ -1553,6 +1693,8 @@
     interestSavingRate: interestSavingRate,
     paydownProjection: paydownProjection,
     paydownHurdle: paydownHurdle,
-    hurdleHistory: hurdleHistory
+    hurdleHistory: hurdleHistory,
+    // Compare Housing Plans (series step 4)
+    housingCompare: housingCompare
   };
 })();

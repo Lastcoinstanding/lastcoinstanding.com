@@ -1,0 +1,165 @@
+---
+layout: base.njk
+permalink: /compare-housing-plans.html
+slug: compare-housing-plans
+related:
+  - slug: bitcoin-vs-real-estate
+    desc: "The single decision underneath every plan here: buy the house, or rent and hold bitcoin. The same engine, checked against this page to the cent."
+  - slug: bitcoin-vs-paying-down-the-mortgage
+    desc: "Once you own: put spare cash on the mortgage, or into bitcoin? The homeowner's chair in the same series."
+  - slug: compare-retirement-plans
+    desc: "The same two-column pattern for retirement: two complete plans, one shared set of assumptions, and the difference stated."
+  - slug: the-power-law
+    desc: "The growth model behind the Floor, Stay and Trend scenarios both plans run under."
+companion: []
+faq:
+  - q: "Is it better to buy a house now or rent and buy later?"
+    a: "The page doesn't decide it for you. It runs both plans on the same savings and the same monthly spending, so the plan that costs less each month puts the difference into bitcoin, and shows what each is worth at the end, after selling costs and tax. The answer turns on the gap between rent and the cost of owning, how fast house prices rise while you wait, and bitcoin's path, which is why the page shows plain what-ifs (bitcoin halves, bitcoin goes nowhere) beside the model's scenarios."
+  - q: "Should I put 20% down or 10% down and buy bitcoin with the difference?"
+    a: "Set Plan A to 20% down and Plan B to 10% down on the same house, or use the preset. The smaller down payment leaves more cash to put into bitcoin today, at the cost of a bigger loan and more interest every month, which the 20% plan then invests. The page shows the end result under each bitcoin path and the risks of carrying the larger loan."
+  - q: "How does the page keep the comparison fair?"
+    a: "Both households start with the same savings, the larger of the two plans' up-front needs, and every month both spend what the dearer plan's housing costs that month. Whatever a plan doesn't spend on housing goes into bitcoin. If a plan has to find money it doesn't have, for a down payment later or a month its costs are higher, it sells bitcoin, and anything beyond that comes from income and is counted against the plan."
+  - q: "Where do the default numbers come from?"
+    a: "The house is $415,000, the 2025 median price of a new US home; rent is market rent for that house from Zillow's price-to-rent ratio (15.8); closing, property tax, insurance, maintenance and selling costs are the series' sourced defaults; the mortgage rate is 7.0%, Freddie Mac's 30-year average in late September 2026 (7.03%). Change any of them."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/compare-housing-plans-head.html' %}"
+  page_styles: "{% include '_pageassets/compare-housing-plans.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/compare-housing-plans.js' %}"
+---
+{#
+  Compare Housing Plans — two housing plans side by side, step four of the
+  real-estate series (tenant · landlord · homeowner · two plans). The Compare
+  Retirement Plans pattern (SITE_GUIDE §52) on the pair's engine:
+  RealEstateModel.housingCompare in shared/real-estate-model.js, checked
+  against bvreProjection to the cent (chpQA()). SITE_GUIDE §59.
+  URL: a_/b_ names for each plan from the first commit; the series' carried
+  names for the shared assumptions.
+#}
+<section class="hero">
+    <h1>Compare <em>Housing Plans</em></h1>
+    <div class="hero-subtitle">Two ways to house yourself, side by side: buy now or rent and buy later, 20% down or 10% with the difference in bitcoin, this house or a cheaper one.</div>
+    <p class="subtitle">Both plans start with the same savings and spend the same every month; whatever a plan doesn&rsquo;t spend on housing goes into bitcoin. The page shows what each is worth at the end, under stated assumptions, and doesn&rsquo;t pick one.</p>
+</section>
+
+<main class="content-area">
+
+{% include 'components/real-estate-series.njk' %}
+
+{% include 'components/tool-framing.njk' %}
+
+<section class="ch-calc" id="calculator" aria-labelledby="chCalcTitle">
+    <h2 class="ch-h2" id="chCalcTitle">Your two plans</h2>
+    <div class="ch-presets" role="group" aria-label="Start from a common comparison">
+        <span class="ch-presets-k">Start from</span>
+        <button type="button" class="ch-chip" data-preset="later">Buy now vs. buy in 3 years</button>
+        <button type="button" class="ch-chip" data-preset="down">20% down vs. 10% down</button>
+        <button type="button" class="ch-chip" data-preset="cheaper">This house vs. a cheaper one</button>
+        <button type="button" class="ch-chip" data-preset="rent">Buy vs. rent</button>
+    </div>
+
+    <div class="ch-plans">
+        {% for x in [{ p: 'a', name: 'Plan A' }, { p: 'b', name: 'Plan B' }] %}
+        <div class="ch-plan {{ x.p }}" id="chPlan{{ x.p | upper }}">
+            <h3>{{ x.name }}</h3>
+            <div class="ch-plan-grid">
+                <label class="ch-field full"><span class="k">The plan</span>
+                    <select id="ch_{{ x.p }}_kind" aria-label="{{ x.name }}: the plan"><option value="now">Buy today</option><option value="later">Rent, then buy</option><option value="rent">Rent the whole time</option></select></label>
+                <label class="ch-field"><span class="k">Home price today<span class="help-tip" tabindex="0">?<span class="tip-content">The house this plan buys, or rents, at today&rsquo;s price. A plan that buys later pays that year&rsquo;s price, grown at the home-appreciation rate. Rent is market rent for this house.</span></span></span>
+                    <span class="ch-in ch-in-usd"><input id="ch_{{ x.p }}_price" type="text" inputmode="numeric" aria-label="{{ x.name }}: home price today"></span></label>
+                <label class="ch-field" data-own><span class="k">Down payment</span>
+                    <span class="ch-in ch-in-pct"><input id="ch_{{ x.p }}_down" type="text" inputmode="decimal" aria-label="{{ x.name }}: down payment, percent"></span></label>
+                <label class="ch-field" data-own><span class="k">Mortgage rate<span class="help-tip" tabindex="0">?<span class="tip-content">A 30-year fixed rate. For a plan that buys later, the rate it expects to get then; the page doesn&rsquo;t forecast rates.</span></span></span>
+                    <span class="ch-in ch-in-pct"><input id="ch_{{ x.p }}_rate" type="text" inputmode="decimal" aria-label="{{ x.name }}: mortgage rate"></span></label>
+                <label class="ch-field" data-later><span class="k">Buy in year</span>
+                    <span class="ch-in"><input id="ch_{{ x.p }}_year" type="text" inputmode="numeric" aria-label="{{ x.name }}: buy in year"></span></label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <details class="ch-assume" id="chAssume">
+        <summary><span>Shared assumptions: years, homes, costs, tax</span> <span class="ch-assume-hint" id="chAssumeHint"></span></summary>
+        <div class="ch-assume-body">
+            <label class="ch-field"><span class="k">Years to compare</span><span class="ch-in"><input id="chHorizon" type="text" inputmode="numeric" value="10" aria-label="Years to compare"></span></label>
+            <label class="ch-field"><span class="k">Home appreciation<span class="help-tip" tabindex="0">?<span class="tip-content">Nominal, a year, for both plans&rsquo; houses. Default: the site&rsquo;s setting (Since 2000, about 4.7%), the same as the other real-estate pages. Rent grows at the same rate.</span></span></span><span class="ch-in ch-in-pct"><input id="chAppr" type="text" inputmode="decimal" aria-label="Home appreciation, percent a year"></span></label>
+            <label class="ch-field"><span class="k">Closing costs (buying)</span><span class="ch-in ch-in-pct"><input id="chClosing" type="text" inputmode="decimal" value="1.04" aria-label="Closing costs, percent of price"></span></label>
+            <label class="ch-field"><span class="k">Property tax</span><span class="ch-in ch-in-pct"><input id="chPropTax" type="text" inputmode="decimal" value="0.9" aria-label="Property tax, percent of value a year"></span></label>
+            <label class="ch-field"><span class="k">Maintenance</span><span class="ch-in ch-in-pct"><input id="chMaint" type="text" inputmode="decimal" value="1" aria-label="Maintenance, percent of value a year"></span></label>
+            <label class="ch-field"><span class="k">Selling costs</span><span class="ch-in ch-in-pct"><input id="chSell" type="text" inputmode="decimal" value="6.6" aria-label="Selling costs, percent of price"></span></label>
+            <label class="ch-field"><span class="k">Bitcoin trading cost</span><span class="ch-in ch-in-pct"><input id="chTx" type="text" inputmode="decimal" value="0.5" aria-label="Bitcoin trading cost, percent"></span></label>
+            <label class="ch-field"><span class="k">Federal bracket</span>
+                <select id="chBracket" aria-label="Federal tax bracket"><option value="12">12%</option><option value="22">22%</option><option value="24" selected>24%</option><option value="32">32%</option><option value="35">35%</option><option value="37">37%</option></select></label>
+            <label class="ch-field"><span class="k">State</span><select id="chState" aria-label="State for tax"></select></label>
+            <label class="ch-field"><span class="k">Tax on gains</span>
+                <select id="chTax" aria-label="Tax on gains"><option value="us" selected>US rules</option><option value="none">No capital-gains tax</option></select></label>
+            <label class="ch-field ch-check"><input id="chDed" type="checkbox"> <span>I itemize and deduct mortgage interest</span></label>
+            <div class="ch-field"><span class="k">Dollars shown</span>
+                <div class="re-seg" role="group" aria-label="Dollars shown"><button type="button" class="re-seg-btn active" data-display="real" aria-pressed="true">Today&rsquo;s dollars</button><button type="button" class="re-seg-btn" data-display="nominal" aria-pressed="false">Future dollars</button></div>
+                <span class="ch-small" id="chDeflLine"></span></div>
+        </div>
+    </details>
+
+    <div class="ch-scen" role="group" aria-label="Bitcoin scenario">
+        <span class="ch-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">The series&rsquo; four Power Law paths: <strong>Floor</strong>, the channel&rsquo;s lower line; <strong>Stay</strong> at today&rsquo;s multiple (the default); <strong>Trend</strong>; <strong>Upper</strong>, a stress test. The table under the cards adds two plain what-ifs.</span></span></span>
+        <button type="button" class="ch-chip" data-scenario="floor">Floor</button>
+        <button type="button" class="ch-chip on" data-scenario="stay">Stay at today&rsquo;s multiple</button>
+        <button type="button" class="ch-chip" data-scenario="trend">Trend</button>
+        <button type="button" class="ch-chip" data-scenario="upper">Upper</button>
+    </div>
+
+    <div class="ch-hurdle" id="chHead" aria-live="polite">
+        <div class="ch-hurdle-k">The difference</div>
+        <div class="ch-hurdle-v" id="chHeadV">&hellip;</div>
+        <p class="ch-hurdle-s" id="chHeadS">The calculator needs JavaScript.</p>
+    </div>
+    <p class="ch-cashout" id="chCashOut"></p>
+    <div class="ch-cards" id="chCards"></div>
+
+    <div class="ch-table-wrap"><table class="ch-table" id="chScenTable" aria-label="The difference under each bitcoin path"></table></div>
+
+    <div class="re-chart-block" id="chChartBlock">
+        <div class="re-chart-head">
+            <div class="re-chart-title">The two plans over time <span class="re-chart-frame" id="chChartFrame"></span></div>
+            <div class="re-seg" role="group" aria-label="What the lines value"><button type="button" class="re-seg-btn active" data-basis="ifsold" aria-pressed="true">If sold, after tax</button><button type="button" class="re-seg-btn" data-basis="held" aria-pressed="false">Held</button></div>
+        </div>
+        <div class="re-chart-wrap"><canvas id="chChart"></canvas></div>
+        <p class="re-chart-note">Each line is a plan&rsquo;s wealth each year: its house (if it owns one) less the loan, plus its bitcoin, less anything it had to find from income. <em>If sold, after tax</em> sells both that year; <em>Held</em> is before any sale. The heaviest, light line is the <strong>difference</strong>, Plan B minus Plan A.</p>
+    </div>
+    <div id="chLedger"></div>
+</section>
+
+<section class="ch-prose" id="risks" aria-labelledby="chRiskTitle">
+    <h2 class="ch-h2" id="chRiskTitle">What the numbers leave out</h2>
+    <div class="ch-risks">
+        <div class="ch-risk">
+            <h3>Owning</h3>
+            <ul>
+                <li><strong>One asset, borrowed against.</strong> A mortgage is leverage on a single house in a single town. The page grows every house at the same rate; yours won&rsquo;t.</li>
+                <li><strong>Hard to leave.</strong> Selling costs about 6.6% and takes months. A smaller down payment means a bigger loan, more interest, and less room if prices fall.</li>
+                <li><strong>Costs the page averages.</strong> A new roof is a lump, not 1% a year.</li>
+            </ul>
+        </div>
+        <div class="ch-risk">
+            <h3>Renting and holding bitcoin</h3>
+            <ul>
+                <li><strong>Rent can outrun the model.</strong> The page grows rent at the home-appreciation rate; local rents jump, and leases end.</li>
+                <li><strong>Buying later means selling bitcoin then.</strong> A plan that buys in year three sells bitcoin for the down payment at that year&rsquo;s price, which could be in a deep fall. If the bitcoin doesn&rsquo;t cover it, the rest comes from income and the card says so.</li>
+                <li><strong>Prices can run away.</strong> Waiting costs more if house prices rise faster than the setting.</li>
+                <li><strong>Bitcoin can fall a long way:</strong> 73% or more four times between month-end closes since 2011. The table above shows the plans if it halves, or goes nowhere.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="ch-prose" id="method" aria-labelledby="chMethodTitle">
+    <h2 class="ch-h2" id="chMethodTitle">How the page computes</h2>
+    <ul class="ch-method">
+        <li><strong>The same savings, the same spending.</strong> Both plans start with the larger of their two up-front needs (a down payment plus closing costs for a plan that buys today). Each month both spend what the dearer plan&rsquo;s housing costs that month; the cheaper plan puts the difference into bitcoin. That is the rule the other real-estate pages use, stated for two plans.</li>
+        <li><strong>Owning</strong> costs the 30-year loan&rsquo;s payment, property tax, insurance and maintenance, the last three following the home&rsquo;s value; <strong>renting</strong> costs market rent for the same house, growing at the home-appreciation rate. A plan that buys later rents until the start of its purchase year, then buys at that year&rsquo;s price, selling bitcoin for the down payment and closing costs.</li>
+        <li><strong>At the end</strong> each plan&rsquo;s house is sold, less selling costs, the loan and any tax above the home-sale exclusion (and only after two years of owning), and its bitcoin is sold, less the trading cost and the tax on its gain. Money a plan had to find from income is subtracted.</li>
+        <li><strong>The engine</strong> is the one behind <a href="/bitcoin-vs-real-estate">Bitcoin vs. Real Estate</a>; set Plan A to buy and Plan B to rent the same house and the page&rsquo;s check reproduces that page&rsquo;s figures to the cent.</li>
+        <li><strong>Not modelled:</strong> private mortgage insurance on a down payment under 20%, typically a fraction of a percent of the loan a year until enough is paid off, which leaving out flatters the smaller down payment; moving costs; renters&rsquo; insurance; refinancing; and rates or prices that differ from the settings.</li>
+    </ul>
+</section>
+
+</main>
