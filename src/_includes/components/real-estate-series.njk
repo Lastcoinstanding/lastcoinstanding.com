@@ -76,8 +76,8 @@ a.rser-item .rser-t::after { content: ' \2192'; color: var(--amber, #e09422); }
 {%- set series = [
   { slug: 'bitcoin-vs-real-estate',     step: 'The tenant',   q: 'Buy or rent?',      t: 'Bitcoin vs. Real Estate',     hash: 'calculator' },
   { slug: 'bitcoin-vs-rental-property', step: 'The landlord', q: 'Keep the rental?',  t: 'Bitcoin vs. Rental Property', hash: 'calculator' },
-  { slug: 'bitcoin-vs-paying-down-the-mortgage', step: 'The homeowner', q: 'Pay it down?', t: 'Bitcoin vs. Paying Down the Mortgage', hash: 'calculator' },
-  { slug: 'compare-housing-plans', step: 'Two plans', q: 'Which way in?', t: 'Compare Housing Plans', hash: 'calculator' }
+  { slug: 'bitcoin-vs-paying-down-the-mortgage', step: 'The homeowner', q: 'Pay down the mortgage?', t: 'Bitcoin vs. Paying Down the Mortgage', hash: 'calculator' },
+  { slug: 'compare-housing-plans', step: 'Two strategies', q: 'Which approach?', t: 'Compare Housing Plans', hash: 'calculator' }
 ] -%}
 {%- if rserHome %}
 <nav class="rser rser--home" aria-labelledby="rser-title">
@@ -87,7 +87,7 @@ a.rser-item .rser-t::after { content: ' \2192'; color: var(--amber, #e09422); }
 {%- else %}
 <nav class="rser" aria-labelledby="rser-title">
   <{{ rserLevel }} class="rser-title" id="rser-title">{% if rserHub %}Bitcoin and real estate{% else %}<a href="/bitcoin-and-real-estate">Bitcoin and real estate</a>{% endif %}</{{ rserLevel }}>
-  <p class="rser-lede">One housing decision, seen from each chair: the tenant, the landlord, the homeowner, and two plans side by side. The links carry the inputs the calculators share.{% if not rserHub %} <a href="/bitcoin-and-real-estate">All four in one place &rarr;</a>{% endif %}</p>
+  <p class="rser-lede">One housing decision, seen from each chair: the tenant, the landlord, the homeowner, and two housing strategies side by side. The links carry the inputs the calculators share.{% if not rserHub %} <a href="/bitcoin-and-real-estate">All four in one place &rarr;</a>{% endif %}</p>
 {%- endif %}
   <div class="rser-row">
     {%- for f in series -%}

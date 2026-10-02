@@ -90,7 +90,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         { style: 'btc', label: 'Bitcoin', data: series(B) },
         { style: 'diff', label: 'Difference: bitcoin minus the house', data: series(function(p){ return B(p) - H(p); }) }
       ];
-      if (floorPts) s.splice(2, 0, { style: 'floor', label: 'Bitcoin at Floor', data: series(B, floorPts) });
+      if (floorPts) s.splice(2, 0, { style: 'floor', label: 'Bitcoin, drifts to the floor', data: series(B, floorPts) });
       var fr = document.getElementById(prefix + 'ChartFrame');
       if (fr) fr.textContent = '(' + (sold ? 'if sold that year, after tax' : 'held, before any sale') + (o.real ? (_reFrameReal() ? '; real, today\u2019s $' : '; nominal, future $') : '; nominal') + ')';
       window.RealEstateChart.render(prefix, { labels: labels.slice(0, n + 1), series: s, fmt: fmtFn });
@@ -810,8 +810,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     setPlaceholder('fwdRentGrowth', pctTxt(homeApprNominal) + ' default');
     setPlaceholder('fwdInsurance', fmt(P.insuranceDefault) + ' default');
 
-    var SCEN_NAMES = { floor: 'Floor', stay: 'Stay at today\u2019s multiple', trend: 'Trend', upper: 'Upper' };
-    var scenarioLabel = SCEN_NAMES[scenario] || 'Stay at today\u2019s multiple';
+    var SCEN_NAMES = { floor: 'Drifts to the floor', stay: 'Today\u2019s gap persists', trend: 'Reverts to trend', upper: 'Peaks at 2.5\u00d7 trend' };
+    var scenarioLabel = SCEN_NAMES[scenario] || 'Today\u2019s gap persists';
     // M3: today's multiple on the Stay button, and the selected scenario's
     // implied growth beside the selector (nominal, today → horizon end).
     var stayMultEl = document.getElementById('fwdStayMult');
@@ -929,7 +929,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // The sensitivity grid (PR 7; R9, P1): the after-tax difference if sold,
     // bitcoin minus the house, as two assumptions move; yours outlined.
     if (window.RealEstateGrid) {
-      var SC = [['floor', 'Floor'], ['stay', 'Stay'], ['trend', 'Trend']];
+      var SC = [['floor', 'Drifts to the floor'], ['stay', 'Today\u2019s gap persists'], ['trend', 'Reverts to trend']];
       var LR = window.ModelingAssumptions ? window.ModelingAssumptions._dimensions.homeApprNominal.presetValues['long-run'] : 3.41;
       function pc(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
       var hs = [Math.max(1, horizonYrs - 5), horizonYrs, Math.min(30, horizonYrs + 5)];
@@ -949,7 +949,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           return _mode === 'real' ? d / Q.deflator : d;
         },
         mine: function(pair){ if (pair === 'hr') return [1, 1]; var k = ['floor', 'stay', 'trend'].indexOf(scenario); return k < 0 ? null : [k, 1]; },
-        note: 'Each cell: the bitcoin minus the house, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. Upper isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
+        note: 'Each cell: the bitcoin minus the house, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. <em>Peaks at 2.5&times; trend</em> isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
       });
     }
     if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {

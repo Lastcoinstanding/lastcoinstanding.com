@@ -10,7 +10,7 @@ related:
   - slug: compare-retirement-plans
     desc: "The same two-column pattern for retirement: two complete plans, one shared set of assumptions, and the difference stated."
   - slug: the-power-law
-    desc: "The growth model behind the Floor, Stay and Trend scenarios both plans run under."
+    desc: "The growth model behind the four bitcoin paths both plans run under."
 companion: []
 faq:
   - q: "Is it better to buy a house now or rent and buy later?"
@@ -100,11 +100,11 @@ eleventyComputed:
     </details>
 
     <div class="ch-scen" role="group" aria-label="Bitcoin scenario">
-        <span class="ch-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">The series&rsquo; four Power Law paths: <strong>Floor</strong>, the channel&rsquo;s lower line; <strong>Stay</strong> at today&rsquo;s multiple (the default); <strong>Trend</strong>; <strong>Upper</strong>, a stress test. The table under the cards adds two plain what-ifs.</span></span></span>
-        <button type="button" class="ch-chip" data-scenario="floor">Floor</button>
-        <button type="button" class="ch-chip on" data-scenario="stay">Stay at today&rsquo;s multiple</button>
-        <button type="button" class="ch-chip" data-scenario="trend">Trend</button>
-        <button type="button" class="ch-chip" data-scenario="upper">Upper</button>
+        <span class="ch-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">The series&rsquo; four paths from the <a href="/the-power-law">Power Law</a>, each moving bitcoin from where it sits today against the trend to a target at the end: <strong>Drifts to the floor</strong>, the model&rsquo;s lower line (0.42&times; trend); <strong>Today&rsquo;s gap persists</strong> (the default); <strong>Reverts to trend</strong>; <strong>Peaks at 2.5&times; trend</strong>, a stress test. The table under the cards adds two plain what-ifs.</span></span></span>
+        <button type="button" class="ch-chip" data-scenario="floor">Drifts to the floor</button>
+        <button type="button" class="ch-chip on" data-scenario="stay">Today&rsquo;s gap persists</button>
+        <button type="button" class="ch-chip" data-scenario="trend">Reverts to trend</button>
+        <button type="button" class="ch-chip" data-scenario="upper">Peaks at 2.5&times; trend</button>
     </div>
 
     <div class="ch-hurdle" id="chHead" aria-live="polite">
