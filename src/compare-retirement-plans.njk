@@ -38,6 +38,10 @@ eleventyComputed:
 
 <main class="content-area">
 
+  {# Retirement family strip, first in the main column (moved from the foot
+     2026-10-02; SITE_GUIDE §53.1). Carries its own scoped styles. #}
+  {% include 'components/retirement-family.njk' %}
+
   {% include 'components/tool-framing.njk' %}
 
   <!-- ════════ THE TWO PLANS (design §2, §3) ════════
@@ -270,11 +274,9 @@ eleventyComputed:
        stateful handoffs this page owns sit beneath it, keeping their ids
        for the renderer. -->
   <section class="crp-section" id="next" aria-label="Where to go next">
-    {#- No wrapper heading here. The component owns its own eyebrow and title
-        (2026-08-26); the page's former "The next question" / "Four questions,
-        in order" pair stacked a second heading on top of the strip's, saying
-        nearly the same thing twice. -#}
-    {% include 'components/retirement-family.njk' %}
+    {#- The family strip moved to the top of the page (2026-10-02); the two
+        stateful handoffs stay here, where a reader who has weighed the plans
+        lands. -#}
 
     <div class="crp-carry">
       <a class="crp-carry-link" href="/the-bitcoin-retirement-stress-test" id="crpStressLink">Stress-test the winner &rarr;</a>

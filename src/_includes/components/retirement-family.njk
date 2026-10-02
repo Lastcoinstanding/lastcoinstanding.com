@@ -42,6 +42,11 @@
 {#- Homepage variant: `{% set rfam_home = true %}` before the include. See the
     .rfam--home rules below. Only the homepage sets it. -#}
 {%- set onHome = (rfam_home == true) -%}
+{#- On a spoke the strip sits at the TOP of the page (2026-10-02, JM: the same
+    treatment as the real-estate series, so a reader knows the other three
+    questions exist before starting). `rfam--top` swaps the old foot spacing
+    for the real-estate strip's. The hub and homepage keep their own. -#}
+{%- set onSpoke = (not onHub) and (not onHome) -%}
 <style>
 /* One cohesive object containing four. The frame is deliberately LOWER
    contrast than the tool cards inside it — the cards are the things being
@@ -71,6 +76,27 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
    mobile tap target pushed it off the text (defect fixed 2026-09-21). */
 .rfam-foot a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; }
 .rfam-foot a:hover { text-decoration-color: var(--amber, #e09422); }
+/* SPOKE VARIANT (top of page, 2026-10-02, JM: "structurally consistent
+   with the real-estate family"). The .rser strip's anatomy and sizes, rule
+   for rule: an eyebrow-sized title linking to the hub, one lede ending in
+   the hub link, the four cards (arrow on the linked ones), no icon, no
+   serif title, no foot. Every rule is scoped to .rfam--top, so the hub and
+   homepage strips are untouched. */
+.rfam.rfam--top { margin: 0 auto 2rem; padding: 0.9rem 1.1rem 1rem; }
+.rfam--top .rfam-ttl { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.2rem; line-height: 1.4; }
+.rfam--top .rfam-ttl a { color: inherit; text-decoration: none; }
+.rfam--top .rfam-ttl a:hover { text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.rfam--top .rfam-lede { font-size: 0.84rem; line-height: 1.55; margin: 0 0 0.7rem; }
+.rfam--top .rfam-lede a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; white-space: nowrap; }
+.rfam--top .rfam-lede a:hover { text-decoration-color: var(--amber, #e09422); }
+/* Fixed four across, not .rser's auto-fit: the flagship's column is 912px,
+   where auto-fit wrapped the cards three plus an orphan. */
+.rfam--top .rfam-row { grid-template-columns: repeat(4, 1fr); }
+.rfam--top .rfam-item { gap: 0.2rem; padding: 0.65rem 0.8rem; }
+.rfam--top .rfam-item.is-here .rfam-step::after { content: ' · you are here'; }
+.rfam--top .rfam-q { font-size: 1.05rem; }
+.rfam--top .rfam-t { font-size: 0.74rem; }
+.rfam--top a.rfam-item .rfam-t::after { content: ' \2192'; color: var(--amber, #e09422); }
 /* HOMEPAGE VARIANT (`rfam_home`, Treatment A 2026-09-21) — the fifth-surface
    case, SITE_GUIDE §53.1. On the homepage the strip is a section, not a boxed
    object: no frame, no icon, centered header on the hero's 64rem column, a
@@ -107,6 +133,8 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
   .rfam-foot a { padding: 0.6rem 0 1rem; }
 }
 @media (max-width: 460px) { .rfam-row { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .rfam--top .rfam-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .rfam.rfam--top { padding: 0.8rem 0.9rem 0.9rem; } .rfam--top .rfam-row { grid-template-columns: 1fr; } .rfam--top .rfam-lede a { padding: 0.6rem 0; } }
 </style>
 {%- set fam = [
   { slug: 'the-bitcoin-retirement',            step: 'Build',  q: 'What does my plan look like?',       t: 'One plan in full model context.' },
@@ -114,6 +142,11 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
   { slug: 'compare-retirement-plans',          step: 'Choose', q: 'Which of my options?',               t: 'Two complete plans, side by side.' },
   { slug: 'the-bitcoin-retirement-stress-test', step: 'Stress', q: 'Does it survive bad luck?',          t: 'The plan you picked, under a crash.' }
 ] -%}
+{%- if onSpoke %}
+<nav class="rfam rfam--top" aria-labelledby="rfam-ttl">
+  <{{ rfamLevel }} class="rfam-ttl" id="rfam-ttl"><a href="/bitcoin-retirement">Plan your bitcoin retirement</a></{{ rfamLevel }}>
+  <p class="rfam-lede">One decision asked four ways: build the plan, size it, choose between options, and stress-test the one you pick. <a href="/bitcoin-retirement">All four in one place &rarr;</a></p>
+{%- else %}
 <nav class="rfam{% if onHome %} rfam--home{% endif %}" aria-label="The retirement decision funnel">
   <div class="rfam-head">
     {%- if not onHub and not onHome %}
@@ -136,6 +169,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
   {%- else %}
   <p class="rfam-lede">Retiring on a bitcoin stack is one decision asked four ways &mdash; each tool below answers one of them, and together they&rsquo;re the complete picture.</p>
   {%- endif %}
+{%- endif %}
   <div class="rfam-row">
     {%- for f in fam -%}
       {%- if f.slug == slug -%}
@@ -153,7 +187,7 @@ a.rfam-item:hover { border-color: rgba(224,148,34,0.34); background: rgba(224,14
       {%- endif -%}
     {%- endfor -%}
   </div>
-  {%- if not onHome %}
+  {%- if not onHome and not onSpoke %}
   <p class="rfam-foot">Your inputs travel between these tools &mdash; the links each page offers carry the plan you are looking at, so you rarely re-type a number.{% if not onHub %} <a href="/bitcoin-retirement">Start from the beginning &rarr;</a>{% endif %}</p>
   {%- endif %}
 </nav>
