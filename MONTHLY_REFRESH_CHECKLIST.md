@@ -71,6 +71,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | Institutional guidance citations (How Much Bitcoin?) | `how-much-bitcoin.njk` | §8 |
 | Copy-tell drift re-grep | site-wide | §8.5 |
 | Bitcoin as Collateral: the record | `bitcoin-as-collateral.njk` | §8.6 |
+| Bitcoin vs. Paying Down the Mortgage defaults: balance, rate, years left (FHFA NMDB, released at quarter end + ~3 months); the hero tooltips and FAQ quote them | `bitcoin-vs-paying-down-the-mortgage.{njk,js}` | DATA_AUDIT MPD-1 |
 | Metcalfe pinned weekly series `METCALFE_SERIES` | `bitcoin-and-metcalfes-law-data.js` | §9 |
 | The Doubling Ladder series (`DEVIATION`, `MONTHLY_HIGH`, rung crossings) and the checksum figures in its text | `the-doubling-ladder.js` / `.njk` | §9.9 |
 | Rates, fees and product terms quoted in prose (lenders, cards, mortgages, savings rates, the rental page's reference rates) *(judgement)* | several | §9.10 |

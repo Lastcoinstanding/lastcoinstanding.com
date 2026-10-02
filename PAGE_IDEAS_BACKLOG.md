@@ -821,7 +821,7 @@ _**Order and the family (JM, 2026-10-01).** Spoke three (the homeowner, below) i
     - this house vs. a cheaper one plus bitcoin.
   - **Gate:** after PR 8 of the pair (it needs the shared engine, equal cash out, the ledger and the P3 vocabulary).
   - **Open question:** a third column. Compare Retirement Plans ruled no for v1, and the `a_`/`b_` namespace extends to `c_` if one ever earns its cost.
-- [ ] **The homeowner's side: pay down the mortgage, or hold bitcoin?** Surfaced 2026-09-27 (JM).
+- [x] **The homeowner's side: pay down the mortgage, or hold bitcoin?** Surfaced 2026-09-27 (JM). **Built 2026-10-02** as `/bitcoin-vs-paying-down-the-mortgage` (SITE_GUIDE §58; `MORTGAGE_PAYDOWN_DESIGN.md`; JM's nine rulings all as recommended). Next in the series: Compare Housing Plans, high priority; then the hub, nav grouping and homepage strip at four pages.
   - **Concept:** for existing owners, the third chair beside the tenant (BvRE) and the landlord (BvRP). Should extra cash go to prepaying principal or to bitcoin? About half of outstanding US mortgages carry rates below 4% (49.9%, FHFA National Mortgage Database, Q1 2026; already cited on BvRP, DATA_AUDIT BvRP-24), so for many owners prepaying earns a low, certain return.
   - **Connections:** ties to housing research on rate lock-in (the same reader the pair is built for); reuses the pair's amortisation, tax and bitcoin-path math.
   - **Gate:** after PR 8 of the pair.

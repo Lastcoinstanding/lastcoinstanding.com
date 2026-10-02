@@ -43,11 +43,12 @@ a.rser-item .rser-t::after { content: ' \2192'; color: var(--amber, #e09422); }
 </style>
 {%- set series = [
   { slug: 'bitcoin-vs-real-estate',     step: 'The tenant',   q: 'Buy or rent?',      t: 'Bitcoin vs. Real Estate',     hash: 'calculator' },
-  { slug: 'bitcoin-vs-rental-property', step: 'The landlord', q: 'Keep the rental?',  t: 'Bitcoin vs. Rental Property', hash: 'calculator' }
+  { slug: 'bitcoin-vs-rental-property', step: 'The landlord', q: 'Keep the rental?',  t: 'Bitcoin vs. Rental Property', hash: 'calculator' },
+  { slug: 'bitcoin-vs-paying-down-the-mortgage', step: 'The homeowner', q: 'Pay it down?', t: 'Bitcoin vs. Paying Down the Mortgage', hash: 'calculator' }
 ] -%}
 <nav class="rser" aria-labelledby="rser-title">
   <{{ rserLevel }} class="rser-title" id="rser-title">Bitcoin and real estate</{{ rserLevel }}>
-  <p class="rser-lede">One decision, seen from each side of the lease. The links carry the inputs the calculators share.</p>
+  <p class="rser-lede">One housing decision, seen from three chairs: the tenant, the landlord and the homeowner. The links carry the inputs the calculators share.</p>
   <div class="rser-row">
     {%- for f in series -%}
       {%- if f.slug == slug -%}

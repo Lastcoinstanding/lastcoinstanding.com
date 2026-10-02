@@ -1,0 +1,167 @@
+---
+layout: base.njk
+permalink: /bitcoin-vs-paying-down-the-mortgage.html
+slug: bitcoin-vs-paying-down-the-mortgage
+related:
+  - slug: bitcoin-vs-real-estate
+    desc: "The tenant's side of the same decision: buy the house, or rent and hold bitcoin. The same engine, scenarios and tax treatment."
+  - slug: bitcoin-vs-rental-property
+    desc: "The landlord's side: keep the rental, or sell and move the equity. The page this one shares its mortgage arithmetic with."
+  - slug: the-bitcoin-horizon
+    desc: "The history behind the hurdle table: bitcoin's average yearly growth over every holding period, and how the spread narrows as the period lengthens."
+  - slug: the-power-law
+    desc: "The growth model behind the Floor, Stay and Trend scenarios this page projects with."
+companion: []
+faq:
+  - q: "Should I pay off my mortgage early or invest in bitcoin?"
+    a: "This page doesn't answer that for you; it shows what each choice does to the numbers. The deciding figure is a hurdle: the yearly growth bitcoin would need, after tax, for holding it to end ahead of paying the loan down. On a 4.4% mortgage over ten years it is about 5.6% a year at the page’s defaults. The page sets that against bitcoin's scenarios and its record, and names the risks on both sides: prepaying is a certain return that locks the money in the house; bitcoin is liquid but can fall more than 70%."
+  - q: "Why is the hurdle higher than my mortgage rate?"
+    a: "Two reasons. Bitcoin gains are taxed when sold, while the interest you avoid by prepaying is, for most owners, a tax-free saving; and each purchase and sale of bitcoin has a trading cost. The page includes both, and shows the hurdle before tax as well. If you itemize and deduct mortgage interest, the effective cost of the loan falls and so does the hurdle; the deduction is off by default because only about one return in ten itemizes."
+  - q: "Does paying extra on my mortgage lower my monthly payment?"
+    a: "Usually not. Extra principal shortens the loan, but the required payment stays the same until the loan is paid off, unless the lender recasts it. So prepaid money doesn't help in a month when cash is short; getting it back means a home-equity loan or selling the house. The page counts this as a risk of paying down, alongside bitcoin's own."
+  - q: "What happens after the mortgage is paid off on the page?"
+    a: "The household that paid the loan down then puts its whole freed payment, the old payment plus the extra, into bitcoin each month, so both households spend the same every month for the whole horizon. The question the page answers is order: the loan first and bitcoin later, or bitcoin now and the loan on schedule."
+  - q: "Where do the default numbers come from?"
+    a: "The Federal Housing Finance Agency's National Mortgage Database for the second quarter of 2026: about 51.4 million outstanding mortgages, an average balance near $241,000, an average rate of 4.4%, and an average age of 80 months, so about 23 years left on a 30-year loan. The $500 a month of extra cash is a round, stated choice. Change any of them."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage.js' %}"
+---
+{#
+  Bitcoin vs. Paying Down the Mortgage — the homeowner, step three of the
+  real-estate series (tenant · landlord · homeowner). Design and JM's rulings:
+  MORTGAGE_PAYDOWN_DESIGN.md (repo) / claude/MORTGAGE_PAYDOWN_DESIGN_2026-10-01
+  (project). Engine: RealEstateModel.paydownProjection / paydownHurdle /
+  hurdleHistory in shared/real-estate-model.js. SITE_GUIDE §58.
+  Without JS the page keeps its argument, the risks, the method and the
+  FAQ; the calculator's numbers need the script.
+#}
+<section class="hero">
+    <h1>Bitcoin vs. <em>Paying Down the Mortgage</em></h1>
+    <div class="hero-subtitle">The homeowner&rsquo;s question: a mortgage at a fixed rate and some spare cash each month. Pay the loan off faster, or hold bitcoin?</div>
+    <p class="subtitle">The page doesn&rsquo;t choose for you. It shows what each path does to the numbers under stated assumptions, the yearly growth bitcoin would need for holding to come out ahead, how often bitcoin has managed it, and the risks on both sides.</p>
+</section>
+
+<main class="content-area">
+
+{% include 'components/real-estate-series.njk' %}
+
+{% include 'components/tool-framing.njk' %}
+
+<section class="mp-calc" id="calculator" aria-labelledby="mpCalcTitle">
+    <h2 class="mp-h2" id="mpCalcTitle">Your mortgage and your spare cash</h2>
+    <p class="mp-lede">Two households, the same house and the same loan, spending the same cash every month. One puts the extra on the mortgage and, once the loan is gone, its whole freed payment into bitcoin. The other buys bitcoin with the extra from the start and pays the loan on schedule. The house is worth the same either way, so what differs at the end is the loan still owed and the bitcoin held.</p>
+
+    <div class="mp-inputs">
+        <label class="mp-field"><span class="k">Loan balance<span class="help-tip" tabindex="0">?<span class="tip-content">What you still owe on the mortgage today. Default: about the average US outstanding balance, $241,000 (FHFA, Q2 2026).</span></span></span>
+            <span class="mp-in mp-in-usd"><input id="mpBal" type="text" inputmode="numeric" value="240,000" aria-label="Loan balance, dollars"></span></label>
+        <label class="mp-field"><span class="k">Mortgage rate<span class="help-tip" tabindex="0">?<span class="tip-content">Your loan&rsquo;s fixed interest rate. Default: the average rate on outstanding US mortgages, 4.4% (FHFA, Q2 2026). About half carry less than 4%.</span></span></span>
+            <span class="mp-in mp-in-pct"><input id="mpRate" type="text" inputmode="decimal" value="4.4" aria-label="Mortgage rate, percent a year"></span></label>
+        <label class="mp-field"><span class="k">Years left on the loan<span class="help-tip" tabindex="0">?<span class="tip-content">Default: 23, a 30-year loan at the average age of outstanding mortgages, 80 months (FHFA, Q2 2026).</span></span></span>
+            <span class="mp-in"><input id="mpYears" type="text" inputmode="numeric" value="23" aria-label="Years left on the loan"></span></label>
+        <label class="mp-field"><span class="k">Extra cash each month<span class="help-tip" tabindex="0">?<span class="tip-content">The spare cash in question: on top of your normal payment, it goes either to principal or into bitcoin. $500 is a round default, not a sourced figure.</span></span></span>
+            <span class="mp-in mp-in-usd"><input id="mpExtra" type="text" inputmode="numeric" value="500" aria-label="Extra cash each month, dollars"></span></label>
+        <label class="mp-field"><span class="k">Lump sum now <span class="opt">optional</span><span class="help-tip" tabindex="0">?<span class="tip-content">A sum you have today, such as a bonus or savings above your emergency fund. One household puts it on the loan; the other buys bitcoin with it.</span></span></span>
+            <span class="mp-in mp-in-usd"><input id="mpLump" type="text" inputmode="numeric" value="0" aria-label="Lump sum now, dollars"></span></label>
+        <label class="mp-field"><span class="k">Years to compare<span class="help-tip" tabindex="0">?<span class="tip-content">How far ahead both households are followed, 1 to 30 years. The hurdle and the history table follow it.</span></span></span>
+            <span class="mp-in"><input id="mpHorizon" type="text" inputmode="numeric" value="10" aria-label="Years to compare"></span></label>
+    </div>
+
+    <details class="mp-assume" id="mpAssume">
+        <summary><span>Tax, costs and how the dollars are shown</span> <span class="mp-assume-hint" id="mpAssumeHint"></span></summary>
+        <div class="mp-assume-body">
+            <label class="mp-field"><span class="k">Federal bracket</span>
+                <select id="mpBracket" aria-label="Federal tax bracket"><option value="12">12%</option><option value="22">22%</option><option value="24" selected>24%</option><option value="32">32%</option><option value="35">35%</option><option value="37">37%</option></select></label>
+            <label class="mp-field"><span class="k">State</span>
+                <select id="mpState" aria-label="State for tax"><option value="OTHER" selected>Typical (about 5%)</option><option value="TX">No income tax (TX, FL, NV, WA, TN, NH, AK, WY, SD)</option><option value="CA">California (13.3%)</option><option value="NY">New York (10.9%)</option><option value="NJ">New Jersey (10.75%)</option><option value="MA">Massachusetts (5%)</option><option value="IL">Illinois (4.95%)</option><option value="PA">Pennsylvania (3.07%)</option></select></label>
+            <label class="mp-field"><span class="k">Tax on bitcoin gains</span>
+                <select id="mpTax" aria-label="Tax on bitcoin gains"><option value="us" selected>US long-term rates</option><option value="none">No capital-gains tax</option></select></label>
+            <label class="mp-field"><span class="k">Where the bitcoin is held</span>
+                <select id="mpAcct" aria-label="Account type"><option value="taxable" selected>Taxable account</option><option value="advantaged">Tax-advantaged (no tax on sale)</option></select></label>
+            <label class="mp-field mp-check"><input id="mpDed" type="checkbox"> <span>I itemize and deduct mortgage interest<span class="help-tip help-tip-right" tabindex="0">?<span class="tip-content">Off by default: only about one return in ten itemizes since the 2017 tax law (9.2% in 2021, IRS data via the Congressional Research Service). If you do, each month&rsquo;s interest saves tax at your bracket plus your state&rsquo;s rate (on up to $750,000 of loan), and both households invest that saving in bitcoin. It lowers the hurdle.</span></span></span></label>
+            <label class="mp-field"><span class="k">Bitcoin trading cost</span>
+                <span class="mp-in mp-in-pct"><input id="mpTx" type="text" inputmode="decimal" value="0.5" aria-label="Bitcoin trading cost, percent of each purchase or sale"></span></label>
+            <div class="mp-field"><span class="k">Dollars shown</span>
+                <div class="re-seg" role="group" aria-label="Dollars shown"><button type="button" class="re-seg-btn active" data-display="real" aria-pressed="true">Today&rsquo;s dollars</button><button type="button" class="re-seg-btn" data-display="nominal" aria-pressed="false">Future dollars</button></div>
+                <span class="mp-small" id="mpDeflLine"></span></div>
+        </div>
+    </details>
+
+    <div class="mp-hurdle" id="mpHurdle" aria-live="polite">
+        <div class="mp-hurdle-k">The hurdle</div>
+        <div class="mp-hurdle-v" id="mpHurdleV">&hellip;</div>
+        <p class="mp-hurdle-s" id="mpHurdleS">The calculator needs JavaScript.</p>
+    </div>
+
+    <div class="mp-scen" role="group" aria-label="Bitcoin scenario">
+        <span class="mp-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">The same four scenarios as the other real-estate pages, from the Power Law: <strong>Floor</strong> falls to the channel&rsquo;s lower bound; <strong>Stay</strong> keeps today&rsquo;s position against the trend (the default, no reversion either way); <strong>Trend</strong> closes the gap to the trend line; <strong>Upper</strong> is a stress test at 2.5&times; the trend. Each is a path, not a promise.</span></span></span>
+        <button type="button" class="mp-chip" data-scenario="floor">Floor</button>
+        <button type="button" class="mp-chip on" data-scenario="stay">Stay at today&rsquo;s multiple</button>
+        <button type="button" class="mp-chip" data-scenario="trend">Trend</button>
+        <button type="button" class="mp-chip" data-scenario="upper">Upper</button>
+    </div>
+
+    <div class="mp-cards" id="mpCards"></div>
+    <p class="mp-diff" id="mpDiff"></p>
+
+    <div class="mp-table-wrap"><table class="mp-table" id="mpScenTable" aria-label="Each scenario against the hurdle"></table></div>
+
+    <div class="re-chart-block" id="mpChartBlock">
+        <div class="re-chart-head">
+            <div class="re-chart-title">The two households over time <span class="re-chart-frame" id="mpChartFrame"></span></div>
+            <div class="re-seg" role="group" aria-label="What the lines value"><button type="button" class="re-seg-btn active" data-basis="ifsold" aria-pressed="true">If sold, after tax</button><button type="button" class="re-seg-btn" data-basis="held" aria-pressed="false">Held</button></div>
+        </div>
+        <div class="re-chart-wrap"><canvas id="mpChart"></canvas></div>
+        <p class="re-chart-note">Each line is a household&rsquo;s bitcoin less the loan it still owes, valued each year. <em>If sold, after tax</em> sells the bitcoin that year, less its trading cost and the tax on its gain; <em>Held</em> is before any sale. The heaviest, light line is the <strong>difference</strong>, holding minus paying down: above zero, holding is ahead. The house is left out because it is the same in both.</p>
+    </div>
+    <div id="mpGrid"></div>
+    <div id="mpLedger"></div>
+</section>
+
+<section class="mp-prose" id="history" aria-labelledby="mpHistTitle">
+    <h2 class="mp-h2" id="mpHistTitle">The hurdle against bitcoin&rsquo;s record</h2>
+    <p>The scenarios above are paths a model draws. The record is what bitcoin did. Across every stretch between two month-end closes since January 2011, how often did bitcoin&rsquo;s average yearly growth clear <strong id="mpHistRate">the hurdle</strong>?</p>
+    <div class="mp-table-wrap"><table class="mp-table" id="mpHistTable" aria-label="How often bitcoin cleared the hurdle"></table></div>
+    <p class="mp-small">Hypothetical history, not a forecast and not a performance record. The stretches overlap, so they are not independent tries; they all come from one asset&rsquo;s first fifteen years, which include its adoption from almost nothing; and a long-period record that has never failed is a short record, not a guarantee. Month-end closes from the site&rsquo;s own series, <span id="mpHistSpan">2011 to the latest month</span>. Shorter stretches failed often, and the worst year in the record fell <span id="mpHistWorst1">about 74%</span>.</p>
+</section>
+
+<section class="mp-prose" id="risks" aria-labelledby="mpRiskTitle">
+    <h2 class="mp-h2" id="mpRiskTitle">The risks, on both sides</h2>
+    <div class="mp-risks">
+        <div class="mp-risk">
+            <h3>Paying it down</h3>
+            <ul>
+                <li><strong>It doesn&rsquo;t lower the payment you owe.</strong> Extra principal shortens the loan, but the monthly bill stays the same until the loan is gone, unless the lender recasts it. In a month when cash is short, prepaid money doesn&rsquo;t help.</li>
+                <li><strong>The money is locked in the house.</strong> Getting it back means a home-equity loan, at about 7.3% today (Bankrate&rsquo;s average, September 2026), or selling.</li>
+                <li><strong>Inflation works for the borrower.</strong> A fixed-rate loan shrinks in real terms every year. Paying it off early gives that up; the <em>today&rsquo;s dollars</em> view shows the effect.</li>
+                <li><strong>It is the certain return.</strong> Every dollar of principal earns exactly the mortgage rate, with no drawdowns and, for most owners, no tax. That is the case for it.</li>
+            </ul>
+        </div>
+        <div class="mp-risk">
+            <h3>Holding bitcoin</h3>
+            <ul>
+                <li><strong>It can fall a long way.</strong> Between month-end closes bitcoin has fallen 73% or more four times: 83% in 2011, 81% in 2013&ndash;15, 76% in 2017&ndash;19 and 73% in 2021&ndash;22. The lows within those months were deeper. The <em>Floor</em> scenario shows a sustained low path.</li>
+                <li><strong>A forced sale at the bottom.</strong> If you need cash during a fall, you sell at a loss. Holding works only if you can wait.</li>
+                <li><strong>Behaviour.</strong> Holding through a deep fall is harder than a model makes it look.</li>
+                <li><strong>Tax.</strong> Gains are taxed when sold; the interest saved by prepaying is, for most owners, a tax-free return. The hurdle already includes this.</li>
+            </ul>
+        </div>
+    </div>
+    <p class="mp-before"><strong>Before either.</strong> As general education, not advice: the usual order is an emergency fund first, then any high-interest debt and any employer retirement match, and only then this choice.</p>
+</section>
+
+<section class="mp-prose" id="method" aria-labelledby="mpMethodTitle">
+    <h2 class="mp-h2" id="mpMethodTitle">How the page computes</h2>
+    <ul class="mp-method">
+        <li><strong>Month by month.</strong> Both households pay the same: the loan&rsquo;s scheduled payment plus the extra. One sends all of it to the loan until the loan is gone, then all of it to bitcoin; the other sends the scheduled payment to the loan and the extra to bitcoin, and the whole payment to bitcoin once its loan ends. A lump sum goes to the loan or to bitcoin on day one.</li>
+        <li><strong>Bitcoin&rsquo;s price</strong> follows the chosen scenario from today&rsquo;s price, the same paths as <a href="/bitcoin-vs-real-estate">Bitcoin vs. Real Estate</a> and <a href="/bitcoin-vs-rental-property">Bitcoin vs. Rental Property</a>. Each purchase pays the trading cost, and so does a sale.</li>
+        <li><strong>The hurdle</strong> is found by search: the steady yearly growth at which the two households end level, after the tax on a sale at the end (and, beside it, before tax).</li>
+        <li><strong>Tax</strong> is on the gain over what was paid, at your federal long-term rate, your state&rsquo;s rate and the 3.8% net investment income tax where the bracket brings it in. With the deduction on, the interest&rsquo;s tax saving is invested in bitcoin by both households.</li>
+        <li><strong>Today&rsquo;s dollars</strong> divide every figure by inflation compounded to that year, at the site&rsquo;s inflation setting (the same one every calculator uses).</li>
+        <li><strong>Not modelled:</strong> a recast or refinance, private mortgage insurance, escrow for property tax and insurance (the same in both households), a home-equity loan, and lending the bitcoin out. The house&rsquo;s value is the same in both households and is left out.</li>
+        <li><strong>Defaults</strong> come from the Federal Housing Finance Agency&rsquo;s National Mortgage Database, second quarter of 2026 (released 30 September 2026): the average outstanding balance, the average rate and the average age of a loan.</li>
+    </ul>
+</section>
+
+</main>

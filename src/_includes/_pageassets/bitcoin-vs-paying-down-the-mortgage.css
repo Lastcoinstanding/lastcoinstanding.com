@@ -1,0 +1,149 @@
+/* ───────────────────────────────────────────────
+   BITCOIN VS. PAYING DOWN THE MORTGAGE — PAGE CSS
+   The homeowner, step three of the real-estate series. Mixed-content tier
+   (STYLE_GUIDE §4.2): 1100px content-area, 880px prose. Hero and tokens
+   follow the lenders page; the chart, grid and ledger use the series'
+   shared styles (shared/real-estate-ledger.css). Colour tokens only; no
+   hex outside :root.
+   ─────────────────────────────────────────────── */
+:root {
+    --bg: #0a0908;
+    --bg-card: #111110;
+    --amber: #e09422;
+    --amber-dim: #b8791c;
+    --amber-glow: rgba(224,148,34,0.15);
+    --amber-soft: rgba(224,148,34,0.08);
+    --text: #e8e0d4;
+    --text-dim: #9a9080;
+    --text-muted: #6a6256;
+    --text-bright: #f2eee8;
+    --red: #d0665a;
+    --green: #5fa872;
+    --btc: #e8801c;
+    --btc-soft: rgba(232,128,28,0.10);
+    --loan: #3987e5;
+    --loan-soft: rgba(57,135,229,0.10);
+    --border: #1e1c1a;
+    --border-lt: #2a2826;
+    --font-d: 'Cormorant Garamond', Georgia, serif;
+    --font-b: 'Inter', -apple-system, sans-serif;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-b); -webkit-font-smoothing: antialiased; }
+
+/* Hero + content */
+.content-area { position: relative; max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+.hero { position: relative; text-align: center; max-width: 840px; margin: 0 auto; padding: 5rem 2rem 2.5rem; }
+.hero h1 { font-family: var(--font-d); font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 500; color: var(--text); line-height: 1.05; letter-spacing: -0.015em; margin: 0 0 0.6rem; }
+.hero h1 em { font-style: italic; color: var(--amber); font-weight: 500; }
+.hero-subtitle { font-family: var(--font-d); font-size: clamp(1.1rem, 2vw, 1.35rem); color: var(--text-dim); margin: 0 auto 1.4rem; max-width: 720px; line-height: 1.5; }
+.hero .subtitle { font-size: clamp(0.98rem, 1.8vw, 1.08rem); line-height: 1.7; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+.mp-h2 { font-family: var(--font-d); font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 500; color: var(--text-bright); margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+.mp-lede { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; max-width: 880px; margin: 0 0 1.4rem; }
+.mp-small { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+/* The calculator */
+.mp-calc { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.8rem 1.8rem 1.4rem; margin: 2rem 0 3rem; }
+.mp-inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.2rem; margin: 0 0 1rem; }
+.mp-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.mp-field .k { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: inline-flex; align-items: center; }
+.mp-field .opt { text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 0.3rem; }
+.mp-in { position: relative; display: block; }
+.mp-in input, .mp-field select { width: 100%; box-sizing: border-box; font-family: var(--font-b); font-size: 1rem; color: var(--text-bright); background: var(--bg); border: 1px solid var(--border-lt); border-radius: 6px; padding: 0.55rem 0.7rem; font-variant-numeric: tabular-nums; }
+.mp-field select { font-size: 0.88rem; }
+.mp-in input:focus, .mp-field select:focus { outline: none; border-color: var(--amber); }
+.mp-in-usd input { padding-left: 1.4rem; }
+.mp-in-usd::before { content: '$'; position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.95rem; pointer-events: none; }
+.mp-in-pct input { padding-right: 1.6rem; }
+.mp-in-pct::after { content: '%'; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.95rem; pointer-events: none; }
+.mp-check { flex-direction: row; align-items: center; gap: 0.5rem; font-size: 0.86rem; color: var(--text); grid-column: span 2; }
+.mp-check input { accent-color: var(--amber); width: 1rem; height: 1rem; }
+
+.mp-assume { border: 1px solid var(--border); border-radius: 8px; margin: 0 0 1.4rem; }
+.mp-assume summary { cursor: pointer; padding: 0.7rem 0.9rem; font-size: 0.82rem; color: var(--amber); font-weight: 600; list-style: none; display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; align-items: baseline; }
+.mp-assume summary::-webkit-details-marker { display: none; }
+.mp-assume summary::before { content: '\203A'; display: inline-block; transition: transform 0.15s; margin-right: 0.2rem; }
+.mp-assume[open] summary::before { transform: rotate(90deg); }
+.mp-assume-hint { font-weight: 400; color: var(--text-muted); font-size: 0.78rem; }
+.mp-assume-body { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.2rem; padding: 0.4rem 0.9rem 1rem; }
+
+/* The hurdle */
+.mp-hurdle { border: 1px solid var(--amber-glow); background: var(--amber-soft); border-radius: 10px; padding: 1.2rem 1.4rem; margin: 0 0 1.2rem; }
+.mp-hurdle-k { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+.mp-hurdle-v { font-family: var(--font-d); font-size: clamp(1.5rem, 3.2vw, 2.2rem); color: var(--text-bright); line-height: 1.25; margin: 0.25rem 0 0.4rem; }
+.mp-hurdle-v strong { color: var(--amber); font-weight: 600; }
+.mp-hurdle-s { margin: 0; font-size: 0.86rem; color: var(--text-dim); line-height: 1.6; }
+.mp-hurdle-s strong { color: var(--text); }
+
+/* Scenario chips */
+.mp-scen { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin: 0 0 1rem; }
+.mp-scen-k { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-right: 0.3rem; display: inline-flex; align-items: center; }
+.mp-chip { font-family: var(--font-b); font-size: 0.78rem; font-weight: 600; color: var(--text-dim); background: transparent; border: 1px solid var(--border-lt); border-radius: 999px; padding: 0.4rem 0.85rem; cursor: pointer; }
+.mp-chip:hover { color: var(--text); border-color: var(--amber-dim); }
+.mp-chip.on { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); }
+
+/* The two households */
+.mp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.mp-card { border: 1px solid var(--border-lt); border-radius: 10px; padding: 1.1rem 1.2rem; background: var(--bg); }
+.mp-card.pay { border-top: 3px solid var(--loan); }
+.mp-card.hold { border-top: 3px solid var(--btc); }
+.mp-card h3 { font-family: var(--font-d); font-size: 1.35rem; font-weight: 500; color: var(--text-bright); margin: 0 0 0.15rem; }
+.mp-card .sub { font-size: 0.8rem; color: var(--text-dim); margin: 0 0 0.8rem; line-height: 1.5; }
+.mp-card .big { font-family: var(--font-d); font-size: 2rem; color: var(--text-bright); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.mp-card .big-k { font-size: 0.74rem; color: var(--text-muted); margin: 0.1rem 0 0.7rem; }
+.mp-card dl { display: grid; grid-template-columns: auto auto; gap: 0.25rem 1rem; margin: 0; font-size: 0.84rem; }
+.mp-card dt { color: var(--text-dim); }
+.mp-card dd { margin: 0; text-align: right; color: var(--text); font-variant-numeric: tabular-nums; }
+.mp-card dd.neg { color: var(--red); }
+.mp-diff { font-size: 0.98rem; line-height: 1.65; color: var(--text); margin: 1rem 0 1.2rem; }
+.mp-diff strong { color: var(--text-bright); }
+.mp-diff .ahead-hold { color: var(--btc); }
+.mp-diff .ahead-pay { color: var(--loan); }
+
+/* Tables */
+.mp-table-wrap { overflow-x: auto; margin: 0 0 1rem; }
+.mp-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
+.mp-table th, .mp-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+.mp-table th:first-child, .mp-table td:first-child { text-align: left; white-space: normal; }
+.mp-table thead th { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+.mp-table tr.mine td { background: var(--amber-soft); }
+.mp-table td.pos { color: var(--btc); }
+.mp-table td.neg { color: var(--loan); }
+.mp-table caption { caption-side: bottom; text-align: left; font-size: 0.76rem; color: var(--text-muted); padding-top: 0.5rem; }
+
+/* Prose */
+.mp-prose { max-width: 880px; margin: 0 auto 3rem; }
+.mp-prose p, .mp-prose li { font-size: 0.97rem; line-height: 1.75; color: var(--text); }
+.mp-prose a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+.mp-risks { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.mp-risk { border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+.mp-risk h3 { font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--text-bright); margin: 0 0 0.4rem; }
+.mp-risk ul { margin: 0; padding-left: 1.1rem; }
+.mp-risk li { font-size: 0.9rem; line-height: 1.6; margin: 0 0 0.55rem; }
+.mp-before { border-left: 2px solid var(--amber); padding-left: 0.9rem; margin-top: 1.2rem; color: var(--text-dim); }
+.mp-method { padding-left: 1.1rem; }
+.mp-method li { margin-bottom: 0.5rem; }
+
+/* Help-tip (canonical §6.13; same markup and tokens as the lenders page) */
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--text-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
+.help-tip:hover, .help-tip:focus { color: var(--amber); border-color: var(--amber); outline: none; }
+.help-tip .tip-content { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: min(260px, calc(100vw - 32px)); padding: 0.85rem 1rem; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; line-height: 1.5; color: var(--text); background: var(--bg-card); border: 1px solid var(--amber-glow); border-radius: 5px; box-shadow: 0 4px 18px rgba(0,0,0,0.55); z-index: 50; text-align: left; letter-spacing: 0; text-transform: none; white-space: normal; }
+.help-tip .tip-content strong { color: var(--text-bright); font-weight: 600; }
+.help-tip:hover .tip-content, .help-tip:focus .tip-content, .help-tip:focus-within .tip-content { display: block; }
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+
+@media (max-width: 860px) {
+    .mp-inputs, .mp-assume-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mp-risks { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .content-area { padding: 0 1rem 4rem; }
+    .hero { padding: 3.5rem 1rem 2rem; }
+    .mp-calc { padding: 1.2rem 1rem 1rem; }
+    .mp-cards { grid-template-columns: 1fr; }
+    .mp-check { grid-column: span 2; }
+}
+@media (max-width: 420px) {
+    .mp-inputs, .mp-assume-body { grid-template-columns: 1fr; }
+    .mp-check { grid-column: span 1; }
+}
