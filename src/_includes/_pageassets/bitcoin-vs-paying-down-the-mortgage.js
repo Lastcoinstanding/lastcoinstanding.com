@@ -154,12 +154,12 @@
         : 'Buys ' + usd(v.extra) + ' of bitcoin a month' + (v.lump > 0 ? ' and ' + usd(v.lump) + ' today' : '') + ', and pays the ' + usd(P) + ' loan payment on schedule' +
           (payoff !== null ? ' until it ends in ' + payoffDate(payoff) + ', then all of it into bitcoin.' : '.');
       return '<div class="mp-card ' + kind + '"><h3>' + (pay ? 'Pay it down' : 'Hold bitcoin') + '</h3><p class="sub">' + sub + '</p>' +
-        '<div class="big">' + usd(h.ifSold / D) + '</div><div class="big-k">bitcoin less the loan, if the bitcoin is sold after ' + H + (H === 1 ? ' year' : ' years') + ', after tax</div>' +
+        '<div class="big">' + usd(h.ifSold / D) + '</div><div class="big-k">what is left after ' + H + (H === 1 ? ' year' : ' years') + ' if the bitcoin is sold, after tax, and the rest of the loan is paid off' + (h.ifSold < 0 ? ' (below zero: the bitcoin wouldn’t cover the loan)' : '') + '</div>' +
         '<dl><dt>Loan still owed</dt><dd' + (h.balance > 0.5 ? ' class="neg"' : '') + '>' + (h.balance > 0.5 ? '−' + usd(h.balance / D) : 'paid off') + '</dd>' +
         '<dt>Bitcoin, value</dt><dd>' + usd(h.btcValue / D) + '</dd>' +
-        '<dt>Paid for that bitcoin</dt><dd>' + usd(h.basis / D) + '</dd>' +
+        '<dt>Paid for that bitcoin <span class="sumnote">sum, dollars of each year</span></dt><dd>' + usd(h.basis) + '</dd>' +
         '<dt>Tax and cost on a sale</dt><dd' + (h.tax > 0.5 ? ' class="neg"' : '') + '>' + (h.tax + h.btcValue * v.btctx / 100 > 0.5 ? '−' + usd((h.tax + h.btcValue * v.btctx / 100) / D) : '$0') + '</dd>' +
-        '<dt>Interest paid on the loan</dt><dd>' + usd(h.interest / D) + '</dd></dl></div>';
+        '<dt>Interest paid on the loan <span class="sumnote">sum, dollars of each year</span></dt><dd>' + usd(h.interest) + '</dd></dl></div>';
     }
     $('mpCards').innerHTML = card('pay', e.pay, ap) + card('hold', e.hold, ah);
     var d = R.diffIfSold / D, mult = M.effectiveCAGR(st.scenario, H);
@@ -196,17 +196,19 @@
 
     // The grid
     if (window.RealEstateGrid && hasExtra) {
-      var rates = [3, 4.5, 6, 7], hors = [5, 10, 20], extras = [250, 500, 1000];
-      var gridScen = ['floor', 'stay', 'trend'];
+      var rates = [3, 5, 7].concat([v.mrate]).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort(function (a, b) { return a - b; });
+      var hors = [5, 10, 20].concat([H]).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort(function (a, b) { return a - b; });
+      var gridScen = ['flat', 'floor', 'stay', 'trend'];
+      var gName = function (s) { return s === 'flat' ? 'Goes nowhere' : SC_NAME[s].replace(' at today’s multiple', ''); };
       window.RealEstateGrid.render($('mpGrid'), {
         axes: [
-          { id: 'rate', label: 'Scenario × mortgage rate', rows: { label: 'Scenario', items: gridScen.map(function (s) { return { label: SC_NAME[s].replace(' at today’s multiple', ''), v: s }; }) },
+          { id: 'rate', label: 'Scenario × mortgage rate', rows: { label: 'Scenario', items: gridScen.map(function (s) { return { label: gName(s), v: s }; }) },
             cols: { label: 'Rate', items: rates.map(function (r) { return { label: r + '%', v: r }; }) } },
-          { id: 'horizon', label: 'Scenario × years', rows: { label: 'Scenario', items: gridScen.map(function (s) { return { label: SC_NAME[s].replace(' at today’s multiple', ''), v: s }; }) },
+          { id: 'horizon', label: 'Scenario × years', rows: { label: 'Scenario', items: gridScen.map(function (s) { return { label: gName(s), v: s }; }) },
             cols: { label: 'Years', items: hors.map(function (h) { return { label: h + ' yrs', v: h }; }) } }
         ],
         cell: function (pair, rowV, colV) {
-          var over = { scenario: rowV };
+          var over = rowV === 'flat' ? { growth: 0 } : { scenario: rowV };
           if (pair === 'rate') over.ratePct = colV; else over.horizon = colV;
           var hh = pair === 'horizon' ? colV : H;
           return M.paydownProjection(input(v, over)).diffIfSold / defl(hh);
@@ -218,7 +220,7 @@
         },
         ahead: ['Holding ahead', 'Paying down ahead'],
         frame: '(holding minus paying down, if sold, after tax' + (st.display === 'real' ? ', today’s dollars' : '') + ')',
-        note: 'Every cell is the whole calculation rerun with one or two inputs changed and the rest as you set them. Orange: holding bitcoin ends ahead; blue: paying down does. The outlined cell is yours, when your inputs sit on the grid.'
+        note: 'Every cell is the whole calculation rerun with one or two inputs changed and the rest as you set them. <em>Goes nowhere</em> holds bitcoin’s price flat; the other rows are Power Law paths. Orange: holding bitcoin ends ahead; blue: paying down does. The outlined cell is yours.'
       });
     } else if ($('mpGrid')) $('mpGrid').innerHTML = '';
 
@@ -229,7 +231,8 @@
         { label: 'Loan still owed', unit: '$', get: function (r) { return r[k].balance / defl(r.year); }, fmt: 'usd' },
         { label: 'Bitcoin held', unit: '₿', get: function (r) { return r[k].units; }, fmt: 'btc' },
         { label: 'Bitcoin, value', unit: '$', get: function (r) { return r[k].btcValue / defl(r.year); }, fmt: 'usd' },
-        { label: 'Paid for it', unit: '$', get: function (r) { return r[k].basis / defl(r.year); }, fmt: 'usd' },
+        { label: 'Paid for it (sum, dollars of each year)', unit: '$', get: function (r) { return r[k].basis; }, fmt: 'usd' },
+        { label: 'Interest paid (sum, dollars of each year)', unit: '$', get: function (r) { return r[k].interest; }, fmt: 'usd' },
         { label: 'If sold, after tax, less the loan', unit: '$', get: function (r) { return r[k].ifSold / defl(r.year); }, fmt: 'usd' }
       ]; };
       window.RealEstateLedger.render($('mpLedger'), {
