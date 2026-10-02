@@ -809,6 +809,8 @@ _Opened 2026-09-27 (JM). The pair above plus the pages that extend it, each answ
 
 _**Order and the family (JM, 2026-10-01).** Spoke three (the homeowner, below) is next; **Compare Housing Plans is high priority immediately after it.** At four spokes the series gets the retirement treatment: a family hub page, the pages grouped together in the nav, and a homepage family strip like the retirement one (JM wants real estate vs. bitcoin called out as a section on the homepage). Bitcoin-Backed Mortgages is **not** counted as a spoke to reach four sooner (proposed and declined: wait for the four pages); it stays a neighbour, linked from the hub._
 
+_**Hub shipped 2026-10-02** (`SITE_GUIDE §60`): `/bitcoin-and-real-estate`, the Real Estate nav group, and the homepage section._
+
 - [x] **Compare Housing Plans: two independently configured housing plans, side by side.** Surfaced 2026-09-27 (JM). **Built 2026-10-02** as `/compare-housing-plans` (SITE_GUIDE §59): `housingCompare`, parity with bvreProjection to the cent; a_/b_ URL names; no third column. The series now has four pages: the hub, nav grouping and homepage strip are next.
   - **Pattern:** Compare Retirement Plans (`COMPARE_RETIREMENT_PLANS_DESIGN.md`; `SITE_GUIDE §52`), applied to housing:
     - **namespaced `a_` / `b_` URL names from the first commit**, since retrofitting breaks every shared link (`COMPARE_RETIREMENT_PLANS_DESIGN.md:109`);

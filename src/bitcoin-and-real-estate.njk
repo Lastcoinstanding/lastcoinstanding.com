@@ -1,0 +1,119 @@
+---
+layout: base.njk
+permalink: /bitcoin-and-real-estate.html
+slug: bitcoin-and-real-estate
+related:
+  - slug: bitcoin-vs-real-estate
+    desc: "The tenant's chair, and the first page in the series: buy the house, or rent and hold bitcoin. Looking back from any start year, or projecting forward under stated assumptions."
+  - slug: bitcoin-vs-rental-property
+    desc: "The landlord's chair: keep the rental, or sell it and hold bitcoin. The yield once landlord costs and the tax on selling are counted."
+  - slug: bitcoin-vs-paying-down-the-mortgage
+    desc: "The homeowner's chair: spare cash each month, onto the mortgage or into bitcoin? The yearly growth bitcoin needs to come out ahead, and how often it has."
+  - slug: compare-housing-plans
+    desc: "Two plans side by side: buy now or later, 20% down or 10%, this house or a cheaper one, with whatever one plan saves going into bitcoin."
+  - slug: bitcoin-backed-mortgages
+    desc: "A neighbour, not one of the four: buy the house with bitcoin pledged as collateral instead of selling it, and what each kind of lender asks in return."
+faq:
+  - q: "Where should I start?"
+    a: "With the chair you are sitting in. If you rent and are weighing a purchase, start with <a href='/bitcoin-vs-real-estate'>Bitcoin vs. Real Estate</a>. If you own a rental, <a href='/bitcoin-vs-rental-property'>Bitcoin vs. Rental Property</a>. If you own your home and have a mortgage, <a href='/bitcoin-vs-paying-down-the-mortgage'>Bitcoin vs. Paying Down the Mortgage</a>. If you already know you will buy and the question is how, <a href='/compare-housing-plans'>Compare Housing Plans</a>."
+  - q: "Do I have to re-enter my numbers on each page?"
+    a: "Not the ones the pages share. The links between the four calculators carry the horizon, how fast house prices grow, the selling costs, bitcoin's scenario, the tax settings and whether figures show in today's dollars, so the next page opens on the assumptions you just set. Inputs that belong to one page only, such as a rent or a loan balance, stay on that page. Each page also writes its state into the address bar, so a link you save or send comes back to the same numbers."
+  - q: "Do these pages say bitcoin beats a house?"
+    a: "No. They put numbers on a trade-off people usually make on instinct, and they show the cases where the house wins: bitcoin at the model's floor, bitcoin going nowhere, bitcoin halving. A home is also shelter, and paying off a mortgage is a sure return; the pages count both. Bitcoin's growth is a projection under the Power Law model, a description of its history and not a forecast."
+  - q: "Why isn't Bitcoin-Backed Mortgages one of the four?"
+    a: "Because it answers a different kind of question. The four pages compare holding bitcoin against putting the same money into a home. Bitcoin-Backed Mortgages is about borrowing against bitcoin you already hold in order to buy, which is a lending decision with its own risks (liquidation, the lender, rehypothecation). It is linked from here as a neighbour, along with the lender comparison."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-and-real-estate-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-and-real-estate.css' %}"
+---
+
+<section class="hero">
+  <h1><em>Bitcoin</em> and Real Estate</h1>
+  <div class="hero-subtitle">One housing decision, seen from each chair.</div>
+  <p class="subtitle">Four calculators, each answering the question one person actually has: the renter thinking of buying, the landlord, the homeowner with a mortgage, and the buyer choosing between two ways in. They share one engine and one set of housing costs, and your assumptions travel between them.</p>
+</section>
+
+<main class="content-area">
+
+  {% include 'components/real-estate-series.njk' %}
+
+  <section class="hub-section" aria-label="The four questions">
+
+    <a class="hub-card" href="/bitcoin-vs-real-estate#calculator">
+      <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-vs-real-estate.njk' %}</span>
+        <span class="hub-step">The tenant</span>
+        <span class="hub-q">Buy or rent?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Bitcoin vs. Real Estate</div>
+        <p class="hub-desc">Start here if you rent. Buy the house, or keep renting and put the down payment and the monthly difference into bitcoin. Look back from any start year to see what each path actually did, or project forward with the mortgage, property tax, insurance, upkeep and selling costs all counted, and the tax on each side at the end.</p>
+        <span class="hub-cta">Weigh buying against renting &rarr;</span>
+      </div>
+    </a>
+
+    <a class="hub-card" href="/bitcoin-vs-rental-property#calculator">
+      <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-vs-rental-property.njk' %}</span>
+        <span class="hub-step">The landlord</span>
+        <span class="hub-q">Keep the rental?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Bitcoin vs. Rental Property</div>
+        <p class="hub-desc">A rental's headline yield is not what the owner keeps. Vacancy, repairs, management, insurance and tax come out first, and selling has its own costs and tax. This page sets the net yield and the sale proceeds against holding bitcoin instead, and names what the landlord gives up by selling: steady income and a tenant paying the loan.</p>
+        <span class="hub-cta">Weigh the rental &rarr;</span>
+      </div>
+    </a>
+
+    <a class="hub-card" href="/bitcoin-vs-paying-down-the-mortgage#calculator">
+      <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/bitcoin-vs-paying-down-the-mortgage.njk' %}</span>
+        <span class="hub-step">The homeowner</span>
+        <span class="hub-q">Pay it down?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Bitcoin vs. Paying Down the Mortgage</div>
+        <p class="hub-desc">Spare cash each month and a mortgage: pay the loan off faster, or hold bitcoin? Every extra payment earns the loan's rate, guaranteed. The page finds the yearly growth bitcoin would need to come out ahead after tax, sets it against the model's scenarios and bitcoin's record since 2011, and states the risks on both paths.</p>
+        <span class="hub-cta">Find the hurdle &rarr;</span>
+      </div>
+    </a>
+
+    <a class="hub-card" href="/compare-housing-plans#calculator">
+      <div class="hub-card-head">
+        <span class="hub-icon" aria-hidden="true">{% include 'components/calc-tile-icons/compare-housing-plans.njk' %}</span>
+        <span class="hub-step">Two plans</span>
+        <span class="hub-q">Which way in?</span>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-title">Compare Housing Plans</div>
+        <p class="hub-desc">For when the question is how to buy, not whether. Set two complete plans side by side: buy now or in three years, 20% down or 10% with the difference in bitcoin, this house or a cheaper one, or keep renting. Both start from the same savings and spend the same each month, so whatever one plan saves goes into bitcoin, and the difference at the end is stated plainly.</p>
+        <span class="hub-cta">Weigh two plans &rarr;</span>
+      </div>
+    </a>
+
+  </section>
+
+  <section class="hub-note" aria-label="How the calculators connect">
+    <p><strong>Your assumptions follow you.</strong> The links between the four pages carry the settings they share: the horizon, how fast house prices grow, the cost of selling, bitcoin's scenario, the tax settings and the dollar basis. Inputs that belong to one chair, such as a rent or a loan balance, stay on their own page. Every page also writes its state into the address bar, so a link you save or send comes back to the same numbers.</p>
+    <p><strong>One engine, and the house gets its due.</strong> All four run on the same housing model, with the same costs of owning and of selling and the same tax treatment, so they cannot disagree about what a house does. Bitcoin's path comes from the <a href="/the-power-law">Power Law</a>, a fit to its whole price history used as an assumption and not as a forecast, shown as three scenarios beside plain what-ifs where bitcoin halves or goes nowhere. A home is also somewhere to live, and a paid-down mortgage is a sure return; the pages count both rather than treat the house as a bitcoin that underperformed.</p>
+  </section>
+
+  <section class="hub-neighbours" aria-label="Neighbouring pages">
+    <p class="hub-neighbours-label">Nearby, on borrowing rather than buying</p>
+    <div class="hub-neighbours-row">
+      <a class="hub-neighbour" href="/bitcoin-backed-mortgages">
+        <span class="hub-neighbour-t">Bitcoin-Backed Mortgages</span>
+        <span class="hub-neighbour-d">Buy the house with bitcoin pledged as collateral instead of selling it, across the kinds of lender.</span>
+      </a>
+      <a class="hub-neighbour" href="/borrowing-against-your-stack">
+        <span class="hub-neighbour-t">Borrowing Against Your Stack</span>
+        <span class="hub-neighbour-d">When a loan makes more sense than a sale, and how far the price can fall before it is liquidated.</span>
+      </a>
+      <a class="hub-neighbour" href="/bitcoin-lenders">
+        <span class="hub-neighbour-t">Bitcoin Lenders Compared</span>
+        <span class="hub-neighbour-d">Rates, loan-to-value limits and custody terms, re-read from each lender's own pages every month.</span>
+      </a>
+    </div>
+  </section>
+
+</main>

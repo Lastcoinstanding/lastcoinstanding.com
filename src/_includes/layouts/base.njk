@@ -592,7 +592,11 @@ h1, h2, h3 {
         hard constraint. The five family entries carry group "Retirement" in
         explorations.json and sit there in funnel order: the hub first (its `nav_note`
         marks it the entry point), then Build → Size → Choose → Stress. -#}
-    {%- set numbersGroups = ["Models & Trends", "Bitcoin vs. Other Assets", "Positioning & Strategy", "Retirement", "Living on Bitcoin"] -%}
+    {#- "Real Estate" replaced "Bitcoin vs. Other Assets" in the same column slot
+        2026-10-02 (SITE_GUIDE §60): the series hub first ("start here"), then its
+        four spokes. Bitcoin vs. The Stock Market, the old column's only other
+        page, moved to Models & Trends. Still five columns; bar untouched. -#}
+    {%- set numbersGroups = ["Models & Trends", "Real Estate", "Positioning & Strategy", "Retirement", "Living on Bitcoin"] -%}
     {%- set argumentsGroups = ["Why Fiat Fails", "Why Bitcoin Endures", "Objections, Answered", "Holding & Spending"] -%}
     {#- Freshness badge (STYLE_GUIDE §6.39). Reads the build-time `freshness` map
         (_data/freshness.js, computed from updates.json). NEW suppresses UPDATED;

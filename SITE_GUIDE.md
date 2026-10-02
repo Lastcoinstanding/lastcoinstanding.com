@@ -2071,8 +2071,8 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 | Group (= panel column) | Pages |
 |---|---|
-| Models & Trends (7) | Bitcoin & The Power Law · Bitcoin & Metcalfe’s Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? · The Bitcoin Floor |
-| Bitcoin vs. Other Assets (5) | Bitcoin vs. The Stock Market · BTC vs. Real Estate · BTC vs. Rental Property · BTC vs. Paying Down the Mortgage · Compare Housing Plans |
+| Models & Trends (7 + Bitcoin vs. The Stock Market, moved in 2026-10-02) | Bitcoin & The Power Law · Bitcoin & Metcalfe’s Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? · The Bitcoin Floor |
+| Real Estate (5) — replaced *Bitcoin vs. Other Assets* 2026-10-02 (§60) | Bitcoin and Real Estate (hub, "start here") · BTC vs. Real Estate · BTC vs. Rental Property · BTC vs. Paying Down the Mortgage · Compare Housing Plans |
 | Positioning & Strategy (14) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · Bitcoin Escape Velocity · Compare Retirement Plans · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
 | Living on Bitcoin (6) | Borrowing Against Your Stack · Bitcoin Lenders Compared · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income · The STRC Mechanism |
 
@@ -3443,4 +3443,20 @@ The fence is the part to read before touching this. The wordmark **already** wra
 **Not modelled, said on the page:** private mortgage insurance under 20% down (its absence flatters the smaller down payment; TECH_DEBT), moving costs, renters' insurance, refinancing.
 
 **Homepage.** Latest card (Bitcoin as Collateral rotates off; it keeps its category card and carousel slide) and a Numbers card after the mortgage page. Strip step 4 (*Two plans · Which way in?*); related links from BvRE, BvRP, the mortgage page and Compare Retirement Plans.
+
+## 60. Bitcoin and Real Estate (`/bitcoin-and-real-estate.html`) — the real-estate series hub
+
+**Added 2026-10-02**, straight after the fourth spoke (Compare Housing Plans, §59), per JM 2026-10-01: at four pages the series gets the retirement family's treatment (§53) — a hub page, its own group in the nav and a homepage section. **Bitcoin-Backed Mortgages is not a spoke** (JM, declined as a way to reach four sooner); the hub links it as a neighbour.
+
+**What it is.** The retirement hub's shape exactly: hero, the series strip, one card per chair (**The tenant · The landlord · The homeowner · Two plans**, the strip's order), two paragraphs on how the pages connect (shared assumptions carry; one housing engine, and the house is given its due), a small *neighbours* row (Bitcoin-Backed Mortgages, Borrowing Against Your Stack, Bitcoin Lenders Compared), FAQ (4). Nothing is computed; no `page_scripts`. Editorial 960 tier. `bitcoin-and-real-estate.css` is a copy of `bitcoin-retirement.css` (same classes) plus the neighbours row and a four-across strip at this tier. Cards link to each page's `#calculator`.
+
+**Naming.** Title and H1 *Bitcoin and Real Estate* (accent on *Bitcoin*), matching the strip's own heading; slug `/bitcoin-and-real-estate`, distinct from the spoke `/bitcoin-vs-real-estate`. Not verb-first like *Plan Your Bitcoin Retirement*: no single verb covers four chairs, and the plain subject parses from a list (§10.4). JM may retitle; the slug carries no user state yet, so it is not frozen.
+
+**Nav.** `numbersGroups` gained **Real Estate** in the column slot that **Bitcoin vs. Other Assets** held: the hub first (`nav_note: "start here"`), then BvRE, BvRP, the mortgage page and Compare Housing Plans. The old column's only other page, **Bitcoin vs. The Stock Market, moved to Models & Trends** (JSON order puts it after The Bitcoin Rundown). Still five columns; the bar is untouched (65px at 1280 and 1024, measured). A JM-reversible call: the alternative was a one-page "Other Assets" column.
+
+**The strip (§53.2) gained three variants**, mirroring §53.1: on a spoke the heading links to the hub and the lede ends *All four in one place →*; on the hub neither link is drawn; on the homepage (`{% set rser_home = true %}`) it takes the `.rfam--home` treatment — eyebrow *The real-estate tools*, heading *Bitcoin or a home? Four chairs, one decision.*, a lede carrying the hub link, four cards across.
+
+**Homepage.** The strip sits **directly below the Featured carousel**, above Get Updates: the retirement strip keeps the slot under the hero, so the page opens on one family section, not two stacked. No Latest card for the hub (the §53 precedent: the strip is the permanent route).
+
+**Other surfaces.** `/calculators` tile at position **65** (before BvRE 70) with its own SVG (`calc-tile-icons/bitcoin-and-real-estate.njk`: one house, four marks around it); `sitemap.xml`; `llms.txt` (which also gained the mortgage page and Compare Housing Plans, missed when they shipped); `updates.json`; brand-forward OG `og-bitcoin-and-real-estate.jpg` (registered in `.eleventy.js`). The pair's `rePairQA` digests are unchanged (BvRE `9d32a783`, BvRP `222d6ae6`).
 

@@ -21,11 +21,24 @@
   pair params on load and after any input change. Without script the plain
   href stands. The current page is marked from the page's `slug`.
 
-  MORE SPOKES. The backlog's next two (Compare Housing Plans; the
-  homeowner's side) are further entries in `series` below, each with the
-  hash its calculator answers to. The row takes any number of items.
+  MORE SPOKES. Further entries in `series` below, each with the hash its
+  calculator answers to. The row takes any number of items.
+
+  THE HUB (2026-10-02, SITE_GUIDE §60). At four spokes the series got the
+  retirement family's treatment (§53): a hub at /bitcoin-and-real-estate.
+  Three variants, by slug and flag, mirroring retirement-family.njk:
+    · on a spoke, the title is a LINK to the hub and the lede ends with
+      "All four in one place →";
+    · on the hub itself (slug 'bitcoin-and-real-estate') neither link is
+      drawn: the H1 a few hundred pixels above already says where you are;
+    · on the homepage (`{% set rser_home = true %}` before the include) the
+      strip is a section, not a boxed object: no frame, a top hairline,
+      centred eyebrow + heading + one-line lede carrying the hub link, on
+      the hero's 64rem column. Same Treatment A as `.rfam--home` (§53.1).
 -#}
 {%- set rserLevel = rser_level | default('h2') -%}
+{%- set rserHub = (slug == 'bitcoin-and-real-estate') -%}
+{%- set rserHome = (rser_home == true) -%}
 <style>
 .rser { max-width: 1100px; margin: 0 auto 2rem; padding: 0.9rem 1.1rem 1rem; border: 1px solid rgba(224,148,34,0.09); border-radius: 10px; }
 .rser-title { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber, #e09422); margin: 0 0 0.2rem; line-height: 1.4; }
@@ -39,7 +52,26 @@ a.rser-item:hover, a.rser-item:focus-visible { border-color: rgba(224,148,34,0.3
 .rser-q { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.05rem; line-height: 1.25; color: var(--ink-bright, #f2eee8); }
 .rser-t { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.74rem; line-height: 1.4; color: var(--ink-dim, #9a9080); }
 a.rser-item .rser-t::after { content: ' \2192'; color: var(--amber, #e09422); }
-@media (max-width: 560px) { .rser { padding: 0.8rem 0.9rem 0.9rem; } .rser-row { grid-template-columns: 1fr; } }
+.rser-title a { color: inherit; text-decoration: none; }
+.rser-title a:hover { text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.rser-lede a, .rser--home .rser-lede a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.4); text-underline-offset: 2px; white-space: nowrap; }
+.rser-lede a:hover { text-decoration-color: var(--amber, #e09422); }
+/* HOMEPAGE VARIANT (`rser_home`) — the .rfam--home treatment, so the two
+   family sections on the homepage read as a pair. */
+.rser.rser--home { max-width: 64rem; margin: 2rem auto 2.5rem; padding: 2rem 3rem 0; border: 0; border-top: 1px solid rgba(247,147,26,0.15); border-radius: 0; text-align: center; }
+.rser--home .rser-title { margin: 0 0 0.35rem; }
+.rser--home .rser-head { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.35rem, 2.6vw, 1.75rem); font-weight: 500; line-height: 1.15; letter-spacing: -.01em; color: var(--ink-bright, #f2eee8); margin: 0 0 0.45rem; }
+.rser--home .rser-head em { font-style: italic; color: var(--amber, #e09422); }
+.rser--home .rser-lede { max-width: none; margin: 0 auto 1.1rem; }
+.rser--home .rser-row { text-align: left; grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 860px) { .rser--home .rser-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .rser.rser--home { padding: 2rem 1.5rem 0; } }
+@media (max-width: 560px) {
+  .rser { padding: 0.8rem 0.9rem 0.9rem; } .rser-row, .rser--home .rser-row { grid-template-columns: 1fr; }
+  .rser.rser--home { padding: 1.75rem 1.25rem 0; margin-bottom: 2rem; }
+  /* tap targets: inline vertical padding, as .rfam (§53.1, 2026-09-21 fix) */
+  .rser-lede a { padding: 0.6rem 0; }
+}
 </style>
 {%- set series = [
   { slug: 'bitcoin-vs-real-estate',     step: 'The tenant',   q: 'Buy or rent?',      t: 'Bitcoin vs. Real Estate',     hash: 'calculator' },
@@ -47,9 +79,16 @@ a.rser-item .rser-t::after { content: ' \2192'; color: var(--amber, #e09422); }
   { slug: 'bitcoin-vs-paying-down-the-mortgage', step: 'The homeowner', q: 'Pay it down?', t: 'Bitcoin vs. Paying Down the Mortgage', hash: 'calculator' },
   { slug: 'compare-housing-plans', step: 'Two plans', q: 'Which way in?', t: 'Compare Housing Plans', hash: 'calculator' }
 ] -%}
+{%- if rserHome %}
+<nav class="rser rser--home" aria-labelledby="rser-title">
+  <p class="rser-title">The real-estate tools</p>
+  <{{ rserLevel }} class="rser-head" id="rser-title">Bitcoin or a home? <em>Four chairs</em>, one decision.</{{ rserLevel }}>
+  <p class="rser-lede">Each calculator answers one person&rsquo;s question, and your assumptions travel between them &mdash; <a href="/bitcoin-and-real-estate">see all four in one place &rarr;</a></p>
+{%- else %}
 <nav class="rser" aria-labelledby="rser-title">
-  <{{ rserLevel }} class="rser-title" id="rser-title">Bitcoin and real estate</{{ rserLevel }}>
-  <p class="rser-lede">One housing decision, seen from each chair: the tenant, the landlord, the homeowner, and two plans side by side. The links carry the inputs the calculators share.</p>
+  <{{ rserLevel }} class="rser-title" id="rser-title">{% if rserHub %}Bitcoin and real estate{% else %}<a href="/bitcoin-and-real-estate">Bitcoin and real estate</a>{% endif %}</{{ rserLevel }}>
+  <p class="rser-lede">One housing decision, seen from each chair: the tenant, the landlord, the homeowner, and two plans side by side. The links carry the inputs the calculators share.{% if not rserHub %} <a href="/bitcoin-and-real-estate">All four in one place &rarr;</a>{% endif %}</p>
+{%- endif %}
   <div class="rser-row">
     {%- for f in series -%}
       {%- if f.slug == slug -%}
