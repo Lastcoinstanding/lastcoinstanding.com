@@ -698,6 +698,17 @@ eleventyComputed:
 </div>
 
 
+<!-- REAL-ESTATE SERIES STRIP — the second tool family on the homepage
+     (SITE_GUIDE §60, 2026-10-02; JM: "call real estate out as a section from
+     the homepage, like retirement"). `rser_home` selects the component's
+     homepage variant, the same Treatment A as the retirement strip under the
+     hero. Placed directly below the carousel rather than stacked under the
+     retirement strip, so the top of the page keeps one family section ahead
+     of the carousel. No homepage CSS: the component carries its own. -->
+{% set rser_home = true %}
+{% include 'components/real-estate-series.njk' %}
+
+
 {# Get Updates — placed manually here (directly below the Featured carousel; moved
    down from under the hero 2026-09-20 so the hero's two actions lead) rather than at the layout-level footer position, which
    the front-matter `get_updates: false` suppresses for the homepage only. One

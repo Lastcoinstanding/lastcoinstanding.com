@@ -60,6 +60,7 @@ module.exports = function (eleventyConfig) {
     'og-bitcoin-lenders.jpg',
     'og-bitcoin-vs-paying-down-the-mortgage.jpg',
     'og-compare-housing-plans.jpg',
+    'og-bitcoin-and-real-estate.jpg',
     'og-bitcoin-backed-mortgages.jpg',
     'og-bitcoin-fixed-income.jpg',
     'og-strc-below-par.jpg',

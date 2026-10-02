@@ -202,7 +202,7 @@
     "slug": "bitcoin-vs-the-stock-market",
     "title": "Bitcoin vs. The Stock Market",
     "category": "numbers",
-    "group": "Bitcoin vs. Other Assets",
+    "group": "Models & Trends",
     "interactive": true,
     "calculator_tile": {
       "tagline": "The wealth-over-time stress test &mdash; bitcoin against the S&amp;P 500 and NASDAQ-100 across any holding window since 2010.",
@@ -214,10 +214,25 @@
     }
   },
   {
+    "_comment": "Bitcoin and Real Estate — the real-estate series hub (SITE_GUIDE §60), built when the fourth spoke (Compare Housing Plans) landed, per the retirement precedent (§53: 'a family earns a hub before nav grows'). Same shape as the retirement hub: category 'numbers' so it rides the data-driven dropdown, first in its own 'Real Estate' group with the 'start here' note; no bar change. The 'Real Estate' group replaced the 'Bitcoin vs. Other Assets' column, whose only other member, Bitcoin vs. The Stock Market, moved to Models & Trends (2026-10-02; a JM-reversible call, flagged in the PR). Bitcoin-Backed Mortgages is NOT a spoke (JM 2026-10-01) and stays in Living on Bitcoin, linked from the hub as a neighbour. Tile position 65 sits it immediately before its own family's tiles (BvRE 70, BvRP 80, mortgage 85, compare 87). No page_scripts: a landing page, not an instrument.",
+    "slug": "bitcoin-and-real-estate",
+    "title": "Bitcoin and Real Estate",
+    "category": "numbers",
+    "group": "Real Estate",
+    "nav_note": "start here",
+    "interactive": false,
+    "calculator_tile": {
+      "tagline": "One housing decision from each chair &mdash; buy or rent, keep the rental, pay down the mortgage, or compare two ways in.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 65
+    }
+  },
+  {
     "slug": "bitcoin-vs-real-estate",
     "title": "BTC vs. Real Estate",
     "category": "numbers",
-    "group": "Bitcoin vs. Other Assets",
+    "group": "Real Estate",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Bitcoin or a house &mdash; looking back, or projecting forward? Full mortgage and ownership costs included.",
@@ -229,7 +244,7 @@
     "slug": "bitcoin-vs-rental-property",
     "title": "BTC vs. Rental Property",
     "category": "numbers",
-    "group": "Bitcoin vs. Other Assets",
+    "group": "Real Estate",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Bitcoin or rental property &mdash; the yield comparison once landlord costs and tax leakage are surfaced.",
@@ -242,7 +257,7 @@
     "slug": "bitcoin-vs-paying-down-the-mortgage",
     "title": "BTC vs. Paying Down the Mortgage",
     "category": "numbers",
-    "group": "Bitcoin vs. Other Assets",
+    "group": "Real Estate",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Spare cash and a mortgage &mdash; pay the loan off faster, or hold bitcoin? The growth bitcoin needs to win, and how often it has.",
@@ -255,7 +270,7 @@
     "slug": "compare-housing-plans",
     "title": "Compare Housing Plans",
     "category": "numbers",
-    "group": "Bitcoin vs. Other Assets",
+    "group": "Real Estate",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Two housing plans side by side &mdash; buy now or later, 20% down or 10% with the difference in bitcoin, this house or a cheaper one.",
