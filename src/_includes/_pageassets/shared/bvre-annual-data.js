@@ -6,10 +6,22 @@
    (btcData, 13 entries: 2013-2025). Both are year-keyed objects with
    numeric values.
 
-   homeData sources: Census/HUD national median sales price series,
-   sparse pre-1985 (decadal samples) and annual from 1990 forward.
-   btcData sources: annual mean of monthly closes from the canonical
-   BTC_MONTHLY series (see shared/btc-monthly-data.js).
+   homeData: the median sales price of new houses sold in the US, each
+   year's average of the four quarterly values (Census/HUD via FRED
+   MSPUS, annual average; sparse before 2013). The same definition as the
+   housing pages' $415,000 default (DATA_AUDIT RE-6). Restated 2026-10-03
+   from FRED's current vintage (JM); the old values were an earlier
+   vintage of Census's annual medians, up to 5% off (2021, 2022). To add a
+   year: fredgraph.csv?id=MSPUS&fq=Annual&fam=avg, rounded to the dollar.
+   btcData: each year's average price, the mean of PL_DATA's samples in
+   that calendar year (a ~12-day grid, close to the daily average). This
+   is the retrospective's method (DATA_AUDIT RE-20), so the static
+   exhibits and the calculator price a year the same way. Restated
+   2026-10-03: the old values mixed methods (2013 was near the year-end
+   price, 732 against an average of 190; 2022 and 2025 were snapshots,
+   19,657 and 88,000 against 27,920 and 102,775). To add a year in
+   January, run in the browser console on any page:
+     (function(y){var s=0,n=0;PL_DATA.forEach(function(r){if(new Date((GENESIS_TS+r[0]*86400)*1000).getUTCFullYear()===y){s+=r[1];n++;}});return Math.round(s/n);})(2026)
 
    Consumed by:
      /bitcoin-vs-real-estate (the deep-dive page — Question, Postponed
@@ -41,7 +53,7 @@
    ============================================================ */
 
 var homeData = {
-    1965:20000,1970:23400,1975:39300,1980:64600,1985:82800,1990:122900,1995:133900,2000:169000,2005:240900,2010:222900,2013:268900,2014:282800,2015:294000,2016:306200,2017:323500,2018:326400,2019:321500,2020:336900,2021:401700,2022:454900,2023:426100,2024:420300,2025:416900
+    1965:20125,1970:23475,1975:39275,1980:64750,1985:84275,1990:122300,1995:133475,2000:167550,2005:236550,2010:222700,2013:266225,2014:285775,2015:294150,2016:305125,2017:322425,2018:325275,2019:320250,2020:328150,2021:383000,2022:432950,2023:426525,2024:418975,2025:415400
 };
 
 // Case-Shiller National, annual average of the monthly NSA index (FRED
@@ -56,5 +68,32 @@ var csData = {
 };
 
 var btcData = {
-    2013:732,2014:530,2015:272,2016:567,2017:4348,2018:7565,2019:7362,2020:11072,2021:47458,2022:19657,2023:28233,2024:62682,2025:88000
+    2013:190,2014:524,2015:274,2016:553,2017:3967,2018:7599,2019:7313,2020:10962,2021:47158,2022:27920,2023:28693,2024:65153,2025:102775
 };
+
+// Bitcoin needed to buy the median new house: a fitted trend through the
+// actual years and a Power Law path after them (JM, 2026-10-03). Shared by
+// Bitcoin vs. Real Estate and The Gallery chart 3. The fit is least squares
+// on the logarithm; the path grows the last year's house at apprPct a year
+// and divides by bitcoin's Power Law trend price at mid-year (plPrice). The
+// path is the model's trend, not a forecast; today bitcoin trades below it.
+function btcHouseTrend(projYears, apprPct) {
+    var years = Object.keys(btcData).map(Number), n = years.length;
+    var xs = years, ys = years.map(function (y) { return Math.log(homeData[y] / btcData[y]); });
+    var mx = 0, my = 0, i; for (i = 0; i < n; i++) { mx += xs[i] / n; my += ys[i] / n; }
+    var sxy = 0, sxx = 0; for (i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) * (xs[i] - mx); }
+    var b = sxy / sxx, a = my - b * mx, last = years[n - 1];
+    var appr = (typeof apprPct === 'number' && isFinite(apprPct)) ? apprPct : 4.68;
+    var path = projYears.map(function (y) {
+        if (typeof plPrice !== 'function' || typeof GENESIS_TS !== 'number') return null;
+        var days = (Date.UTC(y, 6, 1) / 1000 - GENESIS_TS) / 86400;
+        return +(homeData[last] * Math.pow(1 + appr / 100, y - last) / plPrice(days)).toFixed(2);
+    });
+    return {
+        years: years,
+        actual: years.map(function (y) { return +(homeData[y] / btcData[y]).toFixed(1); }),
+        fit: years.map(function (y) { return +Math.exp(a + b * y).toFixed(1); }),
+        fitChange: Math.exp(b) - 1,
+        path: path
+    };
+}

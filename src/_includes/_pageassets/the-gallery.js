@@ -724,18 +724,23 @@ var chartInstance = null;
     var projYears = [2026, 2027, 2028, 2029, 2030, 2031, 2032];
     var allLabels = btcYears.map(String).concat(projYears.map(String));
 
-    var btcHouseValues = btcYears.map(function(y){
-      return +(homeData[y] / btcData[y]).toFixed(1);
-    });
-
-    // Smooth trend line — log-linear from 367 BTC (2013) to ~1.5 BTC (2032),
-    // matching the source chart. Continues seamlessly across actual + projected.
-    var trendFull = btcYears.concat(projYears).map(function(y){
-      var t = (y - 2013) / (2032 - 2013);
-      return +(367 * Math.pow(1.5 / 367, t)).toFixed(2);
-    });
-    // Historical actual: data for 2013-2025, nulls for projection years
-    var historicalFull = btcHouseValues.concat(projYears.map(function(){ return null; }));
+    // A fitted trend through the actual years and the Power Law path after
+    // them, shared with Bitcoin vs. Real Estate (btcHouseTrend in
+    // shared/bvre-annual-data.js; JM 2026-10-03, replacing a hand-drawn line
+    // from 367 BTC in 2013). This page has no appreciation setting, so the
+    // path uses the site's default (4.68% a year).
+    var BH = btcHouseTrend(projYears);
+    var nulls = function(arr){ return arr.map(function(){ return null; }); };
+    var historicalFull = BH.actual.concat(nulls(projYears));
+    var trendFull = BH.fit.concat(nulls(projYears));
+    var pathFull = nulls(btcYears).concat(BH.path);
+    (function(){
+      var last = btcYears[btcYears.length - 1], v0 = BH.actual[0], v1 = BH.actual[BH.actual.length - 1];
+      var set = function(id, t){ var e = document.getElementById(id); if (e) e.textContent = t; };
+      set('gBh2013', Math.round(v0).toLocaleString());
+      set('gBhLast', String(Math.round(v1 * 10) / 10));
+      set('gBhDecline', (100 * (1 - v1 / v0)).toFixed(1) + '%');
+    })();
 
     chartInstance = new Chart(canvas.getContext('2d'), {
       type: 'line',
@@ -747,9 +752,12 @@ var chartInstance = null;
             backgroundColor: 'rgba(247,147,26,0.15)',
             borderWidth: 2.5, pointBackgroundColor: 'rgba(247,147,26,1)',
             pointRadius: 4, pointHoverRadius: 7, fill: true, tension: 0.3 },
-          { label: 'Trend', data: trendFull,
+          { label: 'Fitted trend, 2013–' + btcYears[btcYears.length - 1], data: trendFull,
             borderColor: 'rgba(224,148,34,0.45)', backgroundColor: 'transparent',
-            borderWidth: 2, borderDash: [8, 4], pointRadius: 0, tension: 0.4 }
+            borderWidth: 2, borderDash: [8, 4], pointRadius: 0, tension: 0 },
+          { label: 'Power Law path', data: pathFull,
+            borderColor: 'rgba(224,148,34,0.7)', backgroundColor: 'transparent',
+            borderWidth: 2, borderDash: [3, 4], pointRadius: 0, tension: 0.2 }
         ]
       },
       options: {
@@ -771,7 +779,8 @@ var chartInstance = null;
               label: function(c){
                 var y = parseInt(c.label);
                 var isProj = y > 2025;
-                if (c.datasetIndex === 1) return 'Trend: ~' + c.parsed.y.toFixed(1) + ' BTC';
+                if (c.datasetIndex === 1) return 'Fitted trend: ~' + c.parsed.y.toFixed(1) + ' BTC';
+                if (c.datasetIndex === 2) return 'Power Law path: ~' + c.parsed.y.toFixed(2) + ' BTC';
                 if (isProj) return null;
                 return [
                   c.parsed.y.toFixed(1) + ' BTC',
@@ -792,13 +801,13 @@ var chartInstance = null;
             border: { display: false }
           },
           y: {
-            type: 'logarithmic', min: 1,
+            type: 'logarithmic', min: 0.5, max: 2000,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
               color: 'rgba(220,200,170,0.45)',
               font: { size: 11, family: 'Inter, sans-serif' },
               callback: function(v){
-                var marks = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+                var marks = [0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000];
                 return marks.indexOf(v) !== -1 ? v.toLocaleString() : '';
               }
             },
@@ -1310,8 +1319,8 @@ var chartInstance = null;
 //
 // Line chart of compound annual growth rate over rolling four-year
 // windows, ending each year from 2017 through 2026. Three series:
-// bitcoin (using annual averages from btcData + today's live price
-// for the 2026 endpoint), S&P 500 total return, and NASDAQ-100 total
+// bitcoin (December month-end closes from BTC_MONTHLY + today's live
+// price for the current-year endpoint), S&P 500 total return, and NASDAQ-100 total
 // return. Replaces an earlier "$10K invested in 2010" lump-sum wealth
 // chart (Commit C) that was structurally vulnerable to the same
 // cherry-pick objection the rest of the site works to refute — picking
@@ -1339,11 +1348,9 @@ var chartInstance = null;
   // comment). Each entry is [date-ISO, level].
   /* SP500_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
   /* NDQ_TR_DATA: see shared/tr-comparator-data.js (loaded before this script). */
-  // ── Bitcoin annual averages (mirrors bitcoin-vs-real-estate.js
-  //   homeData/btcData duplication pattern). Used as the per-year
-  //   bitcoin price for CAGR calculations 2013-2025. The 2026 value
-  //   is live (TODAY_PRICE, updated by fetchTodayPrice when it lands).
-  /* btcData alias removed — Chart 7 now uses canonical btcData from shared/bvre-annual-data.js. */
+  // ── Bitcoin: December month-end closes from BTC_MONTHLY (2026-10-03; was
+  //   btcData's yearly averages). The current-year value is live
+  //   (TODAY_PRICE, updated by fetchTodayPrice when it lands).
 // ── Helpers
   function spYearEnd(year, isCurrent) {
     if (isCurrent) return SP500_TR_DATA[SP500_TR_DATA.length - 1][1];
@@ -1361,12 +1368,20 @@ var chartInstance = null;
     }
     return null;
   }
+  // Bitcoin's year-end value is its December month-end close (BTC_MONTHLY),
+  // the same point in the year as the equity series' Dec-28 samples. Until
+  // 2026-10-03 this used btcData, a yearly average, so bitcoin's windows ran
+  // average to average while the equities ran year-end to year-end.
   function btcYearEnd(year, isCurrent) {
     if (isCurrent) {
       return (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
         ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
     }
-    return btcData[year];
+    var key = year + '-12';
+    for (var i = BTC_MONTHLY.length - 1; i >= 0; i--) {
+      if (BTC_MONTHLY[i][0] === key) return BTC_MONTHLY[i][1];
+    }
+    return null;
   }
 
   function cagr(endVal, startVal, years) {
@@ -1475,7 +1490,7 @@ var chartInstance = null;
     if (typeof fetchTodayPrice !== 'function') return;
     fetchTodayPrice(function(/* price, source */){
       if (!chartInstance || !chartInstance.data) return;
-      var s = buildSeries();   // recompute (btcData is unchanged; only
+      var s = buildSeries();   // recompute (the closes are unchanged; only
                                // the current-year endpoint reads TODAY_PRICE)
       chartInstance.data.datasets[0].data = s.btc;
       chartInstance.update('none');
