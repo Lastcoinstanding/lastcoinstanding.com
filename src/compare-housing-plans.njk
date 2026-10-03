@@ -37,8 +37,8 @@ eleventyComputed:
 #}
 <section class="hero">
     <h1>Compare <em>Housing Plans</em></h1>
-    <div class="hero-subtitle">Two ways to house yourself, side by side: buy now or rent and buy later, 20% down or 10% with the difference in bitcoin, this house or a cheaper one.</div>
-    <p class="subtitle">Both plans start with the same savings and spend the same every month; whatever a plan doesn&rsquo;t spend on housing goes into bitcoin. The page shows what each is worth at the end, under stated assumptions, and doesn&rsquo;t pick one.</p>
+    <div class="hero-subtitle">Two ways to handle what is, for most people, their biggest expense, rent or a mortgage, side by side: buy now or rent and buy later; put 20% down or 10% and the difference into bitcoin; buy this house or a cheaper one and put the difference into bitcoin.</div>
+    <p class="subtitle">Both plans start with the same savings and spend the same every month; whatever a plan doesn&rsquo;t spend on housing goes into bitcoin. The page shows what each is worth at the end, under stated assumptions, and doesn&rsquo;t pick either: only you can judge which suits your circumstances.</p>
 </section>
 
 <main class="content-area">
@@ -94,7 +94,7 @@ eleventyComputed:
                 <select id="chTax" aria-label="Tax on gains"><option value="us" selected>US rules</option><option value="none">No capital-gains tax</option></select></label>
             <label class="ch-field ch-check"><input id="chDed" type="checkbox"> <span>I itemize and deduct mortgage interest</span></label>
             <div class="ch-field"><span class="k">Dollars shown</span>
-                <div class="re-seg" role="group" aria-label="Dollars shown"><button type="button" class="re-seg-btn active" data-display="real" aria-pressed="true">Today&rsquo;s dollars</button><button type="button" class="re-seg-btn" data-display="nominal" aria-pressed="false">Future dollars</button></div>
+                <div class="re-seg" role="group" aria-label="Dollars shown"><button type="button" class="re-seg-btn active" data-display="real" aria-pressed="true">Real (today&rsquo;s $)</button><button type="button" class="re-seg-btn" data-display="nominal" aria-pressed="false">Nominal (future $)</button></div>
                 <span class="ch-small" id="chDeflLine"></span></div>
         </div>
     </details>
@@ -105,6 +105,7 @@ eleventyComputed:
         <button type="button" class="ch-chip on" data-scenario="stay">Today&rsquo;s gap persists</button>
         <button type="button" class="ch-chip" data-scenario="trend">Reverts to trend</button>
         <button type="button" class="ch-chip" data-scenario="upper">Peaks at 2.5&times; trend</button>
+        <p class="ch-scen-note" id="chScenNote">These four paths come from the <a href="/the-power-law">Power Law</a>, the long-run trend bitcoin&rsquo;s price has followed since 2010. <a href="/the-power-law">What is the Power Law? &rarr;</a></p>
     </div>
 
     <div class="ch-hurdle" id="chHead" aria-live="polite">
@@ -115,7 +116,9 @@ eleventyComputed:
     <p class="ch-cashout" id="chCashOut"></p>
     <div class="ch-cards" id="chCards"></div>
 
-    <div class="ch-table-wrap"><table class="ch-table" id="chScenTable" aria-label="The difference under each bitcoin path"></table></div>
+    <h3 class="ch-h3" id="chScenTitle">Every bitcoin path: both plans at the end</h3>
+    <p class="ch-table-sub" id="chScenSub"></p>
+    <div class="ch-table-wrap"><table class="ch-table" id="chScenTable" aria-labelledby="chScenTitle"></table></div>
 
     <div class="re-chart-block" id="chChartBlock">
         <div class="re-chart-head">

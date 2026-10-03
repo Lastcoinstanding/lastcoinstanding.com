@@ -166,3 +166,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ch-cashout strong { color: var(--text); }
 .ch-warn { color: var(--red); }
 @media (max-width: 760px) { .ch-plans { grid-template-columns: 1fr; } }
+
+/* JM review round 1 (2026-10-02) ─────────────────────────────── */
+/* The Power Law line under the scenario buttons (the reader may not know it). */
+.ch-scen-note { flex-basis: 100%; margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--text-dim); line-height: 1.55; }
+.ch-scen-note a, .ch-table caption a, .ch-table-sub a, .ch-hurdle-s a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+/* Cards: the rows sum to a bold total; the loan is neutral (both plans that buy
+   owe one), costs and taxes red; the plan ahead carries a green badge. */
+.ch-card dt.net, .ch-card dd.net { font-weight: 600; color: var(--text-bright); border-top: 1px solid var(--border-lt); padding-top: 0.3rem; margin-top: 0.15rem; }
+.ch-card .ahead { display: inline-block; margin: 0 0 0.5rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; color: var(--green); border: 1px solid rgba(95,168,114,0.45); background: rgba(95,168,114,0.1); border-radius: 999px; padding: 0.15rem 0.6rem; }
+.ch-card.lead { box-shadow: 0 0 0 1px rgba(95,168,114,0.35); }
+/* Scenario table title (as the mortgage page). */
+.ch-h3 { font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--text-bright); margin: 1.6rem 0 0.25rem; }
+.ch-table-sub { font-size: 0.86rem; color: var(--text-dim); line-height: 1.6; margin: 0 0 0.6rem; max-width: 72ch; }
+.ch-table td .help-tip { margin-left: 0.3rem; }
