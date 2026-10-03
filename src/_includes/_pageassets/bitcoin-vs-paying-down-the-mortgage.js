@@ -140,6 +140,9 @@
       ? 'Divided by inflation at ' + inflPct() + '% a year, the site’s setting; ' + usd(100000) + ' in ' + H + ' years is ' + usd(100000 / D) + ' today.'
       : 'Dollars of each future year, before inflation.';
 
+    // The halving what-if, used by the hurdle line and the scenario table.
+    var halfG = Math.pow(0.5, 1 / H) - 1, half = M.paydownProjection(input(v, { growth: halfG }));
+
     // The hurdle
     var hv = $('mpHurdleV'), hs = $('mpHurdleS');
     if (!hasExtra) {
@@ -153,7 +156,11 @@
       hv.innerHTML = 'Your mortgage costs ' + v.mrate + '%. Over ' + H + (H === 1 ? ' year' : ' years') + ', holding bitcoin ends ahead if bitcoin averages more than <strong>' + pct(hAfter) + '</strong> a year.';
       hs.innerHTML = 'That is after the tax on selling the bitcoin at the end' + (v.tax === 'none' || v.acct === 'advantaged' ? ' (none, in your setting)' : '') +
         ' and the ' + v.btctx + '% trading cost. Before tax, held rather than sold: <strong>' + pct(hHeld) + '</strong>.' + ded +
-        ' If bitcoin goes nowhere, holding ends <strong>' + usd(-flat.diffIfSold / D) + '</strong> behind' + upside() + ' The paths and the record are below.';
+        downside() + upside() + ' The paths and the record are below.';
+    }
+    // Both plain what-ifs beside the upside paths (claims read 2026-10-03).
+    function downside() {
+      return ' If bitcoin halves, holding ends ' + aheadBy(half.diffIfSold / D) + '; if it goes nowhere, ' + aheadBy(flat.diffIfSold / D);
     }
     function aheadBy(d) { return Math.abs(d) < 1 ? 'level' : '<strong>' + usd(Math.abs(d)) + '</strong> ' + (d > 0 ? 'ahead' : 'behind'); }
     function upside() {
@@ -211,7 +218,6 @@
       : '';
 
     // Each scenario against the hurdle
-    var halfG = Math.pow(0.5, 1 / H) - 1, half = M.paydownProjection(input(v, { growth: halfG }));
     var rows = [{ k: 'half', label: 'Bitcoin halves over the ' + H + (H === 1 ? ' year' : ' years'), g: halfG, diff: half.diffIfSold },
                 { k: 'flat', label: 'Bitcoin goes nowhere', g: 0, diff: flat.diffIfSold }]
       .concat(['floor', 'stay', 'trend', 'upper'].map(function (s) { return { k: s, label: SC_NAME[s] + (s === 'upper' ? ' (stress test)' : ''), g: cagr(s), diff: scDiff(s) }; }));
@@ -319,6 +325,18 @@
         return '<tr' + (n === H ? ' class="mine"' : '') + '><td>' + n + (n === 1 ? ' year' : ' years') + (n === H ? ' (yours)' : '') + '</td><td>' + x.count + '</td><td>' + Math.round(x.share * 100) + '%</td><td>' + pctS(x.worst) + '</td></tr>';
       }).join('') + '</tbody>';
     if (any) $('mpHistSpan').textContent = any.first.slice(0, 4) + ' to ' + any.last;
+    // When the reader's periods began, and at what prices (claims read
+    // 2026-10-03): a long record that never failed all starts early.
+    var S = typeof BTC_MONTHLY !== 'undefined' ? BTC_MONTHLY : null, k = Math.round(H * 12), el = $('mpHistStarts');
+    if (el) {
+      if (S && S.length > k) {
+        var starts = S.slice(0, S.length - k), lo = Infinity, hi = 0;
+        starts.forEach(function (r) { lo = Math.min(lo, r[1]); hi = Math.max(hi, r[1]); });
+        var mon = function (ym) { return new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1)).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }); };
+        var price = function (p) { return p < 1 ? 'under $1' : usd(p); };
+        el.textContent = ' The ' + H + '-year' + ' periods all began between ' + mon(starts[0][0]) + ' and ' + mon(starts[starts.length - 1][0]) + ', when bitcoin cost from ' + price(lo) + ' to ' + price(hi) + '.';
+      } else el.textContent = '';
+    }
   }
 
   // ─── URL (this page's own names; the carried ones go through RealEstateCarry) ───

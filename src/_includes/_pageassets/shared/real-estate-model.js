@@ -1472,7 +1472,7 @@
   }
   // The hurdle's record: over every run of `years` between two month-end
   // closes in BTC_MONTHLY (2011 on), how often bitcoin's average yearly
-  // growth beat `rate`. Hypothetical history, not a forecast; the runs overlap.
+  // growth beat `rate`. The price record, not a forecast; the runs overlap.
   function hurdleHistory(rate, years, series){
     var S = series || (typeof BTC_MONTHLY !== 'undefined' ? BTC_MONTHLY : null);
     if (!S || !S.length) return null;
