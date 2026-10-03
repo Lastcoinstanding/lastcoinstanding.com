@@ -41,8 +41,9 @@
   // JM review round 1 (2026-10-02): the path described in prices, not as a flat
   // rate (the Power Law's rate slows), with the Power Law linked where it is named.
   var PL_LINK = '<a href="/the-power-law">Power Law</a>';
-  var SC_PHRASE = { floor: 'drifts down to its ' + PL_LINK + ' floor', stay: 'keeps today’s gap to its ' + PL_LINK + ' trend',
-                    trend: 'reverts to its ' + PL_LINK + ' trend', upper: 'peaks at 2.5× its ' + PL_LINK + ' trend at the end' };
+  // The headline names the path it rests on (claims read 2026-10-03): a
+  // projection reads as a condition, never as a plain statement of fact.
+  var SC_IF = { floor: 'drifts down to its floor', stay: 'keeps today’s gap to its trend', trend: 'reverts to its trend', upper: 'peaks at 2.5× its trend' };
   var UPPER_TIP = '<span class="help-tip" tabindex="0">?<span class="tip-content">A peak, not a level: this path ends at a cycle-top multiple of the trend, so an average a year says little about it. Past tops have faded within months.</span></span>';
   var st = { scenario: 'stay', display: 'real' };
 
@@ -131,12 +132,24 @@
     // Headline
     var d = R.diffAfter / Dh, mult = (Math.pow(R.priceEnd / btcNow(), 1 / H) - 1);
     $('chHeadV').innerHTML = Math.abs(d) < 1 ? 'After ' + yrs(H) + ', the two plans end level.'
-      : 'After ' + yrs(H) + ', <strong>Plan ' + (d > 0 ? 'B' : 'A') + '</strong> ends <strong>' + usd(Math.abs(d)) + '</strong> ahead.';
+      : 'After ' + yrs(H) + ', if bitcoin ' + SC_IF[st.scenario] + ', <strong>Plan ' + (d > 0 ? 'B' : 'A') + '</strong> ends <strong>' + usd(Math.abs(d)) + '</strong> ahead.';
+    // The downside beside the headline (claims read 2026-10-03): the two plain
+    // what-ifs from the table, so the bad cases sit next to the verdict.
+    var half = Math.pow(0.5, 1 / H) - 1;
+    var rFlat = M.housingCompare(input(a, b, s, { growth: 0 })), rHalf = M.housingCompare(input(a, b, s, { growth: half }));
+    function leadTxt(r, prev) {
+      var x = r.diffAfter / Dh;
+      if (Math.abs(x) < 1) return 'the plans end level';
+      var who = x > 0 ? 'B' : 'A';
+      return prev === who ? usd(Math.abs(x)) : 'Plan ' + who + ' ends ' + usd(Math.abs(x)) + ' ahead';
+    }
+    var flatWho = Math.abs(rFlat.diffAfter / Dh) < 1 ? null : (rFlat.diffAfter > 0 ? 'B' : 'A');
+    var downTxt = ' If bitcoin goes nowhere, ' + leadTxt(rFlat) + '; if it halves, ' + leadTxt(rHalf, flatWho) + '.';
     var yEnd = new Date().getFullYear() + H;
     $('chHeadS').innerHTML = 'If both sell everything at the end, after selling costs and tax' + (st.display === 'real' ? ', in today’s dollars' : ', in future dollars') +
-      '. Bitcoin here ' + SC_PHRASE[st.scenario] + ': its price goes from ' + usdK(btcNow()) + ' today to about ' + usdK(R.priceEnd) + ' in ' + yEnd +
+      '. On this ' + PL_LINK + ' path, bitcoin’s price goes from ' + usdK(btcNow()) + ' today to about ' + usdK(R.priceEnd) + ' in ' + yEnd +
       (st.scenario === 'upper' ? ', at the peak' : ', about ' + pctS(mult) + ' a year on average' + (st.scenario === 'floor' ? '' : ', the rate slowing as it goes')) + ' (prices before inflation). Held instead of sold: Plan ' +
-      (R.diffHeld >= 0 ? 'B' : 'A') + ' ahead by ' + usd(Math.abs(R.diffHeld / Dh)) + '. Every path, including two plain what-ifs, is in the table below the cards.';
+      (R.diffHeld >= 0 ? 'B' : 'A') + ' ahead by ' + usd(Math.abs(R.diffHeld / Dh)) + '.' + downTxt + ' Every path is in the table below the cards.';
 
     // Equal cash out
     var first = function (P) { return P.first ? usd(P.first.cost) + ' (' + (P.first.kind === 'own' ? 'owning' : 'rent') + ')' : '—'; };
@@ -164,15 +177,18 @@
           (P.loan > 0 ? '; a ' + usd(P.loan) + ' loan at ' + v.rate + '%, ' + usd(P.pi) + ' a month.' : ', no loan.')
         : 'Never buys; rent starts at ' + usd(P.first ? P.first.cost : 0) + ' a month.';
       rows.push(['Everything sold, after tax', usd(e.after / Dh), 'net']);
+      // Mortgage insurance is not modelled (claims read 2026-10-03): say so on
+      // the card it flatters, not only in the notes at the foot of the page.
+      var pmi = v.kind !== 'rent' && v.down < 20
+        ? '<p class="ch-small ch-pmi">Leaves out mortgage insurance, usually charged on less than 20% down, which flatters this plan.</p>' : '';
       return '<div class="ch-card ' + cls + (lead ? ' lead' : '') + '"><h3>' + name + '</h3>' + (lead ? '<span class="ahead">Ahead by ' + usd(Math.abs(d)) + '</span>' : '') + '<p class="sub">' + describe(v) + '. ' + bought + '</p>' +
         '<div class="big">' + usd(e.after / Dh) + '</div><div class="big-k">everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', in today’s dollars' : ', in future dollars') + '</div>' +
-        '<dl>' + rows.map(function (r) { return '<dt' + (r[2] === 'net' ? ' class="net"' : '') + '>' + r[0] + '</dt><dd' + (r[2] ? ' class="' + r[2] + '"' : '') + '>' + r[1] + '</dd>'; }).join('') + '</dl></div>';
+        '<dl>' + rows.map(function (r) { return '<dt' + (r[2] === 'net' ? ' class="net"' : '') + '>' + r[0] + '</dt><dd' + (r[2] ? ' class="' + r[2] + '"' : '') + '>' + r[1] + '</dd>'; }).join('') + '</dl>' + pmi + '</div>';
     }
     var leadA = d < -0.5, leadB = d > 0.5;
     $('chCards').innerHTML = card(A, a, 'a', 'Plan A', leadA) + card(B, b, 'b', 'Plan B', leadB);
 
     // Scenario table, with plain what-ifs first
-    var half = Math.pow(0.5, 1 / H) - 1;
     var paths = [{ k: 'half', label: 'Bitcoin halves over the ' + yrs(H), over: { growth: half }, g: half },
                  { k: 'flat', label: 'Bitcoin goes nowhere', over: { growth: 0 }, g: 0 }]
       .concat(['floor', 'stay', 'trend', 'upper'].map(function (sc) { return { k: sc, label: SC_NAME[sc] + (sc === 'upper' ? ' (stress test)' : ''), over: { scenario: sc } }; }));
