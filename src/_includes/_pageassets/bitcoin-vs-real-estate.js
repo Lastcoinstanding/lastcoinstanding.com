@@ -2,7 +2,9 @@
     /* homeData: see shared/bvre-annual-data.js (loaded before this script). */
 const incomeData={1965:6957,1970:9867,1975:13719,1980:21023,1985:23620,1990:29940,1995:34076,2000:42148,2005:46326,2010:49276,2013:51939,2014:53657,2015:56516,2016:59039,2017:61372,2018:63179,2019:68703,2020:67521,2021:70784,2022:74580,2023:80610,2024:81500,2025:83150};
     /* btcData: see shared/bvre-annual-data.js (loaded before this script). */
-const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54,2019:3.94,2020:3.11,2021:2.96,2022:5.34,2023:6.81,2024:6.72,2025:6.80};
+const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54,2019:3.94,2020:3.11,2021:2.96,2022:5.34,2023:6.81,2024:6.72,2025:6.60};
+// Freddie Mac PMMS 30-year fixed, each year's average (FRED MORTGAGE30US,
+// annual average). 2025 restated 2026-10-03 from 6.80, a mid-year reading.
 
     // ── Tax on a sale (PR 5b, rulings M7, M9, R7) ──
     // One tax profile for both calculators, from the "Tax on a sale" block
@@ -152,21 +154,25 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       {label:"\u2018Affordable\u2019 threshold (3.0\u00d7)",data:affordThresh,borderColor:greenColor,backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,pointHoverRadius:0,tension:0,fill:false}
     ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:12,color:tickColor,font:{size:10}}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,filter:c=>c.parsed.y!==null,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'\u00d7 income'}}},scales:{x:{...cso()},y:{...cso('Price-to-Income Ratio'),min:2,max:25,ticks:{color:tickColor,font:{size:10},stepSize:5,callback:v=>v+'\u00d7'}}}}});
 
-    // TAB 2: BTC HOUSE with trend projection
+    // TAB 2: BTC HOUSE: actual, a fitted trend through the actual years, and
+    // a Power Law path after them (btcHouseTrend in shared/bvre-annual-data.js;
+    // JM 2026-10-03, replacing a hand-drawn line from 367 BTC in 2013).
     const btcYears=Object.keys(btcData).map(Number);
-    const btcHouseValues=btcYears.map(y=>+(homeData[y]/btcData[y]).toFixed(1));
-    // Project trend to 2032 using log-linear regression on historical data
     const projYears=[2026,2027,2028,2029,2030,2031,2032];
     const allLabels=[...btcYears.map(String),...projYears.map(String)];
-    // Simple exponential decay projection from observed trend (~98.6% decline over 12 years)
-    const lastVal=btcHouseValues[btcHouseValues.length-1];
-    const projValues=projYears.map((y,i)=>{const decay=Math.pow(0.72,i+1);return+(lastVal*decay).toFixed(2)});
-    const historicalFull=[...btcHouseValues,...projYears.map(()=>null)];
-    const trendFull=[...btcYears.map(()=>null),...[lastVal,...projValues.slice(0,-1)]];
-    // Smooth trend line across full range for visual
-    const trendLineData=btcYears.map((y,i)=>{const t=(y-2013)/(2032-2013);return+(367*Math.pow(1.5/367,t)).toFixed(2)});
-    const trendLineFull=[...trendLineData,...projYears.map((y)=>{const t=(y-2013)/(2032-2013);return+(367*Math.pow(1.5/367,t)).toFixed(2)})];
-    new Chart(document.getElementById('btcHouseChart'),{type:'line',data:{labels:allLabels,datasets:[{label:'Actual',data:historicalFull,borderColor:amber,backgroundColor:amberLight,borderWidth:2.5,pointBackgroundColor:amber,pointRadius:4,pointHoverRadius:7,fill:true,tension:0.3},{label:'Trend',data:trendLineFull,borderColor:'rgba(224,148,34,0.4)',backgroundColor:'transparent',borderWidth:2,borderDash:[8,4],pointRadius:0,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:20,color:tickColor,font:{size:10},filter:item=>item.text!=='Projection'}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{title:c=>c[0].label,label:c=>{const y=parseInt(c.label);const isProj=y>2025;if(c.datasetIndex===1)return'Trend: ~'+c.parsed.y.toFixed(1)+' BTC';if(isProj)return null;return[c.parsed.y.toFixed(1)+' BTC','House: $'+(homeData[y]||0).toLocaleString(),'BTC price: $'+(btcData[y]||0).toLocaleString()]}}}},scales:{x:{...cso(),ticks:{color:function(c){return c.index>12?'rgba(106,98,86,0.5)':tickColor},font:{size:9}}},y:{...cso('Bitcoin Required'),type:'logarithmic',min:1,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[1,2,5,10,20,50,100,200,500];return a.includes(v)?v.toLocaleString():''}}}}}});
+    const apprNow=(function(){try{return window.ModelingAssumptions.get('homeApprNominal').value}catch(e){return 4.68}})();
+    const BH=btcHouseTrend(projYears,apprNow);
+    const btcHouseValues=BH.actual;
+    const historicalFull=[...BH.actual,...projYears.map(()=>null)];
+    const fitFull=[...BH.fit,...projYears.map(()=>null)];
+    const pathFull=[...btcYears.map(()=>null),...BH.path];
+    // Stat cards and narrative read the same numbers (were hardcoded 367 / 74 / ~5 / 98.6%).
+    (function(){const v=y=>BH.actual[btcYears.indexOf(y)];const f=x=>x>=100?Math.round(x).toLocaleString():x>=10?String(Math.round(x)):'~'+(Math.round(x*10)/10);
+      const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
+      set('bhStat2013',f(v(2013)));set('bhStat2017',f(v(2017)));set('bhStatLast',f(v(btcYears[btcYears.length-1])));
+      set('bhN2013',Math.round(v(2013)).toLocaleString());set('bhNLast',String(Math.round(v(btcYears[btcYears.length-1])*10)/10));
+      set('bhNDecline',(100*(1-v(btcYears[btcYears.length-1])/v(2013))).toFixed(1)+'%');})();
+    new Chart(document.getElementById('btcHouseChart'),{type:'line',data:{labels:allLabels,datasets:[{label:'Actual',data:historicalFull,borderColor:amber,backgroundColor:amberLight,borderWidth:2.5,pointBackgroundColor:amber,pointRadius:4,pointHoverRadius:7,fill:true,tension:0.3},{label:'Fitted trend, 2013–'+btcYears[btcYears.length-1],data:fitFull,borderColor:'rgba(224,148,34,0.4)',backgroundColor:'transparent',borderWidth:2,borderDash:[8,4],pointRadius:0,tension:0},{label:'Power Law path',data:pathFull,borderColor:'rgba(224,148,34,0.65)',backgroundColor:'transparent',borderWidth:2,borderDash:[3,4],pointRadius:0,tension:0.2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'center',labels:{boxWidth:10,usePointStyle:true,pointStyle:'circle',padding:20,color:tickColor,font:{size:10},filter:item=>item.text!=='Projection'}},tooltip:{backgroundColor:'rgba(10,9,8,0.95)',borderColor:amber,borderWidth:1,titleColor:amber,bodyColor:textColor,callbacks:{title:c=>c[0].label,label:c=>{const y=parseInt(c.label);const isProj=y>2025;if(c.datasetIndex===1)return'Fitted trend: ~'+c.parsed.y.toFixed(1)+' BTC';if(c.datasetIndex===2)return'Power Law path: ~'+c.parsed.y.toFixed(2)+' BTC';if(isProj)return null;return[c.parsed.y.toFixed(1)+' BTC','House: $'+(homeData[y]||0).toLocaleString(),'BTC price: $'+(btcData[y]||0).toLocaleString()]}}}},scales:{x:{...cso(),ticks:{color:function(c){return c.index>12?'rgba(106,98,86,0.5)':tickColor},font:{size:9}}},y:{...cso('Bitcoin Required'),type:'logarithmic',min:0.5,max:2000,ticks:{color:tickColor,font:{size:10},callback:v=>{const a=[0.5,1,2,5,10,20,50,100,200,500,1000,2000];return a.includes(v)?v.toLocaleString():''}}}}}});
 
     // TAB 2: OPPORTUNITY COST CHART (indexed, log scale, fixed tooltips)
     // TAB 2: SEESAW — Real Opportunity Cost (growth of $1 invested, log scale).
@@ -200,13 +206,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
     // TAB 2: HOUSES VISUAL with mortgage comparison
     (function(){
-        const invest=60000;const endBtc=88000;const endHome=416900;
-        const scenarios=[
-            {year:2015,btcPrice:272,homePrice:294000,rate:3.85},
-            {year:2017,btcPrice:4348,homePrice:323500,rate:3.99},
-            {year:2019,btcPrice:7362,homePrice:321500,rate:3.94},
-            {year:2020,btcPrice:11072,homePrice:336900,rate:3.11}
-        ];
+        // Reads the shared yearly series (were hardcoded copies, 2026-10-03).
+        const endYr=Math.max(...Object.keys(btcData).map(Number));
+        const invest=60000;const endBtc=btcData[endYr];const endHome=homeData[endYr];
+        const scenarios=[2015,2017,2019,2020].map(y=>({year:y,btcPrice:btcData[y],homePrice:homeData[y],rate:mortgageRates[y]}));
+        const hsrc=document.getElementById('housesSource');
+        if(hsrc)hsrc.textContent='Based on $60,000 at each year\u2019s average bitcoin price, valued at the '+endYr+' average of $'+endBtc.toLocaleString()+' against the '+endYr+' median new house of $'+endHome.toLocaleString()+'. Mortgage assumes 20% down, 30-year fixed at the prevailing rate.';
         const houseFilled='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3))"><path d="M3 13l9-9 9 9" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" fill="none" stroke="#e09422" stroke-width="1.5"/><path d="M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.2"/></svg>';
         const housePartial='<svg viewBox="0 0 24 24" width="26" height="26" style="margin:1px;opacity:0.25"><path d="M3 13l9-9 9 9" fill="none" stroke="#e09422" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 001 1h12a1 1 0 001-1v-7" fill="none" stroke="#e09422" stroke-width="1.5"/><path d="M10 20v-5h4v5" fill="none" stroke="#e09422" stroke-width="1.2"/></svg>';
         const houseFilled32=houseFilled.replace('width="26" height="26"','width="32" height="32"');
@@ -226,7 +231,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             if(fullH>15)btcIcons+='<span style="font-size:0.8rem;color:var(--amber);margin-left:0.4rem;align-self:center">+'+(fullH-15)+' more\</span>';
             // Mortgage reality
             const loan=s.homePrice-invest;
-            const yrsElapsed=2025-s.year;
+            const yrsElapsed=endYr-s.year;
             const monthlyPmt=mp(loan,s.rate,30);
             const totalPaid=Math.round(invest+(monthlyPmt*yrsElapsed*12));
             const mr2=s.rate/100/12;let bal=RealEstateModel.amortizeBalance(loan,mr2,yrsElapsed*12,monthlyPmt);bal=Math.max(0,Math.round(bal));
@@ -258,7 +263,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const thStyle='padding:0.6rem 0.8rem;color:var(--text-muted);font-size:0.78rem;text-transform:uppercase;letter-spacing:1px';
         // "BTC at start" column added so readers can see the actual entry
         // price the row's BTC Return % is computed against. End price is
-        // constant across rows (2025 BTC ≈ \$88K), so we only surface the
+        // constant across rows (the last year's average), so we only surface the
         // start-year price; the end price is implied by '<start> → 2025'
         // plus the return %.
         let rows='<tr style="border-bottom:1px solid var(--border)"><td style="'+thStyle+'">Start Year</td><td style="'+thStyle+'">BTC at start</td><td style="'+thStyle+'">BTC Return</td><td style="'+thStyle+'">Housing Return</td><td style="'+thStyle+'">Difference</td></tr>';
