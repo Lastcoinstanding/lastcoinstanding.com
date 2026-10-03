@@ -173,3 +173,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
     #mpGrid .re-grid th:first-child { width: 25%; }
     #mpGrid .re-grid th:first-child, #mpGrid .re-grid td:first-child { font-size: 0.66rem; }
 }
+
+/* The Power Law line under the scenario buttons (JM, CHP review, 2026-10-02). */
+.mp-scen-note { flex-basis: 100%; margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--text-dim); line-height: 1.55; }
+.mp-scen-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
