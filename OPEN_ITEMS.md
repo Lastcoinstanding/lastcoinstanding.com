@@ -11,7 +11,14 @@ session automatically. Close items here when done; this file is the "what's cook
 
 ## In flight (dated)
 
-- [ ] **STRC_DATA REFRESH — BLOCKED ON A FILED SHARE COUNT (2026-09-13).** `asOf` in
+> **Triage 2026-10-03.** Six items closed above and below where the repo shows them done. The
+> items still open from July and August (the WDCB thread, the sitemap recheck, the Satos
+> nomination, the pilot publish, the Hurdle Rate essay, the SEO re-tune, the outreach lane, the
+> Substack signal check, the X-card re-scrapes, the branch prune, the LinkedIn update and the
+> eyeball checks) are JM's own tasks or depend on accounts this repo can't see. They are left
+> as they were for JM to close or re-date; none blocks site work.
+
+- [x] **CLOSED 2026-10-03 — done in PR #160 (2026-09-30): `asOf` 2026-09-27 from the 8-K, `sharesOutstanding` 91,621,608 derived from the repurchases, the fuel-gauge constants moved with it.** Original: **STRC_DATA REFRESH — BLOCKED ON A FILED SHARE COUNT (2026-09-13).** `asOf` in
   `src/_includes/_pageassets/the-strc-mechanism.js` is still `2026-07-28`, and the block has
   drifted materially since: `usdReserveB` 3.75 → **5.10**, `btcHoldings` 843,775 → **845,050**,
   `authRemaining.preferredM` 975 → **1190** (the digital-credit repurchase program was doubled
@@ -24,13 +31,13 @@ session automatically. Close items here when done; this file is the "what's cook
   10-Q.** The stale count errs conservatively: too many shares overstates the dividend bill and
   understates coverage. `priorMonthVWAP` is also still `null`, and has been since ship.
 
-- [ ] **BvSM §4 HORIZON FIGURES — FOUR MONTHS STALE (2026-09-13).**
+- [x] **CLOSED 2026-10-03 — restated through September 2026 in the October refresh (PR #172, 2026-10-01) on the rebuilt S&P series; now a monthly item in MONTHLY_REFRESH §3.** Original: **BvSM §4 HORIZON FIGURES — FOUR MONTHS STALE (2026-09-13).**
   `src/bitcoin-vs-the-stock-market.njk` carries "Through May 2026" with hardcoded 1y / 5y / 10y
   returns (+27% S&P, −21% bitcoin at one year). Honestly dated but written in the present
   tense, and bitcoin has gone from $126K to $77K since. Needs an S&P series and a decision on
   the measurement convention before the numbers can move.
 
-- [ ] **METCALFE `FITS` RE-FIT + PINNED DATASET RE-PULL (2026-09-13).** The pinned weekly
+- [x] **CLOSED 2026-10-03 — re-pulled whole and re-fitted in the October refresh (PR #172): headline 1.84/0.95 → 1.83/0.94, ETF era 1.12/0.02.** Original: **METCALFE `FITS` RE-FIT + PINNED DATASET RE-PULL (2026-09-13).** The pinned weekly
   series (`bitcoin-and-metcalfes-law-data.js`) was pulled 2026-06-20 on a quarterly cadence, so
   it is due. The ETF-era holders cell is β=2.86 at **R²=0.09** — noise either way — so do the
   re-fit in one pass with the re-pull rather than piecemeal. Confirm the refreshed full-history
@@ -612,7 +619,7 @@ session automatically. Close items here when done; this file is the "what's cook
   (merged to `main` 2026-09-16, `b0a4e09`). Open follow-ups from that pass are the four dated
   items at the top of "In flight".
 
-- [ ] **~Oct 13 — Monthly refresh due.** PL_DATA append + as-of strings + CLARITY check + MSTR/STRC
+- [x] **CLOSED 2026-10-03 — the October refresh ran on 2026-10-01 (PRs #169, #172); the next is due at the start of November, and `scripts/data-freshness.py` now drives it.** Original: **~Oct 13 — Monthly refresh due.** PL_DATA append + as-of strings + CLARITY check + MSTR/STRC
   snapshots + Bull & Bear triggers. /discount-or-premium needs nothing beyond the shared PL_DATA
   append (all figures live-computed, incl. the duration record).
 
@@ -711,12 +718,12 @@ Remaining tail:
   /disciplined-rebalancing, /lump-sum-or-ladder-in.
 - [ ] **X card re-scrape — /the-strc-mechanism** (renamed from /strc-below-par, 2026-08-10; do AFTER merge,
   and after the new OG card lands — see the handback below).
-- [ ] **OG card handback — `og-the-strc-mechanism.jpg`** (STRC overhaul, `feat/strc-mechanism`). The head
+- [x] **CLOSED 2026-10-03 — the card is in the repo, registered in `.eleventy.js`, and both meta tags point at it.** Original: **OG card handback — `og-the-strc-mechanism.jpg`** (STRC overhaul, `feat/strc-mechanism`). The head
   still points `og:image` at the old `og-strc-below-par.jpg` (kept served — no phantom-200) until the
   drafting chat generates the new product-forward card for "The STRC Mechanism"; then Claude Code registers
   it in `.eleventy.js` `staticAssets` and repoints the meta. Post-landing: `curl -I …/og-the-strc-mechanism.jpg`
   → `image/jpeg`.
-- [ ] **STRC daily-close Action — first live confirmation (post-merge).** `workflow_dispatch` isn't available
+- [x] **CLOSED 2026-10-03 — the Action has committed closes on weekdays since 2026-08-12; the latest `strcClose.json` is 2026-10-01.** Original: **STRC daily-close Action — first live confirmation (post-merge).** `workflow_dispatch` isn't available
   until the workflow is on `main` (GitHub limitation), so it couldn't run pre-merge. After merge, run one
   `gh workflow run strc-daily-close.yml` and confirm the green run + the `data(strc):` commit; then the
   weekday schedule maintains it. Monthly silent-death check is in `MONTHLY_REFRESH §7.6`.

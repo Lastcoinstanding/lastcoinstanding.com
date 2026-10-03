@@ -314,6 +314,15 @@ FIXED = [
     ('the-gallery.njk', 'as of Jul 2026'),
     ('the-gallery.njk', 'as of July 2026'),
 ]
+# Dated by their source document, re-checked on a date: still the latest the
+# source has published, so they count as fresh from the re-check, not from the
+# document date. (file, text, re-checked, what to watch for next)
+RECHECKED = [
+    ('bitcoin-vs-rental-property.njk', 'as of August 23, 2026', dt.date(2026, 10, 3),
+     'Strategy\'s latest investor briefing; none newer on EDGAR to 2026-10-01. Next: Q3 results, late Oct'),
+    ('bitcoin-vs-rental-property.njk', 'as of July 27, 2026', dt.date(2026, 10, 3),
+     'net debt from the Q2 results deck; next: Q3 results, late Oct'),
+]
 DATED = re.compile(r'(?i)\b(?:(?:snapshot|figures)\s+)?(?:as of|through|updated)\s+(?:\w+day,\s+)?'
                    r'(January|February|March|April|May|June|July|August|September|October|November|December|'
                    r'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+(?:(\d{1,2}),\s+)?(\d{4})')
@@ -331,10 +340,14 @@ def dated_strings():
                     continue
                 y, mo = int(m.group(3)), MONTHS[m.group(1).lower()]
                 d = dt.date(y, mo, int(m.group(2))) if m.group(2) else month_end(y, mo)
+                note = 'a future date: a deadline to watch, not an as-of' if (TODAY - d).days < 0 else ''
+                for f, pat, checked, why in RECHECKED:
+                    if fn == f and pat.lower() in m.group(0).lower():
+                        d, note = checked, 're-checked %s: %s' % (checked.isoformat(), why)
                 age = (TODAY - d).days
                 status = 'OK' if age <= 35 else ('DUE' if age <= 75 else 'OVERDUE')
                 rows.append((status, 'Dated text: "%s"' % m.group(0).strip()[:60], d.isoformat(), 'monthly',
-                             '§3', '%s:%d' % (fn, i), 'a future date: a deadline to watch, not an as-of' if age < 0 else ''))
+                             '§3', '%s:%d' % (fn, i), note))
 
 
 # ── Report ────────────────────────────────────────────────────────────────────
