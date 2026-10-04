@@ -89,6 +89,10 @@ body { background: var(--bg); color: var(--text); }
 .hc-eyebrow { font-family: var(--font-b); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
 .hc-h2 { font-family: var(--font-h); font-size: 1.9rem; margin: 0 0 0.7rem; color: var(--text); }
 .hc-lead { max-width: 880px; margin: 0 auto 1.4rem; color: var(--text-dim); }
+/* Arrival note when a reader is handed in from /bitcoin-spikes (?from=spikes). */
+.hc-arrival { max-width: 880px; margin: 0 auto 1.2rem; padding: .65rem .9rem; border: 1px solid var(--border); border-left: 2px solid var(--accent); border-radius: 6px; background: var(--bg-card); color: var(--text-dim); font-size: .88rem; }
+.hc-arrival strong { color: var(--text); font-weight: 600; }
+.hc-arrival a { color: var(--accent); }
 .hc-section > .hc-eyebrow, .hc-section > .hc-h2 { max-width: 880px; margin-left: auto; margin-right: auto; }
 
 /* ── Controls ── */

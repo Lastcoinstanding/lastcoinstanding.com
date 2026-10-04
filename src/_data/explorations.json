@@ -410,6 +410,20 @@
     }
   },
   {
+    "_comment": "The upper side of the channel, as a counterpart to the-bitcoin-floor: where price sits now, every spike above trend since 2011 measured (shared/spike-record.js, modern set from MODERN_FROM, as on the Floor), and what holders did with them. interactive: true — live readout, an intent chooser with three answer cards (fund a bill, a one-time trim, a standing rule) and a tax-hurdle widget. Card B's headline is How Much Cash's own bandMetrics figure and hands off to /how-much-cash with ?pos&rebuy=trend&share&tax&from=spikes. No URL scenario params of its own; tabs take bare-token hash links (#decide, #record, #laws, #different). spikesQA() pins the record to the 2026-09-30 sample. Plural title signed off by JM 2026-10-04 (STYLE_GUIDE §10.4). Tile position 62 sits beside how-much-cash (60), its handoff target. SVG tile at components/calc-tile-icons/bitcoin-spikes.njk.",
+    "slug": "bitcoin-spikes",
+    "title": "Bitcoin's Spikes",
+    "category": "numbers",
+    "group": "Models & Trends",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Where bitcoin sits against its trend today, how every spike above it has ended, and what holders who sold into one ended up with, in bitcoin.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 62
+    }
+  },
+  {
     "_comment": "Does a bitcoin allocation earn its place? Answers one question (worth it over a long horizon, despite drawdowns) with three effects as evidence. Reframed to match The Bitcoin Horizon: the third effect is 'portfolio influence' (the neutral engine, NOT risk); true risk is the drawdown you cannot hold through. Bitcoin growth projected from the Power Law, regime-aware. Consequences counterpart to how-much-bitcoin (Kelly/optimal). SVG tile at components/calc-tile-icons/bitcoin-allocation-sizing.njk.",
     "slug": "bitcoin-allocation-sizing",
     "title": "Bitcoin Portfolio Allocation",

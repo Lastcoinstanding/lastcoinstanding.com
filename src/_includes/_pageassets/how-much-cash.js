@@ -1055,9 +1055,25 @@
     initControls();
   }
 
+  // Arrival from /bitcoin-spikes (?from=spikes): one line naming what was carried
+  // in, plus a GA4 arrival event. Reads the state readUrl() already parsed, so the
+  // note describes exactly what the instrument is showing. `from` is a foreign
+  // param to syncUrl(), which seeds from the live query string, so it survives
+  // writes like any other.
+  function renderArrival() {
+    if (!window.URLSearchParams || new URLSearchParams(window.location.search).get('from') !== 'spikes') return;
+    var el = document.getElementById('hcArrival'); if (!el) return;
+    var at = (S_.pos == null) ? 'today’s position' : (+ratioOf(clampPos(S_.pos)).toFixed(2)) + '× trend';
+    el.innerHTML = 'Picked up from <a href="/bitcoin-spikes">Bitcoin’s Spikes</a>: <strong>trim ' + S_.share + '% at ' + at + ', ' +
+      (S_.tax === 0 ? 'IRA' : 'taxable at ' + S_.tax + '%') + '</strong>.';
+    el.hidden = false;
+    try { if (typeof gtag === 'function') gtag('event', 'spikes_arrival', { position: S_.pos, share: S_.share, tax: S_.tax }); } catch (e) {}
+  }
+
   function init() {
     var urlPresent = readUrl();       // A3 precedence: URL params (any) > stored state > defaults
     if (!urlPresent) loadStore();     // a URL-parameterized load neither reads nor is overridden by the store
+    renderArrival();
     wire(); buildChannel(); renderAll();
     try {
       fetchTodayPrice(function (price, source) {
