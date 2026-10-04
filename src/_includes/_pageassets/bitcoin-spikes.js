@@ -223,7 +223,7 @@
     var t13 = SR.roundTrip(SR.TRADE_CYCLES[0], bTrig, 'trend');
     var rose = t13.fired ? R13.highP / t13.sell.p : null;
     $('spBCaveat').textContent = 'The headline counts every sample near ' + bTrig + '× trend since ' + (c ? yearOf(c.since) : 2014) + ', as How Much Cash does; “below trend” there means price falling under about 0.85× trend, the lower edge of the site’s “at trend” zone. The rows rebuy at 1× trend. ' +
-      (rose ? 'How Much Cash’s set starts in 2014, so the 2013 case appears only here: that rule sold in ' + monthYear(t13.sell.d) + ', and price rose ' + Math.round(rose) + '× more by ' + monthYear(R13.highD) + '. ' : '') +
+      (rose ? 'How Much Cash’s set starts in 2014, so the 2013 case appears only here: that rule sold in ' + monthYear(t13.sell.d) + ', and price rose more than ' + Math.floor(rose) + '× by ' + monthYear(R13.highD) + '. ' : '') +
       'Low cost basis assumed in taxable mode. Bars show your whole stack after the round trip; the line marks where you started.';
     if (c) $('spBCta').setAttribute('href', '/how-much-cash?pos=' + c.P.toFixed(3) + '&rebuy=trend&share=' + Math.round(sh * 100) + '&tax=' + c.tax + '&from=spikes');
   }
@@ -242,7 +242,7 @@
     var t13 = SR.roundTrip(SR.TRADE_CYCLES[0], cTrig, 'trend');
     $('spCNote').textContent = cRebuy === 'ath80'
       ? 'A rebuy waiting for an 80% fall has not triggered since 2013, so the sale stayed in cash. Fixed drawdown targets fail as cycles shrink.'
-      : 'Coins after the round trip as a multiple of coins sold, whole position, no tax.' + (t13.fired ? ' Note 2013: the rule fired in ' + monthYear(t13.sell.d) + ' and price rose ' + Math.round(R13.highP / t13.sell.p) + '× more by ' + monthYear(R13.highD) + '.' : '');
+      : 'Coins after the round trip as a multiple of coins sold, whole position, no tax.' + (t13.fired ? ' Note 2013: the rule fired in ' + monthYear(t13.sell.d) + ' and price rose more than ' + Math.floor(R13.highP / t13.sell.p) + '× by ' + monthYear(R13.highD) + '.' : '');
     $('spCCta').setAttribute('href', '/disciplined-rebalancing?account=' + cAcct);
   }
 
