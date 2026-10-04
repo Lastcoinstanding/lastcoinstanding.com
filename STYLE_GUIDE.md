@@ -2257,6 +2257,38 @@ A **description card**: the same fields in the same order on every instance, so 
 - Grid: three across ≥1080px, two ≥700px, one below; `align-items: stretch` so a row's cards share a height and the foot sits at the bottom (`margin-top: auto`). At ≤520px the chips drop under the name.
 - Colour through tokens only (`--green`, `--red`, `--amber`, `--text-dim`, …); the page defines them in its `:root`.
 
+
+### 6.51 Intent chooser with a grouped pair and an info tip (`/bitcoin-spikes`, 2026-10-04)
+
+A row of buttons that each open one answer card, for a page that answers the same situation for readers with different goals. Page-scoped prefix `sp-`. Two of the three intents share arithmetic but differ in how they are judged, so they sit in a dashed frame with a gold label and an info tip that states the difference.
+
+```html
+<div class="sp-intents" role="group" aria-label="Your goal">
+  <button type="button" class="sp-intent" aria-pressed="true" aria-controls="spWA"><span class="sp-k">Fund something</span><span class="sp-d">…</span></button>
+  <div class="sp-pair">
+    <div class="sp-pair-h">Trim and buy back <button class="sp-tip" type="button" aria-expanded="false" aria-controls="spPairTip">i</button><span class="sp-tip-body" id="spPairTip" role="tooltip">…</span></div>
+    <div class="sp-pair-row"><button class="sp-intent" aria-pressed="false">…</button><button class="sp-intent" aria-pressed="false">…</button></div>
+  </div>
+</div>
+```
+
+- **Buttons with `aria-pressed`, not tabs.** The frame and its tip sit inside the row, which a `tablist` cannot hold validly.
+- **The tip opens on hover, focus and click; Escape and an outside click close it.** The button keeps a small glyph and gets a 44px hit area from an `::after` inset, so touch works without enlarging the icon.
+- **Each card cross-links its pair-mate** ("run it as a rule" / "try a one-time trim"), so a reader who chose wrong moves sideways without scrolling back.
+- **Use it** when the goals lead to different tools. **Skip it** when the cards would only change an input; that is a segmented control.
+
+### 6.52 Evidence tier badge on case cards (`/bitcoin-spikes`, 2026-10-04)
+
+A `<details>` card whose summary carries a pill grading how well the record supports it: **Well documented** (green), **Suggestive** (amber), **Examined and set aside** (muted; the card title dims too, via `.is-set`). The badge sits above the title so a reader scanning the grid reads the grade first.
+
+```html
+<details class="sp-case is-set"><summary><span class="sp-badge set">Examined and set aside</span><span class="sp-case-t">Tulip mania</span></summary><p>…</p></details>
+```
+
+- **Keep the set-aside cards on the page.** Showing what was checked and rejected is part of the evidence; deleting them hides the method.
+- **Three tiers, no more.** A finer scale implies a precision the grading does not have.
+- Colours through tokens (`--green`, `--amber`, `--text-muted`, and the page's border tokens). Use a class rather than `:has()` for the dimmed title.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

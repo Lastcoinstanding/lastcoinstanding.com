@@ -94,6 +94,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | February | Strategy's return-of-capital classification for the prior year | §7.5 step 6 |
 | May | Demographia affordability (both copies) | Annual: Demographia |
 | November | Power Law exponent survey, with the PL-1 recheck | §1 |
+| October | Bitcoin's Spikes snapshots: peak-buyer recovery (Nasdaq, Nikkei, gold, nominal and real) and the unit refits, in `src/_data/spikeSnapshots.json`; re-pull FRED and the World Bank gold series, update DATA_AUDIT SP-4 and SP-5, and update the `spikesQA()` snapshot expectations in `bitcoin-spikes.js` with them | DATA_AUDIT `bitcoin-spikes` |
 
 ### 0.5 Event-driven
 
@@ -101,7 +102,7 @@ When one of these happens, run its list in §12: a **new all-time high**; the **
 
 ### 0.6 Nothing to refresh (computed at load)
 
-The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, The Bitcoin Floor (its QA is §5.1), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
+The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, The Bitcoin Floor (its QA is §5.1), Bitcoin's Spikes (its record QA is `[spikes-qa]`, pinned to 2026-09-30; check the console line after a PL_DATA refresh, and never re-pin the fixture to make it pass), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
 
 ### 0.7 Cross-page agreement (monthly)
 
