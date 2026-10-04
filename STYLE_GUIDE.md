@@ -2514,11 +2514,30 @@ Never *"How long will a return to trend take?"* — that is a forecast, and the 
 - **Not a rule about prose.** Essays may still discuss *retirement income* as a concept (the flagship's Question and Strategies tabs do), and *fixed income* is an asset class. The rule governs the named quantity, not the English word.
 - **The URL parameter stays `income`.** It is invisible to readers, and renaming it would break every shared link.
 
+### 10.12 Plain, high-signal prose
+
+**JM ruling, 2026-10-04.** The target register is the one used in working conversation between JM and Claude: direct, logical, coherent, high signal. Flowery or literary prose is a defect, not a style. Concrete habits:
+
+- **Lead with the point.** The first sentence of a paragraph carries its claim; supporting detail follows. No wind-ups, scene-setting, or rhetorical build-up.
+- **One idea per paragraph.** Short paragraphs. If a paragraph makes two points, split it.
+- **Concrete over abstract.** Numbers, names, dates and mechanisms instead of adjectives. "Peaks fell from ~5x to ~1.3x trend" beats "peaks have dramatically diminished." (`§10.3` governs how the numbers are stated.)
+- **Plain verbs, literal language.** Metaphor only when it explains something faster than a literal sentence would. Cut stock flourishes: "tapestry," "journey," "dance," "testament to," "stands as," "in the grand scheme," "at its core," "it's worth noting." The single-word tells are also on the `§11` banned list.
+- **Say what it means.** After a fact, state its consequence for the reader in one plain line ("For a holder, this means…").
+- **Label the status of claims.** Distinguish what is measured, what a source claims, and what is our inference, in plain words ("a claim, not evidence"; "our reading, not the source's").
+- **State limits once, plainly.** One clear caveat beats stacked hedges ("may potentially perhaps"). Stating the caveat is different from announcing that you are stating it (`§10.1`).
+- **No decorative rhythm.** Avoid triplets for cadence, "not X, but Y" constructions used for effect, and closing lines that restate the paragraph. Use a contrast construction only where the contrast is the point.
+- **Cut intensifiers and throat-clearing:** "truly," "incredibly," "remarkably," "fundamentally," "importantly," "interestingly."
+- **Stop when done.** No summary paragraph that repeats what was just said.
+
+**Litmus test:** would the sentence read naturally in a working message to a smart colleague? If it reads like a brochure or a novel, rewrite it.
+
+Essay tabs may use fuller prose than chat (fewer bullets, more connective sentences), but the register is the same plain one.
+
 ## 11. Words we don't use
 
 The following read as AI-generated and are banned from page copy:
 
-**load-bearing · delve · crucially · notably · robust · leverage (as a verb) · elegant · tapestry · landscape (metaphorical) · deep dive · unpack · testament to · at its core · it's worth noting**
+**load-bearing · delve · crucially · notably · robust · leverage (as a verb) · elegant · tapestry · landscape (metaphorical) · deep dive · unpack · testament to · at its core · it's worth noting · journey (metaphorical) · dance (metaphorical) · stands as · in the grand scheme** _(last four added 2026-10-04 with `§10.12`)_
 
 **Scope: page copy only.** Code comments and internal docs (this file, `SITE_GUIDE`, `TECH_DEBT`, commit messages) are exempt.
 
