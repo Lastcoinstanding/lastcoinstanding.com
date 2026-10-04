@@ -22,8 +22,8 @@ Companion docs:
 
 Answer explicitly in the drafting chat: (1) would NotebookLM deep research add value
 for this page — yes/no and why; (2) if yes, the notebook (new or reused), the ≤6
-corpus-discovery queries, and the question set. Full workflow and rules live in the
-project doc `claude/NOTEBOOKLM_WORKFLOW.md` (drafting-chat side, not the repo).
+corpus-discovery queries, and the question set. Full workflow and rules live in
+`NOTEBOOKLM_WORKFLOW.md` in the claude.ai project docs (drafting-chat side, not the repo).
 
 ## 1. Page implementation
 
