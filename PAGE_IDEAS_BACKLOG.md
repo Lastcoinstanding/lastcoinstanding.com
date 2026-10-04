@@ -676,6 +676,24 @@ _Cluster opened 2026-08-21 (JM). Three pages live — **The Bitcoin Retirement**
   - **Cross-links:** DR (`/disciplined-rebalancing`), BAS (`/borrowing-against-your-stack`), WODN (`/wait-or-deploy-now`).
   - **Open design question — settle at spec time:** own page (lean) vs. an extension of Disciplined Rebalancing. Decide before drafting; the answer changes the scope substantially.
 
+- [ ] **Applied Disciplined Rebalancing: user-defined rules (Phase 4 of `/disciplined-rebalancing`).**
+  Surfaced 2026-10-04 from reader demand: an IRA holder wanting a mechanical sell/rebuy rule to follow. Let the reader define their own exit and re-entry rules and test them against history and conservative projections.
+  - **Extend, don't build new.** DR already has sell/rebuy thresholds, sell fraction, account type, tax rate and trade history.
+  - **Partly answers the open question on "Sell, Borrow, or Wait?" (directly above).** That entry asks whether goal-funding is its own page or a DR extension. This one settles that standing *rules* belong in DR; the goal-funding question stays open.
+  - **Additions:**
+    - Rules in channel terms (×trend: floor, trend, upper band, any multiple), not only percentiles.
+    - Trigger types: ×trend, drawdown from ATH, cycle calendar (days from prior low), and AND/OR combinations.
+    - Fallback for a rebuy that never comes: a time cap, then buy back at market.
+    - Backtest every cycle in coins and dollars versus buy-and-hold, with a trade log.
+    - Forward projection with narrowing cycle swings (the conservative case) beside constant swings.
+    - Taxable vs IRA, with cost basis and state tax (reuse the state dropdown from Bitcoin Lenders Compared, `/bitcoin-lenders`).
+  - **Findings to design around** (`SPIKES_ANALYSIS_2026-10-04.md`, project side, not in the repo):
+    - Rebuy triggers set relative to trend beat drawdown-from-ATH triggers in every cycle; a −80% rebuy never fired after 2013.
+    - A 2× trim with rebuy below trend gained 22–49% more coins in an IRA (2017, 2021) but lost coins in a taxable account at 23.8% in most cases. A 2013 trigger fired at the April spike and cost 51–74% of coins.
+    - Peak excursion fell from 14× to 1.19× trend; the Oct 2025 high was ~1.07× trend.
+    - A "sell at trend" rule now fires close to trend, so the narrowing-swing projection is essential, not optional.
+  - **Overlap to manage:** How Much Cash (`/how-much-cash`, a single sell/rebuy decision), Spend and Replace (`/spend-and-replace`), and the planned spikes page, which routes "standing rule" readers here.
+
 - [x] **What Daily Conviction Bought — daily-conviction DCA tool (The Numbers).** → shipped as `what-daily-conviction-bought` (`/what-daily-conviction-bought.html`) in `1601a05`, 2026-08-05. Full record in **SITE_GUIDE §43**.
   - **SHIPPED 2026-08-05.** Retrospective daily-DCA backtest: pick a start date + daily amount → BTC accumulated · total invested · value today · multiple · longest underwater stretch · deepest drawdown, plus a contributions-vs-value chart. Ports `scripts/thirty-a-day-chart.ps1` (log-linear daily interp of `PL_DATA`); parity gate passed exactly (crossing 2024-11-19 / $86,400 / day 2,880; drawdown −73.3%; latest $104,970 in / 11.3447 BTC). All six collision fences honored via cross-links (Doubling Ladder / Wait-or-Deploy / Power Law). Zero added refresh surface (reads shared `PL_DATA`).
   - **v1.1–v1.2 SHIPPED 2026-08-06** (one merge; JM's additions + preview audit): (1) "If the habit continued" forward scenario block — now a **two-band planning range (floor → trend)** after the v1.2 upper-demotion (upper excursions are brief spikes, per RETIREMENT_CALCULATOR_DESIGN's floor-vs-upper asymmetry; upper is a caption clause + Bull-&-Bear link, no `$` figure), with a `?stack=`+`?dca=` handoff into The Bitcoin Retirement and a humility clause linking the Power Law caveats; (2) an 8-card stat grid in four pairs, "Value"→"Current value", and a NEW **Annualized return** card = money-weighted **IRR** (~38%/yr legend, not the ~22% naive CAGR) with a live CAGR-contrast tooltip; (3) a Peak-value stat ("visible only in the rearview mirror"); (4) a rich chart hover/tap tooltip (date · contributions · value · BTC held · multiple); (5) BTC-bought copy reframed as the second-decade insight. Narrowly amends R1 (banded scenarios allowed; sustainability stays the retirement cluster's) — SITE_GUIDE §43. Parity untouched.
