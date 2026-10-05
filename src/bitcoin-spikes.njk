@@ -15,7 +15,7 @@ faq:
   - q: "Can you tell when bitcoin has peaked?"
     a: "Not in time to act on it. No published forecast I found identified the 2021 or 2025 tops in advance, and by the time price fell back to trend it was 53&ndash;86% below the price high."
   - q: "Should I sell bitcoin when it spikes?"
-    a: "It depends what for. Funding a planned expense at a spike has historically used fewer coins; trimming to buy back has worked in some cycles and cost HODLers coins in others, especially in taxable accounts."
+    a: "It depends what for. Funding a planned expense at a spike has historically used less bitcoin; trimming to buy back has worked in some cycles and shrunk HODLers' stacks in others, especially in taxable accounts."
   - q: "Why is selling and buying back easier in an IRA?"
     a: "No tax is due on the sale, so any fall in price lets you buy back more than you sold. In a taxable account the price must fall by roughly your tax rate first."
   - q: "Are bitcoin's spikes getting smaller?"
@@ -92,12 +92,12 @@ eleventyComputed:
         <div class="sp-for"><h3>The case for acting</h3><ul>
           <li id="spActBullet1">Every excursion far above trend since 2011 has come back to the trend, and in four of five cycles price went on to within about 10% of the floor.</li>
           <li>In an IRA or other tax-advantaged account there is no tax hurdle, so taking a little off the table at highs and buying back at or below trend can grow your stack without a tax penalty to overcome.</li>
-          <li>Funding a known expense, such as a house or college, at a bitcoin price spike has used fewer coins than funding it later would have.</li></ul></div>
+          <li>Funding a known expense, such as a house or college, at a bitcoin price spike has used less bitcoin than funding it later would have.</li></ul></div>
         <div class="sp-against"><h3>The case for HODLing</h3><ul>
           <li>Spikes are shrinking. In 2024&ndash;25 price never reached 1.5&times; trend, so there was little to capture.</li>
           <li>The first spike of a cycle may not be the last. In 2013 price rose more than 8&times; after the April spike.</li>
           <li>In a taxable account the tax hurdle takes most of the edge: you have to be right by a wide margin for the trade to grow your stack.</li>
-          <li>The trend could steepen. The coins you sold are the ones that miss the climb.</li>
+          <li>The trend could steepen. The bitcoin you sold is what misses the climb.</li>
           <li>Price could break upward and not fall back to trend as it has before.</li></ul></div>
       </div>
       <p class="sp-after-vs">The record favors small, planned actions sized so that being wrong is bearable. It does not favor selling the stack.</p>
@@ -114,7 +114,7 @@ eleventyComputed:
           <div class="sp-pair-h">Trim and buy back <span class="help-tip" tabindex="0">?<span class="tip-content">Both sell into a spike and buy back lower, so the arithmetic is the same. The test is different. A one-time trim is decided while watching a spike, so it is judged on that spike. A rule is committed in advance for every spike, so it is judged across all of them, including the cycles where it fires early or never fires.</span></span></div>
           <div class="sp-pair-row">
             <button type="button" class="sp-intent" id="spIB" data-intent="trim" aria-pressed="false" aria-controls="spWB"><span class="sp-k">End up with more bitcoin</span><span class="sp-d">One spike, watched. A trim you decide on in the moment.</span></button>
-            <button type="button" class="sp-intent" id="spIC" data-intent="rule" aria-pressed="false" aria-controls="spWC"><span class="sp-k">Run a rule</span><span class="sp-d">Every spike, decided in advance. The same trade as a discipline.</span></button>
+            <button type="button" class="sp-intent" id="spIC" data-intent="rule" aria-pressed="false" aria-controls="spWC"><span class="sp-k">Run your rules</span><span class="sp-d">Every spike, decided in advance. The same trade as a discipline.</span></button>
           </div>
         </div>
       </div>
@@ -123,7 +123,7 @@ eleventyComputed:
       <div class="sp-work" id="spWA">
         <div class="sp-eyebrow">A look back at history, not a projection</div>
         <h3>Use the spike to pay for something you&rsquo;d sell for anyway</h3>
-        <p class="sp-dim">Selling at a spike means fewer coins for the same dollars, and there&rsquo;s no rebuy to get wrong.</p>
+        <p class="sp-dim">Selling at a spike means less bitcoin for the same dollars, and there&rsquo;s no rebuy to get wrong.</p>
         <div class="sp-controls">
           <div class="sp-ctl sp-ctl-wide"><span class="sp-lbl" id="spFWhenL">Sell when</span><div class="sp-seg" id="spFWhen" role="group" aria-labelledby="spFWhenL"><button type="button" data-v="up:2" aria-pressed="false">As it rises through 2&times; trend</button><button type="button" data-v="down:2" aria-pressed="true">Once it turns down, back below 2&times;</button><button type="button" data-v="down:1.5" aria-pressed="false">Once it turns down, back below 1.5&times;</button><button type="button" data-v="peak" aria-pressed="false">At the peak (hindsight only)</button></div><p class="sp-help" id="spFWhenHelp"></p></div>
           <div class="sp-ctl"><label for="spFMonths">Time until you need it</label><output id="spFMonthsOut" for="spFMonths">12 months</output><input type="range" id="spFMonths" min="6" max="36" step="6" value="12"></div>
@@ -132,7 +132,7 @@ eleventyComputed:
         <div class="sp-answer">
           <p class="sp-head" id="spFHead"></p>
           <div>
-            <div class="sp-rows-h">Coins used, against selling when the bill arrived</div>
+            <div class="sp-rows-h">Bitcoin used, against selling when the bill arrived</div>
             <div class="sp-rows" id="spFRows"></div>
           </div>
         </div>
@@ -167,19 +167,19 @@ eleventyComputed:
         <div class="sp-handoff"><p><strong>Next: How Much Cash</strong>, a separate exploration where you set your own sell and rebuy points and see every past entry near them, in bitcoin and after tax. Your trigger, share and account carry over.</p><a class="sp-cta" id="spBCta" href="/how-much-cash" data-handoff="how-much-cash">Open How Much Cash &rarr;</a></div>
       </div>
 
-      <!-- C · Run a rule -->
+      <!-- C · Run your rules -->
       <div class="sp-work" id="spWC" hidden>
-        <h3>Decide the rule now, let it fire later</h3>
-        <p class="sp-dim">A standing rule, such as selling a slice above one multiple of trend and buying back below another, takes the decision out of the moment.</p>
+        <h3>Decide the rules now, let them fire later</h3>
+        <p class="sp-dim">Two standing rules, one to sell a slice above one multiple of trend and one to buy back below another, take the decision out of the moment.</p>
         <p class="sp-xlink">Judged across every cycle, including the ones it gets wrong. Deciding on a single spike instead? <button type="button" data-go="spIB">Try a one-time trim</button>.</p>
         <div class="sp-controls">
           <div class="sp-ctl"><span class="sp-lbl" id="spCTrigL">Rule: sell above <span class="help-tip" tabindex="0">?<span class="tip-content" id="spCTip">In past cycles a 2&times; rule waited longer and caught more; 1.5&times; was the cautious choice.</span></span></span><div class="sp-seg" id="spCTrig" role="group" aria-labelledby="spCTrigL"><button type="button" data-v="1.5" aria-pressed="true">1.5&times; trend</button><button type="button" data-v="2" aria-pressed="false">2&times; trend</button></div></div>
           <div class="sp-ctl"><span class="sp-lbl" id="spCRebuyL">Buy back at</span><div class="sp-seg" id="spCRebuy" role="group" aria-labelledby="spCRebuyL"><button type="button" data-v="trend" aria-pressed="true">Back to trend</button><button type="button" data-v="ath80" aria-pressed="false">80% below the price high</button></div></div>
-          <div class="sp-ctl"><span class="sp-lbl" id="spCAcctL">Your account, carried to the rule</span><div class="sp-seg" id="spCAcct" role="group" aria-labelledby="spCAcctL"><button type="button" data-v="retirement" aria-pressed="true">IRA</button><button type="button" data-v="regular" aria-pressed="false">Taxable</button></div></div>
+          <div class="sp-ctl"><span class="sp-lbl" id="spCAcctL">Your account, carried to the rules</span><div class="sp-seg" id="spCAcct" role="group" aria-labelledby="spCAcctL"><button type="button" data-v="retirement" aria-pressed="true">IRA</button><button type="button" data-v="regular" aria-pressed="false">Taxable</button></div></div>
         </div>
         <div class="sp-rows" id="spCRows"></div>
         <p class="sp-caveat" id="spCNote"></p>
-        <div class="sp-handoff"><p><strong>Next: Disciplined Rebalancing</strong>, a separate exploration where you write your own sell and buy-back rule and see it run through every cycle and forward. Your rule and account type carry over.</p><a class="sp-cta" id="spCCta" href="/disciplined-rebalancing" data-handoff="disciplined-rebalancing">Open Disciplined Rebalancing &rarr;</a></div>
+        <div class="sp-handoff"><p><strong>Next: Disciplined Rebalancing</strong>, a separate exploration where you write your own sell and buy-back rules and see them run through every past cycle. Both rules and your account type carry over.</p><a class="sp-cta" id="spCCta" href="/disciplined-rebalancing" data-handoff="disciplined-rebalancing">Open Disciplined Rebalancing &rarr;</a></div>
       </div>
     </section>
 
@@ -194,11 +194,11 @@ eleventyComputed:
         <div class="sp-hurdle">
           <div class="sp-seg" id="spHAcct" role="group" aria-label="Account type"><button type="button" data-v="tax" aria-pressed="true">Taxable</button><button type="button" data-v="ira" aria-pressed="false">IRA</button></div>
           <div class="sp-out sp-num" id="spHOut">23.8%</div>
-          <p class="sp-out-l">Price must fall this far before you buy back as many coins as you sold.</p>
+          <p class="sp-out-l">Price must fall this far before you buy back as much bitcoin as you sold.</p>
           <div class="sp-controls sp-flush" id="spHCtl">
             <div class="sp-ctl"><label for="spHRate">Federal rate</label><output id="spHRateOut" for="spHRate">23.8%</output><input type="range" id="spHRate" min="0" max="40.8" step="0.2" value="23.8"></div>
             <div class="sp-ctl"><label for="spHBasis">Cost basis, % of sale price</label><output id="spHBasisOut" for="spHBasis">0%</output><input type="range" id="spHBasis" min="0" max="90" step="5" value="0"></div>
-            <div class="sp-ctl"><label for="spHState">State capital-gains rate</label><select id="spHState"><option value="NONE">Not included</option>{{ reb.stateOptions() }}</select><span class="sp-small">Top state rates on long-term gains, from the site&rsquo;s real-estate calculators.</span></div>
+            <div class="sp-ctl"><label for="spHState">State capital-gains rate</label><select id="spHState"><option value="NONE">Not included</option>{{ reb.stateOptions() }}</select><span class="sp-small">Top state rates on long-term gains, from the site&rsquo;s real-estate calculators.</span><span class="sp-small" id="spHStateHelp" hidden>Above about $1.27M the rate is 9.9% from 2025. Real estate is exempt there; bitcoin is not.</span></div>
           </div>
         </div>
       </div>
@@ -298,8 +298,8 @@ eleventyComputed:
 
     <section class="sp-prose">
       <h3 class="sp-sub-h">No supply glut</h3>
-      <p>Many past manias ended when high prices brought new supply: mines reopened, railroad track was overbuilt, new shares flooded the market. Bitcoin&rsquo;s issuance follows a fixed schedule written into the protocol. The difficulty adjustment keeps blocks, and so new coins, arriving on that schedule whatever the price. Since the 2024 halving that is about 450 coins a day, against roughly 20 million in circulation. Issuance halves about every four years and ends around 2140. The supply that answers a bitcoin spike is existing HODLers selling. Which means the readers of this page are part of how spikes end.</p>
-      <p>One change could tighten supply further. As lending against bitcoin matures, more HODLers may borrow against their coins rather than sell them. Fewer sellers at a spike would leave even less supply to meet demand. That is a possibility, not yet a measured effect, and it does not change the warning on the first tab: borrowing near a spike is the risky moment.</p>
+      <p>Many past manias ended when high prices brought new supply: mines reopened, railroad track was overbuilt, new shares flooded the market. Bitcoin&rsquo;s issuance follows a fixed schedule written into the protocol. The difficulty adjustment keeps blocks, and so new bitcoin, arriving on that schedule whatever the price. Since the 2024 halving that is about 450 bitcoin a day, against roughly 20 million in circulation. Issuance halves about every four years and ends around 2140. The supply that answers a bitcoin spike is existing HODLers selling. Which means the readers of this page are part of how spikes end.</p>
+      <p>One change could tighten supply further. As lending against bitcoin matures, more HODLers may borrow against their bitcoin rather than sell it. Fewer sellers at a spike would leave even less supply to meet demand. That is a possibility, not yet a measured effect, and it does not change the warning on the first tab: borrowing near a spike is the risky moment.</p>
     </section>
 
     <div class="sp-takeaway"><strong>Takeaway.</strong> Laws hold while their mechanism holds. Bitcoin&rsquo;s is a fixed supply meeting a growing network; watch the mechanism, not just the chart.</div>

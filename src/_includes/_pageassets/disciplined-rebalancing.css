@@ -38,6 +38,8 @@
     --dr2-red-soft: rgba(192,57,43,.10);
     --dr2-red-border: rgba(192,57,43,.45);
     --dr2-arrival-border: rgba(247,147,26,.4);
+    --dr2-bar-bg: rgba(20,18,16,.97);
+    --dr2-bar-shadow: rgba(0,0,0,.45);
     --dr-sell: #e09422;
     --dr-fade: rgba(224,148,34,.55);
     --dr-rebuy: #27ae60;
@@ -2203,3 +2205,42 @@ table.dr2-cmp td.mult { font-weight: 600; font-size: .95rem; }
 @media (prefers-reduced-motion: reduce) { .dr2-stack * { transition: none !important; } }
 /* A legend item the rule does not use (the fade level when it equals the sell level) is hidden; the item rules above set display, so restate it. */
 .dr-channel-legend .dr-legend-item[hidden] { display: none; }
+
+/* ─── Review round 1 (2026-10-05) ─────────────────────────────────── */
+/* Power law framing under the rule heading (item 7). */
+.dr2-frame { font-size: .88rem; color: var(--text-dim); line-height: 1.55; }
+.dr2-frame a, .dr2-showing a { color: var(--amber); }
+/* Hero: the stack in BTC and dollars under each figure (item 8). */
+.dr2-res .btc { font-size: .84rem; color: var(--text); line-height: 1.45; }
+.dr2-res .btc strong { color: var(--text-bright); font-weight: 600; }
+/* "Showing:" line under the cycle heading (item 10). */
+.dr2-showing { font-size: .8rem; color: var(--text-dim); line-height: 1.5; }
+/* The failure section is a link target: clear the sticky nav. */
+#dr-fail { scroll-margin-top: 96px; }
+/* Chart 1's five range buttons wrap rather than overflow at phone width. */
+.dr-channel-range-toggle { flex-wrap: wrap; max-width: 100%; }
+.dr-range-btn { min-height: 44px; }
+
+/* Sticky rule bar (item 9). Fixed under the site nav; JS sets top and
+   toggles [hidden]. z-index sits under the nav (1000) and its menus. */
+.dr2-bar { position: fixed; left: 0; right: 0; z-index: 900; background: var(--dr2-bar-bg); border-bottom: 1px solid var(--border-lt); box-shadow: 0 6px 16px var(--dr2-bar-shadow); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: .3rem 1rem; padding: .35rem max(1rem, calc((100vw - 1100px) / 2)); font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; box-sizing: border-box; }
+.dr2-bar[hidden] { display: none; }
+.dr2-bar.is-entering { animation: dr2BarIn .18s ease-out; }
+@keyframes dr2BarIn { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.dr2-bar-text { min-width: 0; flex: 1 1 18rem; display: grid; gap: .1rem; }
+.dr2-bar-rule { margin: 0; font-size: .86rem; color: var(--text-bright); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dr2-bar-sum { margin: 0; font-size: .74rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dr2-bar-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; flex: 0 1 auto; }
+.dr2-bar-chips, .dr2-bar-acct { display: flex; gap: .2rem; }
+.dr2-chip { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: 0 .55rem; min-height: 44px; min-width: 44px; font-family: inherit; font-size: .74rem; font-weight: 500; cursor: pointer; }
+.dr2-chip:hover { border-color: var(--text-muted); }
+.dr2-chip[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
+.dr2-bar-edit { background: var(--orange-soft); border: 1px solid var(--orange); color: var(--orange); border-radius: 6px; padding: 0 .9rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.dr2-bar button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+@media (max-width: 600px) {
+  .dr2-bar { flex-wrap: nowrap; padding: .3rem 16px; }
+  .dr2-bar-sum, .dr2-bar-chips, .dr2-bar-acct { display: none; }
+  .dr2-bar-text { flex: 1 1 auto; }
+  .dr2-bar-ctls { flex: 0 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) { .dr2-bar.is-entering { animation: none; } }

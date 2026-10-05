@@ -20,7 +20,7 @@ related:
   - slug: the-half-life
     desc: "The inflation backdrop that motivates wrapper-protected long-duration holdings — and the context within which the rebalancing discipline makes structural sense."
   - slug: lump-sum-or-ladder-in
-    desc: "The other channel-tactics page — where this is the multi-cycle sell/rebuy protocol for coins held, that one is the getting-in decision: deploy now or ladder."
+    desc: "The other channel-tactics page — where this is the multi-cycle sell/rebuy protocol for bitcoin held, that one is the getting-in decision: deploy now or ladder."
   - slug: how-much-cash
     desc: "The calculator that shows this protocol's historical work. This page states the discipline; How Much Cash prices it — what the trim costs after tax, where in the channel it has historically paid, and how long the round trip took."
   - slug: bitcoin-spikes
@@ -36,7 +36,7 @@ eleventyComputed:
 <section class="hero">
     <h1><em>Disciplined</em> Rebalancing</h1>
     <div class="hero-subtitle">Sell when bitcoin is high in its Power Law channel; rebuy when it's low. Inside a tax-advantaged wrapper, the friction goes away.</div>
-    <p class="subtitle">When the Power Law channel becomes more than a model &mdash; when its bounded oscillations become triggers, and its asymmetric character becomes a discipline. Sell at percentile, rebuy at percentile, inside a wrapper that absorbs the friction. Two rules. Observable triggers.</p>
+    <p class="subtitle">When the Power Law channel becomes more than a model &mdash; when its bounded oscillations become triggers, and its asymmetric character becomes a discipline. Sell high in the channel, buy back lower, ideally avoiding taxable events. Two rules. Observable triggers.</p>
 </section>
 
 <main class="content-area">
@@ -96,7 +96,7 @@ eleventyComputed:
             <p class="prose">Second, the historical distribution of <strong>price relative to trend</strong> is well-defined. Bitcoin has spent roughly half its history at or below trend, half above it. The 80th percentile of historical position corresponds to a specific multiple of trend; the 20th percentile to another. These are facts about the data, not predictions about the future. The Calculator sets its levels as multiples of trend and prints these historical-frequency anchors beside each one, so the user can see, in real time, how often a given trigger condition has actually existed.</p>
             <p class="prose">Third, inside a <strong>retirement-account wrapper</strong>, the rebalancing protocol generates no tax events. Sells trigger no capital gains; rebuys reset no holding-period clocks; the only friction is the bitcoin you fail to capture if a sell-and-rebuy bet doesn't complete. Outside that wrapper, every speculative sale is a taxable event, and the framework collapses into something far less defensible &mdash; the Calculator's account-type toggle makes that cost explicit.</p>
             <p class="prose">These three observations combine into the discipline: <em>Sell a defined fraction of the stack when price reaches a high-percentile zone. Re-buy when it returns to a lower-percentile zone. Accept that some cycles won't trigger; accept that the discipline only works inside a wrapper that absorbs the friction.</em></p>
-            <p class="prose"><strong>How much you sell matters as much as when.</strong> At the same triggers (sell on the way up through 1.75&times; trend, buy back at 0.85&times;), an IRA that sold the whole stack each time ended with <span id="drQ100">0.61&times;</span> the coins of HODLing since 2011; one that sold half ended at <span id="drQ50">0.95&times;</span>. Partial sales cut both the damage and the upside. That is the honest trade, and it is why the calculator&rsquo;s presets sell a quarter to three quarters, never the whole stack.</p>
+            <p class="prose"><strong>How much you sell matters as much as when.</strong> At the same triggers (sell on the way up through 1.75&times; trend, buy back at 0.85&times;), an IRA that sold the whole stack each time ended at <span id="drQ100">0.61&times;</span> HODL since 2011; one that sold half ended at <span id="drQ50">0.95&times;</span>. Partial sales cut both the damage and the upside. That is the honest trade, and it is why the calculator&rsquo;s presets sell a quarter to three quarters, never the whole stack.</p>
         </div>
 
         <div class="section">
@@ -144,19 +144,20 @@ eleventyComputed:
         <div class="dr2-arrival" id="dr2Arrival" role="status" hidden></div>
 
         <!-- 1. RULE -->
-        <section class="dr2-card" aria-labelledby="dr2HRule">
-          <div class="dr2-eyebrow">Your rule</div>
+        <section class="dr2-card" id="dr2RuleCard" aria-labelledby="dr2HRule">
+          <div class="dr2-eyebrow">Your rules</div>
           <h2 id="dr2HRule">Pick a starting point, then make it yours</h2>
+          <p class="dr2-frame">Every level on this page is a multiple of bitcoin&rsquo;s <a href="/the-power-law">power law trend</a>: 1&times; is the trend, 0.42&times; the floor, 3&times; the upper band. A rule like this only makes sense if price keeps returning toward that trend. <a href="#dr-fail">How this strategy can fail</a> covers what happens if it doesn&rsquo;t.</p>
           <div class="dr2-presets" role="group" aria-label="Presets">
-            <button type="button" class="dr2-preset" data-p="conservative" aria-pressed="true"><span class="k">Conservative</span><span class="d">Trim a quarter after a big spike turns. Rarely fires.</span></button>
-            <button type="button" class="dr2-preset" data-p="balanced" aria-pressed="false"><span class="k">Balanced</span><span class="d">Half, after the spike turns. Buy back below trend.</span></button>
-            <button type="button" class="dr2-preset" data-p="adventurous" aria-pressed="false"><span class="k">Adventurous</span><span class="d">Most of it, early, then wait for a deep low.</span></button>
+            <button type="button" class="dr2-preset" data-p="conservative" aria-pressed="true"><span class="k">Conservative</span><span class="d">Trim a quarter of the position after a big spike starts to reverse. Buy back at the trend.</span></button>
+            <button type="button" class="dr2-preset" data-p="balanced" aria-pressed="false"><span class="k">Balanced</span><span class="d">Half the position, after the spike starts to reverse. Buy back below trend.</span></button>
+            <button type="button" class="dr2-preset" data-p="adventurous" aria-pressed="false"><span class="k">Adventurous</span><span class="d">Most of the position, on the way up. Buy back well below trend.</span></button>
             <button type="button" class="dr2-preset" data-p="custom" aria-pressed="false"><span class="k">Custom</span><span class="d">Your own levels. Any change below lands here.</span></button>
           </div>
           <p class="dr2-rule" id="dr2RuleSentence" aria-live="polite"></p>
 
           <details class="dr2-build" id="dr2Build">
-            <summary>Build your own rule</summary>
+            <summary>Build your own rules</summary>
             <div class="dr2-build-body">
               <div class="dr2-group">
                 <h3>When to sell</h3>
@@ -200,9 +201,9 @@ eleventyComputed:
                   <div class="dr2-ctl dr2-taxonly"><label class="dr2-lbl" for="dr2State">State</label>
                     <select id="dr2State"><option value="NONE">Not included</option>{{ reb.stateOptions() }}</select>
                     <span class="dr2-ctx" id="dr2StateCtx">Top state rates on long-term gains, from the site&rsquo;s shared list.</span></div>
-                  <div class="dr2-ctl dr2-taxonly"><span class="dr2-lbl" id="dr2LotsL">Which coins are sold</span>
+                  <div class="dr2-ctl dr2-taxonly"><span class="dr2-lbl" id="dr2LotsL">Which purchases are sold first</span>
                     <div class="dr2-seg" id="dr2SegLots" role="group" aria-labelledby="dr2LotsL"><button type="button" data-v="fifo">Oldest first (FIFO)</button><button type="button" data-v="hifo">Highest cost first</button></div>
-                    <span class="dr2-ctx">FIFO is the default under US rules. Choosing specific coins needs records. Sales within a year of buying are taxed at 32% (federal ordinary rate).</span></div>
+                    <span class="dr2-ctx">FIFO is the default under US rules. Choosing specific lots needs records. Sales within a year of buying are taxed at 32% (federal ordinary rate).</span></div>
                 </div>
               </div>
               <div class="dr2-group">
@@ -216,13 +217,33 @@ eleventyComputed:
           </details>
         </section>
 
+        <!-- STICKY RULE BAR (review round 1, item 9). Shown by JS once the rule
+             card has scrolled out of view, released at the end of the presets
+             block. Its controls drive the same state as the card's. -->
+        <div class="dr2-bar" id="dr2Bar" role="region" aria-label="Your rules, kept in view" hidden>
+          <div class="dr2-bar-text">
+            <p class="dr2-bar-rule" id="dr2BarRule"></p>
+            <p class="dr2-bar-sum" id="dr2BarSum"></p>
+          </div>
+          <div class="dr2-bar-ctls">
+            <div class="dr2-bar-chips" role="group" aria-label="Presets">
+              <button type="button" class="dr2-chip" data-p="conservative" aria-pressed="true">Conservative</button>
+              <button type="button" class="dr2-chip" data-p="balanced" aria-pressed="false">Balanced</button>
+              <button type="button" class="dr2-chip" data-p="adventurous" aria-pressed="false">Adventurous</button>
+              <button type="button" class="dr2-chip" data-p="custom" aria-pressed="false">Custom</button>
+            </div>
+            <div class="dr2-bar-acct" id="dr2BarAcct" role="group" aria-label="Account"><button type="button" class="dr2-chip" data-v="ira" aria-pressed="true">IRA</button><button type="button" class="dr2-chip" data-v="tax" aria-pressed="false">Taxable</button></div>
+            <button type="button" class="dr2-bar-edit" id="dr2BarEdit">Edit rules</button>
+          </div>
+        </div>
+
         <!-- 2. RESULTS -->
         <section class="dr2-card" aria-labelledby="dr2HRes">
           <div class="dr2-eyebrow">How it did</div>
-          <h2 id="dr2HRes">Coins after the rule, compared with HODLing</h2>
+          <h2 id="dr2HRes">Your bitcoin stack after your rules, compared with HODLing</h2>
           <div class="dr2-results">
-            <div class="dr2-res"><span class="lab">Since 2011</span><span class="big dr2-num" id="dr2R11"></span><span class="sub" id="dr2R11s"></span></div>
-            <div class="dr2-res"><span class="lab">Since 2014</span><span class="big dr2-num" id="dr2R14"></span><span class="sub" id="dr2R14s"></span></div>
+            <div class="dr2-res"><span class="lab">Since 2011</span><span class="big dr2-num" id="dr2R11"></span><span class="sub" id="dr2R11s"></span><span class="btc" id="dr2R11b"></span></div>
+            <div class="dr2-res"><span class="lab">Since 2014</span><span class="big dr2-num" id="dr2R14"></span><span class="sub" id="dr2R14s"></span><span class="btc" id="dr2R14b"></span></div>
           </div>
           <p class="dr2-small" id="dr2EraNote">Since 2011 includes 2013, when the trend was growing about 219% a year, so a buy back &ldquo;below trend&rdquo; could still cost more than the sale. Today the trend grows about 37% a year. Since 2014 matches How Much Cash.</p>
           <p class="dr2-lastcycle" id="dr2LastCycle"></p>
@@ -231,37 +252,40 @@ eleventyComputed:
         <!-- 3. CYCLES -->
         <section class="dr2-card" aria-labelledby="dr2HCyc">
           <div class="dr2-row-head">
-            <div><div class="dr2-eyebrow">Cycle by cycle</div><h2 id="dr2HCyc">What the rule did each time</h2></div>
+            <div><div class="dr2-eyebrow">Cycle by cycle</div><h2 id="dr2HCyc">What your rules did each time</h2></div>
             <div class="dr2-seg" id="dr2SegStart" role="group" aria-label="Start of record"><button type="button" data-v="2011-01">From 2011</button><button type="button" data-v="2014-01">From 2014</button><button type="button" data-v="2017-01">From 2017</button></div>
           </div>
-          <div class="dr2-tablewrap" tabindex="0" role="region" aria-label="What the rule did each cycle (scrolls sideways)"><table class="dr2-table">
+          <p class="dr2-showing" id="dr2Showing"></p>
+          <div class="dr2-tablewrap" tabindex="0" role="region" aria-label="What your rules did each cycle (scrolls sideways)"><table class="dr2-table">
             <thead><tr>
               <th scope="col">Cycle</th>
-              <th scope="col">Sold<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">When the rule sold, at what price and multiple of trend, and what share of the coins held.</span></button></th>
+              <th scope="col">Sold<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">When the sell rule sold, at what price and multiple of trend, and what share of your stack.</span></button></th>
               <th scope="col">Bought back<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">When the cash went back into bitcoin: at the buy-back level, at the deadline, or not yet (still in cash, valued at today&rsquo;s price).</span></button></th>
               <th scope="col" class="n">Tax paid<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">Tax on the sale in a taxable account, on your stack. Zero in an IRA.</span></button></th>
-              <th scope="col" class="n">Coins after<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">The round trip alone: coins held after buying back, as a multiple of coins before the sale.</span></button></th>
+              <th scope="col" class="n">Round trip<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">Bitcoin held after buying back, as a multiple of what you held before the sale.</span></button></th>
               <th scope="col" class="n">Your stack<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">Your stack after this cycle, carrying every earlier cycle forward.</span></button></th>
-              <th scope="col" class="n">vs HODL, $<button type="button" class="dr-tt dr-tt-right" aria-label="About this column">?<span class="dr-tt-card">The stack&rsquo;s value against HODLing the same coins, in dollars at the buy-back date.</span></button></th>
+              <th scope="col" class="n">vs HODL, $<button type="button" class="dr-tt dr-tt-right" aria-label="About this column">?<span class="dr-tt-card">The stack&rsquo;s value against HODLing the same bitcoin, in dollars at the buy-back date.</span></button></th>
             </tr></thead>
             <tbody id="dr2CycBody"></tbody>
           </table></div>
-          <p class="dr2-small">&ldquo;Coins after&rdquo; is the round trip alone: coins held after buying back, as a multiple of coins before the sale. &ldquo;Your stack&rdquo; carries every earlier cycle forward. Dollars are at the buy-back date. Prices are the site&rsquo;s ~12-day series, so a rule fires on the first sample past its level.</p>
+          <p class="dr2-small">&ldquo;Round trip&rdquo; is the bitcoin held after buying back, as a multiple of what you held before the sale. &ldquo;Your stack&rdquo; carries every earlier cycle forward. Dollars are at the buy-back date. Prices are the site&rsquo;s ~12-day series, so a rule fires on the first sample past its level.</p>
           <div class="dr2-fail" id="dr2FailBox"></div>
         </section>
 
         <!-- 4. CHARTS -->
         <section class="dr2-card" aria-labelledby="dr2HCh">
           <div class="dr2-eyebrow">On the chart</div>
-          <h2 id="dr2HCh">Where the rule sold and bought back</h2>
+          <h2 id="dr2HCh">Where your rules sold and bought back</h2>
           <div class="dr-channel-viz">
-            <div class="dr-channel-viz-title">The channel, with your rule&rsquo;s levels and every sale and buy back</div>
+            <div class="dr-channel-viz-title">The channel, with your rules&rsquo; levels and every sale and buy back</div>
             <div class="dr-channel-range-toggle" role="tablist" aria-label="Chart time range">
-              <button class="dr-range-btn is-active" data-range="all"      role="tab" aria-selected="true">All-time</button>
-              <button class="dr-range-btn"            data-range="near-1y" role="tab" aria-selected="false">Near (&plusmn;1y)</button>
-              <button class="dr-range-btn"            data-range="plan-2y" role="tab" aria-selected="false">Planning (&plusmn;2y)</button>
+              <button class="dr-range-btn is-active" data-range="all" role="tab" aria-selected="true">All history</button>
+              <button class="dr-range-btn" data-range="10y" role="tab" aria-selected="false">10 years</button>
+              <button class="dr-range-btn" data-range="5y" role="tab" aria-selected="false">5 years</button>
+              <button class="dr-range-btn" data-range="2y" role="tab" aria-selected="false">2 years</button>
+              <button class="dr-range-btn" data-range="2035" role="tab" aria-selected="false">Out to 2035</button>
             </div>
-            <div class="dr-channel-chart-wrapper" data-chart-copy data-chart-heading="closest:.dr-channel-viz .dr-channel-viz-title" data-chart-title="Your rule on the channel">
+            <div class="dr-channel-chart-wrapper" data-chart-copy data-chart-heading="closest:.dr-channel-viz .dr-channel-viz-title" data-chart-title="Your rules on the channel">
               <canvas id="drChannelChart"></canvas>
               <div class="lcs-pulse-halo" id="drPulse" aria-hidden="true"></div>
             </div>
@@ -283,32 +307,32 @@ eleventyComputed:
 
           <div class="dr2-row-head"><h3 class="dr2-h3">Your stack over time</h3>
             <div class="dr2-seg" id="dr2SegUnit" role="group" aria-label="Units"><button type="button" data-v="coins">In bitcoin</button><button type="button" data-v="usd">In dollars</button></div></div>
-          <div class="dr2-chart2"><canvas id="dr2StackChart" role="img" aria-label="Your stack over time, with the rule against HODLing"></canvas></div>
-          <div class="dr2-legend"><span><i class="dr2-key-rule"></i>With the rule</span><span><i class="dr2-key-hodl"></i>HODL</span></div>
+          <div class="dr2-chart2"><canvas id="dr2StackChart" role="img" aria-label="Your stack over time, with your rules against HODLing"></canvas></div>
+          <div class="dr2-legend"><span><i class="dr2-key-rule"></i>With your rules</span><span><i class="dr2-key-hodl"></i>HODL</span></div>
+          <p class="dr2-small">While the rule holds cash, the line counts that cash in bitcoin at each day&rsquo;s price, so it moves even though nothing was traded.</p>
         </section>
 
         <!-- PRESET COMPARISON (rewritten for v2; every figure live) -->
-        <section class="dr2-card" aria-labelledby="dr2HCmp">
+        <section class="dr2-card" id="dr2PresetsCard" aria-labelledby="dr2HCmp">
           <div class="dr2-eyebrow">The three presets</div>
           <h2 id="dr2HCmp">Each preset, from 2011 and from 2014</h2>
           <div id="drPresetComparison"></div>
         </section>
 
         <!-- FAILURE MODES (kept; the worked example is computed) -->
-        <div class="dr-failure-modes">
+        <div class="dr-failure-modes" id="dr-fail">
           <div class="dr-failure-modes-label">How this strategy can fail</div>
-          <p class="dr-failure-modes-intro">The discipline assumes the Power Law channel continues to bound bitcoin's price oscillations &mdash; that historical mean-reversion to the channel persists. That's an empirical observation, not a guarantee. Two specific failure modes are worth flagging concretely:</p>
+          <p class="dr-failure-modes-intro">These rules assume price keeps returning toward the Power Law trend. The record shows that it has, which is not a guarantee that it will. The rules can fail in two ways.</p>
           <div class="dr-failure-mode">
-            <div class="dr-failure-mode-title">1. Bitcoin breaks free of the channel.</div>
-            <p>The Power Law has held with R&sup2; above 0.95 across fifteen years and nine orders of magnitude. Past adherence does not guarantee future adherence. If price departs the channel and stays out &mdash; sustained close below the floor in a structural drawdown, or sustained close above the upper band in a regime shift &mdash; the triggers stop being meaningful.</p>
-            <p><strong>If bitcoin sustains below the floor permanently,</strong> sell triggers may never fire and you bear the full drawdown of HODL with no offsetting cash position. <strong>If bitcoin sustains above the upper band permanently,</strong> sell triggers fire but no rebuy ever materializes &mdash; you're left holding cash while bitcoin continues climbing past your sell price, indefinitely. There is no internal signal in the strategy that can tell you which regime you're in until well after the fact.</p>
+            <div class="dr-failure-mode-title">1. Bitcoin leaves the channel.</div>
+            <p>The Power Law has fit fifteen years of price, across nine orders of magnitude, with R&sup2; above 0.95. If price leaves the channel and stays out, the levels stop meaning anything.</p>
+            <p><strong>If price stays below the floor,</strong> the sell rule never fires, and you take the whole fall with no cash set aside. <strong>If price stays above the upper band,</strong> the sell rule fires and the buy-back level never comes. You hold cash while bitcoin keeps rising, until the deadline buys back higher, or for good if there is no deadline. Neither rule can tell you which case you are in until well after the fact.</p>
           </div>
           <div class="dr-failure-mode">
-            <div class="dr-failure-mode-title">2. The rebuy fires above your prior sell price &mdash; you end up with less bitcoin than HODL.</div>
-            <p>Both triggers can execute correctly &mdash; sell high against trend, buy back low against trend &mdash; and you can still finish a cycle holding less bitcoin than if you'd just held through. This isn't a hypothetical. It has happened in bitcoin's actual history, and the table above marks it &ldquo;Lost coins&rdquo; whenever it does.</p>
+            <div class="dr-failure-mode-title">2. The buy back costs more than the sale, and you end with less bitcoin than HODLing.</div>
+            <p>Both rules can fire as designed, selling high against trend and buying back low against trend, and still leave you with less bitcoin than if you had held. It has happened, and the table above marks it &ldquo;Lost bitcoin&rdquo;.</p>
             <p id="dr2FailExample"></p>
-            <p>The mechanism: triggers are defined relative to the trend, but rebalancing happens in absolute dollars. When the underlying trend grows fast between cycles &mdash; which it did during bitcoin's early years &mdash; the low against trend can sit higher in absolute dollars than the high of the previous cycle. The strategy still &lsquo;worked&rsquo; in trend-relative terms; it just underperformed HODL in absolute BTC count.</p>
-            <p>Recent cycles have been less punishing because trend growth has slowed (each successive doubling takes longer in calendar time, by construction of the Power Law) and because cycle amplitudes have compressed. But the failure mode is structural, not historical-only.</p>
+            <p>The levels are multiples of the trend, but you sell and buy back in dollars. When the trend grows fast between the sale and the buy back, a price below trend can still be higher than the sale price. In 2013 the trend was growing about <span data-dr-math="g13">219%</span> a year; today it grows about <span data-dr-math="gNow">37%</span>, so the same failure now needs a much longer wait. It can still happen.</p>
           </div>
         </div>
 
@@ -332,7 +356,7 @@ eleventyComputed:
             <div class="share-group" id="shareGroupScenario">
               <div class="share-group-header">
                 <span class="share-group-label">Share this scenario</span>
-                <span class="share-group-help">A link that carries your current rule and tax settings &mdash; for sending a specific configuration to a friend, your spouse, or your advisor.</span>
+                <span class="share-group-help">A link that carries your current rules and tax settings &mdash; for sending a specific configuration to a friend, your spouse, or your advisor.</span>
               </div>
               <div class="share-actions">
                 <button type="button" class="share-btn" id="shareCopy" aria-label="Copy link to clipboard">
@@ -404,7 +428,7 @@ eleventyComputed:
         <div class="dr-math-section">
             <h3>2. Trigger detection</h3>
             <p>The rule has two states: holding the stack, watching for a sale; and holding cash beside what&rsquo;s left, watching for the buy back.</p>
-            <p>A <strong>sale</strong> fires one of two ways. <em>On the way up</em>, it fires when price crosses upward through the sell level: below it on one sample, at or above it on the next. <em>As the spike fades</em>, the rule arms when price reaches the sell level, then fires when price falls back below the fade level. The sale takes your chosen share of the coins held at that moment.</p>
+            <p>A <strong>sale</strong> fires one of two ways. <em>On the way up</em>, it fires when price crosses upward through the sell level: below it on one sample, at or above it on the next. <em>As the spike fades</em>, the rule arms when price reaches the sell level, then fires when price falls back below the fade level. The sale takes your chosen share of the bitcoin held at that moment.</p>
             <p>A <strong>buy back</strong> fires when price crosses downward through the buy-back level, or, if a deadline is set, at market once that many months have passed since the sale. It spends all the cash.</p>
             <ul class="dr-math-list">
                 <li><strong>One open sale at a time.</strong> A sale does not re-fire while the rule holds cash, even if price crosses the level again. This stops oscillation around a level from generating trades.</li>
@@ -416,7 +440,7 @@ eleventyComputed:
         <!-- §3: CYCLE ACCUMULATION (WORKED EXAMPLE) -->
         <div class="dr-math-section">
             <h3>3. Cycle accumulation &mdash; worked example</h3>
-            <p>Each completed round trip changes your coin count by the ratio of the two prices, applied to the share you sold:</p>
+            <p>Each completed round trip changes your stack by the ratio of the two prices, applied to the share you sold:</p>
             <div class="dr-math-formula">
                 <p>Per-cycle multiplier, before tax:</p>
                 <code>new_stack = old_stack &times; (1 &minus; f + f &times; P_sell / P_rebuy)</code>
@@ -428,23 +452,23 @@ eleventyComputed:
 
         <!-- §4: TAX AND LOTS -->
         <div class="dr-math-section">
-            <h3>4. Tax, and which coins are sold</h3>
+            <h3>4. Tax, and which purchases are sold first</h3>
             <p>In an IRA or other tax-advantaged account, nothing is taxed. In a taxable account, each sale is taxed on its gain.</p>
-            <p>The calculator tracks every purchase as a lot: the first coin at the price on the start date, then each buy back at its own price. A sale draws on lots oldest first (FIFO), the default under US rules, or highest cost first, a form of specific identification that needs records. A lot held under a year is taxed at 32%, the federal ordinary rate, plus NIIT and state if set; otherwise at the long-term rate you choose (0%, 15% or 20%) plus NIIT and state. Tax is charged on the net gain across the lots sold, never below zero, and it comes out of the cash available to buy back. The previous version averaged the cost of all coins held. Average cost isn&rsquo;t an allowed method for bitcoin held directly.</p>
+            <p>The calculator tracks every purchase as a lot: the first bitcoin at the price on the start date, then each buy back at its own price. A sale draws on lots oldest first (FIFO), the default under US rules, or highest cost first, a form of specific identification that needs records. A lot held under a year is taxed at 32%, the federal ordinary rate, plus NIIT and state if set; otherwise at the long-term rate you choose (0%, 15% or 20%) plus NIIT and state. Tax is charged on the net gain across the lots sold, never below zero, and it comes out of the cash available to buy back. The previous version averaged the cost of all the bitcoin held. Average cost isn&rsquo;t an allowed method for bitcoin held directly.</p>
             <p class="dr-math-note">Source: IRS Rev. Proc. 2024-28 and the per-wallet cost-basis rules that apply from January 2025. Bitcoin held through spot ETFs is taxed as shares: check with your broker; most default to FIFO.</p>
         </div>
 
         <!-- §5: SELL TIMING -->
         <div class="dr-math-section">
             <h3>5. Selling on the way up, or as the spike fades</h3>
-            <p>A rule can sell as price climbs through a level, or wait for the spike to reach a level and sell when it turns back down. Waiting did better. Armed at 2&times; trend, selling half when price fell back below 2&times; and buying back at 0.85&times;, an IRA ended with <span data-dr-math="fade11">1.35&times;</span> the coins of HODLing since 2011 and <span data-dr-math="fade14">2.25&times;</span> since 2014. Selling half on the way up through 1.75&times; ended at <span data-dr-math="up11">0.95&times;</span> and <span data-dr-math="up14">1.32&times;</span>. On the way up, the run-up kept going after the sale.</p>
+            <p>A rule can sell as price climbs through a level, or wait for the spike to reach a level and sell when it turns back down. Waiting did better. Armed at 2&times; trend, selling half when price fell back below 2&times; and buying back at 0.85&times;, an IRA ended at <span data-dr-math="fade11">1.35&times;</span> HODL since 2011 and <span data-dr-math="fade14">2.25&times;</span> since 2014. Selling half on the way up through 1.75&times; ended at <span data-dr-math="up11">0.95&times;</span> and <span data-dr-math="up14">1.32&times;</span>. On the way up, the run-up kept going after the sale.</p>
             <p>The cost of waiting: a fade rule fires only if the spike reaches the level first. The 2024&ndash;25 spike peaked at <span data-dr-math="peak25">1.19&times;</span> trend, so no 2&times; rule fired. Bitcoin&rsquo;s Spikes found the same pattern for funding a bill: selling early on the way up was costly, selling as the spike rolled over was the practical option.</p>
         </div>
 
         <!-- §6: THE DEADLINE -->
         <div class="dr-math-section">
             <h3>6. The buy-back deadline</h3>
-            <p>A buy-back level set too deep can strand a sale in cash. Selling everything at 2&times; trend and waiting for 0.5&times; ended at <span data-dr-math="strand0">0.13&times;</span> the coins since 2011, because price never came back down far enough.</p>
+            <p>A buy-back level set too deep can strand a sale in cash. Selling everything at 2&times; trend and waiting for 0.5&times; ended at <span data-dr-math="strand0">0.13&times;</span> HODL since 2011, because price never came back down far enough.</p>
             <p>A deadline buys back at market after a set number of months. Twelve months hurt: it tended to buy back in the middle of a bear market. Twenty-four months was neutral when the buy-back level came anyway, and it rescued the stranded cases: the same rule with a 24-month deadline ended at <span data-dr-math="strand24">0.61&times;</span>. That is why the presets use 24 months. With no deadline, the cycle table marks a sale still waiting as &ldquo;still in cash&rdquo;, valued at today&rsquo;s price.</p>
         </div>
 
@@ -471,7 +495,7 @@ eleventyComputed:
             <ul class="dr-math-list">
                 <li><strong>Volatility compression.</strong> Bitcoin&rsquo;s cycle amplitudes have decreased over time. Cycle 1 peaked near 8&times; trend in 2011; recent cycles peak closer to 2&times; trend. The triggers that fired in 2011 or 2017 against extreme price excursions will likely fire less often in future cycles, even at the same levels. <a href="/the-power-law#theory">The Power Law Theory tab</a> documents this compression in detail.</li>
                 <li><strong>Regime change is unmodeled.</strong> If the Power Law channel&rsquo;s shape shifts &mdash; if the slope changes, if mean reversion fails, if bitcoin breaks free of the channel and stays out &mdash; the levels become unreliable. The historical record does not exhibit this; future records might.</li>
-                <li><strong>The strategy can fail without doing anything wrong.</strong> The historical record at certain settings shows cycles where both triggers fired correctly (high sell, low rebuy) and yet ended with fewer coins than before, because the rebuy executed above the prior sell price. Detailed in the <em>How this strategy can fail</em> section on the Calculator tab.</li>
+                <li><strong>The strategy can fail without doing anything wrong.</strong> The historical record at certain settings shows cycles where both triggers fired correctly (high sell, low rebuy) and yet ended with less bitcoin than before, because the rebuy executed above the prior sell price. Detailed in the <em>How this strategy can fail</em> section on the Calculator tab.</li>
             </ul>
 
             <p class="dr-math-note">When a rule never fires across the record, the Calculator says so, and the discipline reduces to HODL across that span. None of the presets fired in the 2024&ndash;25 cycle. That is information about the framework, not a bug.</p>
@@ -497,7 +521,7 @@ eleventyComputed:
             <ul class="negative-space-list">
                 <li><strong>Varying cash returns.</strong> Cash waiting to buy back earns 0% or a flat 4% a year. Real money-market rates ran from 0% to about 5% over the record.</li>
                 <li><strong>Tax-loss harvesting.</strong> In a taxable account, capital losses elsewhere could offset cycle gains. The backtest doesn't model this; gains are taxed in isolation.</li>
-                <li><strong>State short-term rates and thresholds.</strong> The state rate is each state&rsquo;s top long-term rate, applied flat. States that tax only above a threshold, like Washington above about $270k, are applied as if the threshold is already passed.</li>
+                <li><strong>State short-term rates and thresholds.</strong> The state rate is each state&rsquo;s top long-term rate, applied flat. Washington is the exception, as two options: gains under about $270k a year (0%), and gains above it (7%), applied flat to every sale. Its 9.9% rate above about $1.27M a year, from 2025, isn&rsquo;t modelled.</li>
                 <li><strong>Retirement-account contribution and withdrawal rules.</strong> Annual contribution limits, RMDs, Roth conversion mechanics, Backdoor / Mega-Backdoor pathways &mdash; none of this is modeled. The page is a cycle protocol calculator, not a retirement-account tax-strategy advisor.</li>
                 <li><strong>Multi-account splits.</strong> A user with bitcoin partly in a retirement account and partly in a taxable account would benefit from running the discipline only on the retirement portion. This is a future page, not a feature of this one.</li>
                 <li><strong>Future-cycle uncertainty.</strong> The historical record is one realization. A Monte Carlo treatment with stochastic volatility would surface a distribution of possible outcomes rather than a single line through the past &mdash; but it would also hide the fact that the past is the actual evidence. I treat the historical record as the primary thing worth showing, and the volatility-compression note above as the acknowledgment that future cycles will look different.</li>
