@@ -841,7 +841,7 @@
     var yo = chart2.options.scales.y;
     if (!usdMode) {
       var all = s.map(function(p){ return p.coins * k; }).concat([k]), lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), pad = Math.max((hi - lo) * 0.1, 0.05 * k);
-      var span = (hi - lo) + 2 * pad, raw = span / 6, pow = Math.pow(10, Math.floor(Math.log10(raw))), step = [1, 2, 2.5, 5, 10].map(function(m){ return m * pow; }).filter(function(v){ return v >= raw; })[0];
+      var span = (hi - lo) + 2 * pad, raw = span / 7, pow = Math.pow(10, Math.floor(Math.log10(raw))), step = [1, 2, 2.5, 5, 10].map(function(m){ return m * pow; }).filter(function(v){ return v >= raw; })[0];
       yo.min = Math.max(0, Math.floor((lo - pad) / step + 1e-9) * step); yo.max = Math.ceil((hi + pad) / step - 1e-9) * step; yo.ticks.stepSize = step;
     }
     else { yo.min = undefined; yo.max = undefined; yo.ticks.stepSize = undefined; }
@@ -1000,9 +1000,7 @@
       d.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
       if (first) first.focus({ preventScroll: true });
     });
-    var ticking = false;
     function place(){
-      ticking = false;
       if (!tab || !tab.classList.contains('active')) { hide(); return; }
       var navB = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
       var cardB = card.getBoundingClientRect().bottom, endB = end.getBoundingClientRect().bottom;
@@ -1019,7 +1017,9 @@
       if (bar.hidden) return;
       bar.hidden = true; bar.classList.remove('is-entering'); document.documentElement.style.scrollPaddingTop = '';
     }
-    function onScroll(){ if (!ticking) { ticking = true; requestAnimationFrame(place); } }
+    // Placed synchronously on scroll (three rect reads), so the bar never lags
+    // the content by a frame.
+    function onScroll(){ place(); }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     document.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ setTimeout(place, 0); }); });
