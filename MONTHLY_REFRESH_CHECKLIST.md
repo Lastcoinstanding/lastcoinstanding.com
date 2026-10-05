@@ -640,6 +640,7 @@ monthly refresh and should be regenerated:
 | `og-the-bitcoin-retirement.jpg` | the projection chart with current-state annotations |
 | `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
 | `og-compare-retirement-plans-v2.jpg` | the paired balance curves for Plan A and Plan B (added 2026-08-26; bumped to `-v2` the same day after the copy review changed the page title and cut the legend to two entries) |
+| `og-bitcoin-spikes.jpg` | the Tab 2 cycle range chart (`#spDecayChart`): each cycle's low and spike against trend, with the live upper-band caption (added 2026-10-04; the stats line is fixed copy: 14× in 2011, 1.19× in 2024, 43% above trend; recheck those if a new spike or a refresh moves them) |
 
 Each card embeds `weeklyBtc` / `PL_DATA` / projection state, so each monthly
 refresh advances the visible window by one month and changes the embedded
