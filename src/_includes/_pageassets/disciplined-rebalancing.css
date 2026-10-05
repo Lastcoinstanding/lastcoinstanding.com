@@ -2201,3 +2201,5 @@ table.dr2-cmp td.mult { font-weight: 600; font-size: .95rem; }
 }
 @media (max-width: 640px) { .dr2-results { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .dr2-stack * { transition: none !important; } }
+/* A legend item the rule does not use (the fade level when it equals the sell level) is hidden; the item rules above set display, so restate it. */
+.dr-channel-legend .dr-legend-item[hidden] { display: none; }
