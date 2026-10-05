@@ -585,27 +585,41 @@
       if (!c.covered) return;
       if (!c.sell) {
         var why = S.R.timing === 'fade' ? 'the sell rule arms at ' + fx(S.R.sx) : 'the sell rule fires at ' + fx(S.R.sx);
-        html += '<tr class="never"><td>' + c.name + '</td><td colspan="2">Never sold. Peak ' + fx(c.peak) + ' trend; ' + why + '.</td><td class="n">—</td><td class="n mult">1.00×</td><td class="n">' + btcf(stack * cum) + '</td><td class="n">—</td></tr>';
+        html += '<tr class="never"><td>' + c.name + '</td><td colspan="2">Never sold. Peak ' + fx(c.peak) + ' trend; ' + why + '.</td><td class="n">—</td><td class="n mult">1.00×</td>' + stackCells(stack * cum, null, stack) + '</tr>';
         if (c.i === 4) fails.push('<b>' + c.name + ': never sold.</b> The spike peaked at ' + fx(c.peak) + ' trend, below the sell rule\'s ' + fx(S.R.sx) + '.');
         return;
       }
-      var s = c.sell, b = c.buy, m, buyCell, dollar;
-      if (b) { m = b.after / s.before; cum *= m; buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>'); dollar = (cum - 1) * stack * b.p; }
-      else { var held = s.before - s.amt, cashNow = (s.amt * s.p - s.tax) / LAST.p; m = (held + cashNow) / s.before; cum *= m; buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>'; dollar = (cum - 1) * stack * LAST.p; }
+      var s = c.sell, b = c.buy, m, buyCell, cum0 = cum;
+      if (b) { m = b.after / s.before; cum *= m; buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>'); }
+      else { var held = s.before - s.amt, cashNow = (s.amt * s.p - s.tax) / LAST.p; m = (held + cashNow) / s.before; cum *= m; buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>'; }
       var row = m < 0.995 ? 'lost' : m > 1.005 ? 'won' : '';
-      html += '<tr class="' + row + '"><td>' + c.name + '</td><td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td><td class="n">' + btcf(stack * cum) + '</td><td class="n ' + (dollar > 0.5 ? 'up' : dollar < -0.5 ? 'down' : '') + '">' + (Math.abs(dollar) < 1 ? '—' : (dollar > 0 ? '+' : '') + usd(dollar)) + '</td></tr>';
+      html += '<tr class="' + row + '"><td>' + c.name + '</td><td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td>' + stackCells(stack * cum, stack * (cum - cum0), stack) + '</tr>';
       if (m < 0.995) {
         var r = b ? (b.why === 'fallback' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.' : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (b.p > s.p ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '')) : 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.';
         fails.push('<b>' + c.name + ': ' + mult(m) + ' the bitcoin.</b> ' + r);
       }
     });
     $('dr2CycBody').innerHTML = html;
+    $('dr2WorthNote').textContent = priceNote();
     renderFailBox(fails, S.start);
 
     updateChart1(T); updateChart2(T);
     renderHandoffs();
     renderPresetComparison();
     if (interacted) { saveSticky(); scheduleUrl(); }
+  }
+  // The table's last three columns (2026-10-05): the stack with this cycle's
+  // change, the cumulative difference from HODLing the starting stack in
+  // bitcoin, and that difference at today's price (the hero's price and
+  // fallback label). delta null = a row that never sold.
+  function btcNum(v){ return v.toFixed(v >= 10 ? 2 : 3); }
+  function signed(v, unit){ return (v > 0 ? '+' : '−') + btcNum(Math.abs(v)) + unit; }
+  function stackCells(now, delta, start){
+    var diff = now - start, zero = Math.abs(diff) < 0.0005, dc = zero ? '' : diff > 0 ? 'up' : 'down';
+    var chg = delta == null ? 'no sale' : Math.abs(delta) < 0.0005 ? 'no change this cycle' : '<span class="' + (delta > 0 ? 'up' : 'down') + '">' + signed(delta, '') + ' this cycle</span>';
+    return '<td class="n">' + btcf(now) + '<span class="s">' + chg + '</span></td>' +
+      '<td class="n ' + dc + '">' + (zero ? '—' : signed(diff, ' BTC')) + '</td>' +
+      '<td class="n ' + dc + '">' + (zero ? '—' : 'about ' + (diff > 0 ? '+' : '') + usd(diff * liveBtcPrice)) + '</td>';
   }
   function renderFailBox(fails, start){
     var fb = $('dr2FailBox');
