@@ -452,7 +452,7 @@
     "group": "Positioning & Strategy",
     "interactive": true,
     "calculator_tile": {
-      "tagline": "Write a standing rule: sell part of the stack as a spike fades, buy back below trend. See what it did in each cycle since 2011, in an IRA or a taxable account.",
+      "tagline": "Set your own rules: sell part of the stack as a spike fades, buy back below trend. See what they did in each cycle since 2011, in an IRA or a taxable account.",
       "preview_kind": "live-chart",
       "preview_id": "mini-rebalancing",
       "position": 30
