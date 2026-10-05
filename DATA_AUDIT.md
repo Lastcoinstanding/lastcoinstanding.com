@@ -373,6 +373,10 @@ Bitcoin's Spikes computes every bitcoin figure on-page from the shared Power Law
 | SP-5 | Unit refits (Tab 4) | Exponents 5.51 / 5.32 / 5.19; R² 0.954 / 0.950 / 0.938 (USD / real USD / gold) | 2011-onward OLS, log10 price on log10 days since genesis, monthly gold and CPI matched to PL_DATA samples; computed chart-side 2026-10-04, no script committed. A cross-check, not the canonical model (5.77) | — | 2026-10-04 | 2027-10 (annual) |
 | SP-6 | 2025 cycle indicators | Pi Cycle did not fire; 7 of 11 classic top indicators missed | Galaxy Research, bitcoin cycle report, June 2026 | — | 2026-10-04 | static |
 | SP-7 | New supply since the 2024 halving | ~450 BTC a day; ~20M in circulation | Protocol: 3.125 BTC × ~144 blocks a day | — | 2026-10-04 | next halving (~2028) |
+| SP-8 | Cycle low against trend and "near the floor" | Lowest ×trend after each price high: 0.46 (2012) / 0.40 (2015) / 0.56 (2019) / 0.42 (2023) / 0.42 (2026); within 10% of the floor in four of five cycles | Live via `spike-record.js` (`lowM`, `nearFloor`); asserted by `spikesQA()` | — | 2026-10-04 | each refresh (QA) |
+| SP-9 | Falling ceiling (Tab 1 copy, Tab 2 chart) | Least-squares fit of ln(spike ×trend) on time through 2011, 2013, 2017; 3.52× at the 2021 spike (actual 3.19×), 1.98× at the 2024 spike (actual 1.19×) | Live via `fallingCeiling()`; asserted ±0.02 | — | 2026-10-04 | each refresh (QA) |
+| SP-10 | 2021 run at the upper band | At or above 3× trend from 21 Feb to 10 Apr 2021 (four ~12-day samples) | Live via `bandRun('2021')`; asserted by month | — | 2026-10-04 | static history |
+| SP-11 | Card B failure list | 2013 at 1.5× / 2×: 0.26× / 0.49×; taxable 1.5× at 23.8%: 2017 0.87×, 2021 0.83×; −50% rebuy 2017: 0.83×; HMC rising leg at 1.5×: 0.94× (Sep 2017); 80% rebuy 2017 never came | Live via `spike-record.js` and `ChannelEntries.bandMetrics` | — | 2026-10-04 | moves with the data |
 
 **Gold monthly averages understate the January 1980 intraday high** ($850 against a $675 monthly average); on daily closes the nominal recovery is about 2008, not 2006. The page caption says so.
 

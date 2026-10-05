@@ -379,7 +379,7 @@
     return h;
   }
   function drawDecay() {
-    var W = 640, H = 320, L = 46, R = 16, T = 18, Bm = 30, Y = logS(0.3, 20, H - Bm, T), n = REC.length, bw = (W - L - R) / n, h = '';
+    var W = 640, H = 320, L = 46, R = 16, T = 18, Bm = 30, Y = logS(0.3, 20, H - Bm, T), n = REC.length, bw = (W - L - R - 84) / n, h = '';  // right margin holds the reference-line labels
     [0.3, 0.5, 1, 2, 5, 10, 20].forEach(function (v) { h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="' + C.grid + '"/>' + txt(L - 6, Y(v) + 3, v + '×', { a: 'end' }); });
     h = refLines(h, Y, L, R, W, W - R - 2);
     var ce = SR.fallingCeiling(), cx = [];
@@ -393,7 +393,7 @@
       cx.push([xc, Y(ce.at(r.spikeD))]);
     });
     h += '<path d="' + cx.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('') + '" fill="none" stroke="' + C.bright + '" stroke-width="1.2" stroke-dasharray="2 4" opacity=".7"/>';
-    ce.later.forEach(function (p) { var i = REC.map(function (r) { return r.y; }).indexOf(p.y); if (i >= 0) h += '<circle cx="' + cx[i][0] + '" cy="' + cx[i][1] + '" r="3" fill="none" stroke="' + C.bright + '"/>' + txt(cx[i][0] - 8, cx[i][1] - 6, 'ceiling ' + p.projected.toFixed(1) + '×', { a: 'end', c: C.dim }); });
+    ce.later.forEach(function (p) { var i = REC.map(function (r) { return r.y; }).indexOf(p.y); if (i >= 0) h += '<circle cx="' + cx[i][0] + '" cy="' + cx[i][1] + '" r="3" fill="none" stroke="' + C.bright + '"/>' + txt(cx[i][0] - bw * .15 - 6, cx[i][1] + 4, 'ceiling ' + p.projected.toFixed(1) + '×', { a: 'end', c: C.dim }); });
     $('spDecayChart').innerHTML = h;
     var lb = lastAtBand(), nf = REC.filter(function (r) { return r.nearFloor; }).length;
     $('spDecayCap').textContent = 'Each bar runs from a cycle’s spike down to its lowest point against trend after the price high (log scale). The bottom of the chart is the floor, which rises with the trend; it is not zero. Price has gone back to within about 10% of it in ' +
@@ -408,7 +408,7 @@
     for (var y = 2020; y <= yearOf(d1); y++) { var xd = X(SR.dayOfIso(y + '-01-01')); h += txt(xd, H - 8, y); }
     [[PL_CEIL, PL_CEIL + '× upper band', C.gold, '4 4'], [1, 'trend', C.amber, '0'], [PL_FLOOR, PL_FLOOR + '× floor', C.floor, '4 4']].forEach(function (a) {
       var pts = []; for (var d = d0; d <= d1; d += 15) pts.push(X(d).toFixed(1) + ' ' + Y(a[0] * plPrice(d)).toFixed(1));
-      h += '<path d="M' + pts.join('L') + '" fill="none" stroke="' + a[2] + '" stroke-dasharray="' + a[3] + '" stroke-width="1.2" opacity=".85"/>' + txt(X(d1) - 4, Y(a[0] * plPrice(d1)) - 5, a[1], { a: 'end', c: a[2] });
+      h += '<path d="M' + pts.join('L') + '" fill="none" stroke="' + a[2] + '" stroke-dasharray="' + a[3] + '" stroke-width="1.2" opacity=".85"/>' + txt(X(d1) - 4, Y(a[0] * plPrice(d1)) + (a[0] === PL_FLOOR ? 13 : -5), a[1], { a: 'end', c: a[2] });
     });
     var S = SR.series().filter(function (s) { return s.d >= d0; });
     h += '<path d="' + S.map(function (s, i) { return (i ? 'L' : 'M') + X(s.d).toFixed(1) + ' ' + Y(s.p).toFixed(1); }).join('') + '" fill="none" stroke="' + C.text + '" stroke-width="1.4"/>';
@@ -513,7 +513,7 @@
   // Items 36–37: each row says what the law states and what kind it is; the
   // population row carries its own end date.
   function drawLaws() {
-    var W = 640, H = 300, L = 190, R = 16, T = 14, Bm = 26, X = function (v) { return L + (v - 1900) / (2030 - 1900) * (W - L - R); };
+    var W = 640, H = 300, L = 165, R = 16, T = 14, Bm = 26, X = function (v) { return L + (v - 1900) / (2030 - 1900) * (W - L - R); };
     var D = [
       ['Wright’s law (costs)', 'costs fall a fixed share per doubling of output', 'power law', 1936, 2026, null, 'holding'],
       ['Moore’s law (chips)', 'transistors double every ~2 years', 'exponential', 1965, 2010, 2026, 'bent'],
@@ -524,7 +524,7 @@
     for (var y = 1900; y <= 2030; y += 20) h += '<line x1="' + X(y) + '" x2="' + X(y) + '" y1="' + T + '" y2="' + (H - Bm) + '" stroke="' + C.grid + '"/>' + txt(X(y), H - 8, y);
     D.forEach(function (a, i) {
       var yy = T + i * rh + rh * .32, hh = rh * .3, hold = a[6] === 'holding';
-      h += txt(L - 10, yy + 2, a[0], { a: 'end', c: C.text, s: 11 }) + txt(L - 10, yy + 15, a[1], { a: 'end', c: C.dim, s: 9 }) + txt(L - 10, yy + 27, a[2], { a: 'end', c: C.muted, s: 9 }) +
+      h += txt(L - 10, yy + 6, a[0], { a: 'end', c: C.text, s: 11 }) + txt(L - 10, yy + 19, a[2], { a: 'end', c: C.muted, s: 9 }) + txt(X(1900), yy + hh + 13, a[1], { a: 'start', c: C.dim, s: 9 }) +
         '<rect x="' + X(a[3]) + '" y="' + yy + '" width="' + (X(a[4]) - X(a[3])) + '" height="' + hh + '" fill="' + (hold ? C.green : C.orange) + '" rx="2"/>';
       if (a[5]) h += '<rect x="' + X(a[4]) + '" y="' + yy + '" width="' + (X(a[5]) - X(a[4])) + '" height="' + hh + '" fill="' + C.muted + '" opacity=".35" rx="2"/>';
       h += txt(X(a[4]) + (hold ? -4 : 4), yy - 4, a[6], { a: hold ? 'end' : 'start', c: hold ? C.green : C.amber });

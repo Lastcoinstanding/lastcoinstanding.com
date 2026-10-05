@@ -2266,14 +2266,14 @@ A row of buttons that each open one answer card, for a page that answers the sam
 <div class="sp-intents" role="group" aria-label="Your goal">
   <button type="button" class="sp-intent" aria-pressed="true" aria-controls="spWA"><span class="sp-k">Fund something</span><span class="sp-d">…</span></button>
   <div class="sp-pair">
-    <div class="sp-pair-h">Trim and buy back <button class="sp-tip" type="button" aria-expanded="false" aria-controls="spPairTip">i</button><span class="sp-tip-body" id="spPairTip" role="tooltip">…</span></div>
+    <div class="sp-pair-h">Trim and buy back <span class="help-tip" tabindex="0">?<span class="tip-content">…</span></span></div>
     <div class="sp-pair-row"><button class="sp-intent" aria-pressed="false">…</button><button class="sp-intent" aria-pressed="false">…</button></div>
   </div>
 </div>
 ```
 
 - **Buttons with `aria-pressed`, not tabs.** The frame and its tip sit inside the row, which a `tablist` cannot hold validly.
-- **The tip opens on hover, focus and click; Escape and an outside click close it.** The button keeps a small glyph and gets a 44px hit area from an `::after` inset, so touch works without enlarging the icon.
+- **The tip is the standard §6.13 help tip** (`.help-tip` / `.tip-content`, `?` glyph), not a custom one (review round 1, 2026-10-04). `tip-clamp.js` keeps the card on screen at narrow widths.
 - **Each card cross-links its pair-mate** ("run it as a rule" / "try a one-time trim"), so a reader who chose wrong moves sideways without scrolling back.
 - **Use it** when the goals lead to different tools. **Skip it** when the cards would only change an input; that is a segmented control.
 
@@ -2288,6 +2288,13 @@ A `<details>` card whose summary carries a pill grading how well the record supp
 - **Keep the set-aside cards on the page.** Showing what was checked and rejected is part of the evidence; deleting them hides the method.
 - **Three tiers, no more.** A finer scale implies a precision the grading does not have.
 - Colours through tokens (`--green`, `--amber`, `--text-muted`, and the page's border tokens). Use a class rather than `:has()` for the dimmed title.
+
+
+### 6.53 Tab takeaway box and the failure list (`/bitcoin-spikes`, 2026-10-04)
+
+**Takeaway box.** Every tab of a multi-tab page ends with a 2–3 line box stating the tab's point, so a reader who stops there leaves with it. Page-scoped `.sp-takeaway`, styled as Lump Sum or Ladder In's `.lsl-takeaway` (faint amber fill and border, amber "Takeaway." lead-in). One box per tab, last element in the panel, prose only: no figures that could go stale beside live ones (`§10.8`).
+
+**Failure list.** Where a card shows outcomes of a trade, the cases where it lost coins or never happened sit in a red-bordered box below the results (`.sp-fail`), each case named with its date and its multiple. Every case is computed; a case from another page's set is read from that page's shared module so the two agree. Results below 1× in result rows are red and labelled "Lost coins". Showing the failures beside the successes is the point; a card that only lists wins is a sales page.
 
 ## 7. Mobile considerations
 
@@ -2564,6 +2571,14 @@ Never *"How long will a return to trend take?"* — that is a forecast, and the 
 **Litmus test:** would the sentence read naturally in a working message to a smart colleague? If it reads like a brochure or a novel, rewrite it.
 
 Essay tabs may use fuller prose than chat (fewer bullets, more connective sentences), but the register is the same plain one.
+
+### 10.13 HODL casing, spike vocabulary, and first person singular
+
+**JM rulings, 2026-10-04 (Bitcoin's Spikes review round 1).**
+
+- **HODL / HODLer(s), all caps**, wherever the word means the Bitcoiner posture of holding through volatility. A generic "hold" (hold a position, hold cash) stays lowercase. Industry and explainer usage is predominantly all caps, and the site already wrote "HODL".
+- **Spike, price high, floor.** A *spike* is a move above the power law trend, measured as a multiple of trend, not as a price. The *price high* is the highest price. The *floor* is the 0.42× trend line, a level that rises with the trend. Because the trend keeps rising, a later price can be higher and still sit lower against trend, so the two words are not interchangeable. Add "price" wherever a sentence is literally about price ("price high", "price fell"). Avoid jargon like "position spike"; write "spike above trend" where emphasis is needed. Define the term once on any page that leans on it.
+- **First person singular for authored analysis.** The site is one person's work and the About page is written in the first person. Use "I" ("So I priced bitcoin in gold…", "What would change my view"), not "we". Prefer a neutral construction where no actor is needed ("Priced in gold, the trend still holds"). "The research behind this page" stays as written. Applied on `/bitcoin-spikes`; the site-wide sweep is a separate task in TECH_DEBT.
 
 ## 11. Words we don't use
 

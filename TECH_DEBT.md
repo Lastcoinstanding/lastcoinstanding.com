@@ -190,6 +190,10 @@ _(no open items)_
 
 ## 5. Cross-page strategic
 
+- [ ] **Site-wide pronoun sweep: first person singular (`STYLE_GUIDE §10.13`).** The site mixes "we" (~55) and "I" (~57) in authored analysis. Sweep `src/*.njk` and `_pageassets/*.js` to "I" (or a neutral construction where no actor is needed), page by page in its own PR. `/bitcoin-spikes` already done (2026-10-04).
+
+- [ ] **The Bitcoin Floor — one-line definition of "floor" as a rising level.** Bitcoin's Spikes now defines spike / price high / floor once (`STYLE_GUIDE §10.13`). Add the matching line to `/the-bitcoin-floor`: the floor is the 0.42× trend line, a level that rises with the trend, not a fixed price.
+
 - [ ] **Bitcoin's Spikes — OG card (deferred at launch, 2026-10-04).** `/bitcoin-spikes` ships with the site default `og-image.jpg` in its head. Generate `og-bitcoin-spikes.jpg` (product-forward suits it: the multiple-of-trend chart is the hero), register it in `.eleventy.js` staticAssets, and repoint `og:image` / `twitter:image` and their alt text. Carousel slide tracked separately in SITE_GUIDE §13 Pending additions.
 
 - [ ] **Disciplined Rebalancing — full rule handoff from Bitcoin's Spikes.** Card C links `/disciplined-rebalancing?account=retirement|regular` only. The fast-follow is DR reading sell/rebuy thresholds (×trend), sell fraction and tax from the URL, so card C can carry the reader's rule. Also add the DR arrival event (`spikes_arrival` pattern from How Much Cash).
