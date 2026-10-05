@@ -25,6 +25,37 @@
     --red-dim: rgba(192,57,43,0.6);
     --green: #27ae60;
     --border: rgba(224,148,34,0.12);
+
+    /* v2 Stage A (2026-10-04): every colour the calculator and its charts use */
+    --orange: #F7931A;
+    --orange-soft: rgba(247,147,26,.08);
+    --gold: #d4a843;
+    --text-bright: #f2eee8;
+    --card2: #151412;
+    --border-lt: #2a2826;
+    --dr2-green: #6fae6f;
+    --dr2-red-txt: #e0705f;
+    --dr2-red-soft: rgba(192,57,43,.10);
+    --dr2-red-border: rgba(192,57,43,.45);
+    --dr2-arrival-border: rgba(247,147,26,.4);
+    --dr2-bar-bg: rgba(20,18,16,.97);
+    --dr2-bar-shadow: rgba(0,0,0,.45);
+    --dr-sell: #e09422;
+    --dr-fade: rgba(224,148,34,.55);
+    --dr-rebuy: #27ae60;
+    --dr-floor: #c0392b;
+    --dr-upper: #e8c820;
+    --dr-history: rgba(232,224,210,0.7);
+    --dr-axis: rgba(160,160,160,0.55);
+    --dr-grid: rgba(255,255,255,0.04);
+    --dr-tip-bg: rgba(10,9,8,0.95);
+    --dr-tip-border: rgba(224,148,34,0.5);
+    --dr-tip-body: #dddddd;
+    --dr-today-line: rgba(224,148,34,0.4);
+    --dr-ref-50: rgba(255,255,255,0.25);
+    --dr-ref-70: rgba(224,148,34,0.35);
+    --dr-ref-80: rgba(224,148,34,0.55);
+    --dr-ref-90: rgba(224,148,34,0.75);
 }
 
 /* ───────────────────────────────────────────────
@@ -1344,8 +1375,9 @@ input[type="range"]::-moz-range-track {
 .dr-swatch-trend    { background: var(--amber);  width: 14px; height: 2.5px; border-radius: 1px; }
 .dr-swatch-upper    { background: transparent;   width: 14px; height: 0; border-top: 1.5px dotted #e8c820; }
 .dr-swatch-history  { background: rgba(232,224,210,0.7); width: 14px; height: 2px; border-radius: 1px; }
-.dr-swatch-sellline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed #e09422; }
-.dr-swatch-rebuyline{ background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--green); }
+.dr-swatch-sellline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--dr-sell); }
+.dr-swatch-fadeline { background: transparent;   width: 14px; height: 0; border-top: 1.5px dotted var(--dr-fade); }
+.dr-swatch-rebuyline{ background: transparent;   width: 14px; height: 0; border-top: 1.5px dashed var(--dr-rebuy); }
 
 /* ── Question-tab simplified channel chart ──
  * Orientation visual at the top of Tab 1 (The Question). Mirrors the
@@ -1414,8 +1446,9 @@ input[type="range"]::-moz-range-track {
     line-height: 1;
     font-size: 0.78rem;
 }
-.dr-legend-glyph-histsell  { color: rgba(224,148,34,0.65); }
-.dr-legend-glyph-histrebuy { color: rgba(39,174,96,0.65); }
+.dr-legend-glyph-histsell  { color: var(--dr-sell); }
+.dr-legend-glyph-histrebuy { color: var(--dr-rebuy); }
+.dr-legend-glyph-fallback  { color: var(--dr-rebuy); }
 
 /* Historical signals summary block — sits below the channel chart
  * legend, above the Porkopolis attribution. Shows a backtest of
@@ -2059,3 +2092,155 @@ input[type="range"]::-moz-range-track {
     color: var(--amber, #e09422);
     font-weight: 600;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CALCULATOR v2 — Stage A (2026-10-04). Ported from DR_V2_MOCKUP;
+   classes prefixed dr2- so the mockup's generic names (.card, .seg,
+   .preset) stay clear of this file's older rules. STYLE_GUIDE §6.54
+   (presets with a live rule sentence), §6.55 (the build panel); the
+   failure box is the §6.53 component.
+   ═══════════════════════════════════════════════════════════════ */
+.dr2-stack { display: grid; gap: 2.2rem; padding-top: 0.6rem; font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; }
+.dr2-stack h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; color: var(--text-bright); font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.dr2-stack p { margin: 0; }
+.dr2-eyebrow { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--orange); }
+.dr2-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem 1.4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; min-width: 0; }
+.dr2-stack { grid-template-columns: minmax(0, 1fr); }
+.dr2-small { font-size: .8rem; color: var(--text-muted); line-height: 1.55; }
+.dr2-num { font-variant-numeric: tabular-nums; }
+.dr2-strong { color: var(--text); }
+.dr2-stack a:focus-visible, .dr2-stack button:focus-visible, .dr2-stack input:focus-visible, .dr2-stack select:focus-visible, .dr2-stack summary:focus-visible, .dr2-tablewrap:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+/* Arrival note from Bitcoin's Spikes: How Much Cash's .hc-arrival treatment */
+.dr2-arrival { border: 1px solid var(--border); border-left: 2px solid var(--amber); border-radius: 6px; background: var(--bg-card); padding: .65rem .9rem; font-size: .88rem; color: var(--text-dim); }
+.dr2-arrival b { color: var(--text); font-weight: 600; }
+.dr2-arrival a { color: var(--amber); }
+/* Presets (§6.54) */
+.dr2-presets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
+.dr2-preset { text-align: left; background: var(--card2); border: 1px solid var(--border-lt); border-radius: 10px; padding: .75rem .85rem; min-height: 44px; color: var(--text); cursor: pointer; font-family: inherit; display: grid; gap: .2rem; align-content: start; }
+.dr2-preset:hover { border-color: var(--text-muted); }
+.dr2-preset[aria-pressed="true"] { border-color: var(--orange); background: var(--orange-soft); }
+.dr2-preset .k { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; color: var(--text-bright); font-weight: 600; line-height: 1.15; }
+.dr2-preset .d { font-size: .76rem; color: var(--text-dim); line-height: 1.4; }
+.dr2-rule { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.2rem, 2.4vw, 1.45rem); line-height: 1.4; color: var(--text); border-left: 2px solid var(--orange); padding-left: .9rem; }
+.dr2-rule strong { color: var(--text-bright); font-weight: 600; }
+/* Build your own rule (§6.55) */
+details.dr2-build { border: 1px solid var(--border-lt); border-radius: 10px; background: var(--card2); }
+details.dr2-build > summary { cursor: pointer; padding: .75rem 1rem; min-height: 44px; font-weight: 500; font-size: .9rem; color: var(--text); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+details.dr2-build > summary::-webkit-details-marker { display: none; }
+details.dr2-build > summary::after { content: "+"; color: var(--orange); font-weight: 600; }
+details.dr2-build[open] > summary::after { content: "–"; }
+.dr2-build-body { padding: 0 1rem 1.1rem; display: grid; gap: 1.3rem; }
+.dr2-group { display: grid; gap: .9rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.dr2-group h3 { font-family: inherit; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin: 0; }
+.dr2-ctls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 1rem 1.6rem; }
+.dr2-ctl { display: grid; gap: .3rem; min-width: 0; align-content: start; }
+.dr2-ctl[hidden] { display: none; }
+.dr2-lbl { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; }
+.dr2-lbl output { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; color: var(--text-bright); letter-spacing: 0; text-transform: none; }
+.dr2-ctx { font-size: .74rem; color: var(--text-muted); line-height: 1.45; }
+.dr2-ctl input[type=range] { width: 100%; accent-color: var(--orange); min-height: 28px; }
+.dr2-ctl input[type=number] { background: var(--bg-card); color: var(--text); border: 1px solid var(--border-lt); border-radius: 6px; padding: .45rem .5rem; min-height: 44px; font-family: inherit; font-size: .9rem; width: 8rem; }
+.dr2-seg { display: flex; flex-wrap: wrap; gap: .3rem; }
+.dr2-seg button { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: .45rem .7rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 500; cursor: pointer; }
+.dr2-seg button[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
+.dr2-ctl select { width: 100%; background: var(--bg-card); color: var(--text); border: 1px solid var(--border-lt); border-radius: 6px; padding: .45rem .5rem; min-height: 44px; font-family: inherit; font-size: .85rem; max-width: 100%; }
+.dr2-chk { display: flex; gap: .45rem; align-items: center; font-size: .85rem; color: var(--text); min-height: 44px; text-transform: none; letter-spacing: 0; }
+.dr2-warnline { font-size: .78rem; color: var(--dr2-red-txt); }
+/* Results */
+.dr2-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.dr2-res { border-top: 1px solid var(--border-lt); padding-top: .8rem; display: grid; gap: .25rem; min-width: 0; }
+.dr2-res .lab { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-dim); }
+.dr2-res .big { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 600; line-height: 1; color: var(--text-bright); overflow-wrap: anywhere; }
+.dr2-res .big small { font-size: .36em; color: var(--text-dim); font-weight: 500; margin-left: .25rem; }
+.dr2-res .sub { font-size: .84rem; color: var(--text-dim); }
+.dr2-stack .up { color: var(--dr2-green) !important; }
+.dr2-stack .down { color: var(--dr2-red-txt) !important; }
+.dr2-stack .flat { color: var(--text-dim) !important; }
+.dr2-lastcycle { font-size: .86rem; color: var(--text-dim); border: 1px dashed var(--border-lt); border-radius: 8px; padding: .6rem .8rem; }
+/* Table */
+.dr2-tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+table.dr2-table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: .82rem; }
+table.dr2-table th, table.dr2-table td { padding: .55rem .7rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.dr2-table th { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; background: var(--card2); }
+table.dr2-table .n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.dr2-table td .s { display: block; font-size: .72rem; color: var(--text-muted); }
+table.dr2-table tr.never td { color: var(--text-muted); }
+table.dr2-table tr.lost td.mult { color: var(--dr2-red-txt); font-weight: 600; }
+table.dr2-table tr.won td.mult { color: var(--dr2-green); font-weight: 600; }
+table.dr2-cmp { min-width: 560px; }
+table.dr2-cmp th[scope="row"] { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; letter-spacing: 0; text-transform: none; color: var(--text-bright); background: none; }
+table.dr2-cmp td.mult { font-weight: 600; font-size: .95rem; }
+.dr2-cmp-rule { color: var(--text-dim); font-size: .8rem; }
+.dr2-cmp-rule strong { color: var(--text); font-weight: 600; }
+.dr2-tag { display: inline-block; font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--border-lt); border-radius: 999px; padding: .05rem .45rem; margin-left: .3rem; color: var(--text-dim); }
+.dr2-tag.fb { border-color: var(--amber); color: var(--amber); }
+.dr2-tag.cash { border-color: var(--red); color: var(--dr2-red-txt); }
+.dr2-row-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem 1rem; align-items: center; }
+.dr2-h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; color: var(--text-bright); font-size: 1.35rem; margin: 0; }
+/* Failure box (§6.53) */
+.dr2-fail { border: 1px solid var(--dr2-red-border); background: var(--dr2-red-soft); border-radius: 10px; padding: .9rem 1.1rem; display: grid; gap: .5rem; }
+.dr2-fail h3 { font-family: inherit; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dr2-red-txt); font-weight: 600; margin: 0; }
+.dr2-fail ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .86rem; color: var(--text); }
+.dr2-fail.ok { border-color: var(--border-lt); background: var(--card2); }
+.dr2-fail.ok h3 { color: var(--text-dim); }
+/* Charts */
+.dr2-card .dr-channel-viz { margin: 0; }
+.dr2-chart2 { position: relative; height: 300px; }
+.dr2-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .75rem; color: var(--text-dim); }
+.dr2-legend i { display: inline-block; width: 14px; height: 0; vertical-align: middle; margin-right: .35rem; }
+.dr2-key-rule { border-top: 2px solid var(--orange); }
+.dr2-key-hodl { border-top: 2px dashed var(--text-muted); }
+/* Handoffs */
+.dr2-next { display: grid; gap: .9rem; }
+.dr2-handoffs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.dr2-ho { border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1rem; display: grid; gap: .4rem; align-content: start; font-size: .85rem; color: var(--text-dim); }
+.dr2-ho b { color: var(--text-bright); font-weight: 600; font-size: .9rem; }
+.dr2-ho a { color: var(--orange); font-weight: 500; text-decoration: none; padding: .55rem 0; }
+@media (max-width: 760px) {
+  .dr2-presets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dr2-handoffs { grid-template-columns: 1fr; }
+  .dr2-card { padding: 1.1rem 1rem; }
+}
+@media (max-width: 640px) { .dr2-results { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .dr2-stack * { transition: none !important; } }
+/* A legend item the rule does not use (the fade level when it equals the sell level) is hidden; the item rules above set display, so restate it. */
+.dr-channel-legend .dr-legend-item[hidden] { display: none; }
+
+/* ─── Review round 1 (2026-10-05) ─────────────────────────────────── */
+/* Power law framing under the rule heading (item 7). */
+.dr2-frame { font-size: .88rem; color: var(--text-dim); line-height: 1.55; }
+.dr2-frame a, .dr2-showing a { color: var(--amber); }
+/* Hero: the stack in BTC and dollars under each figure (item 8). */
+.dr2-res .btc { font-size: .84rem; color: var(--text); line-height: 1.45; }
+.dr2-res .btc strong { color: var(--text-bright); font-weight: 600; }
+/* "Showing:" line under the cycle heading (item 10). */
+.dr2-showing { font-size: .8rem; color: var(--text-dim); line-height: 1.5; }
+/* The failure section is a link target: clear the sticky nav. */
+#dr-fail { scroll-margin-top: 96px; }
+/* Chart 1's five range buttons wrap rather than overflow at phone width. */
+.dr-channel-range-toggle { flex-wrap: wrap; max-width: 100%; }
+.dr-range-btn { min-height: 44px; }
+
+/* Sticky rule bar (item 9). Fixed under the site nav; JS sets top and
+   toggles [hidden]. z-index sits under the nav (1000) and its menus. */
+.dr2-bar { position: fixed; left: 0; right: 0; z-index: 900; background: var(--dr2-bar-bg); border-bottom: 1px solid var(--border-lt); box-shadow: 0 6px 16px var(--dr2-bar-shadow); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: .3rem 1rem; padding: .35rem max(1rem, calc((100vw - 1100px) / 2)); font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; box-sizing: border-box; }
+.dr2-bar[hidden] { display: none; }
+.dr2-bar.is-entering { animation: dr2BarIn .18s ease-out; }
+@keyframes dr2BarIn { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.dr2-bar-text { min-width: 0; flex: 1 1 18rem; display: grid; gap: .1rem; }
+.dr2-bar-rule { margin: 0; font-size: .86rem; color: var(--text-bright); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dr2-bar-sum { margin: 0; font-size: .74rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dr2-bar-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; flex: 0 1 auto; }
+.dr2-bar-chips, .dr2-bar-acct { display: flex; gap: .2rem; }
+.dr2-chip { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: 0 .55rem; min-height: 44px; min-width: 44px; font-family: inherit; font-size: .74rem; font-weight: 500; cursor: pointer; }
+.dr2-chip:hover { border-color: var(--text-muted); }
+.dr2-chip[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
+.dr2-bar-edit { background: var(--orange-soft); border: 1px solid var(--orange); color: var(--orange); border-radius: 6px; padding: 0 .9rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.dr2-bar button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+@media (max-width: 600px) {
+  .dr2-bar { flex-wrap: nowrap; padding: .3rem 16px; }
+  .dr2-bar-sum, .dr2-bar-chips, .dr2-bar-acct { display: none; }
+  .dr2-bar-text { flex: 1 1 auto; }
+  .dr2-bar-ctls { flex: 0 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) { .dr2-bar.is-entering { animation: none; } }

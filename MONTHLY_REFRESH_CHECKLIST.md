@@ -44,7 +44,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | Equity comparators `SP500_TR_DATA`, `NDQ_TR_DATA` (Day-28 rows) | `shared/tr-comparator-data.js` | Yahoo `^SP500TR`, QQQ adjusted close | §1 |
 | Bitcoin month-end closes `BTC_MONTHLY` | `shared/btc-monthly-data.js` | Yahoo BTC-USD | §1 |
 | The Power Law's three falsifiability tests (live on `/the-power-law#when-reliable`; read the statuses) | `the-power-law.js` | computed from `PL_DATA` | §9.8a |
-| Values computed once from `PL_DATA` and stored: `TREND_RATIO_PERCENTILES`; Disciplined Rebalancing's percentile table; What Daily Conviction Bought's FAQ and meta figures; the hurdle-rate meta line; Allocation Sizing's "about 0.44× today" tooltip | several | recompute from `PL_DATA` | §9.8 |
+| Values computed once from `PL_DATA` and stored: `TREND_RATIO_PERCENTILES`; ~~Disciplined Rebalancing's percentile table~~ (live since 2026-10-04); What Daily Conviction Bought's FAQ and meta figures; the hurdle-rate meta line; Allocation Sizing's "about 0.44× today" tooltip | several | recompute from `PL_DATA` | §9.8 |
 | As-of callouts, captions and hand-typed callout values (Bitcoin vs. the Stock Market §1/§3 and its "Through August 2026" returns; the Horizon's "through August 2026") | several `.njk` | recompute | §3, §4 |
 | Case-Shiller, Zillow rents and values | `shared/housing-monthly-data.js` | FRED, Zillow | §9.4 |
 | Is Bitcoin a Bubble? weekly line `BTC_DATA_2014` | `not-a-bubble.js` | Yahoo, Sunday closes | §9.7 |
@@ -102,7 +102,7 @@ When one of these happens, run its list in §12: a **new all-time high**; the **
 
 ### 0.6 Nothing to refresh (computed at load)
 
-The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, The Bitcoin Floor (its QA is §5.1), Bitcoin's Spikes (its record QA is `[spikes-qa]`, pinned to 2026-09-30; check the console line after a PL_DATA refresh, and never re-pin the fixture to make it pass), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
+The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, Disciplined Rebalancing (its QA is §5.1c), The Bitcoin Floor (its QA is §5.1), Bitcoin's Spikes (its record QA is `[spikes-qa]`, pinned to 2026-09-30; check the console line after a PL_DATA refresh, and never re-pin the fixture to make it pass), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
 
 ### 0.7 Cross-page agreement (monthly)
 
@@ -626,6 +626,12 @@ constants (`flParityRead`, the honesty-endpoint copy) as a measurement dated
 2026-07-31, which is exactly what they are; a fixture failure is a broken test,
 not a published error.
 
+### 5.1c Disciplined Rebalancing — `[dr-qa]` after a PL_DATA refresh (fix the anchor, never the constants)
+
+Added 2026-10-04 with DR v2 Stage A. `drQA()` (console-runnable on `/disciplined-rebalancing`, and run on every load as `[dr-qa]`) truncates the series at the **2026-09-30** sample, located by exact date, and asserts the §5 fixture: the three presets in an IRA and taxable (20% + NIIT) from 2011 and 2014 (±0.01×), Conservative's per-cycle sales and buy backs, the context shares (17% / 13% at or above 2×, 56% at or below 1×), the legacy `sell=80&rebuy=50` mapping, FIFO vs highest-cost vs average cost on a two-lot case, the deadline firing on the first sample at or past `cap × 30.44` days, and a clean bare load.
+
+After a refresh, load the page and read the console line. Same rule as §5.1b: **if `[dr-qa]` fails, fix the anchor, never the constants.** A failure that names the anchor means the 2026-09-30 sample moved or was renumbered; a failure on a figure with the anchor present means the engine or the series under the anchor changed, which is a defect to investigate, not a constant to re-pin. The live figures on the page move with every refresh and are not asserted.
+
 ## 6. OG image regeneration (product-forward cards)
 
 The 2026-05-17 OG rollout introduced **product-forward OG cards** that
@@ -990,7 +996,7 @@ at 2026-03-15 — six months short of the chart's "today" point, with a visible 
 Some figures were computed from the price series once and written into the source. They don't move when `PL_DATA` does, so after each §1 append, recompute them:
 
 - **`TREND_RATIO_PERCENTILES`** (`shared/calculator-helpers.js`). The Bitcoin Retirement's status line reads it ("historically, BTC has traded below this trend level N% of its history"). Rebuild from every `PL_DATA` sample: the ratio `price ÷ (PL_A · day^PL_B)`, sorted, one row at every second percentile from 0 to 100. Update the header's "spanning days 592 → N" (the freshness report reads it). On 2026-09-29 it stopped at day 6304 (2026-04-08), six samples short. The header's note to regenerate "when PL_DATA in the-power-law.js changes" is out of date: `PL_DATA` lives in `shared/power-law-data.js`. Computing the table at load would retire this item (TECH_DEBT).
-- **Disciplined Rebalancing's reference thresholds** (`disciplined-rebalancing.njk` ~376–396 and the chart lines in `disciplined-rebalancing.js` ~75–78). The page says they are "computed against current PL_DATA"; recompute the percentile multiples and fix the sample count ("~5,500+ samples"; the series has about 480).
+- ~~**Disciplined Rebalancing's reference thresholds**~~ **Retired 2026-10-04 (DR v2 Stage A): the Math table and chart lines are computed live by the engine; nothing to refresh by hand.** Was: (`disciplined-rebalancing.njk` ~376–396 and the chart lines in `disciplined-rebalancing.js` ~75–78). The page says they are "computed against current PL_DATA"; recompute the percentile multiples and fix the sample count ("~5,500+ samples"; the series has about 480).
 - **What Daily Conviction Bought**: the FAQ answer (njk ~16), the drawdown figure (~20, 165) and the head meta (`what-daily-conviction-bought-head.html` ~7, 15). Recompute with the page's own tool at the default settings ($30 a day from 2017-01-01).
 - **The Bitcoin Hurdle Rate**: the head meta ("near 30% over ten years"; it falls about a point a year) and the forty-year figure (njk ~24).
 - **Allocation Sizing**: the tooltip "about 0.44× today" (njk ~70). Prefer rewriting it without a number, since the live figure is on the page.

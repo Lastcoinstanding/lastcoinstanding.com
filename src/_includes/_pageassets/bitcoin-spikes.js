@@ -172,20 +172,20 @@
     'peak': 'The best case, for comparison. No one knew which day it was.'
   };
   // Results are framed as the saving against the realistic default, selling
-  // when the bill arrives: "43% fewer coins", not "57% of the coins".
-  function saving(r) { var s = Math.round((1 - r) * 100); return s >= 0 ? s + '% fewer' : (-s) + '% more'; }
+  // when the bill arrives: "43% less bitcoin", not "57% of the bitcoin".
+  function saving(r) { var s = Math.round((1 - r) * 100); return s >= 0 ? s + '% less' : (-s) + '% more'; }
   function updA() {
     var mo = +$('spFMonths').value, amt = +$('spFAmt').value;
     var parts = fWhen.split(':'), when = parts[0], level = parts[1] ? +parts[1] : 2;
     $('spFMonthsOut').textContent = mo + ' months'; $('spFAmtOut').textContent = money(amt);
     $('spFWhenHelp').textContent = F_HELP[fWhen] || '';
     var res = SR.fundResults(when, mo, null, level);
-    var items = [{ y: 'When due', v: 1, t: 'baseline', n: 'Selling when the bill arrived: the coins each cycle is compared with.', c: 'var(--text-muted)' }];
+    var items = [{ y: 'When due', v: 1, t: 'baseline', n: 'Selling when the bill arrived: the bitcoin each cycle is compared with.', c: 'var(--text-muted)' }];
     res.forEach(function (o) {
       if (o.never) { items.push({ y: o.c.y, v: 1, t: 'no sale', n: 'Price never reached ' + level + '× trend, so you sell when the bill arrives.', c: 'var(--text-muted)' }); return; }
       if (o.pending) { items.push({ y: o.c.y, v: 0, t: 'not yet', n: 'Sold ' + monthYear(o.s.d) + '; the need date is still ahead.', c: 'var(--border)' }); return; }
       var cs = amt / o.s.p, cl = amt / o.q;
-      items.push({ y: o.c.y, v: o.r, t: saving(o.r), n: (o.r > 1 ? 'Cost coins. ' : '') + 'Sold ' + monthYear(o.s.d) + ': ' + cs.toFixed(cs < 1 ? 3 : 1) + ' BTC, against ' + cl.toFixed(cl < 1 ? 3 : 1) + ' BTC when the bill arrived ' + mo + ' months later', c: o.r < 1 ? 'var(--green)' : 'var(--red)' });
+      items.push({ y: o.c.y, v: o.r, t: saving(o.r), n: (o.r > 1 ? 'Cost bitcoin. ' : '') + 'Sold ' + monthYear(o.s.d) + ': ' + cs.toFixed(cs < 1 ? 3 : 1) + ' BTC, against ' + cl.toFixed(cl < 1 ? 3 : 1) + ' BTC when the bill arrived ' + mo + ' months later', c: o.r < 1 ? 'var(--green)' : 'var(--red)' });
     });
     var done = res.filter(function (o) { return o.r != null; }).map(function (o) { return o.r; });
     var peak = SR.fundResults('peak', mo).filter(function (o) { return o.r != null; }).map(function (o) { return o.r; });
@@ -196,14 +196,14 @@
     else {
       var s = sav(done), worse = done.filter(function (r) { return r > 1; }).length;
       h = 'Selling ' + what + ' for a bill due ' + mo + ' months later used ' +
-        (worse ? '<strong>up to ' + s.hi + '% fewer coins</strong> than selling when the bill arrived, and <strong>more in ' + worse + ' of ' + done.length + '</strong> cycles where a sale happened.'
-          : (s.lo === s.hi ? '<strong>' + s.hi + '% fewer coins</strong>' : '<strong>' + s.lo + '–' + s.hi + '% fewer coins</strong>') + ' than selling when the bill arrived, in ' + words(done.length) + ' cycle' + (done.length === 1 ? '' : 's') + ' where a sale happened.');
-      if (when !== 'peak' && peak.length) { var p = sav(peak); h += ' Selling at the peak, with perfect hindsight, would have used ' + p.lo + '–' + p.hi + '% fewer.'; }
+        (worse ? '<strong>up to ' + s.hi + '% less bitcoin</strong> than selling when the bill arrived, and <strong>more in ' + worse + ' of ' + done.length + '</strong> cycles where a sale happened.'
+          : (s.lo === s.hi ? '<strong>' + s.hi + '% less bitcoin</strong>' : '<strong>' + s.lo + '–' + s.hi + '% less bitcoin</strong>') + ' than selling when the bill arrived, in ' + words(done.length) + ' cycle' + (done.length === 1 ? '' : 's') + ' where a sale happened.');
+      if (when !== 'peak' && peak.length) { var p = sav(peak); h += ' Selling at the peak, with perfect hindsight, would have used ' + p.lo + '–' + p.hi + '% less.'; }
     }
     $('spFHead').innerHTML = h; $('spFRows').innerHTML = rowsHTML(items, 1.4);
-    $('spFCaveat').textContent = 'Bars show the coins each sale used against the coins selling when the bill arrived would have taken (the grey baseline). ' +
+    $('spFCaveat').textContent = 'Bars show the bitcoin each sale used against the bitcoin selling when the bill arrived would have taken (the grey baseline). ' +
       (when === 'peak' ? '' : 'If price never reaches ' + level + '×, you sell when the bill arrives. ') +
-      'Selling on the way up came too early in every cycle, because the run-up kept going. Selling as the spike faded needed no forecast and still used fewer coins for bills up to a year out. Past two years, the next cycle tends to undo it. ' +
+      'Selling on the way up came too early in every cycle, because the run-up kept going. Selling as the spike faded needed no forecast and still used less bitcoin for bills up to a year out. Past two years, the next cycle tends to undo it. ' +
       'Why not compare with selling at the trend price? On the day of a spike sale, price is far above trend by definition; nobody could sell at trend that day. Selling when the money is needed is the realistic alternative. ' +
       'The cash sits idle until you need it, and price can keep rising after you sell. Tax applies either way if you’d have sold anyway.';
   }
@@ -239,7 +239,7 @@
       var end = 1 - sh + sh * c.medianRT, chg = Math.round((end - 1) * 100);
       $('spBHead').innerHTML = 'Selling at ' + bTrig + '× trend and buying back once price fell below trend left more bitcoin <strong>' + Math.round(c.hitAfterTax) +
         '%</strong> of the time, across the ' + c.n + ' times since ' + yearOf(c.since) + ' that price stood near ' + bTrig + '×. The typical round trip returned <strong>' +
-        c.medianRT.toFixed(2) + '×</strong> the coins sold' + (c.tax ? ', after ' + c.tax + '% tax' : ', in an IRA') + '. A ' + Math.round(sh * 100) + '% trim at that typical outcome ends with ' +
+        c.medianRT.toFixed(2) + '×</strong> the bitcoin sold' + (c.tax ? ', after ' + c.tax + '% tax' : ', in an IRA') + '. A ' + Math.round(sh * 100) + '% trim at that typical outcome ends with ' +
         (chg === 0 ? 'about the same bitcoin as HODLing.' : Math.abs(chg) + '% ' + (chg > 0 ? 'more' : 'less') + ' bitcoin than HODLing.');
       $('spBLegs').textContent = (c.rising != null && c.falling != null)
         ? 'The same entries split by direction: sold while price was still rising through ' + bTrig + '×, the median round trip returned ' + c.rising.toFixed(2) + '×; sold as it fell back, ' + c.falling.toFixed(2) + '×. ' + CE.legSentence(c.m, 'the round trip paid')
@@ -256,7 +256,7 @@
       if (!r.rb) { items.push({ y: cy.y, v: 1, t: 'open', n: 'Sold ' + monthYear(r.sell.d) + '; no return to trend yet.', c: 'var(--text-muted)' }); return; }
       var stack = 1 - sh + sh * keep * r.ratio;
       var lost = stack < 1;
-      items.push({ y: cy.y, v: stack, t: (stack >= 1 ? '+' : '') + Math.round((stack - 1) * 100) + '%', n: (lost ? 'Lost coins. ' : '') + 'Sold ' + monthYear(r.sell.d) + ' at ' + money(r.sell.p) + ', bought back ' + monthYear(r.rb.d) + ' at ' + money(r.rb.p), c: lost ? 'var(--red)' : 'var(--green)' });
+      items.push({ y: cy.y, v: stack, t: (stack >= 1 ? '+' : '') + Math.round((stack - 1) * 100) + '%', n: (lost ? 'Lost bitcoin. ' : '') + 'Sold ' + monthYear(r.sell.d) + ' at ' + money(r.sell.p) + ', bought back ' + monthYear(r.rb.d) + ' at ' + money(r.rb.p), c: lost ? 'var(--red)' : 'var(--green)' });
     });
     $('spBRowsH').textContent = 'Illustration: the first time price reached ' + bTrig + '× in each cycle' + (bAcct === 'tax' ? ', at ' + (rate % 1 ? rate.toFixed(1) : rate) + '% tax' : ', in an IRA');
     $('spBRows').innerHTML = rowsHTML(items, 2);
@@ -268,7 +268,7 @@
     if (c) $('spBCta').setAttribute('href', '/how-much-cash?pos=' + c.P.toFixed(3) + '&rebuy=trend&share=' + Math.round(sh * 100) + '&tax=' + c.tax + '&from=spikes');
   }
 
-  // Item 18: the cases where trimming cost coins, listed in red. Each is
+  // Item 18: the cases where trimming cost bitcoin, listed in red. Each is
   // computed: from spike-record.js, or (the rising-leg case) from How Much
   // Cash's own set via ChannelEntries, so the figure matches that page.
   var TOP_RATE = 23.8;
@@ -276,23 +276,23 @@
     var L = [], c13 = SR.TRADE_CYCLES[0];
     var a = SR.roundTrip(c13, 1.5, 'trend'), b = SR.roundTrip(c13, 2, 'trend');
     if (a.rb && b.rb) L.push('<strong>2013, at either level.</strong> Sold in ' + monthYear(a.sell.d) + ' (1.5×) or ' + monthYear(b.sell.d) + ' (2×) and bought back at trend in ' + monthYear(b.rb.d) +
-      ': ' + a.ratio.toFixed(2) + '× and ' + b.ratio.toFixed(2) + '× the coins sold. The first spike of the cycle was not the last.');
+      ': ' + a.ratio.toFixed(2) + '× and ' + b.ratio.toFixed(2) + '× the bitcoin sold. The first spike of the cycle was not the last.');
     var tx = SR.TRADE_CYCLES.slice(1, 3).map(function (cy) { var r = SR.roundTrip(cy, 1.5, 'trend'); return r.rb ? { y: cy.y, v: r.ratio * (1 - TOP_RATE / 100) } : null; }).filter(function (x) { return x && x.v < 1; });
-    if (tx.length) L.push('<strong>Taxable, at 1.5×.</strong> At the top ' + TOP_RATE + '% rate, ' + listAnd(tx.map(function (x) { return x.y + ' returned ' + x.v.toFixed(2) + '×'; })) + ' the coins sold: the fall did not clear the tax.');
+    if (tx.length) L.push('<strong>Taxable, at 1.5×.</strong> At the top ' + TOP_RATE + '% rate, ' + listAnd(tx.map(function (x) { return x.y + ' returned ' + x.v.toFixed(2) + '×'; })) + ' the bitcoin sold: the fall did not clear the tax.');
     var c17 = SR.TRADE_CYCLES[1], h50 = SR.roundTrip(c17, 2, 'ath50');
-    if (h50.rb && h50.ratio < 1) L.push('<strong>Rebuy at 50% below the price high, 2017.</strong> Sold at 2× in ' + monthYear(h50.sell.d) + ' at ' + money(h50.sell.p) + '; the rebuy came in ' + monthYear(h50.rb.d) + ' at ' + money(h50.rb.p) + ': ' + h50.ratio.toFixed(2) + '× the coins.');
+    if (h50.rb && h50.ratio < 1) L.push('<strong>Rebuy at 50% below the price high, 2017.</strong> Sold at 2× in ' + monthYear(h50.sell.d) + ' at ' + money(h50.sell.p) + '; the rebuy came in ' + monthYear(h50.rb.d) + ' at ' + money(h50.rb.p) + ': ' + h50.ratio.toFixed(2) + '× the bitcoin.');
     var P15 = sellPos(1.5), m15 = CE.bandMetrics(Math.max(0, P15), 'trend');
     if (m15) {
       var worst = m15.metrics.filter(function (e) { return e.leg === 'rising'; }).sort(function (x, y) { return x.ratio - y.ratio; })[0];
-      if (worst && worst.ratio < 1) L.push('<strong>Selling while price was still rising.</strong> In How Much Cash&rsquo;s set at 1.5× trend, the worst rising-leg entry sold in ' + monthYear(worst.d0) + ' and bought back in ' + monthYear(worst.waitDay) + ': ' + worst.ratio.toFixed(2) + '× the coins.');
+      if (worst && worst.ratio < 1) L.push('<strong>Selling while price was still rising.</strong> In How Much Cash&rsquo;s set at 1.5× trend, the worst rising-leg entry sold in ' + monthYear(worst.d0) + ' and bought back in ' + monthYear(worst.waitDay) + ': ' + worst.ratio.toFixed(2) + '× the bitcoin.');
     }
     var n80 = SR.roundTrip(c17, 2, 'ath80');
-    if (n80.fired && !n80.rb) L.push('<strong>A rebuy that never comes.</strong> Sold at 2× in ' + monthYear(n80.sell.d) + ' at ' + money(n80.sell.p) + ', waiting for an 80% fall that never came. Bought back today, that cash gets ' + (n80.sell.p / spot).toFixed(2) + '× the coins sold.');
+    if (n80.fired && !n80.rb) L.push('<strong>A rebuy that never comes.</strong> Sold at 2× in ' + monthYear(n80.sell.d) + ' at ' + money(n80.sell.p) + ', waiting for an 80% fall that never came. Bought back today, that cash gets ' + (n80.sell.p / spot).toFixed(2) + '× the bitcoin sold.');
     if (LATEST.spikeM < 1.5) L.push('<strong>A spike that ends early.</strong> In ' + LATEST.y + ' the spike peaked at ' + fmtShort(LATEST.spikeM) + '× trend, so a plan waiting for 1.5× or 2× never sold. As spikes shrink, a fixed level can simply never be reached.');
-    $('spBFail').innerHTML = '<div class="sp-fail-h">Where trimming has cost coins, or never happened</div><ul>' + L.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
+    $('spBFail').innerHTML = '<div class="sp-fail-h">Where trimming has cost bitcoin, or never happened</div><ul>' + L.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
   }
 
-  // ═══════════ CARD C · RUN A RULE ═══════════
+  // ═══════════ CARD C · RUN YOUR RULES ═══════════
   var cTrig = 1.5, cRebuy = 'trend', cAcct = 'retirement';
   function updC() {
     var items = [];
@@ -301,7 +301,7 @@
       if (!r.fired) { items.push({ y: cy.y, v: 1, t: 'never fired', n: 'HODLed through the cycle.', c: 'var(--text-muted)' }); return; }
       if (!r.rb) { items.push({ y: cy.y, v: 0.05, t: 'no rebuy', n: 'Sold ' + monthYear(r.sell.d) + ' at ' + money(r.sell.p) + '; the rebuy never triggered. Still in cash.', c: 'var(--red)' }); return; }
       var lost = r.ratio < 1;
-      items.push({ y: cy.y, v: r.ratio, t: r.ratio.toFixed(2) + '×', n: (lost ? 'Lost coins. ' : '') + 'Sold ' + monthYear(r.sell.d) + ', bought back ' + monthYear(r.rb.d) + ' (whole position, IRA)', c: lost ? 'var(--red)' : 'var(--green)' });
+      items.push({ y: cy.y, v: r.ratio, t: r.ratio.toFixed(2) + '×', n: (lost ? 'Lost bitcoin. ' : '') + 'Sold ' + monthYear(r.sell.d) + ', bought back ' + monthYear(r.rb.d) + ' (whole position, IRA)', c: lost ? 'var(--red)' : 'var(--green)' });
     });
     $('spCRows').innerHTML = rowsHTML(items, 2);
     // Item 20: the trade-off tip, computed. "Just above trend" = JUST_ABOVE× trend.
@@ -312,8 +312,11 @@
     var t13 = SR.roundTrip(SR.TRADE_CYCLES[0], cTrig, 'trend');
     $('spCNote').textContent = cRebuy === 'ath80'
       ? 'A rebuy waiting for an 80% fall has not triggered since 2013, so the sale stayed in cash. Fixed drawdown targets fail as cycles shrink.'
-      : 'Coins after the round trip as a multiple of coins sold, whole position, no tax.' + (t13.fired ? ' Note 2013: the rule fired in ' + monthYear(t13.sell.d) + ' and price rose more than ' + Math.floor(R13.highP / t13.sell.p) + '× by ' + monthYear(R13.highD) + '.' : '');
-    $('spCCta').setAttribute('href', '/disciplined-rebalancing?account=' + cAcct);
+      : 'Bitcoin after the round trip as a multiple of the bitcoin sold, whole position, no tax.' + (t13.fired ? ' Note 2013: the rule fired in ' + monthYear(t13.sell.d) + ' and price rose more than ' + Math.floor(R13.highP / t13.sell.p) + '× by ' + monthYear(R13.highD) + '.' : '');
+    // The link carries the whole rule (DR v2 Stage A reads it: sx, st, f, rx, account, from).
+    // Card C's buy back is trend (rx=1) or 80% below the high, which DR can't do yet: rb=ath80
+    // tells DR to say so. Card C's own figures are computed here, separately from DR's engine.
+    $('spCCta').setAttribute('href', '/disciplined-rebalancing?sx=' + cTrig + '&st=up&f=100&rx=1&account=' + cAcct + '&from=spikes' + (cRebuy === 'ath80' ? '&rb=ath80' : ''));
   }
 
   // ═══════════ TAX HURDLE ═══════════
@@ -505,7 +508,7 @@
     var g13 = trendGrowth(SR.dayOfIso('2013-07-01')), gNow = trendGrowth(TODAY_DAYS);
     var x = R13.low ? R13.highP / R13.low.p : null, never = spot / R13.highP;
     $('spShrinkTxt').textContent = 'In 2013 bitcoin’s trend was rising about ' + (Math.round(g13 / 10) * 10) + '% a year; today it rises about ' + Math.round(gNow) + '%. That changes the arithmetic of selling into a spike. ' +
-      (x ? 'Trimming at the ' + monthLong(R13.highD) + ' high and buying back at the ' + yearOf(R13.low.d) + ' low gave ' + x.toFixed(1) + '× the coins. ' : '') +
+      (x ? 'Trimming at the ' + monthLong(R13.highD) + ' high and buying back at the ' + yearOf(R13.low.d) + ' low gave ' + x.toFixed(1) + '× the bitcoin. ' : '') +
       'Never buying back missed a ' + Math.round(never) + '× rise. Smaller spikes mean less to gain from selling; a slower trend means less lost by being out.';
   }
 
@@ -612,6 +615,16 @@
     seg('spCAcct', function (v) { cAcct = v; updC(); });
     seg('spHAcct', function (v) { hAcct = v; updH(); });
     $('spHRate').addEventListener('input', updH); $('spHBasis').addEventListener('input', updH); $('spHState').addEventListener('change', updH);
+    // The shared list carries Washington at 0%, right for real estate (exempt there) but not for
+    // bitcoin: WA taxes long-term gains, crypto included, at 7% above about $270k (DATA_AUDIT DR-WA).
+    // Two options, as on Disciplined Rebalancing: WA (0%, under the deduction) and WAHI (7%,
+    // above it). The rate is read from the label, so each label carries its rate.
+    var wa = $('spHState').querySelector('option[value="WA"]');
+    if (wa) {
+      wa.textContent = 'Washington, gains under ~$270k a year (0%)';
+      var waHi = document.createElement('option'); waHi.value = 'WAHI'; waHi.textContent = 'Washington, gains above ~$270k a year (7%)'; wa.after(waHi);
+    }
+    $('spHState').addEventListener('change', function () { var h = $('spHStateHelp'); if (h) h.hidden = $('spHState').value !== 'WAHI'; });
     $('spHState').value = 'NONE';
     document.querySelectorAll('.sp-intent').forEach(function (b) { b.addEventListener('click', function () { selectIntent(b, true); }); });
     document.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { var t = $(b.getAttribute('data-go')); selectIntent(t, true); t.focus(); }); });

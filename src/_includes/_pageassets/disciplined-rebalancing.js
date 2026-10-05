@@ -30,11 +30,22 @@
       history.replaceState(null, '', '#' + b.dataset.tab);
     });
   });
-  var hash = location.hash.replace('#','');
-  if(hash){
+  // A hash can also name an element inside a tab (#dr-fail): open its tab,
+  // then scroll to it. Covers in-page links and reloads.
+  function openHash(){
+    var hash = location.hash.replace('#','');
+    if(!hash) return;
     var target = document.querySelector('[data-tab="'+hash+'"]');
-    if(target) target.click();
+    if(target){ target.click(); return; }
+    var el = document.getElementById(hash), pane = el && el.closest('.tab-content');
+    if(!pane) return;
+    var btn = document.querySelector('[data-tab="'+pane.id.replace('tab-','')+'"]');
+    if(btn && !pane.classList.contains('active')) btn.click();
+    history.replaceState(null, '', '#' + hash);
+    setTimeout(function(){ el.scrollIntoView({ block: 'start' }); }, 0);
   }
+  openHash();
+  window.addEventListener('hashchange', openHash);
 })();
 
 // ═══════ MATH TAB CHART ═══════
@@ -69,14 +80,17 @@
       }
     }
 
-    // Horizontal reference percentile lines — values match the
-    // canonical thresholds documented in the percentile table above.
+    // Horizontal reference percentile lines, live from the engine's one
+    // percentile function (since-2011 set) — the same levels the Math
+    // tab's table prints.
+    function pct(P){ return window.RuleEngine ? window.RuleEngine.ratioAtPercentile(P, '2011-01') : null; }
+    function cv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
     var refs = [
-      { y: 0.85, label: '50th — historical median', color: 'rgba(255,255,255,0.25)' },
-      { y: 1.32, label: '70th', color: 'rgba(224,148,34,0.35)' },
-      { y: 1.75, label: '80th', color: 'rgba(224,148,34,0.55)' },
-      { y: 2.83, label: '90th', color: 'rgba(224,148,34,0.75)' }
-    ];
+      { y: pct(50), label: '50th — median since 2011', color: cv('--dr-ref-50') },
+      { y: pct(70), label: '70th', color: cv('--dr-ref-70') },
+      { y: pct(80), label: '80th', color: cv('--dr-ref-80') },
+      { y: pct(90), label: '90th', color: cv('--dr-ref-90') }
+    ].filter(function(r){ return r.y != null; });
 
     // Build datasets: one for the historical ratio line, plus
     // straight horizontal lines for each reference percentile.
@@ -408,1722 +422,740 @@
   });
 })();
 
-// ═══════ CHANNEL VIZ — Calculator tab anchor visualization ═══════
+// ═══════ CALCULATOR v2 — Stage A (2026-10-04) ═══════
 //
-// Shows the Power Law channel (floor / trend / upper) with historical
-// price overlay AND the user's sell/rebuy thresholds as parallel-to-trend
-// lines that update live as the percentile sliders move. Once the user
-// enters a stack value, the calculator IIFE dispatches a 'dr:simResult'
-// CustomEvent and we paint the simulated forward price path plus
-// trigger markers (▼ sell, ▲ rebuy) on top.
+// Replaces the percentile calculator (runHistoricalBacktest, both local
+// percentileToRatio copies, the era toggle and the four-param URL sync).
+// Ported from the approved DR_V2_MOCKUP: presets, the rule sentence, the
+// "Build your own rule" panel, the hero (since 2011 and since 2014), the
+// cycle table, the failure box, two charts and three handoffs.
 //
-// X-axis: linear days-from-genesis; year-formatting tick callback
-// (matches the Tab 4 'Channel' chart on /the-power-law and the Math
-// tab companion chart — no chartjs date-adapter needed).
-// Y-axis: logarithmic USD price, autoscaled.
+// Engine: shared/rule-engine.js (window.RuleEngine). Percentiles: the
+// engine's one function family on the since-2011 set. Chart 1 is the page's
+// existing Chart.js channel chart, now carrying the rule's sell, fade and
+// buy-back levels and its ▼ / ▲ / △ markers; Chart 2 (stack over time) uses
+// Chart.js too, so the two match.
 //
-// Mežinskis / Porkopolis attribution lives in the markup below the chart.
+// URL schema (spec §7): preset, sx, st, sz, f, rx, cap, account, tax
+// (federal 0/15/20), state, from. Never written on a bare load (the first
+// real interaction unlocks the writer); defaults omitted; foreign params and
+// the hash preserved. Legacy sell= / rebuy= percentiles and the old 0–40
+// tax= still parse; the writer emits the new keys only.
+//
+// Stickiness: dr: keys for the new inputs; the stack is never saved. URL
+// params (any) override storage, as before. The old sell/rebuy/tax keys are
+// removed on load, not migrated.
 (function(){
-  var canvas = document.getElementById('drChannelChart');
-  if(!canvas) return;
-  if(typeof Chart === 'undefined') return;
+  if (!window.RuleEngine || !document.getElementById('dr2RuleSentence')) return;
+  var RE = window.RuleEngine;
+  function $(id){ return document.getElementById(id); }
+  function cssVar(n, fb){ var v = getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v || fb; }
+  function track(name, params){ try { if (typeof gtag === 'function') gtag('event', name, params); } catch (e) {} }
 
-  // Narrow-viewport flag: drives compact tooltip styling. matchMedia
-  // is supported everywhere we ship; the fallback is the default
-  // (desktop) tooltip if matchMedia is unavailable. Read once at
-  // chart-init — rotation/resize across the threshold is rare in
-  // practice and the visual penalty for a stale value is mild.
-  var isNarrowViewport = (typeof window !== 'undefined' &&
-    window.matchMedia && window.matchMedia('(max-width: 480px)').matches);
+  var INITIAL_HREF = location.href;
+  var interacted = false;
 
-  // ─── X-DOMAIN ───
-  // Min: PL_DATA[0][0] (first historical sample; ~mid-2010)
-  // Max: today + horizon × 365.25 (extends to user's projection end)
-  // Today is fixed at script-load time.
-  var todayD = (Date.now()/1000 - GENESIS_TS) / 86400;
-  var minD = PL_DATA[0][0];
-  function maxD(){
-    var horizonEl = document.getElementById('drHorizon');
-    var horizon = horizonEl ? parseInt(horizonEl.value) : 20;
-    return todayD + horizon * 365.25;
-  }
-
-  // ─── BAND DATA ───
-  // Sampled every 30 days for performance (matches Tab 4 cadence).
-  function bandData(){
-    var trend = [], floor = [], upper = [];
-    var hi = maxD();
-    for(var d = minD; d <= hi; d += 30){
-      var t = plPrice(d);
-      trend.push({x: d, y: t});
-      floor.push({x: d, y: t * PL_FLOOR});
-      upper.push({x: d, y: t * PL_CEIL});
-    }
-    return { trend: trend, floor: floor, upper: upper };
-  }
-
-  // User's threshold lines: ratio × trend at every day. Same x-grid
-  // as the bands so they update cheaply (just rebuild y values).
-  function thresholdData(ratio){
-    var line = [];
-    var hi = maxD();
-    for(var d = minD; d <= hi; d += 30){
-      line.push({x: d, y: plPrice(d) * ratio});
-    }
-    return line;
-  }
-
-  // Historical price as scatter data (PL_DATA is already day-indexed).
-  var historicalData = PL_DATA.map(function(p){ return {x: p[0], y: p[1]}; });
-
-  // ─── HISTORICAL BACKTEST ───
-  // Walks PL_DATA day-by-day applying the user's sell/rebuy/fraction
-  // logic — same trigger algorithm as the calculator's runSimulation,
-  // but on real historical price data instead of the synthetic ±60%
-  // cycle pattern. Returns a chronological list of trigger events
-  // that would have fired if the user had been running this strategy
-  // since the first PL_DATA sample (~mid-2010).
-  //
-  // Honest-application choice: starts holding-stack at PL_DATA[0]
-  // (no choice of "starting point" that could be cherry-picked) and
-  // runs through the full historical record. The only inputs are
-  // the user's threshold ratios; nothing else is tunable, nothing
-  // is excluded. If the strategy never crosses a threshold, the
-  // backtest returns an empty trade list.
-  // Walks PL_DATA day by day; records every threshold crossing as a
-  // trigger event AND tracks the running BTC + cash + cost-basis state
-  // across cycles. Starting position is 1.0 BTC at the cost basis of
-  // the first PL_DATA price, so cumulative BTC is comparable to a
-  // 1.0-BTC HODL across the same span.
-  //
-  // params:
-  //   sellRatio, rebuyRatio  — price/trend ratios that fire triggers
-  //   accountType            — 'retirement' (no tax) or 'regular' (capital-gains drag)
-  //   taxRate                — 0..1, applied to gain at each sell in 'regular' mode
-  //
-  // returns:
-  //   trades: per-trigger events with {day, price, ratio, type,
-  //           deltaBTC, cumBTC, cumCash, taxPaid, costBasis}
-  //   finalState: 'holding-stack' | 'holding-cash-and-stack'
-  //   btcHeld, cashHeld, costBasis: end-of-record state
-  //   currentDay, currentPrice, currentRatio: latest PL_DATA sample
-  //   sellsCount, rebuysCount, cyclesCompleted
-  function runHistoricalBacktest(sellRatio, rebuyRatio, accountType, taxRate, minDay){
-    // Defaults — preserve old call-site behavior for any caller that
-    // still passes only (sellRatio, rebuyRatio).
-    if(typeof accountType !== 'string') accountType = 'retirement';
-    if(typeof taxRate !== 'number') taxRate = 0;
-    // minDay: optional — if provided, only PL_DATA samples with day >= minDay
-    // are considered. Used by the preset-comparison block to compare full-
-    // history vs. post-2015 results.
-
-    // Sell fraction is now fixed at 100% — at each sell trigger the entire
-    // BTC position is converted to cash; at each rebuy trigger all cash is
-    // converted back to BTC. This makes the cycle dynamics directly
-    // visible (cumulative BTC after one cycle = sellPrice / rebuyPrice)
-    // and matches the framing decision documented in session 2026-05-09:
-    // the page is a unit-level demonstration users mentally scale to
-    // their own portion-allocation, not a "what would my whole stack do"
-    // simulation.
-    var sellFraction = 1.0;
-
-    var trades = [];
-    var state = 'holding-stack';
-    var prevRatio = null;
-
-    // Stack-tracking. Start at 1.0 BTC so cumulative is directly
-    // comparable to HODL through the same window. Cost basis seeds
-    // at the first historical price so capital-gains math has a
-    // concrete starting value (matters for 'regular' tax accounting).
-    var btcHeld = 1.0;
-    var cashHeld = 0;
-    var costBasis = PL_DATA.length > 0 ? PL_DATA[0][1] : 0;
-
-    for(var i = 0; i < PL_DATA.length; i++){
-      var d = PL_DATA[i][0];
-      var p = PL_DATA[i][1];
-      if(typeof minDay === 'number' && d < minDay) continue;
-      var t = plPrice(d);
-      if(t <= 0) continue;
-      var ratio = p / t;
-
-      if(prevRatio !== null){
-        if(state === 'holding-stack'){
-          if(prevRatio < sellRatio && ratio >= sellRatio){
-            // SELL — sellFraction of held BTC at price p.
-            var btcSold = btcHeld * sellFraction;
-            var grossProceeds = btcSold * p;
-            var taxPaid = 0;
-            if(accountType === 'regular'){
-              var gain = (p - costBasis) * btcSold;
-              if(gain > 0) taxPaid = gain * taxRate;
-            }
-            var netProceeds = grossProceeds - taxPaid;
-
-            btcHeld -= btcSold;
-            cashHeld += netProceeds;
-            // Cost basis of remaining BTC unchanged on a sell.
-
-            trades.push({
-              day: d, price: p, ratio: ratio, type: 'sell',
-              deltaBTC: -btcSold,
-              cumBTC: btcHeld,
-              cumCash: cashHeld,
-              taxPaid: taxPaid,
-              costBasis: costBasis
-            });
-            state = 'holding-cash-and-stack';
-          }
-        } else {
-          if(prevRatio > rebuyRatio && ratio <= rebuyRatio){
-            // REBUY — convert all held cash back to BTC at price p.
-            var btcBought = cashHeld / p;
-            // Weighted-average cost basis on the new total BTC.
-            var totalCost = btcHeld * costBasis + cashHeld;
-            var newTotal = btcHeld + btcBought;
-            costBasis = newTotal > 0 ? totalCost / newTotal : 0;
-
-            btcHeld += btcBought;
-            cashHeld = 0;
-
-            trades.push({
-              day: d, price: p, ratio: ratio, type: 'rebuy',
-              deltaBTC: btcBought,
-              cumBTC: btcHeld,
-              cumCash: cashHeld,
-              taxPaid: 0,
-              costBasis: costBasis
-            });
-            state = 'holding-stack';
-          }
-        }
-      }
-      prevRatio = ratio;
-    }
-
-    // Latest PL_DATA sample is "today" for the historical-record view
-    // (no live price fetch on this page; PL_DATA is the same series
-    // the channel viz draws, so the Today row stays internally
-    // consistent with what the chart shows).
-    var lastIdx = PL_DATA.length - 1;
-    var lastDay = lastIdx >= 0 ? PL_DATA[lastIdx][0] : null;
-    var lastPrice = lastIdx >= 0 ? PL_DATA[lastIdx][1] : null;
-    var lastTrend = lastDay !== null ? plPrice(lastDay) : null;
-    var lastRatio = (lastTrend && lastTrend > 0) ? lastPrice / lastTrend : null;
-
-    var sellsCount = 0, rebuysCount = 0;
-    for(var k = 0; k < trades.length; k++){
-      if(trades[k].type === 'sell') sellsCount++;
-      else if(trades[k].type === 'rebuy') rebuysCount++;
-    }
-
-    return {
-      trades: trades,
-      finalState: state,
-      btcHeld: btcHeld,
-      cashHeld: cashHeld,
-      costBasis: costBasis,
-      currentDay: lastDay,
-      currentPrice: lastPrice,
-      currentRatio: lastRatio,
-      sellsCount: sellsCount,
-      rebuysCount: rebuysCount,
-      // A "cycle" = a sell event followed by a rebuy event. Trailing
-      // unmatched sell is an open cycle (still in cash-and-stack state).
-      cyclesCompleted: Math.min(sellsCount, rebuysCount)
-    };
-  }
-
-  // ─── PERCENTILE → RATIO (mirrors calc IIFE; computed once at init) ───
-  // We re-derive these here so the channel viz can render thresholds
-  // BEFORE the calc IIFE runs (e.g. before the user enters a stack).
-  var historicalRatios = [];
-  for(var i = 0; i < PL_DATA.length; i++){
-    var d = PL_DATA[i][0], p = PL_DATA[i][1];
-    var t = plPrice(d);
-    if(t > 0) historicalRatios.push(p / t);
-  }
-  historicalRatios.sort(function(a,b){ return a-b; });
-  function percentileToRatio(P){
-    if(P <= 0) return historicalRatios[0];
-    if(P >= 100) return historicalRatios[historicalRatios.length-1];
-    var idx = (P/100) * (historicalRatios.length - 1);
-    var lo = Math.floor(idx), hi = Math.ceil(idx);
-    if(lo === hi) return historicalRatios[lo];
-    var frac = idx - lo;
-    return historicalRatios[lo] * (1-frac) + historicalRatios[hi] * frac;
-  }
-
-  // ─── COLORS ───
-  var amber = '#e09422';
-  var rust = '#c0392b';
-  var gold = '#e8c820';
-  var historyColor = 'rgba(232,224,210,0.7)';
-  var sellColor = '#e09422';
-  var rebuyColor = '#27ae60';
-  var muted = 'rgba(160,160,160,0.55)';
-
-  // ─── "TODAY" VERTICAL LINE PLUGIN (mirrors Tab 4) ───
-  var todayLinePlugin = {
-    id: 'drTodayLine',
-    afterDatasetsDraw: function(chart){
-      var xScale = chart.scales.x;
-      var area = chart.chartArea;
-      if(!xScale || !area) return;
-      var xPos = xScale.getPixelForValue(todayD);
-      if(xPos < area.left || xPos > area.right) return;
-      var ctx = chart.ctx;
-      ctx.save();
-      ctx.strokeStyle = 'rgba(224,148,34,0.4)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4,4]);
-      ctx.beginPath();
-      ctx.moveTo(xPos, area.top);
-      ctx.lineTo(xPos, area.bottom);
-      ctx.stroke();
-      ctx.fillStyle = amber;
-      ctx.font = '10px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Today', xPos, area.top + 12);
-      ctx.restore();
-    }
+  // ─── Presets (D1) ───
+  var PRESETS = {
+    conservative: { timing: 'fade', sx: 2, sz: 2, f: 25, rx: 1.0, cap: 24 },
+    balanced:     { timing: 'fade', sx: 2, sz: 2, f: 50, rx: 0.85, cap: 24 },
+    adventurous:  { timing: 'up', sx: 1.5, sz: 1.5, f: 75, rx: 0.7, cap: 24 }
   };
+  var PRESET_NAMES = { conservative: 'Conservative', balanced: 'Balanced', adventurous: 'Adventurous', custom: 'Custom' };
+  // Defaults. The state matches Bitcoin's Spikes' tax hurdle ("Not included"),
+  // so a reader moving between the pages sees one assumption.
+  var DEF_O = { acct: 'ira', fed: 15, niit: false, state: 'NONE', lots: 'fifo', yield: 0 };
+  var S = { preset: 'conservative', R: copy(PRESETS.conservative), O: copy(DEF_O), stack: 1, start: '2011-01', unit: 'coins', fromSpikes: false, rb: null };
+  function copy(o){ var r = {}; for (var k in o) r[k] = o[k]; return r; }
 
-  // ─── INITIAL RENDER ───
-  var bands = bandData();
-  // Read default slider values to render initial threshold lines
-  var sellEl = document.getElementById('drSellPct');
-  var rebuyEl = document.getElementById('drRebuyPct');
-  var initialSellRatio = sellEl ? percentileToRatio(parseInt(sellEl.value)) : 1.75;
-  var initialRebuyRatio = rebuyEl ? percentileToRatio(parseInt(rebuyEl.value)) : 0.85;
-
-  // Dataset index map — used by update functions
-  var DS = {
-    floor: 0, trend: 1, upper: 2,
-    sellLine: 3, rebuyLine: 4,
-    history: 5,
-    forwardPath: 6,
-    sellMarkers: 7, rebuyMarkers: 8,
-    histSellMarkers: 9, histRebuyMarkers: 10
+  // ─── State rates: the shared list's labels (reb.stateOptions), with one
+  // bitcoin-specific override. The list was built for the real-estate pages,
+  // where Washington is right at 0% (no income tax; real estate is exempt from
+  // its capital gains tax). For bitcoin it isn't: Washington taxes long-term
+  // gains, crypto included, at 7% above an inflation-adjusted deduction (about
+  // $270k) and 9.9% above about $1.27M from 2025 (DATA_AUDIT DR-WA).
+  // Review round 1 (item 14): two Washington options. WA keeps the shared
+  // code at 0% (gains under the deduction); WAHI is this page's own code for
+  // gains above it. WAHI is inserted after WA at init.
+  var BTC_STATE_OVERRIDE = {
+    WA: { rate: 0, label: 'Washington, gains under ~$270k a year (0%)' },
+    WAHI: { rate: 7, label: 'Washington, gains above ~$270k a year (7%)', help: 'Above about $1.27M the rate is 9.9% from 2025. Real estate is exempt there; bitcoin is not.' }
   };
+  function stateRate(code){
+    if (!code || code === 'NONE') return 0;
+    if (BTC_STATE_OVERRIDE[code]) return BTC_STATE_OVERRIDE[code].rate;
+    var o = $('dr2State').querySelector('option[value="' + code + '"]');
+    var m = o && o.textContent.match(/([\d.]+)%/);
+    return m ? parseFloat(m[1]) : 0;
+  }
+  function engineOpts(o, start){ return { start: start, acct: o.acct, fed: o.fed, niit: o.niit, state: stateRate(o.state), lots: o.lots, yield: o.yield }; }
 
-  // ─── CUSTOM INTERACTION MODE: 'xPerDataset' ───
-  // Chart.js's built-in 'mode: index' fails on this chart because
-  // datasets don't share an x-grid: bands sample every 30 days from
-  // minD across the full horizon (1300+ points by 2046), historical
-  // price uses PL_DATA's ~480-point cadence (denser at ~12-day
-  // spacing in the historical range), markers are sparse. With axis:
-  // 'x' Chart.js picks the dataset whose nearest-in-x point is
-  // closest to cursor, which in the historical range is usually
-  // historical price (denser locally). It then applies THAT index
-  // to all datasets — bands[N] where N comes from historical_price's
-  // index ends up at a completely different year than the cursor.
-  // Result observed in user screenshots: active-point circles
-  // appear at year ~2014 when cursor is at year ~2019.
-  //
-  // 'mode: x' has its own problem (point hitRadius defaults to 1px,
-  // bands at 30-day cadence are ~1.5px apart on wide charts, cursor
-  // frequently lands between two band points and Chart.js returns
-  // nothing).
-  //
-  // Custom mode: iterate each dataset independently, find the data
-  // point with the closest x to cursor, return ONE item per dataset
-  // (within a 90-day tolerance so bands don't show when cursor is
-  // outside the chart's data range, and the historical price stops
-  // showing past ~mid-2025). Self-contained — uses e.x (which Chart
-  // .js pre-resolves to canvas-relative pixels) plus chart.scales.x.
-  // No dependency on Chart.helpers.getRelativePosition or any other
-  // version-dependent helper.
-  if(Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.xPerDataset){
-    Chart.Interaction.modes.xPerDataset = function(chart, e, options, useFinalPosition){
-      var cursorPixelX = (e && typeof e.x === 'number') ? e.x : null;
-      if(cursorPixelX == null) return [];
+  // ─── Formatting (mockup) ───
+  function fx(v){ return String(parseFloat(v.toFixed(2))) + '×'; }
+  function mult(v){ return v.toFixed(2) + '×'; }
+  function cls(v){ return v > 1.005 ? 'up' : v < 0.995 ? 'down' : 'flat'; }
+  function usd(v){ var a = Math.abs(v), s = v < 0 ? '−$' : '$'; if (a >= 1e6) return s + (a / 1e6).toFixed(2) + 'M'; if (a >= 1e4) return s + Math.round(a / 1e3) + 'k'; if (a >= 1000) return s + (a / 1e3).toFixed(1) + 'k'; return s + Math.round(a); }
+  function price(v){ return v >= 1000 ? '$' + Math.round(v).toLocaleString('en-US') : v >= 10 ? '$' + Math.round(v) : '$' + v.toFixed(2); }
+  function btcf(v){ return v.toFixed(v >= 10 ? 2 : 3) + ' BTC'; }
+  var my = RE.monthYear;
+  function share(x, from){ return Math.round(RE.pctAtOrAbove(x, from)); }
+  function shareBelow(x, from){ return Math.round(RE.pctAtOrBelow(x, from)); }
 
-      // Pixel-space comparison. Earlier versions did this in data-space
-      // (compute cursorDataX via scale.getValueForPixel, compare to each
-      // raw point's data x) — but Chart.js's tooltip draws active-point
-      // indicator circles at element.x (pixel-space). If element.x has
-      // drifted out of sync with the underlying raw data (stale layout
-      // after an update path didn't refresh elements), data-space match
-      // could find the right index but the element renders at the wrong
-      // pixel — circles appear far from the cursor while tooltip values
-      // look correct. Comparing cursor pixel directly to element pixel
-      // ensures the items we return have circles at the actual cursor
-      // position; if any element is stale-positioned far from cursor,
-      // it falls outside tolerance and gets dropped (better than a
-      // misplaced indicator).
-      //
-      // Two tolerances:
-      //   - 15 px for line/band datasets (Floor, Trend, Upper, sell/
-      //     rebuy thresholds, Historical price, forward path). At the
-      //     chart's ~50 px/year desktop scale that's ~110 days,
-      //     generous enough that bands (sampled every 30 days, ~4 px
-      //     apart) always intersect.
-      //   - 6 px for sparse marker datasets (Historical sell/rebuy
-      //     trigger ▼/▲, Forward sell/rebuy trigger ▼/▲ — datasets
-      //     7-10). Otherwise on a narrow mobile chart (~240px wide,
-      //     ~6 px/year) the 15-px window covers ~2.5 years of history,
-      //     and the tooltip lights up rows for sell/rebuy triggers
-      //     years away from the cursor — even though the user can see
-      //     all the historical markers on the chart already as ▼/▲.
-      //     Tighter tolerance makes the marker rows additive only when
-      //     the cursor is genuinely near a marker, on both desktop
-      //     and mobile.
-      var lineTolerance = 15;
-      var markerTolerance = 6;
-      var items = [];
-      chart.getSortedVisibleDatasetMetas().forEach(function(meta){
-        var elements = meta.data;
-        if(!elements || elements.length === 0) return;
-        // Marker datasets are 7,8,9,10 (sell/rebuy/histSell/histRebuy).
-        var tol = meta.index >= 7 ? markerTolerance : lineTolerance;
-        var bestIdx = -1;
-        var bestDist = Infinity;
-        for(var i = 0; i < elements.length; i++){
-          var el = elements[i];
-          if(!el || el.skip) continue;
-          // Element pixel x — Chart.js v4 sets this on Point elements
-          // during layout. Use getProps for animation-aware reads when
-          // the chart is mid-animation; falls back to direct read.
-          var elX;
-          if(useFinalPosition && typeof el.getProps === 'function'){
-            var props = el.getProps(['x'], true);
-            elX = props && typeof props.x === 'number' ? props.x : el.x;
-          } else {
-            elX = el.x;
-          }
-          if(elX == null || isNaN(elX)) continue;
-          var dist = Math.abs(elX - cursorPixelX);
-          if(dist < bestDist){
-            bestDist = dist;
-            bestIdx = i;
-          }
-        }
-        if(bestIdx === -1 || bestDist > tol) return;
-        items.push({ element: elements[bestIdx], datasetIndex: meta.index, index: bestIdx });
-      });
-      return items;
-    };
+  function ruleText(R){
+    var sell = R.timing === 'up' ? 'Sell <strong>' + R.f + '%</strong> when price rises through <strong>' + fx(R.sx) + ' trend</strong>.'
+      : 'Sell <strong>' + R.f + '%</strong> when price falls back below <strong>' + fx(R.sz) + ' trend</strong> after reaching ' + (R.sz === R.sx ? 'it' : fx(R.sx)) + '.';
+    var buy = ' Buy back at <strong>' + fx(R.rx) + ' trend</strong>' + (R.cap ? ', or at market after <strong>' + R.cap + ' months</strong>.' : ', with no deadline.');
+    return sell + buy;
   }
 
-  // ─── Live BTC anchor (added with the 2026-05-28 live-fetch rollout).
-  // DR's chart historical line continues to end at the latest PL_DATA
-  // sample (matches the dataset the chart is built from); the pulse +
-  // today-caption below provide a separate, live "you are here" anchor
-  // that does NOT mutate the chart's historical-price dataset, avoiding
-  // any interaction with the documented scale-cache fragility.
-  var liveBtcPrice = TODAY_PRICE;
+  function segSet(id, v){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === v)); }); }
+  function syncControls(){
+    var R = S.R;
+    document.querySelectorAll('.dr2-preset').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.p === S.preset)); });
+    segSet('dr2SegTiming', R.timing); segSet('dr2SegCap', String(R.cap)); segSet('dr2SegYield', String(S.O.yield)); segSet('dr2SegAcct', S.O.acct);
+    segSet('dr2SegFed', String(S.O.fed)); segSet('dr2SegLots', S.O.lots); segSet('dr2SegStart', S.start); segSet('dr2SegUnit', S.unit);
+    $('dr2Sx').value = R.sx; $('dr2Sz').max = R.sx; $('dr2Sz').value = R.sz; $('dr2F').value = R.f; $('dr2Rx').value = R.rx;
+    $('dr2SxOut').textContent = fx(R.sx); $('dr2SzOut').textContent = fx(R.sz); $('dr2FOut').textContent = R.f + '%'; $('dr2RxOut').textContent = fx(R.rx);
+    $('dr2SxLbl').textContent = R.timing === 'up' ? 'Sell when price reaches' : 'Arm the rule when price reaches';
+    $('dr2SzWrap').hidden = R.timing !== 'fade';
+    $('dr2TimingCtx').textContent = R.timing === 'up' ? 'Sells as price climbs through the level. Simple, but in past cycles it often sold well before the top.' : 'Waits for the spike to reach the level, then sells when it turns back down. It caught more of past spikes, but only fires if the spike gets that high.';
+    $('dr2SxCtx').textContent = 'Price has been at or above ' + fx(R.sx) + ' trend ' + share(R.sx, '2011-01') + '% of the time since 2011 and ' + share(R.sx, '2017-01') + '% since 2017. The 2024–25 spike peaked at ' + fx(lastPeak()) + '.';
+    $('dr2RxCtx').textContent = 'Price has been at or below ' + fx(R.rx) + ' trend ' + shareBelow(R.rx, '2011-01') + '% of the time since 2011. Cycle lows ran 0.40× to 0.56×; the floor is 0.42×.';
+    $('dr2CapCtx').innerHTML = R.cap ? 'After ' + R.cap + ' months in cash the buy-back rule buys back at whatever the price is. 24 months was neutral when the buy-back level came, and it rescued sales that never got one.' : '<span class="dr2-warnline">No deadline can strand your sale in cash if price never falls to your level.</span>';
+    document.querySelectorAll('.dr2-taxonly').forEach(function(e){ e.hidden = S.O.acct !== 'tax'; });
+    $('dr2Niit').checked = S.O.niit;
+    if ($('dr2State').value !== S.O.state) $('dr2State').value = S.O.state;
+    $('dr2StateCtx').textContent = BTC_STATE_OVERRIDE[S.O.state] && BTC_STATE_OVERRIDE[S.O.state].help ? BTC_STATE_OVERRIDE[S.O.state].help : 'Top state rates on long-term gains, from the site’s shared list.';
+    $('dr2RuleSentence').innerHTML = ruleText(R);
+    // The sticky bar mirrors the card: presets, account, and the short rule.
+    document.querySelectorAll('#dr2Bar .dr2-chip[data-p]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.p === S.preset)); });
+    document.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === S.O.acct)); });
+    $('dr2BarRule').textContent = shortRule(R);
+    $('dr2BarSum').textContent = settingSummary() + ' · ' + stackText() + ' · from ' + S.start.slice(0, 4);
+    $('dr2Showing').textContent = 'Showing: ' + shortRule(R) + ' · ' + settingSummary() + ' · ' + stackText() + ' · from ' + S.start.slice(0, 4) + '.';
+  }
+  // "Sell 25% below 2× after reaching it · buy back at 1× · 24-mo deadline"
+  function shortRule(R){
+    var sell = R.timing === 'up' ? 'Sell ' + R.f + '% rising through ' + fx(R.sx) : 'Sell ' + R.f + '% below ' + fx(R.sz) + ' after reaching ' + (R.sz === R.sx ? 'it' : fx(R.sx));
+    return sell + ' · buy back at ' + fx(R.rx) + ' · ' + (R.cap ? R.cap + '-mo deadline' : 'no deadline');
+  }
+  // "IRA" or "Taxable · 20% + 3.8% · CA 13.3% · FIFO"
+  function settingSummary(){
+    var O = S.O; if (O.acct === 'ira') return 'IRA';
+    var p = ['Taxable', O.fed + '%' + (O.niit ? ' + 3.8%' : '')];
+    if (O.state && O.state !== 'NONE') p.push((O.state === 'WAHI' ? 'WA' : O.state) + ' ' + stateRate(O.state) + '%');
+    p.push(O.lots === 'hifo' ? 'highest cost first' : 'FIFO');
+    return p.join(' · ');
+  }
+  function stackNum(v){ return String(parseFloat(v.toFixed(4))); }
+  function stackText(){ return stackNum(S.stack) + ' BTC'; }
+  var _lastPeak = null;
+  function lastPeak(){ if (_lastPeak == null) { var t = RE.run(PRESETS.conservative, engineOpts(DEF_O, '2011-01')); _lastPeak = t.cyc[4].peak; } return _lastPeak; }
 
-  // ─── Canonical "you are here" pulse halo (STYLE_GUIDE §6.23).
-  // Positions #drPulse at (TODAY_DAYS, liveBtcPrice) after every chart
-  // render. liveBtcPrice is closure-captured and updated by the
-  // fetchTodayPrice callback below.
-  var lcsPulsePlugin = {
-    id: 'lcsPulse',
-    afterRender: function(c) {
-      var pulse = document.getElementById('drPulse');
-      if (!pulse || !c.scales || !c.scales.x || !c.scales.y) return;
-      var x = c.scales.x.getPixelForValue(TODAY_DAYS);
-      var y = c.scales.y.getPixelForValue(liveBtcPrice);
-      if (x < c.chartArea.left  - 4 || x > c.chartArea.right  + 4 ||
-          y < c.chartArea.top   - 4 || y > c.chartArea.bottom + 4) {
-        pulse.classList.remove('is-visible');
+  // ─── Render ───
+  function render(){
+    syncControls();
+    var O = S.O, other = copy(O); other.acct = O.acct === 'ira' ? 'tax' : 'ira';
+    var a11 = RE.run(S.R, engineOpts(O, '2011-01')), a14 = RE.run(S.R, engineOpts(O, '2014-01'));
+    var b11 = RE.run(S.R, engineOpts(other, '2011-01')), b14 = RE.run(S.R, engineOpts(other, '2014-01'));
+    function hero(el, elS, a, b){
+      $(el).innerHTML = '<span class="' + cls(a.end) + '">' + mult(a.end) + '</span><small>HODL</small>';
+      // Item 8: the stack in BTC and dollars, at the live price when it has loaded.
+      var k = S.stack, endB = a.end * k, d = endB - k, sgn = d > 0 ? '+' : d < 0 ? '−' : '';
+      var dTxt = Math.abs(d) < 0.0005 ? 'no change' : sgn + btcf(Math.abs(d)) + ', about ' + (d > 0 ? '+' : '') + usd(d * liveBtcPrice) + ' ' + priceNote();
+      $(el + 'b').innerHTML = 'Your ' + stackText() + ' became <strong>' + btcf(endB) + '</strong>: ' + dTxt + '.';
+      var n = a.ev.filter(function(e){ return e.t === 'sell'; }).length;
+      var acct = O.acct === 'ira' ? 'IRA' : 'Taxable';
+      $(elS).innerHTML = acct + ', ' + n + ' sale' + (n === 1 ? '' : 's') + (a.inCash ? ', <span class="down">still in cash</span>' : '') + '. ' + (O.acct === 'ira' ? 'Taxable' : 'In an IRA') + ': <span class="' + cls(b.end) + '">' + mult(b.end) + '</span>.';
+    }
+    hero('dr2R11', 'dr2R11s', a11, b11); hero('dr2R14', 'dr2R14s', a14, b14);
+    var lastPk = a11.cyc[4].peak;
+    $('dr2LastCycle').innerHTML = a11.cyc[4].sell ? 'Your sell rule fired in the last cycle, which peaked at ' + fx(lastPk) + ' trend.' : '<b class="dr2-strong">Your sell rule did not fire in the last cycle.</b> The 2024–25 spike peaked at ' + fx(lastPk) + ' trend. As spikes shrink, a fixed level can go unreached; doing nothing is the most likely outcome of most rules next cycle, and in an IRA that costs nothing.';
+    // Era note: the two growth rates are templated from the trend function.
+    var g13 = Math.round(RE.trendGrowth(RE.dayOfIso('2013-07-01'))), gNow = Math.round(RE.trendGrowth(RE.lastDay));
+    $('dr2EraNote').textContent = 'Since 2011 includes 2013, when the trend was growing about ' + g13 + '% a year, so a buy back “below trend” could still cost more than the sale. Today the trend grows about ' + gNow + '% a year. Since 2014 matches How Much Cash.';
+
+    // Table + failure box
+    var T = RE.run(S.R, engineOpts(O, S.start)), cum = 1, html = '', fails = [], stack = S.stack, LAST = T.last;
+    T.cyc.forEach(function(c){
+      if (!c.covered) return;
+      if (!c.sell) {
+        var why = S.R.timing === 'fade' ? 'the sell rule arms at ' + fx(S.R.sx) : 'the sell rule fires at ' + fx(S.R.sx);
+        html += '<tr class="never"><td>' + c.name + '</td><td colspan="2">Never sold. Peak ' + fx(c.peak) + ' trend; ' + why + '.</td><td class="n">—</td><td class="n mult">1.00×</td><td class="n">' + btcf(stack * cum) + '</td><td class="n">—</td></tr>';
+        if (c.i === 4) fails.push('<b>' + c.name + ': never sold.</b> The spike peaked at ' + fx(c.peak) + ' trend, below the sell rule\'s ' + fx(S.R.sx) + '.');
         return;
       }
-      pulse.style.left = x + 'px';
-      pulse.style.top  = y + 'px';
-      pulse.classList.add('is-visible');
-    }
-  };
-
-  var chart = new Chart(canvas, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        // 0: Floor band
-        {
-          label: 'Floor (0.42× trend)',
-          data: bands.floor,
-          borderColor: rust,
-          borderWidth: 1.4,
-          borderDash: [6, 3],
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.2,
-          order: 5
-        },
-        // 1: Trend
-        {
-          label: 'Trend',
-          data: bands.trend,
-          borderColor: amber,
-          borderWidth: 2,
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.2,
-          order: 4
-        },
-        // 2: Upper band
-        {
-          label: 'Upper (3.0× trend)',
-          data: bands.upper,
-          borderColor: gold,
-          borderWidth: 1.2,
-          borderDash: [1, 5],
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.2,
-          order: 6
-        },
-        // 3: User's sell-threshold line (parallel to trend, scaled by sellRatio)
-        {
-          label: 'Your sell threshold',
-          data: thresholdData(initialSellRatio),
-          borderColor: sellColor,
-          borderWidth: 1.6,
-          borderDash: [8, 4],
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.2,
-          order: 2
-        },
-        // 4: User's rebuy-threshold line
-        {
-          label: 'Your rebuy threshold',
-          data: thresholdData(initialRebuyRatio),
-          borderColor: rebuyColor,
-          borderWidth: 1.6,
-          borderDash: [8, 4],
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.2,
-          order: 3
-        },
-        // 5: Historical price
-        {
-          label: 'Historical price',
-          data: historicalData,
-          borderColor: historyColor,
-          borderWidth: 1.2,
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.15,
-          order: 1
-        },
-        // 6: Forward-projected discipline price path (populated on sim event)
-        {
-          label: 'Projected price',
-          data: [],
-          borderColor: 'rgba(232,224,210,0.45)',
-          borderWidth: 1,
-          borderDash: [3, 3],
-          pointRadius: 0,
-          showLine: true,
-          tension: 0.2,
-          order: 0
-        },
-        // 7: Sell markers (▼)
-        {
-          label: 'Sell triggers',
-          data: [],
-          borderColor: sellColor,
-          backgroundColor: sellColor,
-          pointStyle: 'triangle',
-          pointRotation: 180,
-          pointRadius: 7,
-          pointHoverRadius: 9,
-          showLine: false,
-          order: 0
-        },
-        // 8: Rebuy markers (▲)
-        {
-          label: 'Rebuy triggers',
-          data: [],
-          borderColor: rebuyColor,
-          backgroundColor: rebuyColor,
-          pointStyle: 'triangle',
-          pointRadius: 7,
-          pointHoverRadius: 9,
-          showLine: false,
-          order: 0
-        },
-        // 9: HISTORICAL Sell markers (▼) — what would have fired in real history.
-        // Smaller + lower-opacity than forward markers so the eye distinguishes
-        // "this happened" from "this is projected".
-        {
-          label: 'Historical sell',
-          data: [],
-          borderColor: 'rgba(224,148,34,0.55)',
-          backgroundColor: 'rgba(224,148,34,0.35)',
-          pointStyle: 'triangle',
-          pointRotation: 180,
-          pointRadius: 4.5,
-          pointHoverRadius: 7,
-          showLine: false,
-          order: 1
-        },
-        // 10: HISTORICAL Rebuy markers (▲)
-        {
-          label: 'Historical rebuy',
-          data: [],
-          borderColor: 'rgba(39,174,96,0.55)',
-          backgroundColor: 'rgba(39,174,96,0.35)',
-          pointStyle: 'triangle',
-          pointRadius: 4.5,
-          pointHoverRadius: 7,
-          showLine: false,
-          order: 1
-        }
-      ]
-    },
-    plugins: [todayLinePlugin, lcsPulsePlugin],
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'xPerDataset', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(10,9,8,0.95)',
-          borderColor: 'rgba(224,148,34,0.5)',
-          borderWidth: 1,
-          titleColor: amber,
-          bodyColor: '#ddd',
-          // Compact on narrow viewports: at 375px viewport the chart's
-          // inner plot area is only ~150px wide, so a default-sized
-          // tooltip card with 6+ rows of full-length labels (e.g.
-          // "Floor (0.42× trend): $5.4K") covers most of the chart
-          // surface. Smaller font + tighter padding + shortened band
-          // labels reclaim ~40% of the tooltip footprint without losing
-          // information density. Read once at chart-init; no need to
-          // re-evaluate on resize since rotation between mobile and
-          // desktop layouts also reloads the page in practice.
-          titleFont: { size: isNarrowViewport ? 11 : 13 },
-          bodyFont:  { size: isNarrowViewport ? 11 : 13 },
-          padding:   isNarrowViewport ? 6 : 10,
-          boxPadding: isNarrowViewport ? 3 : 5,
-          callbacks: {
-            title: function(items){
-              if(!items.length) return '';
-              var d = new Date(GENESIS_TS*1000 + items[0].parsed.x*86400*1000);
-              return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-            },
-            label: function(item){
-              var v = item.parsed.y;
-              var fmt;
-              if(v >= 1e6) fmt = '$' + (v/1e6).toFixed(2) + 'M';
-              else if(v >= 1000) fmt = '$' + (v/1000).toFixed(1) + 'K';
-              else if(v >= 1) fmt = '$' + v.toFixed(2);
-              else fmt = '$' + v.toFixed(4);
-              // Shorten band labels on narrow viewports — the (0.42×
-              // trend) and (3.0× trend) suffixes are also visible in
-              // the legend below the chart, so dropping them from
-              // the tooltip avoids redundant on-chart real estate.
-              var label = item.dataset.label;
-              if(isNarrowViewport){
-                if(label === 'Floor (0.42× trend)') label = 'Floor';
-                else if(label === 'Upper (3.0× trend)') label = 'Upper';
-              }
-              return label + ': ' + fmt;
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          type: 'linear',
-          title: { display: true, text: 'Year', color: muted, font: { size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          min: minD,
-          ticks: {
-            color: muted,
-            maxTicksLimit: 10,
-            callback: function(v){
-              var date = new Date(GENESIS_TS*1000 + v*86400*1000);
-              return date.getFullYear();
-            }
-          }
-        },
-        y: {
-          type: 'logarithmic',
-          title: { display: true, text: 'BTC price (USD)', color: muted, font: { size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: {
-            color: muted,
-            callback: function(v){
-              // Defensive: round at every magnitude so any value — including
-              // an explicit min/max set by the zoom code — renders as a clean
-              // label rather than a raw decimal (e.g. '$854.39…K').
-              if(v >= 1e6){
-                var m = v / 1e6;
-                if(m >= 10 || m === Math.floor(m)) return '$' + Math.round(m) + 'M';
-                return '$' + (Math.round(m * 10) / 10) + 'M';
-              }
-              if(v >= 1000){
-                var k = v / 1000;
-                if(k >= 100 || k === Math.floor(k)) return '$' + Math.round(k) + 'K';
-                return '$' + (Math.round(k * 10) / 10) + 'K';
-              }
-              if(v >= 1) return '$' + Math.round(v);
-              return '$' + v.toFixed(2);
-            }
-          }
-        }
-      }
-    }
-  });
-
-  // ─── DYNAMIC UPDATES ───
-
-  // Update threshold lines + historical backtest when user moves
-  // sell/rebuy sliders. Threshold lines are cheap (rebuild y-values
-  // for two datasets). Backtest is also cheap — ~480 PL_DATA samples,
-  // a single linear pass.
-  function updateThresholds(){
-    if(!sellEl || !rebuyEl) return;
-    var sr = percentileToRatio(parseInt(sellEl.value));
-    var rr = percentileToRatio(parseInt(rebuyEl.value));
-    chart.data.datasets[DS.sellLine].data = thresholdData(sr);
-    chart.data.datasets[DS.rebuyLine].data = thresholdData(rr);
-    updateBacktest(sr, rr);
-    chart.update('none');
-  }
-
-  // Era state — controls the historical window the table + Today row +
-  // summary + volatility note all reflect. Persists to localStorage so a
-  // returning reader who switched to 'full' last visit stays there.
-  // Default = 'since-2015' (post-volatility-compression era — more
-  // representative of the future than the extreme early-bitcoin
-  // cycles that no longer reflect modern dynamics).
-  var startOf2015Day = (Date.UTC(2015, 0, 1) / 1000 - GENESIS_TS) / 86400;
-  var currentEra = 'since-2015';
-  try {
-    var storedEra = localStorage.getItem('dr:era');
-    if(storedEra === 'since-2015' || storedEra === 'full') currentEra = storedEra;
-  } catch(e){}
-
-  // Read account-type / tax-rate / era from the DOM. These live in the
-  // calculator IIFE's controls; the channel viz doesn't own them, so
-  // we read them directly each backtest run.
-  function readBacktestParams(){
-    var acctBtn = document.querySelector('[data-account].active');
-    var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
-    var trEl = document.getElementById('drTaxRate');
-    var taxRate = trEl ? parseFloat(trEl.value) / 100 : 0;
-    var minDay = currentEra === 'since-2015' ? startOf2015Day : null;
-    return { accountType: accountType, taxRate: taxRate, minDay: minDay };
-  }
-
-  // Run the historical backtest at the user's current settings and
-  // (a) paint history-marker datasets on the chart, (b) re-render the
-  // "Historical signals at your current settings" summary block.
-  function updateBacktest(sellRatio, rebuyRatio){
-    var params = readBacktestParams();
-    var bt = runHistoricalBacktest(sellRatio, rebuyRatio, params.accountType, params.taxRate, params.minDay);
-    var hSells = [], hRebuys = [];
-    bt.trades.forEach(function(t){
-      var pt = { x: t.day, y: t.price };
-      if(t.type === 'sell') hSells.push(pt);
-      else hRebuys.push(pt);
-    });
-    chart.data.datasets[DS.histSellMarkers].data = hSells;
-    chart.data.datasets[DS.histRebuyMarkers].data = hRebuys;
-    renderHistoricalSummary(bt, sellRatio, rebuyRatio);
-  }
-
-  // Render the "Historical signals" block. Bounded table with one
-  // row per trigger event, a final "Today" row anchoring current
-  // state, and a summary line + volatility-compression note below.
-  // Cumulative-BTC column tracks the running stack from a 1.0
-  // starting position, directly comparable to a 1.0 BTC HODL.
-  function renderHistoricalSummary(bt, sellRatio, rebuyRatio){
-    var summaryEl = document.getElementById('drHistSignals');
-    if(!summaryEl) return;
-
-    var sellPctEl = document.getElementById('drSellPct');
-    var rebuyPctEl = document.getElementById('drRebuyPct');
-    var sellPct = sellPctEl ? sellPctEl.value : '?';
-    var rebuyPct = rebuyPctEl ? rebuyPctEl.value : '?';
-
-    // Empty case — current settings produced no triggers.
-    if(bt.trades.length === 0){
-      summaryEl.innerHTML = '<p class="dr-hist-signals-empty">At sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th, the strategy would have fired <strong>zero</strong> triggers across ' + PL_DATA.length + ' historical price samples (~15 years). Bitcoin never crossed your sell threshold from below or your rebuy threshold from above. Try a less extreme percentile.</p>';
-      return;
-    }
-
-    // Format helpers — local closures to keep this function self-contained.
-    function fmtPrice(p){
-      if(p >= 1e6) return '$' + (p/1e6).toFixed(2) + 'M';
-      if(p >= 1000) return '$' + (p/1000).toFixed(1) + 'K';
-      if(p >= 1) return '$' + p.toFixed(2);
-      return '$' + p.toFixed(4);
-    }
-    function fmtBTC(b){
-      if(Math.abs(b) >= 0.01) return b.toFixed(2);
-      return b.toFixed(4);
-    }
-    function fmtCash(c){
-      if(c >= 1e6) return '$' + (c/1e6).toFixed(2) + 'M';
-      if(c >= 1000) return '$' + (c/1000).toFixed(1) + 'K';
-      return '$' + c.toFixed(0);
-    }
-    function fmtMonth(day){
-      var date = new Date(GENESIS_TS*1000 + day*86400*1000);
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-    }
-    function fmtCumulative(btc, cash){
-      var s = fmtBTC(btc) + ' BTC';
-      if(cash > 1) s += ' + ' + fmtCash(cash);
-      return s;
-    }
-
-    // ── HEADLINE ──
-    var eraSpan = currentEra === 'since-2015'
-      ? 'across the post-2015 record (~11 years)'
-      : 'across ~15 years of bitcoin history';
-    var startSpan = currentEra === 'since-2015' ? '<strong>1.00 BTC in 2015</strong>' : '<strong>1.00 BTC</strong>';
-    var html = '<p class="dr-hist-signals-headline">At your current settings (sell ' + sellPct + 'th &middot; rebuy ' + rebuyPct + 'th), starting from ' + startSpan + ', the strategy would have fired <strong>' + bt.sellsCount + ' sell signal' + (bt.sellsCount === 1 ? '' : 's') + '</strong> and <strong>' + bt.rebuysCount + ' rebuy signal' + (bt.rebuysCount === 1 ? '' : 's') + '</strong> ' + eraSpan + '.</p>';
-
-    // ── TABLE ──
-    html += '<div class="dr-hist-table-wrap"><table class="dr-hist-table">';
-    html += '<thead><tr>'
-         +    '<th class="dr-col-date">Date</th>'
-         +    '<th class="dr-col-action">Action</th>'
-         +    '<th class="dr-col-price">Price</th>'
-         +    '<th class="dr-col-ratio">Ratio</th>'
-         +    '<th class="dr-col-delta">&Delta; BTC</th>'
-         +    '<th class="dr-col-cum">Cumulative</th>'
-         +  '</tr></thead><tbody>';
-
-    // Trigger rows in chronological order.
-    bt.trades.forEach(function(t){
-      var verb = t.type === 'sell' ? 'SELL' : 'REBUY';
-      var glyph = t.type === 'sell' ? '&#9660;' : '&#9650;';
-      var actionClass = t.type === 'sell' ? 'dr-act-sell' : 'dr-act-rebuy';
-      var deltaSign = t.deltaBTC >= 0 ? '+' : '&minus;';
-      var deltaAbs = Math.abs(t.deltaBTC);
-      html += '<tr>'
-           +    '<td class="dr-col-date">' + fmtMonth(t.day) + '</td>'
-           +    '<td class="dr-col-action ' + actionClass + '"><span class="dr-act-glyph">' + glyph + '</span> ' + verb + '</td>'
-           +    '<td class="dr-col-price">' + fmtPrice(t.price) + '</td>'
-           +    '<td class="dr-col-ratio">' + t.ratio.toFixed(2) + '&times;</td>'
-           +    '<td class="dr-col-delta">' + deltaSign + fmtBTC(deltaAbs) + '</td>'
-           +    '<td class="dr-col-cum">' + fmtCumulative(t.cumBTC, t.cumCash) + '</td>'
-           +  '</tr>';
-    });
-
-    // ── TODAY ROW ──
-    var todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-
-    // Threshold prices in absolute USD at today's trend value. Drives the
-    // state label so users see "HODLing until $X" rather than just "waiting
-    // to sell" — concrete trigger price reinforces that the strategy isn't
-    // firing imminently when X is far above current price.
-    var trendNow = bt.currentDay !== null ? plPrice(bt.currentDay) : null;
-    var sellThresholdPrice = trendNow ? sellRatio * trendNow : null;
-    var rebuyThresholdPrice = trendNow ? rebuyRatio * trendNow : null;
-    function fmtThresholdPrice(p){
-      if(p === null) return '—';
-      if(p >= 1e6) return '$' + (p/1e6).toFixed(2) + 'M';
-      if(p >= 1000) return '$' + Math.round(p/1000) + 'K';
-      if(p >= 1) return '$' + p.toFixed(0);
-      return '$' + p.toFixed(2);
-    }
-
-    var stateLabel, stateClass;
-    if(bt.finalState === 'holding-stack'){
-      stateLabel = 'HODLing until ' + fmtThresholdPrice(sellThresholdPrice);
-      stateClass = 'dr-state-wait-sell';
-    } else {
-      stateLabel = 'Holding cash until ' + fmtThresholdPrice(rebuyThresholdPrice);
-      stateClass = 'dr-state-wait-rebuy';
-    }
-
-    html += '<tr class="dr-hist-today">'
-         +    '<td class="dr-col-date"><strong>' + todayStr + '</strong> <span class="dr-today-tag">today</span></td>'
-         +    '<td class="dr-col-action ' + stateClass + '"><em>' + stateLabel + '</em></td>'
-         +    '<td class="dr-col-price">' + fmtPrice(bt.currentPrice) + '</td>'
-         +    '<td class="dr-col-ratio">' + (bt.currentRatio !== null ? bt.currentRatio.toFixed(2) + '&times;' : '&mdash;') + '</td>'
-         +    '<td class="dr-col-delta">&mdash;</td>'
-         +    '<td class="dr-col-cum"><strong>' + fmtCumulative(bt.btcHeld, bt.cashHeld) + '</strong></td>'
-         +  '</tr>';
-    html += '</tbody></table></div>';
-
-    // ── SUMMARY LINE ──
-    var multiplier = bt.btcHeld; // started at 1.0, so this is the HODL multiple in BTC terms
-    var multStr = multiplier.toFixed(2) + '&times; HODL';
-    var deltaPct = Math.abs((multiplier - 1) * 100);
-    var deltaPctStr = deltaPct >= 10 ? deltaPct.toFixed(0) + '%' : deltaPct.toFixed(1) + '%';
-    var directionWord = multiplier >= 1.0 ? 'gained' : 'lost';
-    var summaryClass = multiplier >= 1.0 ? 'dr-hist-summary-up' : 'dr-hist-summary-down';
-
-    // Tax-drag note when in regular mode and tax was actually paid.
-    var acctBtn = document.querySelector('[data-account].active');
-    var accountType = acctBtn ? acctBtn.dataset.account : 'retirement';
-    var trEl = document.getElementById('drTaxRate');
-    var taxPct = trEl ? parseInt(trEl.value) : 15;
-    var taxFootnote = '';
-    if(accountType === 'regular'){
-      var totalTax = 0;
-      for(var ti = 0; ti < bt.trades.length; ti++) totalTax += (bt.trades[ti].taxPaid || 0);
-      if(totalTax > 0){
-        taxFootnote = ' Cumulative capital-gains tax across these sells: <strong>' + fmtCash(totalTax) + '</strong>.';
-      }
-    }
-
-    // Account-state badge: makes the assumption that drives this result
-    // visible at the result. Click flips the account-type toggle below.
-    var badgeLabel = (accountType === 'retirement')
-      ? 'Retirement account'
-      : 'Regular account &middot; ' + taxPct + '% tax';
-    var badgeFlipTo = (accountType === 'retirement') ? 'regular' : 'retirement';
-    var badgeFlipLabel = (accountType === 'retirement') ? 'switch to regular' : 'switch to retirement';
-    var badgeHtml = '<button type="button" class="dr-account-badge dr-account-badge-' + accountType + '" '
-                  + 'data-flip-to="' + badgeFlipTo + '" '
-                  + 'aria-label="Account assumption: ' + (accountType === 'retirement' ? 'Retirement' : 'Regular ' + taxPct + '%') + '. Click to ' + badgeFlipLabel + '.">'
-                  + '<span class="dr-account-badge-prefix">Showing</span>'
-                  + '<span class="dr-account-badge-value">' + badgeLabel + '</span>'
-                  + '<span class="dr-account-badge-flip">' + badgeFlipLabel + ' &rlarr;</span>'
-                  + '</button>';
-
-    var summarySpan = currentEra === 'since-2015'
-      ? 'Across the post-2015 record (~11 years)'
-      : 'Across ~15 years';
-    html += '<div class="dr-hist-summary ' + summaryClass + '">'
-         +    badgeHtml
-         +    '<p>' + summarySpan + ' and <strong>' + bt.cyclesCompleted + ' completed cycle' + (bt.cyclesCompleted === 1 ? '' : 's') + '</strong>, this configuration ended with <strong>' + fmtBTC(bt.btcHeld) + ' BTC</strong>'
-         +    (bt.cashHeld > 1 ? ' plus <strong>' + fmtCash(bt.cashHeld) + '</strong> in cash' : '')
-         +    ' &mdash; ' + multStr + ' (' + directionWord + ' ' + deltaPctStr + ' vs. holding through).' + taxFootnote + '</p>'
-         +    '<p class="dr-hist-summary-honest">A fact about the historical record &mdash; not a forecast.</p>'
-         +  '</div>';
-
-    // ── VOLATILITY-COMPRESSION NOTE ──
-    // Adapts to current era. In full-record mode it argues for why the
-    // post-2015 view matters; in since-2015 mode it points the user
-    // toward what the full record would expose.
-    var volNoteHtml;
-    if(currentEra === 'since-2015'){
-      volNoteHtml = '<p><strong>You&rsquo;re viewing the post-volatility-compression era.</strong> Bitcoin&rsquo;s cycle amplitudes have shrunk dramatically over time &mdash; Cycle 1 peaked near 8&times; trend in 2011, recent cycles closer to 2&times;. This view excludes the early-history cycles whose magnitudes likely won&rsquo;t repeat. Switching to the full record above shows what would have happened across all of bitcoin&rsquo;s history including those extreme cycles &mdash; the strategy&rsquo;s structural worst case. <a href="/the-power-law#theory">See the Power Law Theory tab</a> for the underlying math.</p>';
-    } else {
-      volNoteHtml = '<p><strong>Why the post-2015 view matters.</strong> Bitcoin&rsquo;s cycle amplitudes have shrunk dramatically &mdash; Cycle 1 peaked near 8&times; trend in 2011, recent cycles closer to 2&times;. The full-record view above reflects an era of extreme volatility that won&rsquo;t repeat at the same magnitudes. Switching to <em>Since 2015</em> reflects the market that volatility compression has produced, and that the next cycle is more likely to resemble. <a href="/the-power-law#theory">See the Power Law Theory tab</a> for the underlying math.</p>';
-    }
-    html += '<div class="dr-hist-volatility-note">' + volNoteHtml + '</div>';
-
-    summaryEl.innerHTML = html;
-  }
-
-  // Render the preset-comparison block — three presets × two windows.
-  // Renders below the per-setting historical table. The dual-window
-  // framing (full record vs. since 2015) is the heart of the page's
-  // editorial finding: at every preset, restricting the analysis to
-  // the post-volatility-compression era flips the verdict from "the
-  // strategy mostly fails" to "the strategy mostly works". The reader
-  // is asked to judge which era the future will resemble.
-  //
-  // Re-renders on account-type / tax-rate change so the dual-window
-  // multipliers reflect the user's current account assumption (per-
-  // setting sliders still don't affect this block — it shows the
-  // three named presets against the historical record).
-  function renderPresetComparison(){
-    var el = document.getElementById('drPresetComparison');
-    if(!el) return;
-
-    // Read current account-type and tax-rate from DOM so the table
-    // reflects the user's assumption — same pattern as readBacktestParams
-    // for the historical-summary block above. Means the dual-window
-    // numbers move in lockstep with the per-setting summary and the
-    // user can't be looking at two different account assumptions in
-    // the same viewport.
-    var acctBtn = document.querySelector('[data-account].active');
-    var pcAccountType = acctBtn ? acctBtn.dataset.account : 'retirement';
-    var pcTrEl = document.getElementById('drTaxRate');
-    var pcTaxRate = pcTrEl ? parseFloat(pcTrEl.value) / 100 : 0;
-    var pcTaxPct = pcTrEl ? parseInt(pcTrEl.value) : 15;
-
-    // Jan 1, 2015 in days-from-genesis. Hardcoded boundary — see
-    // editorial rationale in the contextual paragraph below the table:
-    // bitcoin's pre-2015 cycles involved order-of-magnitude trend
-    // growth in calendar years, a regime the volatility-compression
-    // note already argues won't recur. Post-2015 cycles are more
-    // representative of modern bitcoin dynamics.
-    var startOf2015 = (Date.UTC(2015, 0, 1) / 1000 - GENESIS_TS) / 86400;
-
-    var presets = [
-      { key:'conservative', name:'Conservative', sellPct:70, rebuyPct:40 },
-      { key:'standard',     name:'Standard',     sellPct:80, rebuyPct:50 },
-      { key:'aggressive',   name:'Aggressive',   sellPct:90, rebuyPct:20 }
-    ];
-
-    function multClass(m){
-      // Color scale (revised): red < 1.0 < green < 2.0 < bright-green.
-      //
-      // Editorial decision: any result < 1.0× means the strategy
-      // ended with FEWER bitcoin than holding through. That's failure
-      // by definition — the rebalancing logic destroyed BTC value
-      // versus the HODL baseline. Earlier two-band split (red < 0.5,
-      // amber 0.5–1.0) was misleading: it framed 0.61× as "not so bad,"
-      // when 0.61× means ~39% of the stack was traded away for nothing.
-      // A failed strategy is failed; severity gradation below the line
-      // implies a second-place finish that doesn't exist.
-      if(m < 1.0) return 'dr-mult-red';
-      if(m < 2.0) return 'dr-mult-green';
-      return 'dr-mult-bright-green';
-    }
-    function fmtMult(m){ return m.toFixed(2) + '×'; }
-
-    // Caption: reflects the current account-type assumption so readers
-    // see what tax framing the multipliers below were computed under.
-    var captionHtml = (pcAccountType === 'retirement')
-      ? '<p class="dr-preset-caption"><strong>Retirement account</strong> &mdash; no per-sell tax. Multipliers below show pure cycle-multiplier behavior.</p>'
-      : '<p class="dr-preset-caption"><strong>Regular account &middot; ' + pcTaxPct + '% capital-gains tax</strong> per sell. Multipliers below include tax drag at every trigger.</p>';
-
-    var html = captionHtml + '<div class="dr-preset-table-wrap"><table class="dr-preset-table">';
-    html += '<thead><tr>'
-         +    '<th class="dr-pc-preset">Preset</th>'
-         +    '<th class="dr-pc-trades">Triggers</th>'
-         +    '<th class="dr-pc-window">Full record (2010+)</th>'
-         +    '<th class="dr-pc-window">Since 2015</th>'
-         +  '</tr></thead><tbody>';
-
-    presets.forEach(function(p){
-      var sR = percentileToRatio(p.sellPct);
-      var rR = percentileToRatio(p.rebuyPct);
-      var btFull = runHistoricalBacktest(sR, rR, pcAccountType, pcTaxRate);
-      var bt2015 = runHistoricalBacktest(sR, rR, pcAccountType, pcTaxRate, startOf2015);
-
-      // Cumulative position (BTC + cash-converted-to-BTC at latest price)
-      // for fair × HODL — if the strategy ends mid-cycle holding cash,
-      // converting that cash to BTC at the latest price is the equivalent
-      // BTC count for comparison.
-      var lastPrice = PL_DATA[PL_DATA.length-1][1];
-      var fullEquiv = btFull.btcHeld + (btFull.cashHeld > 0 ? btFull.cashHeld / lastPrice : 0);
-      var p2015Equiv = bt2015.btcHeld + (bt2015.cashHeld > 0 ? bt2015.cashHeld / lastPrice : 0);
-
-      html += '<tr>';
-      html += '<td class="dr-pc-preset"><strong>' + p.name + '</strong> <span class="dr-pc-spec">' + p.sellPct + ' / ' + p.rebuyPct + '</span></td>';
-      html += '<td class="dr-pc-trades">' + btFull.sellsCount + ' sells &middot; ' + btFull.rebuysCount + ' rebuys</td>';
-      html += '<td class="dr-pc-window ' + multClass(fullEquiv) + '">' + fmtMult(fullEquiv) + ' HODL</td>';
-      html += '<td class="dr-pc-window ' + multClass(p2015Equiv) + '">' + fmtMult(p2015Equiv) + ' HODL</td>';
-      html += '</tr>';
-    });
-
-    html += '</tbody></table></div>';
-
-    // ── CONTEXTUAL PARAGRAPH (direct voice) ──
-    html += '<div class="dr-preset-commentary">'
-         +    '<p>The strategy&rsquo;s verdict is era-dependent, not good or bad full-stop. Across the full historical record, <em>even in a retirement account</em>, two of three default presets destroy bitcoin &mdash; Conservative ends with 20% of HODL, Standard with 61%. The damage is concentrated in a single cycle: <strong>March 2013 SELL at $70 &rarr; January 2015 REBUY at $230</strong>, a 0.30&times; cycle multiplier. During bitcoin&rsquo;s most extreme-volatility era, the Power Law trend grew faster than any percentile-based threshold could keep up with. A correctly-fired sell at the 80th percentile in 2013 was rebuying into a higher absolute price two years later, even as the ratio dropped.</p>'
-         +    '<p>Restricted to cycles since 2015, every preset beats HODL. The Aggressive setting nearly quadruples it. The post-2015 cycles &mdash; 2017&ndash;18, the 2019 micro-cycle, 2020&ndash;22 &mdash; produced reasonable BTC gains at every threshold combination, because the volatility compression that has since become the dominant feature of bitcoin&rsquo;s price action started kicking in around then.</p>'
-         +    '<p>The reader&rsquo;s judgment, then, is which era the future will resemble. If you believe bitcoin will keep behaving like 2010&ndash;2014 &mdash; orders of magnitude in calendar years, percentile thresholds blown out by absolute price moves &mdash; the strategy is a cautionary tale and HODL is the answer. If you believe the volatility compression evident since 2015 reflects a maturing market that will continue, the strategy has historical merit at every preset, and the most aggressive settings deliver the most edge.</p>'
-         +    '<p>One more dimension worth naming: the setting that performs best historically is also the one that asks the least of you in lived experience. Aggressive 90/20 fires triggers so rarely that you spend most of the time HODLing &mdash; the default Bitcoiner posture anyway. Conservative 70/40 fires triggers more often, so you spend more time in cash-and-anxious state, and you also end with the worst BTC outcome at full-record. The &lsquo;scary&rsquo; Aggressive setting is actually the least psychologically demanding to live with.</p>'
-         +    '<p>Aggressive&rsquo;s edge has a precondition worth naming. The 90th-percentile sell only fires when bitcoin actually reaches that level &mdash; well above current price, and getting harder to reach as cycles compress. The same compression that flips the strategy&rsquo;s verdict from &lsquo;mostly fails&rsquo; to &lsquo;mostly works&rsquo; across all presets also reduces the frequency at which Aggressive&rsquo;s specific edge can materialize. A future where bitcoin&rsquo;s cycle peaks max out at 1.5&times;&ndash;2&times; trend would keep Aggressive in HODL state indefinitely, reducing it to its 1.0&times; HODL baseline.</p>'
-         +  '</div>';
-
-    el.innerHTML = html;
-  }
-
-  // Rebuild bands + thresholds when horizon changes (extends x-domain).
-  // Rebuild bands + thresholds when horizon changes (extends x-domain).
-  //
-  // chart.resize() at the end is load-bearing. The natural call here is
-  // chart.update('none') (via updateThresholds), but on the FIRST call
-  // after initial chart construction Chart.js v4 doesn't fully recompute
-  // element pixel positions — even though the new band data triggers a
-  // scale-max change and the controllers are invoked, the layout cache
-  // from the chart's first render survives and elements at every
-  // dataset (bands AND historical AND markers) keep pixel positions
-  // computed against the previous scale. The visible symptom (caught
-  // by sticky-values restoring horizon=10 at page load with the slider
-  // HTML default at 20): historical price line ends ~250 pixels left
-  // of the Today line, with hover at the line's end correctly showing
-  // 'Apr 2026' for the data but circles rendering at the year-2021
-  // pixel position.
-  //
-  // Verified empirically (puppeteer harness with localStorage seeded
-  // to dr:horizon=10):
-  //   - chart.update('none') alone → elements stale at every dataset
-  //   - chart.update() (default mode) → still stale
-  //   - chart.update('reset') → fixes positions but flickers (bases
-  //     y-values out then animates back in)
-  //   - chart.resize() → no-op when canvas dimensions are unchanged,
-  //     which is exactly the case here (the canvas size doesn't change
-  //     when horizon does, only the data domain shrinks)
-  //   - chart.update('resize') → fixes positions, no flicker, no
-  //     dependency on canvas dimensions changing. This is the call
-  //     Chart.js makes internally during a real resize-after-layout-
-  //     change pass; invoking it directly forces the layout cache to
-  //     invalidate without the visual reset that 'reset' mode causes.
-  //
-  // Guard: if the canvas isn't laid out yet (parent #tab-calculator
-  // is display:none — the common case at page load when sticky values
-  // fires the horizon input event before the user has navigated to
-  // the calculator tab), skip the update and queue a deferred fix.
-  // The ResizeObserver below catches the canvas going from 0×0 to
-  // real dimensions and runs the update then.
-  var pendingLayoutFix = false;
-  function updateXDomain(){
-    bands = bandData();
-    chart.data.datasets[DS.floor].data = bands.floor;
-    chart.data.datasets[DS.trend].data = bands.trend;
-    chart.data.datasets[DS.upper].data = bands.upper;
-    updateThresholds(); // re-extends sell/rebuy lines + re-runs backtest
-    if(canvas.clientWidth > 0){
-      chart.update('resize');
-    } else {
-      pendingLayoutFix = true;
-    }
-  }
-
-  // ResizeObserver catches the canvas going from 0×0 (hidden tab) to
-  // real dimensions (user clicked into the calculator tab). When that
-  // transition happens AND we deferred a layout fix during the page-
-  // load updateXDomain, run update('resize') so element positions
-  // catch up to the current scale. Well-supported in evergreen
-  // browsers; degrades to a slightly-stale chart on first calculator-
-  // tab view if ResizeObserver is unavailable.
-  if(typeof ResizeObserver !== 'undefined'){
-    var ro = new ResizeObserver(function(){
-      if(pendingLayoutFix && canvas.clientWidth > 0){
-        pendingLayoutFix = false;
-        chart.update('resize');
+      var s = c.sell, b = c.buy, m, buyCell, dollar;
+      if (b) { m = b.after / s.before; cum *= m; buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>'); dollar = (cum - 1) * stack * b.p; }
+      else { var held = s.before - s.amt, cashNow = (s.amt * s.p - s.tax) / LAST.p; m = (held + cashNow) / s.before; cum *= m; buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>'; dollar = (cum - 1) * stack * LAST.p; }
+      var row = m < 0.995 ? 'lost' : m > 1.005 ? 'won' : '';
+      html += '<tr class="' + row + '"><td>' + c.name + '</td><td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td><td class="n">' + btcf(stack * cum) + '</td><td class="n ' + (dollar > 0.5 ? 'up' : dollar < -0.5 ? 'down' : '') + '">' + (Math.abs(dollar) < 1 ? '—' : (dollar > 0 ? '+' : '') + usd(dollar)) + '</td></tr>';
+      if (m < 0.995) {
+        var r = b ? (b.why === 'fallback' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.' : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (b.p > s.p ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '')) : 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.';
+        fails.push('<b>' + c.name + ': ' + mult(m) + ' the bitcoin.</b> ' + r);
       }
     });
-    ro.observe(canvas);
-  }
+    $('dr2CycBody').innerHTML = html;
+    renderFailBox(fails, S.start);
 
-  // Initial backtest at script-load (before any user interaction).
-  updateBacktest(initialSellRatio, initialRebuyRatio);
-  chart.update('none');
-
-  // Preset comparison block — three presets × two windows. Re-renders
-  // when account-type or tax-rate change so the dual-window multipliers
-  // reflect the user's current account assumption.
-  renderPresetComparison();
-
-  if(sellEl) sellEl.addEventListener('input', updateThresholds);
-  if(rebuyEl) rebuyEl.addEventListener('input', updateThresholds);
-  // drHorizon is no longer in the DOM (historical-only redesign), but
-  // keep the guarded query so the code is robust if/when sliders evolve.
-  var horizonEl = document.getElementById('drHorizon');
-  if(horizonEl) horizonEl.addEventListener('input', updateXDomain);
-
-  // Tax-rate and account-type each materially change backtest output
-  // (tax drag, cumulative BTC) without touching threshold lines or
-  // marker positions on the chart. Re-run the backtest so the table
-  // + summary refresh; chart datasets for bands and historical markers
-  // don't change so chart.update is cheap.
-  var taxRateEl = document.getElementById('drTaxRate');
-  if(taxRateEl) taxRateEl.addEventListener('input', function(){
-    updateThresholds();
+    updateChart1(T); updateChart2(T);
+    renderHandoffs();
     renderPresetComparison();
-  });
-  document.querySelectorAll('[data-account]').forEach(function(b){
-    b.addEventListener('click', function(){
-      // Brief defer — calc IIFE's click handler runs first, sets the
-      // .active class on the toggle, then this fires and the backtest
-      // re-reads account type via querySelector('[data-account].active').
-      // Both per-setting summary and the three-presets table re-render.
-      setTimeout(function(){
-        updateThresholds();
-        renderPresetComparison();
-      }, 0);
-    });
-  });
-
-  // ─── ERA TOGGLE ───
-  // Two buttons in the historical-signals header: 'Full record (2010+)'
-  // and 'Since 2015'. Clicking switches the window the table + Today
-  // row + summary + volatility note all reflect. State persists in
-  // localStorage so a returning reader stays in the era they last chose.
-  var eraButtons = document.querySelectorAll('.dr-era-btn');
-  function syncEraButtons(){
-    eraButtons.forEach(function(b){
-      b.classList.toggle('active', b.dataset.era === currentEra);
-      b.setAttribute('aria-pressed', b.dataset.era === currentEra ? 'true' : 'false');
-    });
+    if (interacted) { saveSticky(); scheduleUrl(); }
   }
-  eraButtons.forEach(function(b){
-    b.addEventListener('click', function(){
-      var newEra = b.dataset.era;
-      if(newEra === currentEra) return;
-      currentEra = newEra;
-      try { localStorage.setItem('dr:era', currentEra); } catch(e){}
-      syncEraButtons();
-      updateThresholds();
-    });
-  });
-  // Sync initial active state to whatever currentEra was loaded as
-  // (may have been 'since-2015' if previously stored).
-  syncEraButtons();
-
-  // (No 'dr:simResult' listener — calculator IIFE no longer dispatches
-  // forward-simulation results since the historical-only redesign.
-  // The channel viz's forward-projection datasets stay empty by
-  // initial config.)
-
-  // ─── Interactive-legend wiring
-  // Each .dr-legend-item has a data-dataset-idx attribute mapping to its
-  // position in chart.data.datasets (matches the DS index map above).
-  // Click or Enter/Space toggles visibility on both sides — the chart
-  // hides the dataset via setDatasetVisibility(), and the row gets a
-  // .off class for the dimmed visual treatment. Chart.js stores the
-  // hidden state on each dataset's meta object, which persists through
-  // chart.data.datasets[X].data mutations + chart.update('none') (the
-  // page's update path for slider drags), so no separate state object
-  // is needed here. Help-tip clicks inside legend items are excluded so
-  // the ? affordance remains its own interaction.
-  (function wireDrLegendToggles(){
-    var items = document.querySelectorAll('.dr-channel-legend .dr-legend-item[data-dataset-idx]');
-    items.forEach(function(item){
-      function toggle(){
-        var idx = parseInt(item.getAttribute('data-dataset-idx'), 10);
-        if (isNaN(idx) || !chart) return;
-        var nowVisible = !chart.isDatasetVisible(idx);
-        chart.setDatasetVisibility(idx, nowVisible);
-        chart.update('none');
-        item.classList.toggle('off', !nowVisible);
-        item.setAttribute('aria-pressed', nowVisible ? 'true' : 'false');
-      }
-      item.addEventListener('click', function(e){
-        if (e.target.closest('.dr-tt')) return;
-        toggle();
-      });
-      item.addEventListener('keydown', function(e){
-        if (e.target.closest('.dr-tt')) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggle();
-        }
-      });
-    });
-  })();
-
-  // ─── Today (live) caption + range toggle (added with 2026-05-28 rollout)
-  function updateDrTodayCaption(price, source) {
-    var spotEl = document.getElementById('drTodaySpot');
-    var multEl = document.getElementById('drTodayMult');
-    if (!spotEl || !multEl) return;
-    var labelEl = document.getElementById('drTodayLabel');
-    if (labelEl && typeof todayPriceLabel === 'function') labelEl.textContent = todayPriceLabel(source);
-    var fmt = (price >= 1000) ? '$' + (price / 1000).toFixed(1) + 'K'
-                              : '$' + Math.round(price).toLocaleString();
-    spotEl.textContent = fmt;
-    var trendNow = plPrice(TODAY_DAYS);
-    multEl.textContent = (trendNow && trendNow > 0)
-                         ? (price / trendNow).toFixed(2) + '\u00d7'
-                         : '\u2014\u00d7';
-  }
-  // Seed immediately with the latest-sample value, then update on fetch resolve.
-  updateDrTodayCaption(TODAY_PRICE);
-  if (typeof fetchTodayPrice === 'function') {
-    fetchTodayPrice(function(price, source) {
-      liveBtcPrice = price;
-      updateDrTodayCaption(price, source);
-      // Extend the historical-price line to the live "today" anchor so it
-      // visibly meets the Today vertical (previously stopped at the last
-      // PL_DATA sample, leaving a small but visually awkward gap to Today).
-      // Safe to mutate DS.history here: nothing else in the file writes to
-      // this dataset after construction (grep confirms no DS.history writes
-      // beyond initial setup), so threshold-slider / band / horizon updates
-      // won't overwrite the trailing point. The xPerDataset interaction
-      // mode handles the mixed-cadence picking, so the original scale-cache
-      // bug class is not re-triggered by adding one trailing sample.
-      var histData = chart.data.datasets[DS.history].data;
-      if (histData && histData.length) {
-        var last = histData[histData.length - 1];
-        // Idempotent: if we've already appended a "today" point on a prior
-        // resolve (e.g. a hypothetical hot-reload), update its y rather
-        // than appending again. The "today" point is the one whose x is
-        // greater than the last canonical PL_DATA sample's x.
-        var lastCanonicalDay = PL_DATA[PL_DATA.length - 1][0];
-        if (last && last.x > lastCanonicalDay) {
-          last.y = price;
-        } else {
-          histData.push({ x: TODAY_DAYS, y: price });
-        }
-      }
-      // Re-render so the pulse plugin repositions and the price line
-      // redraws to today. 'resize' update mode triggers afterRender and
-      // safely revisits the scales without the tooltip-index pathology
-      // the documented scale-cache fix addressed.
-      chart.update('resize');
-    });
+  function renderFailBox(fails, start){
+    var fb = $('dr2FailBox');
+    if (fails.length) { fb.className = 'dr2-fail'; fb.innerHTML = '<h3>Where these rules shrank your stack, or never sold</h3><ul>' + fails.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
+    else { fb.className = 'dr2-fail ok'; fb.innerHTML = '<h3>No losing round trips from ' + start.slice(0, 4) + '</h3><ul><li>That is the record, not a promise. Rules tuned to past cycles will fit them; the next cycle can still be the one where price rises after the sale and never comes back.</li></ul>'; }
   }
 
-  // Today-centered range toggle: All-time / Near (±1y) / Planning (±2y).
-  // Unlike a trailing window, this centers on TODAY_DAYS so the visible
-  // x-range includes both recent history and near-future projection —
-  // matches the buy/sell decision context this page is built for. The
-  // y-axis is recomputed for the local band envelope on zoom so a log
-  // y-axis doesn't collapse to a flat sliver.
-  (function(){
-    var btns = document.querySelectorAll('.dr-range-btn');
-    if (!btns || !btns.length) return;
-    function bandsBoundsForWindow(loD, hiD) {
-      // Sample the floor/upper bands across the window to get a sensible
-      // y-domain. Floor = trend × 0.42 (low), Upper = trend × 3.0 (high).
-      var step = 30;
-      var lo = Infinity, hi = -Infinity;
-      for (var d = loD; d <= hiD; d += step) {
-        var t = plPrice(d);
-        if (t * PL_FLOOR < lo) lo = t * PL_FLOOR;
-        if (t * PL_CEIL  > hi) hi = t * PL_CEIL;
-      }
-      // Pad ~10% on each side for breathing room (log scale; multiplicative),
-      // then snap each bound to a nice log-friendly value (1, 1.5, 2, 3, 5, 7
-      // × 10^n) so the edge ticks render as clean labels rather than the raw
-      // padded envelope value. Without this snap, the y-tick callback was
-      // dividing the explicit min/max directly and producing labels like
-      // '$854.39…K' / '$26.53…K' at the chart edges. Picking a relatively
-      // dense candidate set keeps the visual padding tight: worst-case extra
-      // padding from the snap is ~50%, typical case much less.
-      return {
-        min: niceLogBound(lo / 1.10, 'down'),
-        max: niceLogBound(hi * 1.10, 'up')
+  // ─── Preset comparison (rewritten for v2; every figure live) ───
+  function renderPresetComparison(){
+    var el = $('drPresetComparison'); if (!el) return;
+    var O = S.O, acctLbl = O.acct === 'ira' ? 'In an IRA' : 'In a taxable account, at the rates set above';
+    var rows = [], best11 = null, best14 = null, below11 = 0, fired25 = 0;
+    ['conservative', 'balanced', 'adventurous'].forEach(function(k){
+      var a = RE.run(PRESETS[k], engineOpts(O, '2011-01')), b = RE.run(PRESETS[k], engineOpts(O, '2014-01'));
+      if (!best11 || a.end > best11.v) best11 = { k: k, v: a.end };
+      if (!best14 || b.end > best14.v) best14 = { k: k, v: b.end };
+      if (a.end < 0.995) below11++;
+      if (a.cyc[4].sell) fired25++;
+      rows.push('<tr><th scope="row">' + PRESET_NAMES[k] + '</th><td class="dr2-cmp-rule">' + ruleText(PRESETS[k]) + '</td><td class="n mult ' + cls(a.end) + '">' + mult(a.end) + '</td><td class="n mult ' + cls(b.end) + '">' + mult(b.end) + '</td></tr>');
+    });
+    el.innerHTML = '<div class="dr2-tablewrap"><table class="dr2-table dr2-cmp"><thead><tr><th scope="col">Preset</th><th scope="col">Rule</th><th scope="col" class="n">From 2011</th><th scope="col" class="n">From 2014</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>' +
+      '<p class="dr2-small">' + acctLbl + ', your stack after these rules against HODLing. From 2011, ' + PRESET_NAMES[best11.k] + ' ended highest, at ' + mult(best11.v) + '; from 2014, ' + PRESET_NAMES[best14.k] + ', at ' + mult(best14.v) + '. ' +
+      (below11 ? below11 + ' of the three ended below HODLing from 2011. ' : 'None ended below HODLing from 2011. ') +
+      (fired25 ? '' : 'None of them fired in the last cycle; it peaked at ' + fx(lastPeak()) + ' trend.') + '</p>';
+  }
+
+  // ─── Failure-mode worked example (computed, not remembered) ───
+  function renderFailExample(){
+    var el = $('dr2FailExample'); if (!el) return;
+    var t = RE.run(PRESETS.conservative, engineOpts(DEF_O, '2011-01')), c = t.cyc[1];
+    if (!c.sell || !c.buy) { el.textContent = ''; return; }
+    var m = c.buy.after / c.sell.before;
+    el.innerHTML = '<strong>The clearest case:</strong> the Conservative preset sold a quarter of the stack in ' + my(c.sell.d) + ' at <strong>' + price(c.sell.p) + '</strong> (' + fx(c.sell.r) + ' trend). The buy back came in ' + my(c.buy.d) + ' at <strong>' + price(c.buy.p) + '</strong> (' + fx(c.buy.r) + ' trend). Both rules fired as designed, and the round trip ended at <strong>' + mult(m) + '</strong> the bitcoin.';
+  }
+
+  // ─── Handoffs ───
+  function renderHandoffs(){
+    var a = $('dr2HoHmc'); if (!a || !window.ChannelEntries) return;
+    var CE = window.ChannelEntries, d = TODAY_DAYS, t = plPrice(d);
+    var pos = Math.round(CE.posOf(S.R.sx * t, d) * 1000) / 1000, rb = Math.round(CE.posOf(S.R.rx * t, d) * 1000) / 1000;
+    var tax = S.O.acct === 'ira' ? 0 : S.O.fed;   // How Much Cash accepts 0 / 15 / 20; the federal rate here is already one of them
+    a.setAttribute('href', '/how-much-cash?pos=' + pos.toFixed(3) + '&rebuy=' + rb.toFixed(3) + '&share=' + S.R.f + '&tax=' + tax);
+  }
+
+  // ═══ CHART 1 — the page's channel chart, with the rule on it ═══
+  var canvas = $('drChannelChart'), chart = null, pendingLayoutFix = false;
+  var todayD = (Date.now() / 1000 - GENESIS_TS) / 86400, minD = PL_DATA[0][0];
+  function maxD(){ return todayD + 20 * 365.25; }
+  function bandData(){ var trend = [], floor = [], upper = []; for (var d = minD; d <= maxD(); d += 30) { var t = plPrice(d); trend.push({ x: d, y: t }); floor.push({ x: d, y: t * PL_FLOOR }); upper.push({ x: d, y: t * PL_CEIL }); } return { trend: trend, floor: floor, upper: upper }; }
+  function levelData(ratio){ var line = []; for (var d = minD; d <= maxD(); d += 30) line.push({ x: d, y: plPrice(d) * ratio }); return line; }
+  var DS = { floor: 0, trend: 1, upper: 2, sellLine: 3, rebuyLine: 4, history: 5, fadeLine: 6, sells: 7, buys: 8, fallbacks: 9 };
+  var liveBtcPrice = TODAY_PRICE, liveSource = null;
+  // The hero's dollar figure names its price: live, or the dated last sample
+  // (the shared helpers' fallback label).
+  function priceNote(){ return liveSource === 'live' ? 'at today’s price' : 'at the price ' + (typeof todayPriceAsOf === 'function' ? todayPriceAsOf() : 'of the last sample'); }
+  var isNarrow = window.matchMedia && window.matchMedia('(max-width: 480px)').matches;
+
+  function buildChart1(){
+    if (!canvas || typeof Chart === 'undefined') return;
+    var col = {
+      floor: cssVar('--dr-floor'), trend: cssVar('--amber'), upper: cssVar('--dr-upper'), history: cssVar('--dr-history'),
+      sell: cssVar('--dr-sell'), fade: cssVar('--dr-fade'), rebuy: cssVar('--dr-rebuy'), bg: cssVar('--bg'),
+      muted: cssVar('--dr-axis'), grid: cssVar('--dr-grid'), tipBg: cssVar('--dr-tip-bg'), tipBorder: cssVar('--dr-tip-border'), tipBody: cssVar('--dr-tip-body'), todayLine: cssVar('--dr-today-line')
+    };
+    if (Chart.Interaction && Chart.Interaction.modes && !Chart.Interaction.modes.xPerDataset) {
+      // One item per dataset at the cursor's x (pixel space): the datasets
+      // don't share an x-grid, so Chart.js's index/x modes mis-pick here.
+      Chart.Interaction.modes.xPerDataset = function(ch, e, options, useFinal){
+        var cx = (e && typeof e.x === 'number') ? e.x : null; if (cx == null) return [];
+        var items = [];
+        ch.getSortedVisibleDatasetMetas().forEach(function(meta){
+          var els = meta.data; if (!els || !els.length) return;
+          var tol = meta.index >= 7 ? 6 : 15, best = -1, bd = Infinity;
+          for (var i = 0; i < els.length; i++) { var el = els[i]; if (!el || el.skip) continue; var x = (useFinal && el.getProps) ? el.getProps(['x'], true).x : el.x; if (x == null || isNaN(x)) continue; var dd = Math.abs(x - cx); if (dd < bd) { bd = dd; best = i; } }
+          if (best === -1 || bd > tol) return;
+          items.push({ element: els[best], datasetIndex: meta.index, index: best });
+        });
+        return items;
       };
     }
-    function niceLogBound(v, direction) {
-      if (v <= 0) return v;
-      var pow = Math.pow(10, Math.floor(Math.log10(v)));
-      var leading = v / pow;  // in [1, 10)
-      var candidates = [1, 1.5, 2, 3, 5, 7, 10];
-      if (direction === 'down') {
-        for (var i = candidates.length - 1; i >= 0; i--) {
-          if (candidates[i] <= leading) return candidates[i] * pow;
+    var todayLinePlugin = { id: 'drTodayLine', afterDatasetsDraw: function(ch){ var xs = ch.scales.x, a = ch.chartArea; if (!xs || !a) return; var x = xs.getPixelForValue(todayD); if (x < a.left || x > a.right) return; var c = ch.ctx; c.save(); c.strokeStyle = col.todayLine; c.lineWidth = 1; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(x, a.top); c.lineTo(x, a.bottom); c.stroke(); c.fillStyle = col.trend; c.font = '10px Inter, sans-serif'; c.textAlign = 'center'; c.fillText('Today', x, a.top + 12); c.restore(); } };
+    var pulsePlugin = { id: 'lcsPulse', afterRender: function(c){ var p = $('drPulse'); if (!p || !c.scales || !c.scales.x || !c.scales.y) return; var x = c.scales.x.getPixelForValue(TODAY_DAYS), y = c.scales.y.getPixelForValue(liveBtcPrice); if (x < c.chartArea.left - 4 || x > c.chartArea.right + 4 || y < c.chartArea.top - 4 || y > c.chartArea.bottom + 4) { p.classList.remove('is-visible'); return; } p.style.left = x + 'px'; p.style.top = y + 'px'; p.classList.add('is-visible'); } };
+    var bands = bandData();
+    function line(label, data, color, width, dash, order){ return { label: label, data: data, borderColor: color, borderWidth: width, borderDash: dash, pointRadius: 0, showLine: true, tension: 0.2, order: order }; }
+    function markers(label, color, fill, rot, order){ return { label: label, data: [], borderColor: color, backgroundColor: fill, borderWidth: 1.5, pointStyle: 'triangle', pointRotation: rot, pointRadius: 7, pointHoverRadius: 9, showLine: false, order: order }; }
+    chart = new Chart(canvas, {
+      type: 'scatter',
+      data: { datasets: [
+        line('Floor (0.42× trend)', bands.floor, col.floor, 1.4, [6, 3], 5),
+        line('Trend', bands.trend, col.trend, 2, [], 4),
+        line('Upper (3.0× trend)', bands.upper, col.upper, 1.2, [1, 5], 6),
+        line('Sell level', [], col.sell, 1.6, [8, 4], 2),
+        line('Buy-back level', [], col.rebuy, 1.6, [8, 4], 3),
+        { label: 'Historical price', data: PL_DATA.map(function(p){ return { x: p[0], y: p[1] }; }), borderColor: col.history, borderWidth: 1.2, pointRadius: 0, showLine: true, tension: 0.15, order: 1 },
+        line('Fade sell level', [], col.fade, 1.4, [3, 3], 2),
+        markers('Sale', col.sell, col.sell, 180, 0),
+        markers('Buy back', col.rebuy, col.rebuy, 0, 0),
+        markers('Buy back at the deadline', col.rebuy, col.bg, 0, 0)
+      ] },
+      plugins: [todayLinePlugin, pulsePlugin],
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'xPerDataset', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: col.tipBg, borderColor: col.tipBorder, borderWidth: 1, titleColor: col.trend, bodyColor: col.tipBody,
+            titleFont: { size: isNarrow ? 11 : 13 }, bodyFont: { size: isNarrow ? 11 : 13 }, padding: isNarrow ? 6 : 10, boxPadding: isNarrow ? 3 : 5,
+            callbacks: {
+              title: function(items){ if (!items.length) return ''; return new Date(GENESIS_TS * 1000 + items[0].parsed.x * 86400000).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }); },
+              label: function(item){ var v = item.parsed.y, f = v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'K' : v >= 1 ? '$' + v.toFixed(2) : '$' + v.toFixed(4); var l = item.dataset.label; if (isNarrow) { if (l === 'Floor (0.42× trend)') l = 'Floor'; else if (l === 'Upper (3.0× trend)') l = 'Upper'; } return l + ': ' + f; }
+            }
+          }
+        },
+        scales: {
+          x: { type: 'linear', title: { display: true, text: 'Year', color: col.muted, font: { size: 10 } }, grid: { color: col.grid }, min: minD, afterBuildTicks: yearTicks, ticks: { color: col.muted, autoSkip: false, maxRotation: 0, callback: yearLabel } },
+          y: { type: 'logarithmic', title: { display: true, text: 'BTC price (USD)', color: col.muted, font: { size: 10 } }, grid: { color: col.grid }, ticks: { color: col.muted, callback: function(v){ if (v >= 1e6) { var m = v / 1e6; return '$' + (m >= 10 || m === Math.floor(m) ? Math.round(m) : Math.round(m * 10) / 10) + 'M'; } if (v >= 1000) { var k = v / 1000; return '$' + (k >= 100 || k === Math.floor(k) ? Math.round(k) : Math.round(k * 10) / 10) + 'K'; } if (v >= 1) return '$' + Math.round(v); return '$' + v.toFixed(2); } } }
         }
-        return candidates[0] * pow;
       }
-      for (var j = 0; j < candidates.length; j++) {
-        if (candidates[j] >= leading) return candidates[j] * pow;
-      }
-      return candidates[candidates.length - 1] * pow;
-    }
-    btns.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        btns.forEach(function(b){
-          b.classList.remove('is-active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('is-active');
-        btn.setAttribute('aria-selected', 'true');
-        var range = btn.getAttribute('data-range');
-        var xScale = chart.options.scales.x;
-        var yScale = chart.options.scales.y;
-        if (range === 'all') {
-          xScale.min = undefined;
-          xScale.max = undefined;
-          yScale.min = undefined;
-          yScale.max = undefined;
-        } else {
-          var window_yrs = (range === 'near-1y') ? 1 : 2;
-          var loD = TODAY_DAYS - 365 * window_yrs;
-          var hiD = TODAY_DAYS + 365 * window_yrs;
-          xScale.min = loD;
-          xScale.max = hiD;
-          var b = bandsBoundsForWindow(loD, hiD);
-          yScale.min = b.min;
-          yScale.max = b.max;
-        }
-        chart.update('resize');
+    });
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(function(){ if (pendingLayoutFix && canvas.clientWidth > 0) { pendingLayoutFix = false; chart.update('resize'); } }).observe(canvas);
+    wireLegend(); wireRange(); wireToday();
+  }
+  var lastT = null;
+  function updateChart1(T){
+    if (!chart || !T) return;
+    lastT = T;
+    var R = S.R, sells = [], buys = [], fbs = [];
+    T.ev.forEach(function(e){ var pt = { x: e.d, y: e.p }; if (!inWindow(pt)) return; if (e.t === 'sell') sells.push(pt); else if (e.why === 'fallback') fbs.push(pt); else buys.push(pt); });
+    applyRange();
+    chart.data.datasets[DS.sellLine].data = levelData(R.sx);
+    chart.data.datasets[DS.rebuyLine].data = levelData(R.rx);
+    var showFade = R.timing === 'fade' && R.sz !== R.sx;
+    chart.data.datasets[DS.fadeLine].data = showFade ? levelData(R.sz) : [];
+    var lf = $('dr2LegendFade'); if (lf) lf.hidden = !showFade;
+    chart.data.datasets[DS.sells].data = sells; chart.data.datasets[DS.buys].data = buys; chart.data.datasets[DS.fallbacks].data = fbs;
+    if (canvas.clientWidth > 0) chart.update('resize'); else { chart.update('none'); pendingLayoutFix = true; }
+  }
+  function wireLegend(){
+    document.querySelectorAll('.dr-channel-legend .dr-legend-item[data-dataset-idx]').forEach(function(item){
+      function toggle(){ var idx = parseInt(item.getAttribute('data-dataset-idx'), 10); if (isNaN(idx) || !chart) return; var vis = !chart.isDatasetVisible(idx); chart.setDatasetVisibility(idx, vis); chart.update('none'); item.classList.toggle('off', !vis); item.setAttribute('aria-pressed', vis ? 'true' : 'false'); }
+      item.addEventListener('click', toggle);
+      item.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+  }
+  function wireToday(){
+    function caption(p, source){ var s = $('drTodaySpot'), m = $('drTodayMult'); if (!s || !m) return; var l = $('drTodayLabel'); if (l && typeof todayPriceLabel === 'function') l.textContent = todayPriceLabel(source); s.textContent = p >= 1000 ? '$' + (p / 1000).toFixed(1) + 'K' : '$' + Math.round(p).toLocaleString(); var t = plPrice(TODAY_DAYS); m.textContent = t > 0 ? (p / t).toFixed(2) + '×' : '—×'; }
+    caption(TODAY_PRICE);
+    if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function(p, source){
+      if (!(p > 0)) return;
+      liveBtcPrice = p; liveSource = source; caption(p, source);
+      var h = chart.data.datasets[DS.history].data, last = h[h.length - 1];
+      if (last && last.x > PL_DATA[PL_DATA.length - 1][0]) last.y = p; else h.push({ x: TODAY_DAYS, y: p });
+      render();
+    });
+  }
+  // ─── Range (review round 1, item 11) ───
+  // All history: first sample to today + 1 year. 10 / 5 / 2 years: back from
+  // today, ending today + 6 months so the lines run a little ahead. Out to
+  // 2035: two years back to the end of 2035. The y-axis is fitted to what the
+  // window holds (bands, the rule's levels, price); markers outside it are not
+  // drawn. Sticky as dr:range.
+  var RANGES = ['all', '10y', '5y', '2y', '2035'], range = 'all', YR = 365.25;
+  function rangeWindow(r){
+    if (r === '10y' || r === '5y' || r === '2y') return [todayD - parseInt(r, 10) * YR, todayD + YR / 2];
+    if (r === '2035') return [todayD - 2 * YR, RE.dayOfIso('2036-01-01')];
+    return [minD, todayD + YR];
+  }
+  function nice(v, dir){ if (v <= 0) return v; var pow = Math.pow(10, Math.floor(Math.log10(v))), lead = v / pow, c = [1, 1.5, 2, 3, 5, 7, 10], i; if (dir === 'down') { for (i = c.length - 1; i >= 0; i--) if (c[i] <= lead * 1.0000001) return c[i] * pow; return c[0] * pow; } for (i = 0; i < c.length; i++) if (c[i] >= lead / 1.0000001) return c[i] * pow; return c[c.length - 1] * pow; }
+  function applyRange(){
+    if (!chart) return;
+    var w = rangeWindow(range), R = S.R, lo = Infinity, hi = -Infinity, topM = Math.max(PL_CEIL, R.sx), botM = Math.min(PL_FLOOR, R.rx);
+    for (var d = w[0]; d <= w[1] + 30; d += 15) { var t = plPrice(Math.min(d, w[1])); lo = Math.min(lo, t * botM); hi = Math.max(hi, t * topM); }
+    chart.data.datasets[DS.history].data.forEach(function(p){ if (p.x >= w[0] && p.x <= w[1]) { lo = Math.min(lo, p.y); hi = Math.max(hi, p.y); } });
+    var xs = chart.options.scales.x, ys = chart.options.scales.y;
+    xs.min = w[0]; xs.max = w[1]; ys.min = nice(lo / 1.1, 'down'); ys.max = nice(hi * 1.1, 'up');
+  }
+  function inWindow(pt){ var w = rangeWindow(range); return pt.x >= w[0] && pt.x <= w[1]; }
+  function wireRange(){
+    var btns = document.querySelectorAll('.dr-range-btn'); if (!btns.length) return;
+    var saved = load('range'); if (RANGES.indexOf(saved) >= 0) range = saved;
+    function mark(){ btns.forEach(function(b){ var on = b.getAttribute('data-range') === range; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', String(on)); }); }
+    mark();
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        range = btn.getAttribute('data-range'); mark(); store('range', range);
+        updateChart1(lastT);
       });
     });
-  })();
+  }
+  // One tick per year (1 January, UTC), thinned to fit the axis width, so a
+  // year is never labelled twice. Shared by both charts.
+  function yearTicks(axis){
+    var lo = axis.min, hi = axis.max, y0 = new Date(GENESIS_TS * 1000 + lo * 864e5).getUTCFullYear(), y1 = new Date(GENESIS_TS * 1000 + hi * 864e5).getUTCFullYear(), ys = [];
+    for (var y = y0; y <= y1 + 1; y++) { var d = RE.dayOfIso(y + '-01-01'); if (d >= lo && d <= hi) ys.push(d); }
+    var room = Math.max(2, Math.floor((axis.width || axis.chart.width || 600) / 46)), step = Math.max(1, Math.ceil(ys.length / room));
+    axis.ticks = ys.filter(function(d, i){ return i % step === 0; }).map(function(d){ return { value: d }; });
+  }
+  function yearLabel(v){ return new Date(GENESIS_TS * 1000 + v * 864e5).getUTCFullYear(); }
 
+  // ═══ CHART 2 — your stack over time, rule vs HODL ═══
+  var chart2 = null, canvas2 = $('dr2StackChart'), pending2 = false;
+  function buildChart2(){
+    if (!canvas2 || typeof Chart === 'undefined') return;
+    var col = { rule: cssVar('--orange'), hodl: cssVar('--text-muted'), muted: cssVar('--dr-axis'), grid: cssVar('--dr-grid'), tipBg: cssVar('--dr-tip-bg'), tipBorder: cssVar('--dr-tip-border'), tipBody: cssVar('--dr-tip-body') };
+    var endLabel = { id: 'dr2EndLabel', afterDatasetsDraw: function(ch){ var ds = ch.data.datasets[1], meta = ch.getDatasetMeta(1); if (!ds || !meta.data.length) return; var pt = meta.data[meta.data.length - 1], v = ds.data[ds.data.length - 1].y, c = ch.ctx; c.save(); c.fillStyle = col.rule; c.beginPath(); c.arc(pt.x, pt.y, 3.5, 0, 2 * Math.PI); c.fill(); c.font = '12px Inter, sans-serif'; c.textAlign = 'right'; c.fillText(S.unit === 'usd' ? usd(v) : btcf(v), pt.x - 8, pt.y - 9); c.restore(); } };
+    chart2 = new Chart(canvas2, {
+      type: 'scatter',
+      data: { datasets: [
+        { label: 'HODL', data: [], borderColor: col.hodl, borderWidth: 1.4, borderDash: [5, 4], pointRadius: 0, showLine: true, order: 2 },
+        { label: 'With your rules', data: [], borderColor: col.rule, borderWidth: 2, pointRadius: 0, showLine: true, order: 1 }
+      ] },
+      plugins: [endLabel],
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        layout: { padding: { top: 18 } },
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: col.tipBg, borderColor: col.tipBorder, borderWidth: 1, bodyColor: col.tipBody, titleColor: col.rule,
+          callbacks: { title: function(it){ return it.length ? my(it[0].parsed.x) : ''; }, label: function(it){ return it.dataset.label + ': ' + (S.unit === 'usd' ? usd(it.parsed.y) : btcf(it.parsed.y)); } } } },
+        scales: {
+          x: { type: 'linear', grid: { color: col.grid }, afterBuildTicks: yearTicks, ticks: { color: col.muted, autoSkip: false, maxRotation: 0, callback: yearLabel } },
+          y: { type: 'linear', grid: { color: col.grid }, ticks: { color: col.muted, callback: function(v){ return S.unit === 'usd' ? usd(v) : stackNum(v); } } }
+        }
+      }
+    });
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(function(){ if (pending2 && canvas2.clientWidth > 0) { pending2 = false; chart2.update('resize'); } }).observe(canvas2);
+  }
+  function updateChart2(T){
+    if (!chart2) return;
+    var k = S.stack, usdMode = S.unit === 'usd', s = T.ser;
+    chart2.data.datasets[0].data = s.map(function(p){ return { x: p.d, y: usdMode ? p.p * k : k }; });
+    chart2.data.datasets[0].borderDash = usdMode ? [] : [5, 4];
+    chart2.data.datasets[1].data = s.map(function(p){ return { x: p.d, y: usdMode ? p.usd * k : p.coins * k }; });
+    chart2.options.scales.y.type = usdMode ? 'logarithmic' : 'linear';
+    // Item 12: in bitcoin, the y-axis runs on round steps (0.85, 0.90 … 1.15
+    // at the defaults), not the data's own min and max.
+    var yo = chart2.options.scales.y;
+    if (!usdMode) {
+      var all = s.map(function(p){ return p.coins * k; }).concat([k]), lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), pad = Math.max((hi - lo) * 0.1, 0.05 * k);
+      var span = (hi - lo) + 2 * pad, raw = span / 7, pow = Math.pow(10, Math.floor(Math.log10(raw))), step = [1, 2, 2.5, 5, 10].map(function(m){ return m * pow; }).filter(function(v){ return v >= raw; })[0];
+      yo.min = Math.max(0, Math.floor((lo - pad) / step + 1e-9) * step); yo.max = Math.ceil((hi + pad) / step - 1e-9) * step; yo.ticks.stepSize = step;
+    }
+    else { yo.min = undefined; yo.max = undefined; yo.ticks.stepSize = undefined; }
+    chart2.options.scales.x.min = s[0].d; chart2.options.scales.x.max = s[s.length - 1].d;
+    if (canvas2.clientWidth > 0) chart2.update('resize'); else { chart2.update('none'); pending2 = true; }
+  }
+
+  // ═══ URL (spec §7) ═══
+  var KEYS = ['preset', 'sx', 'st', 'sz', 'f', 'rx', 'cap', 'account', 'tax', 'state', 'sell', 'rebuy'];
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+  function r2(v){ return Math.round(v * 100) / 100; }
+  function nearestFed(v){ return [0, 15, 20].reduce(function(b, c){ return Math.abs(c - v) < Math.abs(b - v) ? c : b; }, 15); }
+  // Parse a query string into a state patch. Pure, so drQA can test it.
+  function parseParams(p){
+    var out = { present: false };
+    KEYS.forEach(function(k){ if (p.has(k)) out.present = true; });
+    if (p.has('from') && p.get('from') === 'spikes') { out.fromSpikes = true; out.present = true; }
+    if (p.has('rb')) out.rb = p.get('rb');
+    var preset = p.get('preset'), base = PRESETS[preset] ? preset : 'conservative';
+    if (PRESETS[preset]) { out.preset = preset; out.R = copy(PRESETS[preset]); }
+    var ruleKeys = ['sx', 'st', 'sz', 'f', 'rx', 'cap'].filter(function(k){ return p.has(k); });
+    if (ruleKeys.length) {
+      var R = copy(PRESETS[base]), v;
+      if (p.has('st') && (p.get('st') === 'up' || p.get('st') === 'fade')) R.timing = p.get('st');
+      v = parseFloat(p.get('sx')); if (isFinite(v)) R.sx = r2(clamp(v, 1.1, 5));
+      R.sz = R.sx; v = parseFloat(p.get('sz')); if (R.timing === 'fade' && isFinite(v)) R.sz = r2(clamp(v, 1, R.sx));
+      v = parseFloat(p.get('f')); if (isFinite(v)) R.f = clamp(Math.round(v / 5) * 5, 5, 100);
+      v = parseFloat(p.get('rx')); if (isFinite(v)) R.rx = r2(clamp(v, 0.42, 1.5));
+      v = parseInt(p.get('cap'), 10); if ([0, 12, 18, 24, 36].indexOf(v) >= 0) R.cap = v;
+      out.preset = 'custom'; out.R = R;
+    } else if (p.has('sell') || p.has('rebuy')) {
+      // Legacy percentile links: the old rule sold everything on the way up
+      // with no deadline; levels mapped on the since-2011 set.
+      var sp = parseFloat(p.get('sell')), bp = parseFloat(p.get('rebuy'));
+      var sx = r2(clamp(RE.ratioAtPercentile(isFinite(sp) ? sp : 80, '2011-01'), 1.1, 5)), rx = r2(clamp(RE.ratioAtPercentile(isFinite(bp) ? bp : 50, '2011-01'), 0.42, 1.5));
+      out.preset = 'custom'; out.R = { timing: 'up', sx: sx, sz: sx, f: 100, rx: rx, cap: 0 };
+    }
+    if (p.has('account')) { var a = p.get('account'); if (a === 'retirement') out.acct = 'ira'; else if (a === 'regular') out.acct = 'tax'; }
+    if (p.has('tax')) { var t = parseFloat(p.get('tax')); if (isFinite(t)) out.fed = nearestFed(clamp(t, 0, 40)); }
+    if (p.has('state')) { var sc = String(p.get('state')).toUpperCase(); if (/^[A-Z]{2,5}$/.test(sc) && $('dr2State').querySelector('option[value="' + sc + '"]')) out.state = sc; }
+    return out;
+  }
+  function applyPatch(x){
+    if (x.preset) S.preset = x.preset;
+    if (x.R) S.R = x.R;
+    if (x.acct) S.O.acct = x.acct;
+    if (x.fed != null) S.O.fed = x.fed;
+    if (x.state) S.O.state = x.state;
+    if (x.fromSpikes) S.fromSpikes = true;
+    if (x.rb) S.rb = x.rb;
+  }
+  function writeParams(p){
+    KEYS.forEach(function(k){ p.delete(k); });
+    if (S.preset === 'custom') {
+      var R = S.R;
+      p.set('sx', String(R.sx)); p.set('st', R.timing);
+      if (R.timing === 'fade' && R.sz !== R.sx) p.set('sz', String(R.sz));
+      p.set('f', String(R.f)); p.set('rx', String(R.rx));
+      if (R.cap !== 24) p.set('cap', String(R.cap));
+    } else if (S.preset !== 'conservative') p.set('preset', S.preset);
+    if (S.O.acct === 'tax') {
+      p.set('account', 'regular');
+      if (S.O.fed !== DEF_O.fed) p.set('tax', String(S.O.fed));
+      if (S.O.state !== DEF_O.state) p.set('state', S.O.state);
+    }
+    return p;
+  }
+  function scenarioUrl(){ var qs = writeParams(new URLSearchParams(location.search)).toString(); return location.origin + location.pathname + (qs ? '?' + qs : '') + location.hash; }
+  window.drScenarioUrl = scenarioUrl;
+  var _urlT = null;
+  function scheduleUrl(){
+    if (!interacted || !window.history || !history.replaceState) return;
+    clearTimeout(_urlT);
+    _urlT = setTimeout(function(){ var qs = writeParams(new URLSearchParams(location.search)).toString(); history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash); }, 220);
+  }
+
+  // ═══ Stickiness (dr: keys; stack never saved) ═══
+  function store(k, v){ try { localStorage.setItem('dr:' + k, v); } catch (e) {} }
+  function load(k){ try { return localStorage.getItem('dr:' + k); } catch (e) { return null; } }
+  function removeOldKeys(){
+    try { ['sellPct', 'rebuyPct', 'taxRate', 'accountType', 'era', 'customizeOpen', 'horizon'].forEach(function(k){ localStorage.removeItem('dr:' + k); }); var p = localStorage.getItem('dr:preset'); if (p && !PRESET_NAMES[p]) localStorage.removeItem('dr:preset'); } catch (e) {}
+  }
+  function saveSticky(){
+    store('preset', S.preset); store('rule', JSON.stringify(S.R)); store('acct', S.O.acct); store('fed', String(S.O.fed)); store('niit', S.O.niit ? '1' : '0');
+    store('state', S.O.state); store('lots', S.O.lots); store('yield', String(S.O.yield)); store('start', S.start); store('unit', S.unit);
+  }
+  function loadSticky(){
+    var p = load('preset');
+    if (p && PRESET_NAMES[p]) {
+      S.preset = p;
+      if (PRESETS[p]) S.R = copy(PRESETS[p]);
+      else { try { var R = JSON.parse(load('rule') || 'null'); if (R && R.sx) S.R = { timing: R.timing === 'up' ? 'up' : 'fade', sx: r2(clamp(+R.sx, 1.1, 5)), sz: r2(clamp(+R.sz, 1, +R.sx)), f: clamp(+R.f, 5, 100), rx: r2(clamp(+R.rx, 0.42, 1.5)), cap: [0, 12, 18, 24, 36].indexOf(+R.cap) >= 0 ? +R.cap : 24 }; } catch (e) {} }
+    }
+    var a = load('acct'); if (a === 'ira' || a === 'tax') S.O.acct = a;
+    var f = parseInt(load('fed'), 10); if ([0, 15, 20].indexOf(f) >= 0) S.O.fed = f;
+    S.O.niit = load('niit') === '1';
+    var st = load('state'); if (st && (st === 'NONE' || $('dr2State').querySelector('option[value="' + st + '"]'))) S.O.state = st;
+    var l = load('lots'); if (l === 'fifo' || l === 'hifo') S.O.lots = l;
+    var y = parseInt(load('yield'), 10); if (y === 0 || y === 4) S.O.yield = y;
+    var s = load('start'); if (s === '2011-01' || s === '2014-01' || s === '2017-01') S.start = s;
+    var u = load('unit'); if (u === 'coins' || u === 'usd') S.unit = u;
+  }
+
+  // ═══ Arrival from Bitcoin's Spikes (from=spikes) ═══
+  function renderArrival(){
+    var a = $('dr2Arrival'); if (!a || !S.fromSpikes) return;
+    var R = S.R, acct = S.O.acct === 'ira' ? 'IRA' : 'taxable';
+    var what = (R.f === 100 ? 'sell all' : 'sell ' + R.f + '%') + ' at ' + fx(R.sx) + ' trend, buy back at ' + (R.rx === 1 ? 'trend' : fx(R.rx) + ' trend') + ', ' + acct;
+    a.innerHTML = '<b>Picked up from Bitcoin\'s Spikes:</b> ' + what + '. I added the 24-month deadline this page uses by default to the buy-back rule. Most readers trim less than 100%; try <a href="#" id="dr2TryBal">Balanced</a> to compare.' +
+      (S.rb === 'ath80' ? ' Spikes\' “80% below the high” buy back isn\'t available here yet, so this uses trend.' : '');
+    a.hidden = false;
+    $('dr2TryBal').addEventListener('click', function(ev){ ev.preventDefault(); S.preset = 'balanced'; S.R = copy(PRESETS.balanced); track('dr_preset', { preset: 'balanced' }); render(); });
+    track('dr_arrival', { sx: R.sx, account: S.O.acct });
+  }
+
+  // ═══ Wiring ═══
+  function toCustom(){ S.preset = 'custom'; }
+  function wire(){
+    ['input', 'change', 'click'].forEach(function(ev){ document.addEventListener(ev, function(e){ if (e.target && e.target.closest && e.target.closest('#tab-calculator')) interacted = true; }, { capture: true }); });
+    document.querySelectorAll('.dr2-preset').forEach(function(b){ b.addEventListener('click', function(){ var p = b.dataset.p; S.preset = p; if (PRESETS[p]) S.R = copy(PRESETS[p]); else $('dr2Build').open = true; track('dr_preset', { preset: p }); render(); }); });
+    function seg(id, fn){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.addEventListener('click', function(){ fn(b.dataset.v); render(); }); }); }
+    seg('dr2SegTiming', function(v){ S.R.timing = v; if (v === 'up' || S.R.sz > S.R.sx) S.R.sz = v === 'up' ? S.R.sx : Math.min(S.R.sz, S.R.sx); toCustom(); });
+    seg('dr2SegCap', function(v){ S.R.cap = +v; toCustom(); });
+    seg('dr2SegYield', function(v){ S.O.yield = +v; });
+    seg('dr2SegAcct', function(v){ S.O.acct = v; });
+    seg('dr2SegFed', function(v){ S.O.fed = +v; });
+    seg('dr2SegLots', function(v){ S.O.lots = v; });
+    seg('dr2SegStart', function(v){ S.start = v; });
+    seg('dr2SegUnit', function(v){ S.unit = v; });
+    $('dr2Sx').addEventListener('input', function(e){ S.R.sx = +e.target.value; if (S.R.timing === 'up') S.R.sz = S.R.sx; else S.R.sz = Math.min(S.R.sz, S.R.sx); toCustom(); render(); });
+    $('dr2Sz').addEventListener('input', function(e){ S.R.sz = Math.min(+e.target.value, S.R.sx); toCustom(); render(); });
+    $('dr2F').addEventListener('input', function(e){ S.R.f = +e.target.value; toCustom(); render(); });
+    $('dr2Rx').addEventListener('input', function(e){ S.R.rx = +e.target.value; toCustom(); render(); });
+    $('dr2Niit').addEventListener('change', function(e){ S.O.niit = e.target.checked; render(); });
+    $('dr2State').addEventListener('change', function(e){ S.O.state = e.target.value; render(); });
+    $('dr2Stack').addEventListener('input', function(e){ var v = +e.target.value; if (v > 0) { S.stack = v; render(); } });
+    wireBar();
+    document.querySelectorAll('#tab-calculator [data-handoff]').forEach(function(a){ a.addEventListener('click', function(){ track('dr_handoff', { destination: a.getAttribute('data-handoff') }); }); });
+  }
+
+  // ═══ Sticky rule bar (review round 1, item 9) ═══
+  // Fixed under the site's sticky nav (its height measured, not assumed) from
+  // the moment the rule card has scrolled out of view until the end of the
+  // presets block, where it scrolls away with that block's bottom edge. Its
+  // controls set the same state as the card's, so render() keeps both in sync.
+  function selectPreset(p){ S.preset = p; if (PRESETS[p]) S.R = copy(PRESETS[p]); else $('dr2Build').open = true; track('dr_preset', { preset: p }); render(); }
+  function wireBar(){
+    var bar = $('dr2Bar'), card = $('dr2RuleCard'), end = $('dr2PresetsCard'), nav = document.querySelector('.site-nav'), tab = $('tab-calculator');
+    if (!bar || !card || !end) return;
+    bar.querySelectorAll('.dr2-chip[data-p]').forEach(function(b){ b.addEventListener('click', function(){ selectPreset(b.dataset.p); }); });
+    bar.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.addEventListener('click', function(){ S.O.acct = b.dataset.v; render(); }); });
+    $('dr2BarEdit').addEventListener('click', function(){
+      var d = $('dr2Build'); d.open = true;
+      var first = d.querySelector('.dr2-build-body button, .dr2-build-body input, .dr2-build-body select');
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      d.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+      if (first) first.focus({ preventScroll: true });
+    });
+    function place(){
+      if (!tab || !tab.classList.contains('active')) { hide(); return; }
+      var navB = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
+      var cardB = card.getBoundingClientRect().bottom, endB = end.getBoundingClientRect().bottom;
+      if (cardB > navB || endB <= navB) { hide(); return; }
+      var entering = bar.hidden;
+      bar.hidden = false;
+      var h = bar.offsetHeight;
+      bar.style.top = Math.min(navB, endB - h) + 'px';
+      if (entering) bar.classList.add('is-entering');
+      // Keyboard focus moved by the browser lands below the bar, not under it.
+      document.documentElement.style.scrollPaddingTop = (navB + h + 8) + 'px';
+    }
+    function hide(){
+      if (bar.hidden) return;
+      bar.hidden = true; bar.classList.remove('is-entering'); document.documentElement.style.scrollPaddingTop = '';
+    }
+    // Placed synchronously on scroll (three rect reads), so the bar never lags
+    // the content by a frame.
+    function onScroll(){ place(); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ setTimeout(place, 0); }); });
+    bar.addEventListener('animationend', function(){ bar.classList.remove('is-entering'); });
+    place();
+  }
+
+  // ═══ drQA() — the §5 fixture, pinned to the 2026-09-30 sample ═══
+  var ANCHOR = '2026-09-30';
+  var FIXTURE = {
+    // Taxable = federal 20% + NIIT, no state, FIFO, cash 0%, 24-month deadline, 1 BTC.
+    presets: {
+      conservative: { ira11: 1.10, ira14: 1.35, tax11: 0.82, tax14: 1.18 },
+      balanced:     { ira11: 1.35, ira14: 2.25, tax11: 0.75, tax14: 1.68 },
+      adventurous:  { ira11: 1.12, ira14: 2.59, tax11: 0.48, tax14: 1.75 }
+    },
+    conservativeCycles: [
+      { name: '2011', sold: 'Sep 2011', sp: 5.02, sr: 1.65, bought: 'Oct 2011', bp: 3.32, br: 0.89, m: 1.13 },
+      { name: '2013', sold: 'Apr 2013', sp: 68, sr: 1.58, bought: 'Jan 2015', bp: 270, br: 0.87, m: 0.81 },
+      { name: '2017', sold: 'Apr 2018', sp: 6828, sr: 1.87, bought: 'Nov 2018', bp: 3828, br: 0.70, m: 1.20 },
+      { name: '2021', sold: 'Jan 2021', sp: 30419, sr: 1.79, bought: 'May 2022', bp: 30279, br: 0.98, m: 1.00 }
+    ],
+    lastPeak: 1.19,
+    shares: { above2x2011: 17, above2x2017: 13, below1x2011: 56 },
+    legacy: { sell80: 1.78, rebuy50: 0.87 }
+  };
+  function drQA(){
+    var f = [];
+    function near(label, got, want, tol){ if (got == null || !(Math.abs(got - want) <= tol)) f.push(label + ' ' + (got == null ? 'none' : +got.toFixed(3)) + ' vs ' + want + ' (±' + tol + ')'); }
+    var anchor = null; PL_DATA.forEach(function(r){ if (RE.isoOf(r[0]) === ANCHOR) anchor = r[0]; });
+    if (anchor == null) f.push('fixture anchor ' + ANCHOR + ' is no longer in PL_DATA');
+    var asOf = anchor != null ? anchor : RE.dayOfIso(ANCHOR);
+    var IRA = { acct: 'ira', fed: 20, niit: true, state: 0, lots: 'fifo', yield: 0, asOf: asOf };
+    var TAX = { acct: 'tax', fed: 20, niit: true, state: 0, lots: 'fifo', yield: 0, asOf: asOf };
+    function o(base, start){ var x = copy(base); x.start = start; return x; }
+    Object.keys(FIXTURE.presets).forEach(function(k){
+      var w = FIXTURE.presets[k];
+      near(k + ' IRA since 2011', RE.run(PRESETS[k], o(IRA, '2011-01')).end, w.ira11, 0.01);
+      near(k + ' IRA since 2014', RE.run(PRESETS[k], o(IRA, '2014-01')).end, w.ira14, 0.01);
+      near(k + ' taxable since 2011', RE.run(PRESETS[k], o(TAX, '2011-01')).end, w.tax11, 0.01);
+      near(k + ' taxable since 2014', RE.run(PRESETS[k], o(TAX, '2014-01')).end, w.tax14, 0.01);
+    });
+    var t = RE.run(PRESETS.conservative, o(IRA, '2011-01'));
+    FIXTURE.conservativeCycles.forEach(function(w, i){
+      var c = t.cyc[i];
+      if (!c || !c.sell || !c.buy) { f.push('conservative ' + w.name + ' did not sell and buy back'); return; }
+      if (my(c.sell.d) !== w.sold) f.push('conservative ' + w.name + ' sold ' + my(c.sell.d) + ' ≠ ' + w.sold);
+      if (my(c.buy.d) !== w.bought) f.push('conservative ' + w.name + ' bought ' + my(c.buy.d) + ' ≠ ' + w.bought);
+      near('conservative ' + w.name + ' sale price', c.sell.p, w.sp, Math.max(0.01, w.sp * 0.005));
+      near('conservative ' + w.name + ' buy price', c.buy.p, w.bp, Math.max(0.01, w.bp * 0.005));
+      near('conservative ' + w.name + ' sale ×trend', c.sell.r, w.sr, 0.01);
+      near('conservative ' + w.name + ' buy ×trend', c.buy.r, w.br, 0.01);
+      near('conservative ' + w.name + ' coins after', c.buy.after / c.sell.before, w.m, 0.01);
+    });
+    if (t.cyc[4].sell) f.push('conservative 2024–25 sold; fixture says never');
+    near('2024–25 peak ×trend', t.cyc[4].peak, FIXTURE.lastPeak, 0.01);
+    near('share at or above 2× since 2011 %', Math.round(RE.pctAtOrAbove(2, '2011-01', asOf)), FIXTURE.shares.above2x2011, 0);
+    near('share at or above 2× since 2017 %', Math.round(RE.pctAtOrAbove(2, '2017-01', asOf)), FIXTURE.shares.above2x2017, 0);
+    near('share at or below 1× since 2011 %', Math.round(RE.pctAtOrBelow(1, '2011-01', asOf)), FIXTURE.shares.below1x2011, 0);
+    // Legacy mapping, through the page's own parser.
+    var lg = parseParams(new URLSearchParams('sell=80&rebuy=50&account=regular'));
+    near('legacy sell=80 → ×trend', lg.R && lg.R.sx, FIXTURE.legacy.sell80, 0.01);
+    near('legacy rebuy=50 → ×trend', lg.R && lg.R.rx, FIXTURE.legacy.rebuy50, 0.01);
+    if (lg.acct !== 'tax') f.push('legacy account=regular did not map to taxable');
+    // Lots: two lots, both long-term, rate 20%: FIFO sells the $100 lot (gain
+    // $300 → $60), highest-cost-first the $300 lot ($100 → $20), and the old
+    // average-cost method would use a $200 basis ($200 → $40).
+    var g1 = RE.sellLots([{ b: 1, c: 100, d: 0 }, { b: 1, c: 300, d: 400 }], 1, 400, 800, 'fifo', 0.2, 0.4);
+    var g2 = RE.sellLots([{ b: 1, c: 100, d: 0 }, { b: 1, c: 300, d: 400 }], 1, 400, 800, 'hifo', 0.2, 0.4);
+    var avg = (400 - (100 + 300) / 2) * 1 * 0.2;
+    near('FIFO taxable gain', g1, 60, 1e-9); near('highest-cost taxable gain', g2, 20, 1e-9); near('average-cost taxable gain', avg, 40, 1e-9);
+    // Fallback: a sale on day 12 and a 12-month deadline (365.28 days) must buy
+    // back on the first sample at or past day 377.28, i.e. day 384, not 372.
+    var rows = []; for (var d = 0; d <= 600; d += 12) rows.push({ d: d, p: 100, r: d === 0 ? 1 : 1.2, ym: '2011-01' });
+    var fb = RE.runRows(rows, { timing: 'up', sx: 1.1, sz: 1.1, f: 50, rx: 0.5, cap: 12 }, { acct: 'ira', fed: 0, niit: false, state: 0, lots: 'fifo', yield: 0 });
+    var buy = fb.ev.filter(function(e){ return e.t === 'buy'; })[0];
+    if (!buy || buy.d !== 384 || buy.why !== 'fallback') f.push('fallback fired at ' + (buy ? buy.d + ' (' + buy.why + ')' : 'never') + ', expected 384');
+    // A bare load must leave the address bar alone.
+    if (!interacted && location.href !== INITIAL_HREF) f.push('bare load changed location.href');
+    var sq = typeof window.spikesQA === 'function' ? window.spikesQA().pass : 'run on /bitcoin-spikes';
+    if (sq === false) f.push('spikesQA() failed');
+    return { pass: f.length === 0, failures: f, anchor: ANCHOR, spikesQA: sq, live: { conservativeIRA11: +RE.run(PRESETS.conservative, engineOpts(DEF_O, '2011-01')).end.toFixed(3) } };
+  }
+  window.drQA = drQA;
+  // Console hook for preview checks: renders the failure box for a given list,
+  // so the neutral "No losing round trips" state can be seen without hunting
+  // for a rule that reaches it. Changes nothing else; the next render restores.
+  window.drDebug = { renderFailBox: renderFailBox };
+
+  // ═══ Live figures in the Question and Math tabs (spec §3) ═══
+  // Each [data-dr-math] span and the percentile table are computed here, so
+  // the prose can't drift from the engine.
+  function renderMathFigures(){
+    var IRA = engineOpts({ acct: 'ira', fed: 15, niit: false, state: 'NONE', lots: 'fifo', yield: 0 }, '2011-01');
+    function end(R, start){ var o = copy(IRA); o.start = start; return RE.run(R, o).end; }
+    var upHalf = { timing: 'up', sx: 1.75, sz: 1.75, f: 50, rx: 0.85, cap: 24 }, upAll = { timing: 'up', sx: 1.75, sz: 1.75, f: 100, rx: 0.85, cap: 24 };
+    var strand = { timing: 'up', sx: 2, sz: 2, f: 100, rx: 0.5, cap: 0 }, strand24 = copy(strand); strand24.cap = 24;
+    var samp = RE.run({ timing: 'up', sx: 1.5, sz: 1.5, f: 100, rx: 1, cap: 0 }, IRA).ev.filter(function(e){ return e.t === 'sell'; })[0];
+    var P = function(p, from){ return RE.ratioAtPercentile(p, from); };
+    var v = {
+      p80all: P(80, '2010-01'), p80s11: P(80, '2011-01'), p80s17: P(80, '2017-01'), p50s11: P(50, '2011-01'),
+      fade11: end(PRESETS.balanced, '2011-01'), fade14: end(PRESETS.balanced, '2014-01'), up11: end(upHalf, '2011-01'), up14: end(upHalf, '2014-01'),
+      peak25: lastPeak(), strand0: end(strand, '2011-01'), strand24: end(strand24, '2011-01'), samp11: samp ? samp.r : null
+    };
+    document.querySelectorAll('[data-dr-math]').forEach(function(el){ var k = el.getAttribute('data-dr-math'), x = v[k]; if (x != null) el.textContent = mult(x); });
+    document.querySelectorAll('[data-dr-math="g13"]').forEach(function(el){ el.textContent = Math.round(RE.trendGrowth(RE.dayOfIso('2013-07-01'))) + '%'; });
+    document.querySelectorAll('[data-dr-math="gNow"]').forEach(function(el){ el.textContent = Math.round(RE.trendGrowth(RE.lastDay)) + '%'; });
+    var body = $('drMathPctBody');
+    if (body) body.innerHTML = [50, 70, 80, 90].map(function(p){ return '<tr><td>' + p + 'th</td><td>' + fx(P(p, '2010-01')) + ' trend</td><td>' + fx(P(p, '2011-01')) + ' trend</td><td>' + fx(P(p, '2017-01')) + ' trend</td></tr>'; }).join('');
+    if ($('drQ100')) $('drQ100').textContent = mult(end(upAll, '2011-01'));
+    if ($('drQ50')) $('drQ50').textContent = mult(end(upHalf, '2011-01'));
+  }
+
+  // ═══ Init ═══
+  function init(){
+    // The shared state list carries Washington at 0% (right for real estate);
+    // relabel it here so the dropdown says what the calculator applies.
+    var wa = $('dr2State').querySelector('option[value="WA"]');
+    if (wa) { wa.textContent = BTC_STATE_OVERRIDE.WA.label; var hi = document.createElement('option'); hi.value = 'WAHI'; hi.textContent = BTC_STATE_OVERRIDE.WAHI.label; wa.after(hi); }
+    removeOldKeys();
+    var x = window.URLSearchParams ? parseParams(new URLSearchParams(location.search)) : { present: false };
+    if (x.present) applyPatch(x); else loadSticky();
+    $('dr2Stack').value = S.stack;
+    buildChart1(); buildChart2();
+    wire();
+    render();
+    renderFailExample();
+    renderMathFigures();
+    renderArrival();
+    var q = drQA();
+    if (q.pass) console.log('[dr-qa] pass — §5 fixture verified at ' + q.anchor + '.');
+    else console.error('[dr-qa] FAIL', q.failures);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 
-// ═══════ CALCULATOR ═══════
-// Math engine + percentile computation + state machine + UI wiring.
-(function(){
-  // Bail if calculator surface not present (e.g., hash deep-link to non-calc tab and elements stripped)
-  if(!document.getElementById('drSellPct')) return;
-
-  // ─── PRECOMPUTE PERCENTILE-TO-RATIO MAPPING ───
-  // For each historical day in PL_DATA, compute price/trend ratio. Sort.
-  // Pth percentile threshold = ratio level such that P% of historical
-  // ratios are at-or-below it.
-  var ratios = [];
-  for(var i = 0; i < PL_DATA.length; i++){
-    var d = PL_DATA[i][0], p = PL_DATA[i][1];
-    var trend = plPrice(d);
-    if(trend > 0) ratios.push(p / trend);
-  }
-  ratios.sort(function(a,b){ return a-b; });
-
-  function percentileToRatio(P){
-    if(P <= 0) return ratios[0];
-    if(P >= 100) return ratios[ratios.length-1];
-    var idx = Math.floor(ratios.length * P / 100);
-    return ratios[idx];
-  }
-
-  // ─── ELEMENT REFS ───
-  var elSellPct = document.getElementById('drSellPct');
-  var elSellPctReadout = document.getElementById('drSellPctReadout');
-  var elRebuyPct = document.getElementById('drRebuyPct');
-  var elRebuyPctReadout = document.getElementById('drRebuyPctReadout');
-  var elTaxRate = document.getElementById('drTaxRate');
-  var elTaxRateValue = document.getElementById('drTaxRateValue');
-  var elTaxRow = document.getElementById('drTaxRow');
-
-  // ─── STATE & STICKINESS ───
-  var STORAGE_PREFIX = 'dr:';
-  // Stack is intentionally NOT in this list — sitewide convention §8.2
-  var STICKY = {
-    drSellPct: 'sellPct',
-    drRebuyPct: 'rebuyPct',
-    drTaxRate: 'taxRate'
-  };
-  var STICKY_TOGGLE = {
-    accountType: 'retirement',
-    preset: 'standard'
-  };
-
-  function saveSetting(key, value){
-    try { localStorage.setItem(STORAGE_PREFIX + key, value); } catch(e){}
-  }
-  function loadSetting(key){
-    try { return localStorage.getItem(STORAGE_PREFIX + key); } catch(e){ return null; }
-  }
-  function loadStickyValues(){
-    Object.keys(STICKY).forEach(function(elId){
-      var stored = loadSetting(STICKY[elId]);
-      var el = document.getElementById(elId);
-      if(stored != null && el) el.value = stored;
-    });
-    // Dispatch 'input' on the threshold sliders so the channel viz IIFE
-    // picks up the restored values (its threshold-line and historical-
-    // backtest update path is wired to slider 'input' events, not to a
-    // bare value assignment). Without this, returning visitors with
-    // non-default sliders in localStorage would see channel-viz state
-    // matching the defaults rather than their stored settings.
-    ['drSellPct', 'drRebuyPct', 'drTaxRate'].forEach(function(id){
-      var el = document.getElementById(id);
-      if(el) el.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-    // Toggles
-    var aT = loadSetting('accountType') || 'retirement';
-    var pS = loadSetting('preset') || 'standard';
-    setAccountType(aT, true);
-    // preset is informational only; sliders carry the actual values
-    document.querySelectorAll('.dr-preset-btn').forEach(function(b){
-      b.classList.toggle('active', b.dataset.preset === pS);
-    });
-  }
-
-  // ─── PRESETS ───
-  var PRESETS = {
-    conservative: { sellPct: 70, rebuyPct: 40 },
-    standard:     { sellPct: 80, rebuyPct: 50 },
-    aggressive:   { sellPct: 90, rebuyPct: 20 }
-  };
-  function applyPreset(name){
-    var p = PRESETS[name]; if(!p) return;
-    elSellPct.value = p.sellPct;
-    elRebuyPct.value = p.rebuyPct;
-    // Dispatch 'input' on each slider whose value changed programmatically.
-    // The channel viz IIFE listens directly for slider 'input' events to
-    // refresh threshold lines + the historical backtest, and those listeners
-    // don't fire from a bare value assignment.
-    elSellPct.dispatchEvent(new Event('input', { bubbles: true }));
-    elRebuyPct.dispatchEvent(new Event('input', { bubbles: true }));
-    document.querySelectorAll('.dr-preset-btn').forEach(function(b){
-      b.classList.toggle('active', b.dataset.preset === name);
-    });
-    saveSetting('preset', name);
-    saveSetting('sellPct', p.sellPct);
-    saveSetting('rebuyPct', p.rebuyPct);
-    updateReadouts();
-  }
-
-  // ─── ACCOUNT TYPE TOGGLE ───
-  var accountType = 'retirement';
-
-  function setAccountType(type, silent){
-    accountType = type;
-    document.querySelectorAll('[data-account]').forEach(function(b){
-      b.classList.toggle('active', b.dataset.account === type);
-    });
-    if(elTaxRow) elTaxRow.style.display = (type === 'regular') ? 'flex' : 'none';
-    if(!silent){
-      saveSetting('accountType', type);
-      // Channel viz reads account-type via querySelector('[data-account].active')
-      // each backtest run; fire a synthetic 'input' on the tax-rate slider so
-      // its existing listener re-runs the backtest with the new account-type
-      // (and tax-rate visibility now reflecting the toggle).
-      if(elTaxRate) elTaxRate.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-  }
-  // setGrowthModel removed — growth-model toggle no longer in DOM.
-
-  // Delegated click handler for the .dr-account-badge button rendered inside
-  // .dr-hist-summary. The badge is re-rendered on every backtest update
-  // (innerHTML replacement of #drHistSignals), so we delegate from the
-  // stable parent rather than re-binding each render. Click flips the
-  // account-type via the existing toggle buttons, reusing all existing
-  // listeners (save-setting, tax-row visibility, backtest re-run).
-  var drHistSignalsEl = document.getElementById('drHistSignals');
-  if(drHistSignalsEl){
-    drHistSignalsEl.addEventListener('click', function(e){
-      var badge = e.target.closest('.dr-account-badge');
-      if(!badge) return;
-      var flipTo = badge.dataset.flipTo;
-      if(!flipTo) return;
-      var targetBtn = document.querySelector('[data-account="' + flipTo + '"]');
-      if(targetBtn) targetBtn.click();
-    });
-  }
-
-  // ─── READOUT UPDATES (live) ───
-  function updateReadouts(){
-    var sP = parseInt(elSellPct.value);
-    var rP = parseInt(elRebuyPct.value);
-    var sR = percentileToRatio(sP);
-    var rR = percentileToRatio(rP);
-
-    // Today's threshold prices in absolute USD — concrete anchor for
-    // what the slider value means right now. Trend at today's day
-    // sets the reference; the percentile-derived ratio scales it.
-    var todayD = (Date.now()/1000 - GENESIS_TS) / 86400;
-    var trendNow = plPrice(todayD);
-    var sellThresholdToday = sR * trendNow;
-    var rebuyThresholdToday = rR * trendNow;
-    function fmtThresh(p){
-      if(p >= 1e6) return '$' + (p/1e6).toFixed(2) + 'M';
-      if(p >= 1000) return '$' + Math.round(p/1000) + 'K';
-      return '$' + p.toFixed(0);
-    }
-
-    // Tight inline readout — just the percentile name
-    elSellPctReadout.innerHTML = sP + 'th percentile';
-    elRebuyPctReadout.innerHTML = rP + 'th percentile';
-
-    // Full prose explainer below each slider — same data points the
-    // old inline readout carried, but spelled out for readers who'd
-    // otherwise need to do mental math (per session 2026-05-09 user
-    // feedback). Updates live with slider movement.
-    var sellEx = document.getElementById('drSellPctExplainer');
-    if(sellEx){
-      sellEx.innerHTML = 'Sell trigger fires when bitcoin reaches the <strong>' + sP + 'th percentile</strong> of its Power Law channel position &mdash; about <strong>' + sR.toFixed(2) + '&times; trend</strong>, or roughly <strong>' + fmtThresh(sellThresholdToday) + '</strong> at today&rsquo;s trend value. Bitcoin has historically traded at-or-above this level only <strong>' + (100-sP) + '%</strong> of the time.';
-    }
-    var rebuyEx = document.getElementById('drRebuyPctExplainer');
-    if(rebuyEx){
-      var medianClause = (rP === 50) ? ' &mdash; the historical median' : '';
-      rebuyEx.innerHTML = 'Rebuy trigger fires when bitcoin falls back to the <strong>' + rP + 'th percentile</strong>' + medianClause + ' &mdash; about <strong>' + rR.toFixed(2) + '&times; trend</strong>, or roughly <strong>' + fmtThresh(rebuyThresholdToday) + '</strong> at today&rsquo;s trend value. Bitcoin has historically traded at-or-below this level <strong>' + rP + '%</strong> of the time.';
-    }
-
-    if(elTaxRateValue) elTaxRateValue.textContent = elTaxRate.value + '%';
-  }
-  // updateStatBlock removed — drStatBlock element is gone.
-
-  // ─── EVENT WIRING ───
-  // (No stack input or forward-sim runner anymore — historical-only redesign.
-  // The channel viz IIFE handles the backtest rerun via its own listeners
-  // on the same sliders + account toggle; calc IIFE here just persists
-  // sticky values, updates readouts, and manages preset-active state.)
-
-  Object.keys(STICKY).forEach(function(elId){
-    var el = document.getElementById(elId);
-    if(!el) return;
-    el.addEventListener('input', function(){
-      saveSetting(STICKY[elId], el.value);
-      // Slider changes mean we're off-preset (unless settings happen to match a preset)
-      var matched = null;
-      Object.keys(PRESETS).forEach(function(name){
-        var p = PRESETS[name];
-        if(p.sellPct == elSellPct.value && p.rebuyPct == elRebuyPct.value){
-          matched = name;
-        }
-      });
-      document.querySelectorAll('.dr-preset-btn').forEach(function(b){
-        b.classList.toggle('active', b.dataset.preset === matched);
-      });
-      saveSetting('preset', matched || '');
-      updateReadouts();
-    });
-  });
-
-  document.querySelectorAll('.dr-preset-btn').forEach(function(b){
-    b.addEventListener('click', function(){ applyPreset(b.dataset.preset); });
-  });
-  document.querySelectorAll('[data-account]').forEach(function(b){
-    b.addEventListener('click', function(){ setAccountType(b.dataset.account); });
-  });
-  // Note: [data-growth] buttons no longer in DOM — historical-only redesign.
-
-  // ─── CUSTOMIZE COLLAPSE TOGGLE ───
-  // Default-closed; expanded state persists in localStorage so a
-  // returning customizer stays in customize-on mode. ARIA attributes
-  // (aria-expanded on the button, hidden on the body) are kept in
-  // sync for screen-reader correctness.
-  var customizeToggle = document.getElementById('drCustomizeToggle');
-  var customizeBody = document.getElementById('drCustomizeBody');
-  function setCustomizeOpen(open, persist){
-    if(!customizeToggle || !customizeBody) return;
-    customizeToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if(open){ customizeBody.removeAttribute('hidden'); }
-    else { customizeBody.setAttribute('hidden', ''); }
-    if(persist) saveSetting('customizeOpen', open ? '1' : '0');
-  }
-  if(customizeToggle){
-    customizeToggle.addEventListener('click', function(){
-      var nowOpen = customizeToggle.getAttribute('aria-expanded') !== 'true';
-      setCustomizeOpen(nowOpen, true);
-    });
-  }
-  // Restore stored state at init (default = closed)
-  var storedCustomize = loadSetting('customizeOpen');
-  if(storedCustomize === '1') setCustomizeOpen(true, false);
-
-  // ─── INIT ───
-  loadStickyValues();
-  updateReadouts();
-  // Don't auto-run until user enters a stack value (privacy: no implicit re-runs with default stack)
-})();
-
-
-// ═══════ SCENARIO URL SYNC ═══════
-// URL ⇄ input state for DR's scenario. Same pattern as the Retirement
-// page (see SITE_GUIDE §17.5 + the addendum): a shared link reproduces
-// the sender's slider configuration when opened, and the URL stays in
-// sync as the user drags.
-//
-// DR's params extend the canonical schema with its own slider keys:
-//   sell    sell percentile (integer 60–95)
-//   rebuy   rebuy percentile (integer 5–55)
-//   tax     tax rate (integer 0–40)
-//   account 'retirement' or 'regular'
-// Unknown params (e.g. Retirement's `stack=`, `income=`) are preserved
-// on the URL untouched per the §17.5 forward-compat convention.
-//
-// Self-contained IIFE; no closure access to the calculator IIFE above.
-// Drives state changes by setting input.value + dispatching 'input',
-// which the existing calculator listeners (thresholds, backtest,
-// channel chart) pick up via their established event paths.
-(function(){
-  var URL_MAP = {
-    sell:  { elId: 'drSellPct',  defaultVal: 80 },
-    rebuy: { elId: 'drRebuyPct', defaultVal: 50 },
-    tax:   { elId: 'drTaxRate',  defaultVal: 15 }
-  };
-  var ACCOUNT_DEFAULT = 'retirement';
-
-  // Suppression flag: when applying URL params we dispatch synthetic
-  // 'input' events to refresh dependent UI; we don't want those events
-  // to bounce back into the writer and re-stringify what we just read.
-  var _suppressWriter = false;
-
-  function clampInt(val, min, max) {
-    return Math.max(min, Math.min(max, Math.round(val)));
-  }
-
-  function readUrlIntoInputs() {
-    if (!window.URLSearchParams) return;
-    var params = new URLSearchParams(window.location.search);
-    _suppressWriter = true;
-    try {
-      Object.keys(URL_MAP).forEach(function(p){
-        if (!params.has(p)) return;
-        var raw = params.get(p);
-        var num = parseFloat(raw);
-        if (!isFinite(num)) return;
-        var entry = URL_MAP[p];
-        var el = document.getElementById(entry.elId);
-        if (!el) return;
-        var clamped = clampInt(num, parseFloat(el.min), parseFloat(el.max));
-        el.value = String(clamped);
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-      });
-      if (params.has('account')) {
-        var acct = params.get('account');
-        if (acct === 'retirement' || acct === 'regular') {
-          // Click the matching account button so the calculator IIFE's
-          // existing handler (setAccountType) runs — which updates UI,
-          // saves localStorage, and re-runs the backtest.
-          var btn = document.querySelector('[data-account="' + acct + '"]');
-          if (btn && !btn.classList.contains('active')) btn.click();
-        }
-      }
-    } finally {
-      _suppressWriter = false;
-    }
-  }
-
-  function getActiveAccount() {
-    var active = document.querySelector('[data-account].active');
-    return active ? active.getAttribute('data-account') : ACCOUNT_DEFAULT;
-  }
-
-  // No URL write until the reader touches something. This page previously wrote on
-  // init on purpose ("promotes any non-default localStorage values into the URL") —
-  // which meant a returning reader's stored settings appeared as query params on a
-  // bare visit, and any link they then copied carried settings they never chose.
-  var _suppressUrlWrite = true;
-  function syncUrl() {
-    if (_suppressUrlWrite) return;
-    if (!window.URLSearchParams || !window.history || !window.history.replaceState) return;
-    var params = new URLSearchParams(window.location.search);
-
-    Object.keys(URL_MAP).forEach(function(p){
-      var entry = URL_MAP[p];
-      var el = document.getElementById(entry.elId);
-      if (!el) return;
-      var val = parseInt(el.value, 10);
-      if (!isFinite(val) || val === entry.defaultVal) {
-        params.delete(p);
-      } else {
-        params.set(p, String(val));
-      }
-    });
-
-    var acct = getActiveAccount();
-    if (acct === ACCOUNT_DEFAULT) {
-      params.delete('account');
-    } else {
-      params.set('account', acct);
-    }
-
-    var qs = params.toString();
-    var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
-    window.history.replaceState(null, '', newUrl);
-  }
-
-  var _t = null;
-  function scheduleSyncUrl() {
-    if (_suppressWriter) return;
-    if (_t) clearTimeout(_t);
-    _t = setTimeout(syncUrl, 220);
-  }
-
-  function wireWriters() {
-    Object.keys(URL_MAP).forEach(function(p){
-      var entry = URL_MAP[p];
-      var el = document.getElementById(entry.elId);
-      if (el) el.addEventListener('input', scheduleSyncUrl);
-    });
-    document.querySelectorAll('[data-account]').forEach(function(btn){
-      btn.addEventListener('click', scheduleSyncUrl);
-    });
-    // Presets change sell/rebuy programmatically and dispatch 'input',
-    // so the slider listeners above pick those up. No separate hook.
-  }
-
-  function init() {
-    if (!document.getElementById('drSellPct')) return;
-    readUrlIntoInputs();
-    wireWriters();
-    // One capture-phase gate: the first real interaction unlocks URL writing, and
-    // nothing during load (storage restore, initial render) can slip past it.
-    ['input', 'change', 'click'].forEach(function (ev) {
-      document.addEventListener(ev, function () { _suppressUrlWrite = false; }, { capture: true, once: true });
-    });
-    // No syncUrl() here by design — the address bar stays as the reader found it.
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
 
 
 // ═══════ SHARE THIS SCENARIO ═══════
@@ -2136,7 +1168,9 @@
 (function(){
   var SHARE_TITLE = 'Disciplined rebalancing of bitcoin — within the Power Law channel.';
 
-  function currentUrl() { return window.location.href; }
+  // The scenario link comes from the calculator's own URL writer, so it carries
+  // the rule even before the reader has changed anything.
+  function currentUrl() { return typeof window.drScenarioUrl === 'function' ? window.drScenarioUrl() : window.location.href; }
   function genericPageUrl() {
     return window.location.origin + window.location.pathname + window.location.hash;
   }

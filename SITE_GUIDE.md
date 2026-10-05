@@ -1329,18 +1329,24 @@ The Retirement page is the entry point for two sibling-page strategies — Borro
 
 **Shareable scenario URL on Retirement itself.** Added 2026-05-22. The same schema now also drives the Retirement page's own URL: on init the reader applies any URL params to `SCENARIO` before the first render; on every slider change a debounced (`~220ms`) `history.replaceState` rewrites the address bar to reflect current state. Defaults are omitted from the URL — a clean `/the-bitcoin-retirement.html` represents the default scenario, only the user's deviations show as query params. `withdraw` is intentionally skipped in the *writer* (though still accepted in the reader for forward-compat) because the rate is a derived value that gets reconciled locally from income+stack+baselines; including it would produce URL cruft like `?withdraw=6.7` on a fresh load. Baseline assumptions remain out of scope per the original §17.5 contract — they carry across pages via `localStorage`, not the URL. **Reader precision fix (2026-07):** the reader now rounds each decimal param to its *declared* precision (`stack`=2dp, `withdraw`=1dp) rather than a hardcoded 1dp — the old code silently truncated the 2dp `stack` the writer emits (and would have truncated the carry-in `stack` from the allocation page). This makes the page's own copy-link round-trip lossless and lets the allocation→retirement handoff land the exact figure it displays. The Retirement page is a **receiver** for the allocation page's carry-the-scenario handoff (it lands `stack`; see §37).
 
-**Shareable scenario URL on Disciplined Rebalancing.** Added 2026-05-22. DR adopts the same pattern with its own page-local schema (DR has no `stack`/`income`/etc. surface):
+**Shareable scenario URL on Disciplined Rebalancing.** Added 2026-05-22; **replaced 2026-10-04 by DR v2 Stage A** (spec `DISCIPLINED_REBALANCING_V2_SPEC_2026-10-04` §7, project side). The calculator now runs on multiples of trend, so the schema carries the rule itself:
 
-| Param | Type | Source input | Notes |
-|---|---|---|---|
-| `sell` | integer | `slider-drSellPct` | Sell percentile (60–95, default 80) |
-| `rebuy` | integer | `slider-drRebuyPct` | Rebuy percentile (5–55, default 50) |
-| `tax` | integer | `slider-drTaxRate` | Effective cap-gains rate (0–40, default 15) |
-| `account` | enum | `[data-account].active` | `retirement` (default) or `regular` |
+| Param | Values | Note |
+|---|---|---|
+| `preset` | `conservative` / `balanced` / `adventurous` | written alone for a preset; omitted for Conservative (the default) |
+| `sx` | sell level, ×trend, 1.1–5.0 | Custom only |
+| `st` | `up` / `fade` | Custom only |
+| `sz` | fade sell-below level, ≤ `sx` | Custom only, and only when it differs from `sx` |
+| `f` | share to sell, 5–100 (%) | Custom only |
+| `rx` | buy-back level, ×trend, 0.42–1.5 | Custom only |
+| `cap` | 0 / 12 / 18 / 24 / 36 (months) | Custom only; omitted at 24 |
+| `account` | `retirement` (default, omitted) / `regular` | existing key |
+| `tax` | federal long-term rate, 0 / 15 / 20 | existing key, meaning narrowed; omitted at 15 and in an IRA |
+| `state` | state code from the shared list | omitted at "Not included" and in an IRA |
+| `from` | `spikes` | arrival note + GA4 `dr_arrival`; `rb=ath80` adds the "not available yet" line |
 
-Reader runs on `DOMContentLoaded`, AFTER the calculator IIFE's `loadStickyValues()` (so URL params override localStorage rather than being overwritten by it); writer is debounced ~220ms on slider `input` and account-button `click`. Account button changes go through the existing `setAccountType()` handler (the reader programmatically `.click()`s the matching button rather than re-implementing the toggle's side effects).
+Never written on a bare load (the first interaction in the Calculator tab unlocks the writer), defaults omitted, foreign params preserved, hash re-appended (NEW_PAGE_CHECKLIST §10). "Share this scenario" uses the same writer (`window.drScenarioUrl`), so a shared link carries the rule even before the reader changes anything. **Legacy links still work:** `sell=` / `rebuy=` percentiles map to ×trend on the since-2011 set (the old 80 / 50 lands at about 1.78× / 0.87×, as a 100%, on-the-way-up, no-deadline rule, which is what the old engine ran), and the old 0–40 `tax=` clamps to the nearest of 0 / 15 / 20. The page writes the new keys on the first interaction. URL params (any) override the `dr:` sticky keys; the stack is never saved.
 
-Unknown params are preserved on the URL untouched — `URLSearchParams.set/delete` only touches keys explicitly in DR's schema, leaving everything else as-is. (The Retirement sender used to append `stack`/`income`/etc. to DR links; that was removed in the 2026-07 carry-the-scenario pass, since DR has no matching inputs — see *Sender mechanics* above. The preserve-unknown behavior stays as forward-compat hygiene.)
 
 **Shareable scenario URL on Bitcoin vs. Real Estate.** Added 2026-05-22. BvRE has two calculator modes (retrospective + projection) with disjoint input sets; the URL schema covers both, with the mode itself captured by the existing `#projection` hash convention (handled by `applyHashToMode`):
 
@@ -3523,7 +3529,7 @@ Fifth page of the Power Law family, and the upper-side counterpart to The Bitcoi
 
 **Card B is How Much Cash's own number.** The headline calls `ChannelEntries.bandMetrics(P, 'trend')` at the chosen sell position with HMC's tax rule (IRA 0; taxable rounds to 15 or 20, and the card says so), so a reader following the handoff sees the same figures on arrival. Reference at 2026-09-30: at 2× trend, 27 entries since 2014, 100% left more coins, median 1.96× (rising leg 1.63×, falling 2.04×); at 1.5×, 37 entries, 97%, 1.64×. The per-cycle rows below are labelled an illustration: they rebuy at 1× trend, where HMC's "trend" target is the 0.85× edge of the at-trend zone, and they carry the 2013 April case that HMC's 2014-onward set cannot.
 
-**Handoffs.** Card B → `/how-much-cash?pos&rebuy=trend&share&tax&from=spikes`; HMC shows a one-line arrival note and fires `spikes_arrival`. Card C → `/disciplined-rebalancing?account=retirement|regular` only; the full rule handoff waits on DR parameter support (TECH_DEBT). Card A's secondary link → Spend and Replace. GA4: `spikes_intent` and `spikes_handoff` (intent, position).
+**Handoffs.** Card B → `/how-much-cash?pos&rebuy=trend&share&tax&from=spikes`; HMC shows a one-line arrival note and fires `spikes_arrival`. Card C ("Run your rules" since DR review round 1) → `/disciplined-rebalancing?sx&st=up&f=100&rx=1&account&from=spikes` (+ `rb=ath80` for the 80%-below-the-high buy back), both rules since DR v2 Stage A (§62). Card C's figures are still its own `spike-record.js` calculation, separate from DR's engine: it judges each cycle on its own with fresh coins, where DR runs one continuous record, so the two answer different questions. At card C's default rule they agree on every cycle card C shows. Card A's secondary link → Spend and Replace. GA4: `spikes_intent` and `spikes_handoff` (intent, position).
 
 **Changes from the mockup, all on purpose.** Preview-state chips removed (the prompt's ruling). The 1–1.5× lede now names the cycle whose high sat in that zone (2024–25, at 1.07×); the mockup's "in both of the last two cycles" was false for 2021, whose high was at 2.64×. Every record figure in copy is templated from the module. The back-at-trend fall reads 53–86%, not the design doc's 53–85%: 2011 computes to 85.97%. A "within a month" cell replaces "already there" for 2024–25. The state dropdown reuses the real-estate pair's `stateOptions()` macro (the lending pages carry state codes but no tax rates, so there was no list there to reuse). Card C gained an account toggle so the DR link can carry it. Weimar case file and the power-law history line use the verified wording.
 
@@ -3538,3 +3544,25 @@ Fifth page of the Power Law family, and the upper-side counterpart to The Bitcoi
 - **Fund card** speaks in "fewer coins" against selling when the bill arrives, with that baseline drawn, and a 1.5× option so 2024–25 is not always "no sale". It explains why selling at the trend price is not the comparison.
 - **Charts.** Tab 2's decay bars became cycle ranges from low to spike with the channel's three lines and the falling ceiling; a price-and-channel chart for 2020 on shows a higher price sitting lower against trend. The laws timeline names each law's form (power law or exponential).
 - **Every tab ends with a takeaway box** (`STYLE_GUIDE §6.53`); every handoff names its destination and what it does.
+
+## 62. Disciplined Rebalancing v2, Stage A (`/disciplined-rebalancing.html`)
+
+The page predates this guide's page sections; this records the 2026-10-04 rebuild of its Calculator tab (spec `DISCIPLINED_REBALANCING_V2_SPEC_2026-10-04`, decisions D1–D8, and the approved mockup, both project side). The hero, the tabs, The Question's argument and the Math tab's structure stay.
+
+**What changed.** The percentile calculator (sell 60–95th, rebuy 5–55th, sells 100%, average cost, no deadline) is gone. The Calculator tab is a standing rule in multiples of trend: presets Conservative (25%, as the spike fades below 2×, buy back at 1×), Balanced (50%, fade below 2×, 0.85×) and Adventurous (75%, on the way up through 1.5×, 0.7×), all with a 24-month buy-back deadline, plus Custom through a collapsed "Build your own rule" panel (timing, levels, share, deadline, 0% or 4% cash yield, account, federal 0/15/20 + NIIT + state, FIFO or highest-cost lots, stack). Outputs: a hero with since 2011 and since 2014 side by side (D2), the cycle table with a 2011 / 2014 / 2017 start toggle, the §6.53 failure box generated for the rule, the page's existing channel chart with the rule's levels and ▼ / ▲ / △ markers, a stack-over-time chart, a live preset comparison, and three handoffs.
+
+**One engine.** `shared/rule-engine.js` (`window.RuleEngine`) is the mockup's `run()` on `PL_DATA`: crossing triggers on the ~12-day grid, one open sale at a time, lots taxed short-term (32% + NIIT + state) under a year, cash yield compounded between samples. It also carries the page's one percentile function, on the since-2011 set. `drQA()` pins the §5 fixture to the 2026-09-30 sample (MONTHLY_REFRESH §5.1c).
+
+**Defaults worth knowing.** The state defaults to "Not included", the same as Bitcoin's Spikes' tax hurdle. Washington is relabelled 7% on this page and on Spikes (the shared list's 0% is right for real estate, not for bitcoin; TECH_DEBT). How Much Cash's handoff carries the sell level as `pos`, the buy-back level as `rebuy`, `share` and `tax` (IRA → 0).
+
+**Bitcoin's Spikes card C** now hands its whole rule here (§61). Its own figures stay on `spike-record.js`; at its default rule they match this engine on every cycle it shows. Whether card C moves onto the engine is a Stage B decision (TECH_DEBT).
+
+**Stage B (separate PR, not started):** calendar triggers with a four-cycles warning, extra sell steps, OR buy backs including drawdown from the high, and the forward view ("if the next cycles look like the last ones, but smaller", "if spikes stop", "if bitcoin breaks away"). PAGE_IDEAS_BACKLOG "Applied Disciplined Rebalancing".
+
+**Review round 1 (JM, 2026-10-05).** Engine, preset values and the `drQA()` fixture unchanged.
+- **Wording.** New hero paragraph and preset descriptions (JM's text). "Coins" is out of the reader's vocabulary on this page and on Bitcoin's Spikes: "bitcoin" or "your stack" instead (hero "1.10× HODL", table column "Round trip", "Lost bitcoin"); `STYLE_GUIDE §10.13`. "Rules", plural, where the page means the reader's whole setup (sell rule plus buy-back rule); "the sell rule" or "the buy-back rule" where only one applies. "How this strategy can fail" rewritten plain (`§10.12`) and given the anchor `#dr-fail`; a hash naming an element inside a tab now opens that tab.
+- **Framing.** A short paragraph under the rule heading says every level is a multiple of the power law trend and links the failure section.
+- **Stack in the hero.** Under each figure: "Your 1 BTC became 1.098 BTC: +0.098 BTC, about +$8.4k at today's price", at the live price once it loads, otherwise "at the price as of [last sample date]" (the shared helpers' dated fallback).
+- **Sticky rule bar.** Fixed under the site nav (height measured on every scroll frame) from when the rule card leaves the viewport to the end of the presets block, where it scrolls away with that block. Short rule, setting summary, preset chips, IRA / Taxable, "Edit rules" (opens the build panel and focuses its first control). At 600px and below: the rule and "Edit rules" only. While shown it sets `scroll-padding-top` so focus never lands under it. A "Showing:" line under the cycle heading repeats the same summary.
+- **Charts.** Chart 1 ranges: All history (to today + 1 year), 10 / 5 / 2 years (to today + 6 months), Out to 2035 (two years back); y fitted to the window, markers outside it not drawn, sticky as `dr:range`. Both charts label one tick per year, thinned to fit; Chart 2's bitcoin axis runs on round steps. Chart 2 has a caption on why the line moves while in cash.
+- **Washington** is two options on both pages (DATA_AUDIT DR-WA). The DR OG card still says "percentile" (TECH_DEBT).
