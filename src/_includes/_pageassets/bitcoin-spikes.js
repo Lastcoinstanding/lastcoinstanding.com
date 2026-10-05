@@ -74,7 +74,7 @@
   function stateOf(m) { return m < 1 ? 'calm' : m <= 1.5 ? 'warm' : 'hot'; }
   function ledeFor(m) {
     var st = stateOf(m), ms = m.toFixed(2);
-    if (st === 'calm') return 'Bitcoin is not in a spike. It sits at ' + ms + '× its trend, ' + positionLabelForMultiple(m) + '. This is the time to decide what you would do in one, because the record says you won’t be able to tell when you’re in the middle of it.';
+    if (st === 'calm') return 'Bitcoin is not in a spike. It sits at ' + ms + '× its trend, ' + positionLabelForMultiple(m) + '. This is the time to work out what you would do in one, so you have a reasoned plan before you need it. In the middle of a spike, the record says, you won’t be able to tell how far it has to run.';
     if (st === 'warm') {
       var z = REC.filter(function (r) { return r.highM >= 1 && r.highM <= 1.5; });
       var tail = z.length === 1 ? ' In ' + z[0].y + ' the price high came while price was here, at ' + z[0].highM.toFixed(2) + '× trend, not further up.'
@@ -127,11 +127,26 @@
     $('spFact1').textContent = fallSpan();
     $('spWarnFall').textContent = fallSpan();
     var par = REC.map(function (r) { return r.runupSpike; }).filter(function (v) { return v > SR.PARABOLIC; });
-    $('spFact2').textContent = LATE.map(function (r) { return '+' + Math.round(r.runupHigh) + '%'; }).join(' · ');
-    $('spFact2Txt').textContent = 'The climbs into the ' + words(LATE.length) + ' tops nobody flagged, ' + listAnd(LATE.map(function (r) { return monthYear(r.highD); })) +
-      '. The obvious tops came after +' + Math.round(Math.min.apply(null, par)).toLocaleString('en-US') + '% to +' + Math.round(Math.max.apply(null, par)).toLocaleString('en-US') + '% in 90 days.';
-    $('spFact3').textContent = fmtShort(R13.spikeM) + '× → ' + fmtShort(LATEST.spikeM) + '×';
-    $('spFact3Txt').textContent = 'The largest distance above trend, ' + yearOf(R13.spikeD) + ' against ' + yearOf(LATEST.spikeD) + '. The ' + monthLong(LATEST.highD) + ' high sat at ' + LATEST.highM.toFixed(2) + '× trend.';
+    function pct(v) { return '+' + Math.round(v).toLocaleString('en-US') + '%'; }
+    $('spFact2').textContent = pct(Math.min.apply(null, par)) + ' to ' + pct(Math.max.apply(null, par));
+    $('spFact2Txt').textContent = 'in the 90 days before the tops everyone recognized; ' + listAnd(LATE.map(function (r) { return pct(r.runupHigh); })) + ' before the ' + words(LATE.length) +
+      ' nobody flagged (' + listAnd(LATE.map(function (r) { return monthYear(r.highD); })) + ').';
+    $('spFact3').textContent = fmtShort(REC[0].spikeM) + '× → ' + fmtShort(LATEST.spikeM) + '×';
+    $('spFact3Txt').textContent = 'The spike in each cycle: ' + REC.map(function (r) { return fmtShort(r.spikeM) + '× (' + yearOf(r.spikeD) + ')'; }).join(', ') + '.';
+    // Near the floor (items 2, 23), the 2021 definition (41) and the falling ceiling (12).
+    var nf = REC.filter(function (r) { return r.nearFloor; }).length, of = words(nf) + ' of ' + words(REC.length);
+    $('spActBullet1').textContent = 'Every excursion far above trend since 2011 has come back to the trend, and in ' + of + ' cycles price went on to within about 10% of the floor.';
+    var link = '<a href="/the-power-law">trend</a>';
+    $('spRecLede').innerHTML = 'Every cycle since 2011 has carried bitcoin above its ' + link + ', and every time it came back to trend, and in ' + of + ' cycles fell on to within about 10% of the floor. Here is each one, measured on the same model the rest of this site uses.';
+    var r21 = REC.filter(function (r) { return r.y === '2021'; })[0];
+    if (r21) {
+      $('spDef21S').textContent = monthOnly(r21.spikeD) + ' at ' + fmtShort(r21.spikeM) + '×';
+      $('spDef21H').textContent = monthOnly(r21.highD) + ' at ' + fmtShort(r21.highM) + '×';
+    }
+    var ce = SR.fallingCeiling(), c21 = ce.later[0], cNow = ce.later[ce.later.length - 1];
+    $('spPredictTxt').textContent = 'Few have called a bitcoin top in advance, and fewer still have done it twice. No published forecast I found identified the 2021 or 2025 tops. In hindsight there was a pattern: a falling ceiling drawn through the ' +
+      listAnd(ce.fitted) + ' spikes pointed to about ' + c21.projected.toFixed(1) + '× trend for ' + c21.y + ', close to the ' + fmtShort(c21.actual) + '× reached. The same line, extended, pointed to about ' +
+      cNow.projected.toFixed(1) + '× for this cycle; the actual spike was ' + fmtShort(cNow.actual) + '×.';
     $('spPctAbove').textContent = Math.round(SR.pctAbove()) + '%';
   }
 
@@ -148,25 +163,49 @@
   }
 
   // ═══════════ CARD A · FUND SOMETHING ═══════════
-  var fWhen = 'down';
+  // Sell-timing options: "when:level". The help line says what each one does.
+  var fWhen = 'down:2';
+  var F_HELP = {
+    'up:2': 'Sells early in the run-up.',
+    'down:2': 'Waits for the spike to start fading. No forecast needed.',
+    'down:1.5': 'The same, with a lower bar, so a smaller spike still triggers a sale.',
+    'peak': 'The best case, for comparison. No one knew which day it was.'
+  };
+  // Results are framed as the saving against the realistic default, selling
+  // when the bill arrives: "43% fewer coins", not "57% of the coins".
+  function saving(r) { var s = Math.round((1 - r) * 100); return s >= 0 ? s + '% fewer' : (-s) + '% more'; }
   function updA() {
     var mo = +$('spFMonths').value, amt = +$('spFAmt').value;
+    var parts = fWhen.split(':'), when = parts[0], level = parts[1] ? +parts[1] : 2;
     $('spFMonthsOut').textContent = mo + ' months'; $('spFAmtOut').textContent = money(amt);
-    var res = SR.fundResults(fWhen, mo);
-    var items = res.map(function (o) {
-      if (o.never) return { y: o.c.y, v: 1, t: 'no sale', n: 'Price never reached 2× trend. You would have sold when the bill arrived.', c: 'var(--text-muted)' };
-      if (o.pending) return { y: o.c.y, v: 0, t: 'not yet', n: 'Sold ' + monthYear(o.s.d) + '; the need date is still ahead.', c: 'var(--border)' };
+    $('spFWhenHelp').textContent = F_HELP[fWhen] || '';
+    var res = SR.fundResults(when, mo, null, level);
+    var items = [{ y: 'When due', v: 1, t: 'baseline', n: 'Selling when the bill arrived: the coins each cycle is compared with.', c: 'var(--text-muted)' }];
+    res.forEach(function (o) {
+      if (o.never) { items.push({ y: o.c.y, v: 1, t: 'no sale', n: 'Price never reached ' + level + '× trend, so you sell when the bill arrives.', c: 'var(--text-muted)' }); return; }
+      if (o.pending) { items.push({ y: o.c.y, v: 0, t: 'not yet', n: 'Sold ' + monthYear(o.s.d) + '; the need date is still ahead.', c: 'var(--border)' }); return; }
       var cs = amt / o.s.p, cl = amt / o.q;
-      return { y: o.c.y, v: o.r, t: Math.round(o.r * 100) + '%', n: 'Sold ' + monthYear(o.s.d) + ': ' + cs.toFixed(cs < 1 ? 3 : 1) + ' BTC, against ' + cl.toFixed(cl < 1 ? 3 : 1) + ' BTC ' + mo + ' months later', c: o.r < 1 ? 'var(--green)' : 'var(--amber)' };
+      items.push({ y: o.c.y, v: o.r, t: saving(o.r), n: (o.r > 1 ? 'Cost coins. ' : '') + 'Sold ' + monthYear(o.s.d) + ': ' + cs.toFixed(cs < 1 ? 3 : 1) + ' BTC, against ' + cl.toFixed(cl < 1 ? 3 : 1) + ' BTC when the bill arrived ' + mo + ' months later', c: o.r < 1 ? 'var(--green)' : 'var(--red)' });
     });
     var done = res.filter(function (o) { return o.r != null; }).map(function (o) { return o.r; });
     var peak = SR.fundResults('peak', mo).filter(function (o) { return o.r != null; }).map(function (o) { return o.r; });
-    function rng(a) { return a.length ? Math.round(Math.min.apply(null, a) * 100) + '–' + Math.round(Math.max.apply(null, a) * 100) + '%' : 'n/a'; }
-    var what = fWhen === 'peak' ? 'at each spike’s peak' : fWhen === 'up' ? 'as price rose through 2× trend' : 'as price fell back below 2× trend';
-    var h = 'Selling ' + what + ' for a bill due ' + mo + ' months later used <strong>' + rng(done) + '</strong> of the coins, and fewer coins in <strong>' +
-      done.filter(function (v) { return v < 1; }).length + ' of ' + done.length + '</strong> cycles where a sale happened.';
-    if (fWhen !== 'peak') h += ' Waiting for the peak, with perfect hindsight, would have used ' + rng(peak) + '.';
+    function sav(a) { var s = a.map(function (r) { return Math.round((1 - r) * 100); }); return { lo: Math.min.apply(null, s), hi: Math.max.apply(null, s) }; }
+    var what = when === 'peak' ? 'at each spike’s peak' : when === 'up' ? 'as price rose through ' + level + '× trend' : 'once price turned down, back below ' + level + '× trend,';
+    var h;
+    if (!done.length) h = 'Selling ' + what + ' for a bill due ' + mo + ' months later has no completed case yet.';
+    else {
+      var s = sav(done), worse = done.filter(function (r) { return r > 1; }).length;
+      h = 'Selling ' + what + ' for a bill due ' + mo + ' months later used ' +
+        (worse ? '<strong>up to ' + s.hi + '% fewer coins</strong> than selling when the bill arrived, and <strong>more in ' + worse + ' of ' + done.length + '</strong> cycles where a sale happened.'
+          : (s.lo === s.hi ? '<strong>' + s.hi + '% fewer coins</strong>' : '<strong>' + s.lo + '–' + s.hi + '% fewer coins</strong>') + ' than selling when the bill arrived, in ' + words(done.length) + ' cycle' + (done.length === 1 ? '' : 's') + ' where a sale happened.');
+      if (when !== 'peak' && peak.length) { var p = sav(peak); h += ' Selling at the peak, with perfect hindsight, would have used ' + p.lo + '–' + p.hi + '% fewer.'; }
+    }
     $('spFHead').innerHTML = h; $('spFRows').innerHTML = rowsHTML(items, 1.4);
+    $('spFCaveat').textContent = 'Bars show the coins each sale used against the coins selling when the bill arrived would have taken (the grey baseline). ' +
+      (when === 'peak' ? '' : 'If price never reaches ' + level + '×, you sell when the bill arrives. ') +
+      'Selling on the way up came too early in every cycle, because the run-up kept going. Selling as the spike faded needed no forecast and still used fewer coins for bills up to a year out. Past two years, the next cycle tends to undo it. ' +
+      'Why not compare with selling at the trend price? On the day of a spike sale, price is far above trend by definition; nobody could sell at trend that day. Selling when the money is needed is the realistic alternative. ' +
+      'The cash sits idle until you need it, and price can keep rising after you sell. Tax applies either way if you’d have sold anyway.';
   }
 
   // ═══════════ CARD B · END UP WITH MORE BITCOIN ═══════════
@@ -201,7 +240,7 @@
       $('spBHead').innerHTML = 'Selling at ' + bTrig + '× trend and buying back once price fell below trend left more bitcoin <strong>' + Math.round(c.hitAfterTax) +
         '%</strong> of the time, across the ' + c.n + ' times since ' + yearOf(c.since) + ' that price stood near ' + bTrig + '×. The typical round trip returned <strong>' +
         c.medianRT.toFixed(2) + '×</strong> the coins sold' + (c.tax ? ', after ' + c.tax + '% tax' : ', in an IRA') + '. A ' + Math.round(sh * 100) + '% trim at that typical outcome ends with ' +
-        (chg === 0 ? 'about the same bitcoin as holding.' : Math.abs(chg) + '% ' + (chg > 0 ? 'more' : 'less') + ' bitcoin than holding.');
+        (chg === 0 ? 'about the same bitcoin as HODLing.' : Math.abs(chg) + '% ' + (chg > 0 ? 'more' : 'less') + ' bitcoin than HODLing.');
       $('spBLegs').textContent = (c.rising != null && c.falling != null)
         ? 'The same entries split by direction: sold while price was still rising through ' + bTrig + '×, the median round trip returned ' + c.rising.toFixed(2) + '×; sold as it fell back, ' + c.falling.toFixed(2) + '×. ' + CE.legSentence(c.m, 'the round trip paid')
         : '';
@@ -213,10 +252,11 @@
     var keep = bAcct === 'tax' ? 1 - rate / 100 : 1, items = [];
     SR.TRADE_CYCLES.forEach(function (cy) {
       var r = SR.roundTrip(cy, bTrig, 'trend');
-      if (!r.fired) { items.push({ y: cy.y, v: 1, t: 'held', n: 'Never reached ' + bTrig + '× trend. No sale; you simply held.', c: 'var(--text-muted)' }); return; }
+      if (!r.fired) { items.push({ y: cy.y, v: 1, t: 'held', n: 'Never reached ' + bTrig + '× trend. No sale; you kept HODLing.', c: 'var(--text-muted)' }); return; }
       if (!r.rb) { items.push({ y: cy.y, v: 1, t: 'open', n: 'Sold ' + monthYear(r.sell.d) + '; no return to trend yet.', c: 'var(--text-muted)' }); return; }
       var stack = 1 - sh + sh * keep * r.ratio;
-      items.push({ y: cy.y, v: stack, t: (stack >= 1 ? '+' : '') + Math.round((stack - 1) * 100) + '%', n: 'Sold ' + monthYear(r.sell.d) + ' at ' + money(r.sell.p) + ', bought back ' + monthYear(r.rb.d) + ' at ' + money(r.rb.p) });
+      var lost = stack < 1;
+      items.push({ y: cy.y, v: stack, t: (stack >= 1 ? '+' : '') + Math.round((stack - 1) * 100) + '%', n: (lost ? 'Lost coins. ' : '') + 'Sold ' + monthYear(r.sell.d) + ' at ' + money(r.sell.p) + ', bought back ' + monthYear(r.rb.d) + ' at ' + money(r.rb.p), c: lost ? 'var(--red)' : 'var(--green)' });
     });
     $('spBRowsH').textContent = 'Illustration: the first time price reached ' + bTrig + '× in each cycle' + (bAcct === 'tax' ? ', at ' + (rate % 1 ? rate.toFixed(1) : rate) + '% tax' : ', in an IRA');
     $('spBRows').innerHTML = rowsHTML(items, 2);
@@ -228,17 +268,47 @@
     if (c) $('spBCta').setAttribute('href', '/how-much-cash?pos=' + c.P.toFixed(3) + '&rebuy=trend&share=' + Math.round(sh * 100) + '&tax=' + c.tax + '&from=spikes');
   }
 
+  // Item 18: the cases where trimming cost coins, listed in red. Each is
+  // computed: from spike-record.js, or (the rising-leg case) from How Much
+  // Cash's own set via ChannelEntries, so the figure matches that page.
+  var TOP_RATE = 23.8;
+  function renderFailures() {
+    var L = [], c13 = SR.TRADE_CYCLES[0];
+    var a = SR.roundTrip(c13, 1.5, 'trend'), b = SR.roundTrip(c13, 2, 'trend');
+    if (a.rb && b.rb) L.push('<strong>2013, at either level.</strong> Sold in ' + monthYear(a.sell.d) + ' (1.5×) or ' + monthYear(b.sell.d) + ' (2×) and bought back at trend in ' + monthYear(b.rb.d) +
+      ': ' + a.ratio.toFixed(2) + '× and ' + b.ratio.toFixed(2) + '× the coins sold. The first spike of the cycle was not the last.');
+    var tx = SR.TRADE_CYCLES.slice(1, 3).map(function (cy) { var r = SR.roundTrip(cy, 1.5, 'trend'); return r.rb ? { y: cy.y, v: r.ratio * (1 - TOP_RATE / 100) } : null; }).filter(function (x) { return x && x.v < 1; });
+    if (tx.length) L.push('<strong>Taxable, at 1.5×.</strong> At the top ' + TOP_RATE + '% rate, ' + listAnd(tx.map(function (x) { return x.y + ' returned ' + x.v.toFixed(2) + '×'; })) + ' the coins sold: the fall did not clear the tax.');
+    var c17 = SR.TRADE_CYCLES[1], h50 = SR.roundTrip(c17, 2, 'ath50');
+    if (h50.rb && h50.ratio < 1) L.push('<strong>Rebuy at 50% below the price high, 2017.</strong> Sold at 2× in ' + monthYear(h50.sell.d) + ' at ' + money(h50.sell.p) + '; the rebuy came in ' + monthYear(h50.rb.d) + ' at ' + money(h50.rb.p) + ': ' + h50.ratio.toFixed(2) + '× the coins.');
+    var P15 = sellPos(1.5), m15 = CE.bandMetrics(Math.max(0, P15), 'trend');
+    if (m15) {
+      var worst = m15.metrics.filter(function (e) { return e.leg === 'rising'; }).sort(function (x, y) { return x.ratio - y.ratio; })[0];
+      if (worst && worst.ratio < 1) L.push('<strong>Selling while price was still rising.</strong> In How Much Cash&rsquo;s set at 1.5× trend, the worst rising-leg entry sold in ' + monthYear(worst.d0) + ' and bought back in ' + monthYear(worst.waitDay) + ': ' + worst.ratio.toFixed(2) + '× the coins.');
+    }
+    var n80 = SR.roundTrip(c17, 2, 'ath80');
+    if (n80.fired && !n80.rb) L.push('<strong>A rebuy that never comes.</strong> Sold at 2× in ' + monthYear(n80.sell.d) + ' at ' + money(n80.sell.p) + ', waiting for an 80% fall that never came. Bought back today, that cash gets ' + (n80.sell.p / spot).toFixed(2) + '× the coins sold.');
+    if (LATEST.spikeM < 1.5) L.push('<strong>A spike that ends early.</strong> In ' + LATEST.y + ' the spike peaked at ' + fmtShort(LATEST.spikeM) + '× trend, so a plan waiting for 1.5× or 2× never sold. As spikes shrink, a fixed level can simply never be reached.');
+    $('spBFail').innerHTML = '<div class="sp-fail-h">Where trimming has cost coins, or never happened</div><ul>' + L.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
+  }
+
   // ═══════════ CARD C · RUN A RULE ═══════════
   var cTrig = 1.5, cRebuy = 'trend', cAcct = 'retirement';
   function updC() {
     var items = [];
     SR.TRADE_CYCLES.forEach(function (cy) {
       var r = SR.roundTrip(cy, cTrig, cRebuy);
-      if (!r.fired) { items.push({ y: cy.y, v: 1, t: 'never fired', n: 'Held through the cycle.', c: 'var(--text-muted)' }); return; }
+      if (!r.fired) { items.push({ y: cy.y, v: 1, t: 'never fired', n: 'HODLed through the cycle.', c: 'var(--text-muted)' }); return; }
       if (!r.rb) { items.push({ y: cy.y, v: 0.05, t: 'no rebuy', n: 'Sold ' + monthYear(r.sell.d) + ' at ' + money(r.sell.p) + '; the rebuy never triggered. Still in cash.', c: 'var(--red)' }); return; }
-      items.push({ y: cy.y, v: r.ratio, t: r.ratio.toFixed(2) + '×', n: 'Sold ' + monthYear(r.sell.d) + ', bought back ' + monthYear(r.rb.d) + ' (whole position, IRA)' });
+      var lost = r.ratio < 1;
+      items.push({ y: cy.y, v: r.ratio, t: r.ratio.toFixed(2) + '×', n: (lost ? 'Lost coins. ' : '') + 'Sold ' + monthYear(r.sell.d) + ', bought back ' + monthYear(r.rb.d) + ' (whole position, IRA)', c: lost ? 'var(--red)' : 'var(--green)' });
     });
     $('spCRows').innerHTML = rowsHTML(items, 2);
+    // Item 20: the trade-off tip, computed. "Just above trend" = JUST_ABOVE× trend.
+    var JUST_ABOVE = 1.05, j = SR.roundTrip(SR.TRADE_CYCLES[SR.TRADE_CYCLES.length - 1], JUST_ABOVE, 'trend');
+    $('spCTip').textContent = 'In past cycles a 2× rule waited longer and caught more; 1.5× was the cautious choice. This cycle peaked at ' + fmtShort(LATEST.spikeM) + '×, so neither fired. ' +
+      (j.fired && j.rb ? 'A rule set just above trend, at ' + JUST_ABOVE + '×, would have sold in ' + monthYear(j.sell.d) + ' near ' + money(Math.round(j.sell.p / 1000) * 1000) + ' and bought back in ' + monthYear(j.rb.d) + ' near ' + money(Math.round(j.rb.p / 1000) * 1000) + '. ' : '') +
+      'That is hindsight: shrinking spikes mean any fixed level may be too high next time, or too low.';
     var t13 = SR.roundTrip(SR.TRADE_CYCLES[0], cTrig, 'trend');
     $('spCNote').textContent = cRebuy === 'ath80'
       ? 'A rebuy waiting for an 80% fall has not triggered since 2013, so the sale stayed in cash. Fixed drawdown targets fail as cycles shrink.'
@@ -268,15 +338,6 @@
     for (var k in WORK) $(WORK[k]).hidden = k !== btn.id;
     intent = btn.getAttribute('data-intent');
     if (user) track('spikes_intent', { intent: intent, position: +multNow().toFixed(2) });
-  }
-  function wireTip() {
-    var tip = document.querySelector('.sp-tip');
-    if (!tip) return;
-    function set(v) { tip.setAttribute('aria-expanded', String(v)); }
-    tip.addEventListener('click', function (e) { e.stopPropagation(); set(tip.getAttribute('aria-expanded') !== 'true'); });
-    tip.addEventListener('keydown', function (e) { if (e.key === 'Escape') { set(false); } });
-    document.addEventListener('click', function (e) { if (!e.target.closest('.sp-pair-h')) set(false); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
   }
 
   // ═══════════ TABS (bare-token hash deep links) ═══════════
@@ -308,23 +369,54 @@
 
   // ═══════════ TAB 2 · THE RECORD ═══════════
   function lastAtBand() { var S = SR.series(); for (var i = S.length - 1; i >= 0; i--) if (S[i].m >= PL_CEIL) return S[i]; return null; }
-  function drawDecay() {
-    var W = 640, H = 280, L = 46, R = 16, T = 16, Bm = 34, Y = logS(0.5, 20, H - Bm, T), n = REC.length, bw = (W - L - R) / n, h = '';
-    [0.5, 1, 2, 3, 5, 10, 20].forEach(function (v) { h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="' + (v === 1 ? C.amber : v === 3 ? C.gold : C.grid) + '"' + (v === 3 ? ' stroke-dasharray="4 4"' : '') + '/>' + txt(L - 6, Y(v) + 3, v + '×', { a: 'end' }); });
-    h += txt(L + 4, Y(1) - 4, 'trend', { a: 'start', c: C.amber }) + txt(L + 4, Y(3) - 4, '3× upper band', { a: 'start', c: C.gold });
-    REC.forEach(function (r, i) {
-      var x = L + i * bw + bw * .22, w = bw * .56, top = Y(r.spikeM);
-      h += '<rect x="' + x + '" y="' + top + '" width="' + w + '" height="' + (Y(0.5) - top) + '" fill="' + C.orange + '" opacity=".85" rx="2"/>' + txt(x + w / 2, top - 6, fmtM(r.spikeM) + '×', { c: C.bright, s: 11, w: 600 });
-      if (!r.sameSample) {
-        var lastBar = i === REC.length - 1;
-        h += '<circle cx="' + (x + w / 2) + '" cy="' + Y(r.highM) + '" r="5" fill="' + C.bg + '" stroke="' + C.bright + '" stroke-width="1.5"/>' +
-          txt(lastBar ? x - 6 : x + w + 4, Y(r.highM) + (lastBar ? 16 : 3), 'high ' + r.highM.toFixed(2) + '×', { a: lastBar ? 'end' : 'start', c: C.text });
-      }
-      h += txt(x + w / 2, H - 14, r.y, { c: C.dim, s: 11 });
+  // Item 26: each cycle as a range against trend, from its lowest point after
+  // the price high up to its spike, with the channel's three lines labelled and
+  // the falling ceiling (item 12) fitted through the first three spikes.
+  function refLines(h, Y, L, R, W, labelAt) {
+    [[PL_CEIL, PL_CEIL + '× upper band', C.gold, '4 4'], [1, '1× trend', C.amber, '0'], [PL_FLOOR, PL_FLOOR + '× floor', C.floor, '4 4']].forEach(function (a) {
+      h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(a[0]) + '" y2="' + Y(a[0]) + '" stroke="' + a[2] + '" stroke-dasharray="' + a[3] + '" opacity=".8"/>' + txt(labelAt, Y(a[0]) - 4, a[1], { a: 'end', c: a[2] });
     });
+    return h;
+  }
+  function drawDecay() {
+    var W = 640, H = 320, L = 46, R = 16, T = 18, Bm = 30, Y = logS(0.3, 20, H - Bm, T), n = REC.length, bw = (W - L - R) / n, h = '';
+    [0.3, 0.5, 1, 2, 5, 10, 20].forEach(function (v) { h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="' + C.grid + '"/>' + txt(L - 6, Y(v) + 3, v + '×', { a: 'end' }); });
+    h = refLines(h, Y, L, R, W, W - R - 2);
+    var ce = SR.fallingCeiling(), cx = [];
+    REC.forEach(function (r, i) {
+      var xc = L + i * bw + bw * .42, w = bw * .3, x = xc - w / 2, top = Y(r.spikeM), bot = Y(r.lowM ? r.lowM.m : PL_FLOOR);
+      h += '<rect x="' + x + '" y="' + top + '" width="' + w + '" height="' + (bot - top) + '" fill="' + C.orange + '" opacity=".8" rx="2"/>' +
+        txt(xc, top - 6, fmtM(r.spikeM) + '×', { c: C.bright, s: 11, w: 600 }) +
+        (r.lowM ? txt(xc, bot + 13, 'low ' + r.lowM.m.toFixed(2) + '×', { c: C.dim }) : '');
+      if (!r.sameSample) h += '<circle cx="' + xc + '" cy="' + Y(r.highM) + '" r="5" fill="' + C.bg + '" stroke="' + C.bright + '" stroke-width="1.5"/>' + txt(xc + 9, Y(r.highM) + 4, 'price high ' + r.highM.toFixed(2) + '×', { a: 'start', c: C.text });
+      h += txt(xc, H - 8, r.y, { c: C.dim, s: 11 });
+      cx.push([xc, Y(ce.at(r.spikeD))]);
+    });
+    h += '<path d="' + cx.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('') + '" fill="none" stroke="' + C.bright + '" stroke-width="1.2" stroke-dasharray="2 4" opacity=".7"/>';
+    ce.later.forEach(function (p) { var i = REC.map(function (r) { return r.y; }).indexOf(p.y); if (i >= 0) h += '<circle cx="' + cx[i][0] + '" cy="' + cx[i][1] + '" r="3" fill="none" stroke="' + C.bright + '"/>' + txt(cx[i][0] - 8, cx[i][1] - 6, 'ceiling ' + p.projected.toFixed(1) + '×', { a: 'end', c: C.dim }); });
     $('spDecayChart').innerHTML = h;
-    var lb = lastAtBand();
-    $('spDecayCap').textContent = lb ? 'The ' + PL_CEIL + '× upper band hasn’t been reached since ' + monthLong(lb.d) + '.' : '';
+    var lb = lastAtBand(), nf = REC.filter(function (r) { return r.nearFloor; }).length;
+    $('spDecayCap').textContent = 'Each bar runs from a cycle’s spike down to its lowest point against trend after the price high (log scale). The bottom of the chart is the floor, which rises with the trend; it is not zero. Price has gone back to within about 10% of it in ' +
+      words(nf) + ' of ' + words(REC.length) + ' cycles, but nothing guarantees it will again. Hollow markers: the price high, where it came after the spike. Dotted: a falling ceiling fitted through the ' + listAnd(ce.fitted) + ' spikes.' +
+      (lb ? ' The ' + PL_CEIL + '× upper band hasn’t been reached since ' + monthLong(lb.d) + '.' : '');
+  }
+  // Item 27: price and the channel, 2020 to today, with both spikes and both price highs marked.
+  function drawPriceChart() {
+    var W = 640, H = 300, L = 58, R = 16, T = 14, Bm = 28, d0 = SR.dayOfIso('2020-01-01'), d1 = TODAY_DAYS + 20;
+    var X = function (d) { return L + (d - d0) / (d1 - d0) * (W - L - R); }, Y = logS(3000, 800000, H - Bm, T), h = '';
+    [3000, 10000, 30000, 100000, 300000].forEach(function (v) { h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="' + C.grid + '"/>' + txt(L - 6, Y(v) + 3, '$' + (v >= 1000 ? v / 1000 + 'k' : v), { a: 'end' }); });
+    for (var y = 2020; y <= yearOf(d1); y++) { var xd = X(SR.dayOfIso(y + '-01-01')); h += txt(xd, H - 8, y); }
+    [[PL_CEIL, PL_CEIL + '× upper band', C.gold, '4 4'], [1, 'trend', C.amber, '0'], [PL_FLOOR, PL_FLOOR + '× floor', C.floor, '4 4']].forEach(function (a) {
+      var pts = []; for (var d = d0; d <= d1; d += 15) pts.push(X(d).toFixed(1) + ' ' + Y(a[0] * plPrice(d)).toFixed(1));
+      h += '<path d="M' + pts.join('L') + '" fill="none" stroke="' + a[2] + '" stroke-dasharray="' + a[3] + '" stroke-width="1.2" opacity=".85"/>' + txt(X(d1) - 4, Y(a[0] * plPrice(d1)) - 5, a[1], { a: 'end', c: a[2] });
+    });
+    var S = SR.series().filter(function (s) { return s.d >= d0; });
+    h += '<path d="' + S.map(function (s, i) { return (i ? 'L' : 'M') + X(s.d).toFixed(1) + ' ' + Y(s.p).toFixed(1); }).join('') + '" fill="none" stroke="' + C.text + '" stroke-width="1.4"/>';
+    REC.filter(function (r) { return r.spikeD >= d0; }).forEach(function (r) {
+      h += '<circle cx="' + X(r.spikeD) + '" cy="' + Y(r.spikeP) + '" r="5" fill="' + C.orange + '"/>' + txt(X(r.spikeD) - 7, Y(r.spikeP) - 8, 'spike ' + fmtShort(r.spikeM) + '× · ' + monthYear(r.spikeD), { a: 'end', c: C.orange });
+      if (!r.sameSample) h += '<circle cx="' + X(r.highD) + '" cy="' + Y(r.highP) + '" r="5" fill="' + C.bg + '" stroke="' + C.bright + '" stroke-width="1.5"/>' + txt(X(r.highD) + 4, Y(r.highP) - 10, 'price high ' + fmtShort(r.highM) + '× · ' + monthYear(r.highD), { a: 'middle', c: C.bright });
+    });
+    $('spPriceChart').innerHTML = h;
   }
   function drawGap() {
     var W = 640, H = 220, L = 70, R = 20, T = 14, Bm = 30, rows = REC.filter(function (r) { return r.y !== '2011'; });
@@ -348,11 +440,20 @@
   }
   function drawTable() {
     function mo(v) { return v == null ? '—' : Math.round(v / MONTH_D) + ' mo'; }
-    var h = '<thead><tr><th scope="col">Cycle</th><th scope="col">Spike</th><th scope="col">× trend</th><th scope="col">Price high</th><th scope="col">× trend at high</th><th scope="col">Above 1.5×</th><th scope="col">Above 2×</th><th scope="col">90-day run-up</th><th scope="col">Back at trend</th><th scope="col">Cycle low</th><th scope="col">Peak buyer even</th></tr></thead><tbody>';
+    function th(label, tip) { return '<th scope="col">' + label + (tip ? '<span class="help-tip sp-tip-down" tabindex="0">?<span class="tip-content">' + tip + '</span></span>' : '') + '</th>'; }
+    var h = '<thead><tr>' + th('Cycle') + th('Spike', 'When price stood furthest above trend in the cycle.') + th('× trend') + th('Price high', 'The highest price in the cycle, and when.') + th('× trend at high') +
+      th('Above 1.5×', 'The unbroken run at or above 1.5× trend around the spike.') + th('Above 2×') +
+      th('90-day run-up', 'Price change over the 90 days before the price high.') +
+      th('Back at trend', 'The first close below trend after the price high: how many months later, and how far price had fallen from the high.') +
+      th('Lowest price', 'The lowest price after the price high, within the cycle, as a fall from the high.') +
+      th('Cycle low × trend', 'The lowest point against trend after the price high, within the cycle. The floor is 0.42×.') +
+      th('Near the floor', 'The first close within about 10% of the 0.42× floor after the price high: months later, or “no” if it never came in that cycle.') +
+      th('Peak buyer even', 'Years until price first closed back at or above the price high.') + '</tr></thead><tbody>';
     REC.forEach(function (r) {
       var bt = r.backTrend ? (Math.round(r.backTrend.mo) ? Math.round(r.backTrend.mo) + ' mo, −' + Math.round(r.backTrend.fall) + '%' : 'within a month, −' + Math.round(r.backTrend.fall) + '%') : 'not yet';
       h += '<tr><td>' + r.y + '</td><td>' + monthYear(r.spikeD) + '</td><td>' + fmtM(r.spikeM) + '×</td><td>' + monthYear(r.highD) + ' · ' + money(r.highP) + '</td><td>' + fmtM(r.highM) + '×</td><td>' + mo(r.d15) + '</td><td>' + mo(r.d2) + '</td><td>+' +
-        Math.round(r.runupHigh).toLocaleString('en-US') + '%</td><td>' + bt + '</td><td>' + (r.low ? '−' + Math.round(r.low.fall) + '%' : '—') + '</td><td>' + (r.be ? r.be.yrs.toFixed(1) + ' yrs' : 'not yet') + '</td></tr>';
+        Math.round(r.runupHigh).toLocaleString('en-US') + '%</td><td>' + bt + '</td><td>' + (r.low ? '−' + Math.round(r.low.fall) + '%' : '—') + '</td><td>' +
+        (r.lowM ? r.lowM.m.toFixed(2) + '× · ' + yearOf(r.lowM.d) : '—') + '</td><td>' + (r.nearFloor ? Math.round(r.nearFloor.mo) + ' mo after' : 'no') + '</td><td>' + (r.be ? r.be.yrs.toFixed(1) + ' yrs' : 'not yet') + '</td></tr>';
     });
     $('spRecTable').innerHTML = h + '</tbody>';
   }
@@ -409,40 +510,54 @@
   }
 
   // ═══════════ TAB 3 · WHEN LAWS BREAK ═══════════
+  // Items 36–37: each row says what the law states and what kind it is; the
+  // population row carries its own end date.
   function drawLaws() {
-    var W = 640, H = 250, L = 150, R = 16, T = 10, Bm = 26, X = function (v) { return L + (v - 1900) / (2030 - 1900) * (W - L - R); };
-    var D = [['Wright’s law (costs)', 1936, 2026, null, 'holding'], ['Moore’s law (chips)', 1965, 2010, 2026, 'bent'], ['Population (von Foerster)', 1900, 1962, 2026, 'broke'], ['Bitcoin power law', 2010, 2026, null, 'holding']];
+    var W = 640, H = 300, L = 190, R = 16, T = 14, Bm = 26, X = function (v) { return L + (v - 1900) / (2030 - 1900) * (W - L - R); };
+    var D = [
+      ['Wright’s law (costs)', 'costs fall a fixed share per doubling of output', 'power law', 1936, 2026, null, 'holding'],
+      ['Moore’s law (chips)', 'transistors double every ~2 years', 'exponential', 1965, 2010, 2026, 'bent'],
+      ['Population (von Foerster)', 'grows toward a fixed end date', 'power law', 1900, 1962, 2026, 'broke'],
+      ['Bitcoin power law', 'price rises with time to a fixed power', 'power law', 2010, 2026, null, 'holding']
+    ];
     var rh = (H - T - Bm) / D.length, h = '';
     for (var y = 1900; y <= 2030; y += 20) h += '<line x1="' + X(y) + '" x2="' + X(y) + '" y1="' + T + '" y2="' + (H - Bm) + '" stroke="' + C.grid + '"/>' + txt(X(y), H - 8, y);
-    var dd = X(2026.87); h += '<line x1="' + dd + '" x2="' + dd + '" y1="' + T + '" y2="' + (H - Bm) + '" stroke="' + C.floor + '" stroke-dasharray="3 3"/>';
     D.forEach(function (a, i) {
-      var yy = T + i * rh + rh * .3, hh = rh * .4, hold = a[4] === 'holding';
-      h += txt(L - 10, yy + hh / 2 + 4, a[0], { a: 'end', c: C.text, s: 11 }) + '<rect x="' + X(a[1]) + '" y="' + yy + '" width="' + (X(a[2]) - X(a[1])) + '" height="' + hh + '" fill="' + (hold ? C.green : C.orange) + '" rx="2"/>';
-      if (a[3]) h += '<rect x="' + X(a[2]) + '" y="' + yy + '" width="' + (X(a[3]) - X(a[2])) + '" height="' + hh + '" fill="' + C.muted + '" opacity=".35" rx="2"/>';
-      h += txt(X(a[2]) + (hold ? -4 : 4), yy - 3, a[4], { a: hold ? 'end' : 'start', c: hold ? C.green : C.amber });
+      var yy = T + i * rh + rh * .32, hh = rh * .3, hold = a[6] === 'holding';
+      h += txt(L - 10, yy + 2, a[0], { a: 'end', c: C.text, s: 11 }) + txt(L - 10, yy + 15, a[1], { a: 'end', c: C.dim, s: 9 }) + txt(L - 10, yy + 27, a[2], { a: 'end', c: C.muted, s: 9 }) +
+        '<rect x="' + X(a[3]) + '" y="' + yy + '" width="' + (X(a[4]) - X(a[3])) + '" height="' + hh + '" fill="' + (hold ? C.green : C.orange) + '" rx="2"/>';
+      if (a[5]) h += '<rect x="' + X(a[4]) + '" y="' + yy + '" width="' + (X(a[5]) - X(a[4])) + '" height="' + hh + '" fill="' + C.muted + '" opacity=".35" rx="2"/>';
+      h += txt(X(a[4]) + (hold ? -4 : 4), yy - 4, a[6], { a: hold ? 'end' : 'start', c: hold ? C.green : C.amber });
+      if (i === 2) { var dd = X(2026.87); h += '<line x1="' + dd + '" x2="' + dd + '" y1="' + (yy - 6) + '" y2="' + (yy + hh + 6) + '" stroke="' + C.hot + '" stroke-width="1.5"/>' + txt(dd - 4, yy + hh + 14, 'the curve’s end date: 13 Nov 2026', { a: 'end', c: C.hot, s: 9 }); }
     });
-    h += txt(dd - 4, H - Bm - 6, '13 Nov 2026: von Foerster’s doomsday date', { a: 'end', c: C.hot });
     $('spLawsChart').innerHTML = h;
   }
   var CASES = [
-    ['well', 'Moore’s law bent', 'Transistor counts doubled roughly every two years from 1965. From the 2010s the doubling time stretched past three years as chips hit heat and quantum limits. A law tied to the calendar bent when the physics changed.'],
-    ['well', 'The doomsday curve', 'In 1960 von Foerster and colleagues fitted world population to a curve that reached infinity on Friday, 13 November 2026. Growth rates peaked in the 1960s and fell as birth rates dropped. The law broke because its cause changed.'],
-    ['well', 'Wright’s law, 90 years', 'Costs fall by a steady share each time cumulative production doubles. First measured in aircraft in 1936, it still describes solar panels. Tied to activity, not time, it has outlasted Moore’s law.'],
+    ['well', 'Moore’s law bent', 'Transistor counts doubled roughly every two years from 1965, an exponential law: a fixed doubling time. From the 2010s the doubling time stretched past three years as chips hit heat and quantum limits. A law tied to the calendar bent when the physics changed.'],
+    ['well', 'The doomsday curve', 'In 1960 von Foerster and colleagues fitted world population to a power law in the time remaining to a fixed date, using records up to 1960. It reached infinity on Friday, 13 November 2026. Growth rates peaked in the 1960s instead: as incomes rose and people moved to cities, families had fewer children, birth rates fell, and growth stopped accelerating. The law broke because its cause changed.'],
+    ['well', 'Wright’s law, 90 years', 'A power law: costs fall by a steady share each time cumulative production doubles. First measured in aircraft in 1936, it still describes solar panels. Tied to activity, not time, it has outlasted Moore’s law.'],
     ['well', 'Forecasting rocket tanks', 'Engineers predicted when pressure tanks would rupture from the accelerating pattern of acoustic signals before failure. The same mathematics was later applied to market bubbles, with much weaker results.'],
     ['well', 'Weimar shares', 'German share prices rose enormously in paper marks while falling in gold terms through 1923 (Bresciani-Turroni, <em>The Economics of Inflation</em>, 1937). A rise in a failing currency is the currency failing.'],
-    ['well', 'China, 2021', 'China banned bitcoin mining and trading. Hashrate dropped sharply and price fell about half. Miners moved, hashrate recovered within months, and price made a new high the same year. The trend held.'],
-    ['well', 'The 2025 silence', 'When the Pi Cycle indicator failed to fire at the October 2025 high, some analysts read it as proof the top was still ahead. Price fell about half over the next nine months.'],
-    ['sugg', 'Population after the Black Death', 'Some demographers find world population growth steepened after the 14th-century plagues. The pattern rests on medieval estimates, so we treat it as suggestive.'],
-    ['set', 'The “cube law”', 'Claims that network value now grows with the cube of users, replacing Metcalfe’s law. The sources we found contradict each other on dates and evidence.'],
-    ['set', 'Tulip mania', 'The story of a crash that ruined the Dutch economy. Archival work by historian Anne Goldgar found the episode smaller and contained.'],
-    ['set', 'Bubble models that called bitcoin tops', 'Several papers show models pinpointing bitcoin’s 2017 and 2021 peaks. Every one we found was reconstructed after the fact. None was published before the top.'],
-    ['set', '“90 to 95% of spikes revert”', 'A figure that appeared in our research with no source behind it.']
+    ['well', 'China, 2021', 'China banned bitcoin mining and trading. Hashrate dropped sharply and bitcoin’s price fell about half. Miners moved, hashrate recovered within months, and price made a new high the same year. The trend held.'],
+    ['well', 'The 2025 silence', 'When the Pi Cycle indicator failed to fire at the October 2025 price high, some analysts read it as proof the top was still ahead. Bitcoin’s price fell about half over the next nine months.'],
+    ['sugg', 'Population after the Black Death', 'Some demographers find world population growth steepened after the 14th-century plagues. The pattern rests on medieval estimates, so I treat it as suggestive.'],
+    ['set', 'The “cube law”', 'Claims that network value now grows with the cube of users, replacing Metcalfe’s law. The sources I found contradict each other on dates and evidence.'],
+    ['set', 'Tulip mania', 'The story of a crash that ruined the Dutch economy. Archival work by historian Anne Goldgar found the episode smaller and contained. The site’s bubble page, <a href="/not-a-bubble">Is Bitcoin a Bubble?</a>, covers it in depth.'],
+    ['set', 'Bubble models that called bitcoin tops', 'Several papers show models pinpointing bitcoin’s 2017 and 2021 peaks. Every one I found was reconstructed after the fact. None was published before the top.'],
+    ['set', '“90 to 95% of spikes revert”', 'A figure that appeared in my research with no source behind it.']
   ];
   function renderCases() {
     var B = { well: 'Well documented', sugg: 'Suggestive', set: 'Examined and set aside' };
     $('spCases').innerHTML = CASES.map(function (c) {
       return '<details class="sp-case' + (c[0] === 'set' ? ' is-set' : '') + '"><summary><span class="sp-badge ' + c[0] + '">' + B[c[0]] + '</span><span class="sp-case-t">' + c[1] + '</span></summary><p>' + c[2] + '</p></details>';
     }).join('');
+  }
+  // Item 29: the one signal a HODLer watching the channel had in 2021.
+  function renderTops() {
+    var br = SR.bandRun('2021');
+    if (!br) return;
+    var base = 'The tops everyone recognized came at the end of parabolic run-ups. The cycle indicators that flagged them, Pi Cycle among them, are built to detect that acceleration. The two final price highs nobody flagged came after slow climbs. Pi Cycle never fired in 2025, and seven of eleven classic top indicators missed (Galaxy Research, June 2026). Their trigger lines are fixed; the waves they measure are getting smaller. ';
+    $('spTopsTxt').textContent = base + 'In 2021 a HODLer watching the power law had one signal: price touched the upper band in early 2021, staying at or above ' + PL_CEIL + '× trend from ' + monthOnly(br.from) + ' to ' + monthOnly(br.to) + '. In 2025 there was none. The price high sat close to trend.';
   }
 
   // ═══════════ TAB 4 · UNITS ═══════════
@@ -482,7 +597,7 @@
   window.spikesCardB = cardB;
 
   // ═══════════ INIT ═══════════
-  function renderAll() { renderReadout(); renderShrink(); }
+  function renderAll() { renderReadout(); renderShrink(); renderFailures(); }
   function init() {
     readColors();
     wireTabs();
@@ -503,9 +618,9 @@
     document.querySelectorAll('[data-handoff]').forEach(function (a) {
       a.addEventListener('click', function () { track('spikes_handoff', { intent: intent, destination: a.getAttribute('data-handoff'), position: intent === 'trim' ? bTrig : +multNow().toFixed(2) }); });
     });
-    wireTip();
+
     updA(); updB(); updC(); updH();
-    drawDecay(); drawGap(); drawTable(); drawRunup(); drawRecovery(); drawGrowth(); drawLaws(); renderCases(); drawUnits();
+    drawDecay(); drawGap(); drawPriceChart(); drawTable(); renderTops(); drawRunup(); drawRecovery(); drawGrowth(); drawLaws(); renderCases(); drawUnits();
 
     var qa = spikesQA();
     if (qa.pass) console.log('[spikes-qa] pass — record verified at ' + qa.anchor + ', ' + qa.record.length + ' cycles, time above trend ' + qa.live.pctAbove + '% (live).');

@@ -36,6 +36,8 @@
   var MONTH_D = 30.44, YEAR_D = 365.25;
   var RUNUP_D = 90;                 // run-up window into a spike or high
   var PARABOLIC = 200;              // % in 90 days that marks a parabolic run-up
+  var NEAR_FLOOR = 1.10;            // "within about 10% of the floor": at or below 1.1 × the 0.42× line
+  var CEILING_FIT_N = 3;            // the falling ceiling is fitted through the first three spikes (2011, 2013, 2017)
 
   function dayOfIso(s) { return (Date.parse(s + 'T00:00:00Z') / 1000 - GENESIS_TS) / 86400; }
   function isoOf(d) { return new Date((GENESIS_TS + d * 86400) * 1000).toISOString().slice(0, 10); }
@@ -101,6 +103,14 @@
       }
       for (i = kh + 1; i < S.length && S[i].d <= c.b; i++) { if (!low || S[i].p < low.p) low = { d: S[i].d, p: S[i].p }; }
       for (i = kh + 1; i < S.length; i++) { if (S[i].p >= hi.p) { be = { d: S[i].d, yrs: (S[i].d - hi.d) / YEAR_D }; break; } }
+      // The cycle's lowest point AGAINST TREND after the high (not its lowest
+      // price; the two differ because the trend keeps rising), and the first
+      // close within NEAR_FLOOR of the floor, both inside the cycle window.
+      var lowM = null, nearFloor = null;
+      for (i = kh + 1; i < S.length && S[i].d <= c.b; i++) {
+        if (!lowM || S[i].m < lowM.m) lowM = { d: S[i].d, m: S[i].m, p: S[i].p };
+        if (!nearFloor && S[i].m <= PL_FLOOR * NEAR_FLOOR) nearFloor = { d: S[i].d, m: S[i].m, mo: (S[i].d - hi.d) / MONTH_D };
+      }
       out.push({
         y: c.y, cycle: c,
         spikeD: sp.d, spikeM: sp.m, spikeP: sp.p,
@@ -111,6 +121,7 @@
         backTrend: back,
         low: low ? { d: low.d, p: low.p, fall: (1 - low.p / hi.p) * 100 } : null,
         be: be,
+        lowM: lowM, nearFloor: nearFloor,
         open: c.b > S[S.length - 1].d
       });
     });
@@ -144,38 +155,64 @@
     for (i = 0; i < S.length; i++) {
       var s = S[i]; if (s.d <= sell.d) continue;
       run = Math.max(run, s.p);
-      if (rebuy === 'ath80' ? s.p <= 0.2 * run : s.m <= 1) { rb = s; break; }
+      if (rebuy === 'ath80' ? s.p <= 0.2 * run : rebuy === 'ath50' ? s.p <= 0.5 * run : s.m <= 1) { rb = s; break; }
     }
     return { fired: true, sell: sell, rb: rb, ratio: rb ? sell.p / rb.p : null };
   }
 
   // ── Fund a bill: when in the cycle to sell. 'up' = first sample at or above
-  // 2× trend; 'down' = first sample back below 2× after the spike; 'peak' =
-  // the spike itself (hindsight). null when price never reached 2×.
-  function fundSale(c, when, asOf) {
+  // `level`× trend; 'down' = first sample back below `level`× after the spike;
+  // 'peak' = the spike itself (hindsight). null when price never reached the
+  // level, in which case the reader sells when the bill arrives. level
+  // defaults to 2.
+  function fundSale(c, when, asOf, level) {
+    var L = level || 2;
     var S = series(asOf).filter(function (s) { return s.d >= c.a && s.d <= c.b; });
     if (!S.length) return null;
     var mx = S.reduce(function (a, s) { return s.m > a.m ? s : a; });
     if (when === 'peak') return mx;
-    if (mx.m < 2) return null;
+    if (mx.m < L) return null;
     var i;
-    if (when === 'up') { for (i = 0; i < S.length; i++) if (S[i].m >= 2) return S[i]; return null; }
-    for (i = 0; i < S.length; i++) if (S[i].d > mx.d && S[i].m < 2) return S[i];
+    if (when === 'up') { for (i = 0; i < S.length; i++) if (S[i].m >= L) return S[i]; return null; }
+    for (i = 0; i < S.length; i++) if (S[i].d > mx.d && S[i].m < L) return S[i];
     return null;
   }
   // Coins used selling at the sale point, as a share of the coins selling when
   // the bill arrives `months` later would have taken. pending when that date
   // is still ahead of the series.
-  function fundResults(when, months, asOf) {
+  function fundResults(when, months, asOf, level) {
     var lastD = series(asOf).slice(-1)[0].d;
     return CYCLES.slice(1).map(function (c) {
-      var s = fundSale(c, when, asOf);
+      var s = fundSale(c, when, asOf, level);
       if (!s) return { c: c, never: true };
       var need = s.d + months * MONTH_D;
       if (need > lastD) return { c: c, pending: true, s: s };
       var q = priceAt(need);
       return { c: c, s: s, q: q, r: q / s.p };
     });
+  }
+
+  // ── The falling ceiling: a least-squares line through ln(spike ×trend)
+  // against time for the first CEILING_FIT_N spikes, evaluated at each later
+  // spike's own date. In hindsight it fitted 2021; this cycle came in under it.
+  function fallingCeiling(asOf) {
+    var R = record(asOf), pts = R.slice(0, CEILING_FIT_N);
+    var n = pts.length, mx = 0, my = 0, sxy = 0, sxx = 0, k;
+    pts.forEach(function (r) { mx += r.spikeD / n; my += Math.log(r.spikeM) / n; });
+    pts.forEach(function (r) { sxy += (r.spikeD - mx) * (Math.log(r.spikeM) - my); sxx += (r.spikeD - mx) * (r.spikeD - mx); });
+    var b = sxy / sxx, a = my - b * mx;
+    function at(d) { return Math.exp(a + b * d); }
+    var later = [];
+    for (k = CEILING_FIT_N; k < R.length; k++) later.push({ y: R[k].y, d: R[k].spikeD, projected: at(R[k].spikeD), actual: R[k].spikeM });
+    return { fitted: pts.map(function (r) { return r.y; }), at: at, later: later };
+  }
+
+  // ── The unbroken run at or above the upper band in a cycle (the 2021 signal).
+  function bandRun(cycleLabel, asOf) {
+    var c = CYCLES.filter(function (x) { return x.y === cycleLabel; })[0];
+    if (!c) return null;
+    var S = series(asOf).filter(function (s) { return s.d >= c.a && s.d <= c.b && s.m >= PL_CEIL; });
+    return S.length ? { from: S[0].d, to: S[S.length - 1].d, n: S.length } : null;
   }
 
   // The trim/rule cycles are the four from 2013 on: 2011's window opens on the
@@ -187,6 +224,13 @@
   var ANCHOR = '2026-09-30';
   var FIXTURE = {
     pctAbove: 43,
+    // Review round 1 (2026-10-04): lowest point against trend after each high,
+    // cycles that reached within 10% of the floor, the falling ceiling, and the
+    // 2021 run at the upper band.
+    lowM: [0.46, 0.40, 0.56, 0.42, 0.42],
+    nearFloorCycles: 4,
+    ceiling: { r2021: 3.52, r2024: 1.98 },
+    band2021: { from: '2021-02', to: '2021-04' },
     rec: [
       { y: '2011',    spikeM: 14.01, spikeP: 24,     highM: 14.01, highP: 24,     d15: 156, d2: 132, runup: 2734, back: { mo: 4,  fall: 86 }, low: 89, be: 1.7 },
       { y: '2013',    spikeM: 11.99, spikeP: 1134,   highM: 11.99, highP: 1134,   d15: 432, d2: 336, runup: 882,  back: { mo: 13, fall: 76 }, low: 80, be: 3.3 },
@@ -225,6 +269,16 @@
       near(L + 'years to even', r.be ? r.be.yrs : null, f.be, 0.05);
     });
     near('time above trend %', pctAbove(asOf), FIXTURE.pctAbove, 0.5);
+    FIXTURE.lowM.forEach(function (w, k) { near((R[k] ? R[k].y : k) + ' low ×trend', R[k] && R[k].lowM ? R[k].lowM.m : null, w, 0.006); });
+    var nfc = R.filter(function (r) { return r.nearFloor; }).length;
+    if (nfc !== FIXTURE.nearFloorCycles) failures.push('cycles within 10% of the floor ' + nfc + ' ≠ ' + FIXTURE.nearFloorCycles);
+    var ceil = fallingCeiling(asOf);
+    near('falling ceiling at the 2021 spike', ceil.later[0] && ceil.later[0].projected, FIXTURE.ceiling.r2021, 0.02);
+    near('falling ceiling at the 2024 spike', ceil.later[1] && ceil.later[1].projected, FIXTURE.ceiling.r2024, 0.02);
+    var br = bandRun('2021', asOf);
+    if (!br || isoOf(br.from).slice(0, 7) !== FIXTURE.band2021.from || isoOf(br.to).slice(0, 7) !== FIXTURE.band2021.to) {
+      failures.push('2021 upper-band run ' + (br ? isoOf(br.from) + '…' + isoOf(br.to) : 'none') + ' ≠ ' + FIXTURE.band2021.from + '…' + FIXTURE.band2021.to);
+    }
     // Leak check: no pre-2011 sample may reach the measurement set.
     var leaked = series(asOf).filter(function (s) { return isoOf(s.d) < MODERN_FROM; });
     if (leaked.length) failures.push(leaked.length + ' pre-' + MODERN_FROM.slice(0, 4) + ' samples leaked into the record');
@@ -232,7 +286,8 @@
   }
 
   window.SpikeRecord = {
-    MODERN_FROM: MODERN_FROM, MONTH_D: MONTH_D, YEAR_D: YEAR_D, RUNUP_D: RUNUP_D, PARABOLIC: PARABOLIC,
+    MODERN_FROM: MODERN_FROM, MONTH_D: MONTH_D, YEAR_D: YEAR_D, RUNUP_D: RUNUP_D, PARABOLIC: PARABOLIC, NEAR_FLOOR: NEAR_FLOOR,
+    fallingCeiling: fallingCeiling, bandRun: bandRun,
     CYCLES: CYCLES, TRADE_CYCLES: TRADE_CYCLES, ANCHOR: ANCHOR, FIXTURE: FIXTURE,
     dayOfIso: dayOfIso, isoOf: isoOf, monthYear: monthYear,
     series: series, priceAt: priceAt, record: record, pctAbove: pctAbove, lastAbove: lastAbove,

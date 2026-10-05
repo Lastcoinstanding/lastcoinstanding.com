@@ -4,7 +4,7 @@ permalink: /bitcoin-spikes.html
 slug: bitcoin-spikes
 related:
   - slug: the-bitcoin-floor
-    desc: "The other edge of the same channel. The Floor takes the line at 0.42&times; trend that price has held for fifteen years; this page takes the excursions above trend, which have been large, brief and shrinking."
+    desc: "The other edge of the same channel. The Floor takes the line at 0.42&times; trend that price has held for fifteen years; this page takes the spikes above trend, which have been large, brief and shrinking."
   - slug: how-much-cash
     desc: "Where a trim into a spike is priced in full. Set any sell position and rebuy target and see every past entry near it, in bitcoin and after tax. The &ldquo;End up with more bitcoin&rdquo; card on this page hands its inputs there."
   - slug: disciplined-rebalancing
@@ -13,13 +13,13 @@ related:
     desc: "The model every multiple here is measured against: the trend, the 0.42&times; floor and the 3&times; upper band, with the coefficients and the model&rsquo;s limits stated in full."
 faq:
   - q: "Can you tell when bitcoin has peaked?"
-    a: "Not in time to act on it. No published forecast identified the 2021 or 2025 tops in advance, and by the time price fell back to trend it was 53&ndash;86% below the high."
+    a: "Not in time to act on it. No published forecast I found identified the 2021 or 2025 tops in advance, and by the time price fell back to trend it was 53&ndash;86% below the price high."
   - q: "Should I sell bitcoin when it spikes?"
-    a: "It depends what for. Funding a planned expense at a spike has historically used fewer coins; trimming to buy back has worked in some cycles and cost holders coins in others, especially in taxable accounts."
+    a: "It depends what for. Funding a planned expense at a spike has historically used fewer coins; trimming to buy back has worked in some cycles and cost HODLers coins in others, especially in taxable accounts."
   - q: "Why is selling and buying back easier in an IRA?"
     a: "No tax is due on the sale, so any fall in price lets you buy back more than you sold. In a taxable account the price must fall by roughly your tax rate first."
   - q: "Are bitcoin's spikes getting smaller?"
-    a: "Yes. The largest distance above trend fell from 12&times; in 2013 to 1.19&times; in 2024, and the October 2025 high sat close to trend."
+    a: "Yes. The largest spike above trend fell from 12&times; in 2013 to 1.19&times; in 2024, and the October 2025 price high sat close to trend."
   - q: "Is it safe to borrow against bitcoin after a big rise?"
     a: "It is the riskiest time to borrow: the loan is sized on peak value, and the declines that followed every spike are what trigger liquidations."
 eleventyComputed:
@@ -31,8 +31,8 @@ eleventyComputed:
 
 <section class="sp-hero">
   <h1>Bitcoin&rsquo;s <em>Spikes</em></h1>
-  <div class="hero-subtitle">When bitcoin spikes above trend: what holders can do.</div>
-  <p class="sp-lede">Bitcoin has spent <span id="spPctAbove">43%</span> of its life above its long-run trend, and a few months at a time far above it. What has each spike meant for the people holding?</p>
+  <div class="hero-subtitle">When bitcoin spikes above trend: what HODLers can do.</div>
+  <p class="sp-lede">Bitcoin has spent <span id="spPctAbove">43%</span> of its life above its long-run <a href="/the-power-law">power law trend</a>, and a few months at a time far above it. What has each spike meant for HODLers?</p>
 </section>
 
 <div class="sp-page">
@@ -52,36 +52,53 @@ eleventyComputed:
     <div class="sp-readout">
       <div>
         <div class="sp-eyebrow">Where bitcoin sits now</div>
-        <div class="sp-ro-mult sp-num"><span id="spRoMult">&mdash;</span><small>&times; trend</small></div>
-        <div class="sp-ro-meta sp-num"><strong id="spRoPrice">&mdash;</strong> &middot; trend <span id="spRoTrend">&mdash;</span> &middot; <span id="spRoLabel">&mdash;</span></div>
+        <div class="sp-ro-mult sp-num"><span id="spRoMult">&mdash;</span><small>&times; trend &middot; <span id="spRoLabel">&mdash;</span></small></div>
+        <div class="sp-ro-meta sp-num"><strong id="spRoPrice">&mdash;</strong> &middot; trend <span id="spRoTrend">&mdash;</span></div>
         <div class="sp-ro-meta sp-num" id="spRoLast"></div>
         <span class="sp-pill" id="spRoPill">&mdash;</span>
         <p class="sp-ro-lede" id="spRoLede"></p>
       </div>
       <div class="sp-chart-wrap">
         <svg id="spMultChart" viewBox="0 0 560 250" role="img" aria-label="Bitcoin price as a multiple of its trend, 2011 to today"></svg>
-        <div class="sp-cap">Price as a multiple of trend, 2011 onward (log scale). Dots mark each cycle&rsquo;s largest spike.</div>
+        <div class="sp-cap">Price as a multiple of trend, 2011 onward (log scale). Dots mark each cycle&rsquo;s spike.</div>
       </div>
     </div>
 
     <section class="sp-prose">
+      <div class="sp-eyebrow">Before anything else</div>
+      <h2>What a spike means here</h2>
+      <p>A spike here means price running far above its power law trend, measured as a multiple of trend, not as a price. The two can differ. Because the trend keeps rising, a later price can be higher and still sit lower against trend. In 2021 the biggest move above trend came in <span id="spDef21S">February at 3.2&times;</span>; the highest price came in <span id="spDef21H">November at 2.6&times;</span>. The floor works the same way: a level that rises with the trend, not a fixed price.</p>
+    </section>
+
+    <section class="sp-prose">
       <div class="sp-eyebrow">The first thing to know</div>
       <h2>Recognize and decide, not predict</h2>
-      <p>No one has called a bitcoin top in advance. Not the cycle indicators, not the academic bubble models, not us. The research behind this page found no forecast, published before the fact, that identified the 2021 or 2025 tops. What the record does show is how spikes have behaved, how long they lasted, and what holders who acted on them ended up with. That is enough to decide what you would do, before you need to.</p>
+      <p id="spPredictTxt">Few have called a bitcoin top in advance, and fewer still have done it twice. No published forecast I found identified the 2021 or 2025 tops. In hindsight there was a pattern: a falling ceiling drawn through the 2011, 2013 and 2017 spikes pointed to about 3.5&times; trend for 2021, close to the 3.2&times; reached. The same line, extended, pointed to about 2.0&times; for this cycle; the actual spike was 1.19&times;.</p>
+      <p>What the record does show is how spikes have behaved, how long they lasted, and what HODLers who acted on them ended up with. That is enough to decide what you would do, before you need to.</p>
+
+      <h3 class="sp-sub-h sp-facts-h">Three things the record shows</h3>
       <div class="sp-facts">
-        <div class="sp-fact"><div class="sp-big sp-num" id="spFact1">&mdash;</div><p>below the high by the time price fell back to trend. Waiting for confirmation gave up most of the move.</p></div>
-        <div class="sp-fact"><div class="sp-big sp-num" id="spFact2">&mdash;</div><p id="spFact2Txt"></p></div>
-        <div class="sp-fact"><div class="sp-big sp-num" id="spFact3">&mdash;</div><p id="spFact3Txt"></p></div>
+        <div class="sp-fact"><div class="sp-fact-k">Waiting for confirmation is expensive</div><div class="sp-big sp-num" id="spFact1">&mdash;</div><p>below the price high by the time price fell back to trend.</p></div>
+        <div class="sp-fact"><div class="sp-fact-k">Obvious tops came after parabolic run-ups</div><div class="sp-big sp-num" id="spFact2">&mdash;</div><p id="spFact2Txt"></p></div>
+        <div class="sp-fact"><div class="sp-fact-k">Each spike has been smaller</div><div class="sp-big sp-num" id="spFact3">&mdash;</div><p id="spFact3Txt"></p></div>
       </div>
     </section>
 
     <section class="sp-prose">
       <div class="sp-eyebrow">The old answer</div>
-      <h2>Why not just hold?</h2>
-      <p>&ldquo;Just hold&rdquo; was the right default when nobody knew how far bitcoin could run or where its price should sit. The power law changed that. In public use since 2018&ndash;19, it gives holders a reference point that earlier holders lacked: how far price is above its trend, and how every past excursion that far up ended. Today&rsquo;s holder is guessing less than one in 2017.</p>
+      <h2>Why not just HODL?</h2>
+      <p>&ldquo;Just HODL&rdquo; was the right default when nobody knew how far bitcoin could run or where its price should sit. The power law changed that. In public use since 2018&ndash;19, it gives HODLers a reference point that earlier HODLers lacked: how far price is above its trend, and how every past spike that far up ended. Today&rsquo;s informed HODLer is guessing less than they were in 2017.</p>
       <div class="sp-vs">
-        <div class="sp-for"><h3>The case for acting</h3><ul><li>Every excursion far above trend since 2011 has come back to it.</li><li>In an IRA there is no tax hurdle, so being a little right adds coins.</li><li>Funding a known expense at a spike has used fewer coins than funding it later.</li></ul></div>
-        <div class="sp-against"><h3>The case for holding</h3><ul><li>Spikes are shrinking. In 2024&ndash;25 price never reached 1.5&times; trend, so there was little to capture.</li><li>The first spike of a cycle may not be the last. In 2013 price rose more than 8&times; after the April spike.</li><li>In a taxable account the tax hurdle takes most of the edge.</li><li>The trend could steepen. The coins you sold are the ones that miss it.</li></ul></div>
+        <div class="sp-for"><h3>The case for acting</h3><ul>
+          <li id="spActBullet1">Every excursion far above trend since 2011 has come back to the trend, and in four of five cycles price went on to within about 10% of the floor.</li>
+          <li>In an IRA or other tax-advantaged account there is no tax hurdle, so taking a little off the table at highs and buying back at or below trend can grow your stack without a tax penalty to overcome.</li>
+          <li>Funding a known expense, such as a house or college, at a bitcoin price spike has used fewer coins than funding it later would have.</li></ul></div>
+        <div class="sp-against"><h3>The case for HODLing</h3><ul>
+          <li>Spikes are shrinking. In 2024&ndash;25 price never reached 1.5&times; trend, so there was little to capture.</li>
+          <li>The first spike of a cycle may not be the last. In 2013 price rose more than 8&times; after the April spike.</li>
+          <li>In a taxable account the tax hurdle takes most of the edge: you have to be right by a wide margin for the trade to grow your stack.</li>
+          <li>The trend could steepen. The coins you sold are the ones that miss the climb.</li>
+          <li>Price could break upward and not fall back to trend as it has before.</li></ul></div>
       </div>
       <p class="sp-after-vs">The record favors small, planned actions sized so that being wrong is bearable. It does not favor selling the stack.</p>
     </section>
@@ -94,7 +111,7 @@ eleventyComputed:
       <div class="sp-intents" role="group" aria-label="Your goal">
         <button type="button" class="sp-intent" id="spIA" data-intent="fund" aria-pressed="true" aria-controls="spWA"><span class="sp-k">Fund something</span><span class="sp-d">A house, a tuition bill, a business. Use the spike to pay for it.</span></button>
         <div class="sp-pair">
-          <div class="sp-pair-h">Trim and buy back <button class="sp-tip" type="button" aria-expanded="false" aria-controls="spPairTip" aria-label="How a one-time trim and a rule differ">i</button><span class="sp-tip-body" id="spPairTip" role="tooltip">Both sell into a spike and buy back lower, so the arithmetic is the same. The test is different. A one-time trim is a decision you make while watching a spike, so it is judged on that spike: did this sale and this rebuy leave you with more coins? A rule is a commitment made in advance for every spike, so it is judged across all of them, including the cycles where it fires early or never fires. You take the bad cycles with the good.</span></div>
+          <div class="sp-pair-h">Trim and buy back <span class="help-tip" tabindex="0">?<span class="tip-content">Both sell into a spike and buy back lower, so the arithmetic is the same. The test is different. A one-time trim is decided while watching a spike, so it is judged on that spike. A rule is committed in advance for every spike, so it is judged across all of them, including the cycles where it fires early or never fires.</span></span></div>
           <div class="sp-pair-row">
             <button type="button" class="sp-intent" id="spIB" data-intent="trim" aria-pressed="false" aria-controls="spWB"><span class="sp-k">End up with more bitcoin</span><span class="sp-d">One spike, watched. A trim you decide on in the moment.</span></button>
             <button type="button" class="sp-intent" id="spIC" data-intent="rule" aria-pressed="false" aria-controls="spWC"><span class="sp-k">Run a rule</span><span class="sp-d">Every spike, decided in advance. The same trade as a discipline.</span></button>
@@ -104,25 +121,29 @@ eleventyComputed:
 
       <!-- A · Fund something -->
       <div class="sp-work" id="spWA">
+        <div class="sp-eyebrow">A look back at history, not a projection</div>
         <h3>Use the spike to pay for something you&rsquo;d sell for anyway</h3>
         <p class="sp-dim">Selling at a spike means fewer coins for the same dollars, and there&rsquo;s no rebuy to get wrong.</p>
         <div class="sp-controls">
-          <div class="sp-ctl"><span class="sp-lbl" id="spFWhenL">Sell when</span><div class="sp-seg" id="spFWhen" role="group" aria-labelledby="spFWhenL"><button type="button" data-v="up" aria-pressed="false">Rising through 2&times;</button><button type="button" data-v="down" aria-pressed="true">Falling back below 2&times;</button><button type="button" data-v="peak" aria-pressed="false">At the peak (hindsight)</button></div></div>
+          <div class="sp-ctl sp-ctl-wide"><span class="sp-lbl" id="spFWhenL">Sell when</span><div class="sp-seg" id="spFWhen" role="group" aria-labelledby="spFWhenL"><button type="button" data-v="up:2" aria-pressed="false">As it rises through 2&times; trend</button><button type="button" data-v="down:2" aria-pressed="true">Once it turns down, back below 2&times;</button><button type="button" data-v="down:1.5" aria-pressed="false">Once it turns down, back below 1.5&times;</button><button type="button" data-v="peak" aria-pressed="false">At the peak (hindsight only)</button></div><p class="sp-help" id="spFWhenHelp"></p></div>
           <div class="sp-ctl"><label for="spFMonths">Time until you need it</label><output id="spFMonthsOut" for="spFMonths">12 months</output><input type="range" id="spFMonths" min="6" max="36" step="6" value="12"></div>
           <div class="sp-ctl"><label for="spFAmt">Amount</label><output id="spFAmtOut" for="spFAmt">$200,000</output><input type="range" id="spFAmt" min="50000" max="1000000" step="50000" value="200000"></div>
         </div>
         <div class="sp-answer">
           <p class="sp-head" id="spFHead"></p>
-          <div class="sp-rows" id="spFRows"></div>
+          <div>
+            <div class="sp-rows-h">Coins used, against selling when the bill arrived</div>
+            <div class="sp-rows" id="spFRows"></div>
+          </div>
         </div>
-        <p class="sp-caveat">Bars show coins used by selling at the chosen point, as a share of the coins selling when the bill arrived would have taken. Selling at the peak needs hindsight: no one knew which day it was. Selling on the way up came too early in every cycle, because the run-up kept going. Selling as the spike rolled over, when price fell back below 2&times;, needed no forecast and still used fewer coins for bills up to a year out. Past two years, the next cycle tends to undo it. The cash sits idle until you need it, and price can keep rising after you sell. Tax applies either way if you&rsquo;d have sold anyway.</p>
-        <div class="sp-handoff"><p>Spending bitcoin regularly rather than once? Spend and Replace models spending today and buying back over time.</p><a class="sp-cta-2" href="/spend-and-replace" data-handoff="spend-and-replace">Model ongoing spending &rarr;</a></div>
+        <p class="sp-caveat" id="spFCaveat"></p>
+        <div class="sp-handoff"><p><strong>Next: Spend and Replace</strong>, a separate exploration that models spending bitcoin regularly and buying it back over time, for spending that isn&rsquo;t a single bill.</p><a class="sp-cta-2" href="/spend-and-replace" data-handoff="spend-and-replace">Open Spend and Replace &rarr;</a></div>
       </div>
 
       <!-- B · End up with more bitcoin -->
       <div class="sp-work" id="spWB" hidden>
         <h3>Trim into the spike, buy back lower</h3>
-        <p class="sp-dim">It has worked. It has also cost holders most of their stack. The difference was where they sold, where they bought back, and which account they did it in.</p>
+        <p class="sp-dim">It has worked. It has also cost HODLers most of their stack. The difference was where they sold, where they bought back, and which account they did it in.</p>
         <p class="sp-xlink">Judged on the spike in front of you. To commit to the same trade for every spike, <button type="button" data-go="spIC">run it as a rule</button>.</p>
         <div class="sp-controls">
           <div class="sp-ctl"><span class="sp-lbl" id="spBTrigL">Sell when price reaches</span><div class="sp-seg" id="spBTrig" role="group" aria-labelledby="spBTrigL"><button type="button" data-v="1.5" aria-pressed="false">1.5&times; trend</button><button type="button" data-v="2" aria-pressed="true">2&times; trend</button></div></div>
@@ -141,8 +162,9 @@ eleventyComputed:
             <div class="sp-rows" id="spBRows"></div>
           </div>
         </div>
+        <div class="sp-fail" id="spBFail"></div>
         <p class="sp-caveat" id="spBCaveat"></p>
-        <div class="sp-handoff"><p>See every past entry near this position, set your own rebuy point, and read the result in bitcoin.</p><a class="sp-cta" id="spBCta" href="/how-much-cash" data-handoff="how-much-cash">Set your own sell and rebuy points &rarr;</a></div>
+        <div class="sp-handoff"><p><strong>Next: How Much Cash</strong>, a separate exploration where you set your own sell and rebuy points and see every past entry near them, in bitcoin and after tax. Your trigger, share and account carry over.</p><a class="sp-cta" id="spBCta" href="/how-much-cash" data-handoff="how-much-cash">Open How Much Cash &rarr;</a></div>
       </div>
 
       <!-- C · Run a rule -->
@@ -151,13 +173,13 @@ eleventyComputed:
         <p class="sp-dim">A standing rule, such as selling a slice above one multiple of trend and buying back below another, takes the decision out of the moment.</p>
         <p class="sp-xlink">Judged across every cycle, including the ones it gets wrong. Deciding on a single spike instead? <button type="button" data-go="spIB">Try a one-time trim</button>.</p>
         <div class="sp-controls">
-          <div class="sp-ctl"><span class="sp-lbl" id="spCTrigL">Rule: sell above</span><div class="sp-seg" id="spCTrig" role="group" aria-labelledby="spCTrigL"><button type="button" data-v="1.5" aria-pressed="true">1.5&times; trend</button><button type="button" data-v="2" aria-pressed="false">2&times; trend</button></div></div>
-          <div class="sp-ctl"><span class="sp-lbl" id="spCRebuyL">Buy back at</span><div class="sp-seg" id="spCRebuy" role="group" aria-labelledby="spCRebuyL"><button type="button" data-v="trend" aria-pressed="true">Back to trend</button><button type="button" data-v="ath80" aria-pressed="false">80% below the high</button></div></div>
+          <div class="sp-ctl"><span class="sp-lbl" id="spCTrigL">Rule: sell above <span class="help-tip" tabindex="0">?<span class="tip-content" id="spCTip">In past cycles a 2&times; rule waited longer and caught more; 1.5&times; was the cautious choice.</span></span></span><div class="sp-seg" id="spCTrig" role="group" aria-labelledby="spCTrigL"><button type="button" data-v="1.5" aria-pressed="true">1.5&times; trend</button><button type="button" data-v="2" aria-pressed="false">2&times; trend</button></div></div>
+          <div class="sp-ctl"><span class="sp-lbl" id="spCRebuyL">Buy back at</span><div class="sp-seg" id="spCRebuy" role="group" aria-labelledby="spCRebuyL"><button type="button" data-v="trend" aria-pressed="true">Back to trend</button><button type="button" data-v="ath80" aria-pressed="false">80% below the price high</button></div></div>
           <div class="sp-ctl"><span class="sp-lbl" id="spCAcctL">Your account, carried to the rule</span><div class="sp-seg" id="spCAcct" role="group" aria-labelledby="spCAcctL"><button type="button" data-v="retirement" aria-pressed="true">IRA</button><button type="button" data-v="regular" aria-pressed="false">Taxable</button></div></div>
         </div>
         <div class="sp-rows" id="spCRows"></div>
         <p class="sp-caveat" id="spCNote"></p>
-        <div class="sp-handoff"><p>Write your own rule, choose how much to sell, and project it forward cycle by cycle.</p><a class="sp-cta" id="spCCta" href="/disciplined-rebalancing" data-handoff="disciplined-rebalancing">Write your rule and test it &rarr;</a></div>
+        <div class="sp-handoff"><p><strong>Next: Disciplined Rebalancing</strong>, a separate exploration where you write your own sell and buy-back rule and see it run through every cycle and forward. Your account type carries over.</p><a class="sp-cta" id="spCCta" href="/disciplined-rebalancing" data-handoff="disciplined-rebalancing">Open Disciplined Rebalancing &rarr;</a></div>
       </div>
     </section>
 
@@ -166,8 +188,8 @@ eleventyComputed:
         <div class="sp-prose sp-flush">
           <div class="sp-eyebrow">Taxes</div>
           <h2>In an IRA, a little right is enough</h2>
-          <p>In a taxable account, selling at a spike and buying back lower only adds coins if price falls by more than the tax you paid. With a low cost basis, that&rsquo;s roughly your tax rate: 24% at the top federal long-term rate, more with state tax, 41% short-term. In an IRA there is no hurdle. Any fall in price, after small trading costs, buys back more than you sold.</p>
-          <p class="sp-dim">Two costs the hurdle leaves out. A holder who never sells can defer tax indefinitely, and US heirs may receive a stepped-up cost basis; selling turns that deferred tax into tax paid now. And bitcoin ETFs in an IRA trade only on weekdays, so a spike or crash over a weekend can&rsquo;t be acted on until Monday.</p>
+          <p>In a taxable account, selling at a spike and buying back lower only grows your stack if price falls by more than the tax you paid. With a low cost basis, that&rsquo;s roughly your tax rate: 24% at the top federal long-term rate, more with state tax, 41% short-term. In an IRA or other tax-advantaged account there is no hurdle. Any fall in price, after small trading costs, buys back more than you sold.</p>
+          <p class="sp-dim">Two costs the hurdle leaves out. A HODLer who never sells can defer tax indefinitely, and US heirs may receive a stepped-up cost basis; selling turns that deferred tax into tax paid now. And bitcoin ETFs in an IRA trade only on weekdays, so a spike or crash over a weekend can&rsquo;t be acted on until Monday.</p>
         </div>
         <div class="sp-hurdle">
           <div class="sp-seg" id="spHAcct" role="group" aria-label="Account type"><button type="button" data-v="tax" aria-pressed="true">Taxable</button><button type="button" data-v="ira" aria-pressed="false">IRA</button></div>
@@ -188,6 +210,8 @@ eleventyComputed:
       <p>A loan taken when price is far above trend is sized on collateral at its peak value. The decline that has followed every spike, <span id="spWarnFall">53&ndash;86%</span> by the time price returned to trend, is what triggers margin calls and liquidations. If you&rsquo;re going to borrow against bitcoin, the record favors doing it when price is near the floor, not near a high.</p>
       <p class="sp-flush"><a href="/bitcoin-lenders">Compare bitcoin lenders</a> &middot; <a href="/borrowing-against-your-stack">Borrowing against your stack</a></p>
     </section>
+
+    <div class="sp-takeaway"><strong>Takeaway.</strong> Decide before the spike. Small, planned actions have served HODLers better than all-or-nothing ones, and an IRA removes the tax hurdle.</div>
   </div>
 
   <!-- ══════════ TAB 2 · THE RECORD ══════════ -->
@@ -195,40 +219,43 @@ eleventyComputed:
     <section class="sp-prose sp-first">
       <div class="sp-eyebrow">The Record</div>
       <h2>Every spike, measured</h2>
-      <p>Every cycle since 2011 has carried bitcoin above its trend, and every time it came back. Here is each one, measured on the same model the rest of this site uses.</p>
+      <p id="spRecLede">Every cycle since 2011 has carried bitcoin above its <a href="/the-power-law">trend</a>, and every time it came back to trend, and in four of five cycles fell on to within about 10% of the floor. Here is each one, measured on the same model the rest of this site uses.</p>
     </section>
 
     <section class="sp-section">
       <div class="sp-prose"><h3 class="sp-sub-h">Each spike has been smaller than the last</h3></div>
-      <div class="sp-figure"><svg id="spDecayChart" viewBox="0 0 640 280" role="img" aria-label="Largest multiple of trend in each cycle"></svg>
-      <p class="sp-cap">Largest multiple of trend in each cycle (log scale). Hollow markers show where the price high sat when it came later. <span id="spDecayCap"></span></p></div>
+      <div class="sp-figure"><svg id="spDecayChart" viewBox="0 0 640 320" role="img" aria-label="Each cycle's range against trend, from its low to its spike"></svg>
+      <p class="sp-cap" id="spDecayCap"></p>
+      <p class="sp-cap">Trend, floor and upper band are the site&rsquo;s Power Law channel; see the <a href="/the-power-law">Power Law page</a> for the model.</p></div>
     </section>
 
     <section class="sp-section">
-      <div class="sp-prose"><h3 class="sp-sub-h">The spike and the high stopped coinciding</h3>
+      <div class="sp-prose"><h3 class="sp-sub-h">The spike and the price high stopped coinciding</h3>
       <p id="spGapTxt">Through 2017, bitcoin&rsquo;s biggest move above trend and its highest price arrived together. In the last two cycles they didn&rsquo;t.</p></div>
       <div class="sp-figure"><svg id="spGapChart" viewBox="0 0 640 220" role="img" aria-label="Months between the spike and the price high in each cycle"></svg>
-      <p class="sp-cap">Filled dot: largest multiple of trend. Hollow dot: highest price. Labels give the multiple at each.</p></div>
+      <p class="sp-cap"><span class="sp-key sp-key-fill" aria-hidden="true"></span> Filled dot: the spike, the largest multiple of trend. <span class="sp-key sp-key-hollow" aria-hidden="true"></span> Hollow dot: the price high, the highest price. Labels give the multiple of trend at each.</p></div>
+      <div class="sp-figure"><svg id="spPriceChart" viewBox="0 0 640 300" role="img" aria-label="Bitcoin price and its trend, 2020 to today, with the two spikes and two price highs marked"></svg>
+      <p class="sp-cap">Price and the Power Law channel, 2020 to today (log scale). The price high of November 2021 was above the February spike in dollars and lower against trend, because the trend kept rising. The same happened in 2024&ndash;25.</p></div>
     </section>
 
     <section class="sp-section">
       <div class="sp-prose"><h3 class="sp-sub-h">The table</h3></div>
       <div class="sp-table-wrap" tabindex="0" role="region" aria-label="Every spike, measured (scrolls sideways)"><table class="sp-rec" id="spRecTable"></table></div>
-      <p class="sp-cap">Days above a multiple count the unbroken run around each spike. &ldquo;Back at trend&rdquo; is the first close below trend after the high. Break-even is the first close at or above the high. Prices are the site&rsquo;s ~12-day closes, so highs read slightly below intraday highs.</p>
+      <p class="sp-cap">Days above a multiple count the unbroken run around each spike. Prices are the site&rsquo;s ~12-day closes, so price highs read slightly below intraday highs.</p>
     </section>
 
     <section class="sp-section">
       <div class="sp-prose"><h3 class="sp-sub-h">Why some tops were obvious</h3>
-      <p>The tops everyone recognized came at the end of parabolic run-ups. The cycle indicators that flagged them, Pi Cycle among them, are built to detect that acceleration. The two final highs nobody flagged came after slow climbs. Pi Cycle never fired in 2025, and seven of eleven classic top indicators missed (Galaxy Research, June 2026). Their trigger lines are fixed; the waves they measure are getting smaller.</p></div>
+      <p id="spTopsTxt">The tops everyone recognized came at the end of parabolic run-ups. The cycle indicators that flagged them, Pi Cycle among them, are built to detect that acceleration. The two final price highs nobody flagged came after slow climbs. Pi Cycle never fired in 2025, and seven of eleven classic top indicators missed (Galaxy Research, June 2026). Their trigger lines are fixed; the waves they measure are getting smaller.</p></div>
       <div class="sp-figure"><svg id="spRunupChart" viewBox="0 0 640 260" role="img" aria-label="Price rise in the 90 days before each top"></svg>
-      <p class="sp-cap">Price rise in the 90 days before each top (log scale). Orange: parabolic run-ups, over 200% in 90 days. Grey: slow climbs, including the two final highs nobody flagged.</p></div>
+      <p class="sp-cap">Price rise in the 90 days before each top (log scale). Orange: parabolic run-ups, over 200% in 90 days. Grey: slow climbs, including the two final price highs nobody flagged.</p></div>
     </section>
 
     <section class="sp-section">
       <div class="sp-prose"><h3 class="sp-sub-h">What a peak buyer went through</h3>
-      <p>Buyers at each cycle&rsquo;s high waited <span id="spBeList">1.7, 3.3, 2.9 and 2.3</span> years to get back to even. Buyers at the March 2000 Nasdaq peak waited 15.1 years, or 17.9 after inflation. Buyers at the December 1989 Nikkei peak waited 34.1 years. Gold bought in January 1980 took 26.3 years to recover in dollars and 45.1 years after inflation, until February 2025. Bitcoin&rsquo;s difference is that the asset is the network. The railways and fibre built in past manias lifted the economy, not the shares bought at the top.</p></div>
+      <p>Buyers at each cycle&rsquo;s price high waited <span id="spBeList">1.7, 3.3, 2.9 and 2.3</span> years to get back to even. Buyers at the March 2000 Nasdaq peak waited 15.1 years, or 17.9 after inflation. Buyers at the December 1989 Nikkei peak waited 34.1 years. Gold bought in January 1980 took 26.3 years to recover in dollars and 45.1 years after inflation, until February 2025. Bitcoin&rsquo;s difference is that the asset is the network. The railroads and fiber built in past manias lifted the economy, not the shares bought at the top.</p></div>
       <div class="sp-figure"><svg id="spRecovChart" viewBox="0 0 640 330" role="img" aria-label="Years for a peak buyer to get back to even"></svg>
-      <p class="sp-cap">Years from the peak to the first close at or above it. Bitcoin from the site&rsquo;s price series; Nasdaq and Nikkei from FRED daily closes; gold from World Bank monthly averages, which understate the $850 intraday high of January 1980. &ldquo;Real&rdquo; uses US CPI.</p></div>
+      <p class="sp-cap">Years from the price high to the first close at or above it. Bitcoin from the site&rsquo;s price series; Nasdaq and Nikkei from FRED daily closes; gold from World Bank monthly averages, which understate the $850 intraday high of January 1980. &ldquo;Real&rdquo; uses US CPI.</p></div>
     </section>
 
     <section class="sp-section">
@@ -237,6 +264,8 @@ eleventyComputed:
       <div class="sp-figure"><svg id="spGrowthChart" viewBox="0 0 640 240" role="img" aria-label="Annual growth rate of the trend, 2011 to 2035"></svg>
       <p class="sp-cap">Annual growth of the trend price, by year (log scale). Past the dashed line is the model&rsquo;s own arithmetic carried forward, not data.</p></div>
     </section>
+
+    <div class="sp-takeaway"><strong>Takeaway.</strong> Every spike so far has been smaller, shorter and harder to spot than the one before, and every one came back to trend.</div>
   </div>
 
   <!-- ══════════ TAB 3 · WHEN LAWS BREAK ══════════ -->
@@ -244,32 +273,36 @@ eleventyComputed:
     <section class="sp-prose sp-first">
       <div class="sp-eyebrow">When Laws Break</div>
       <h2>What other growth laws did</h2>
-      <p>Bitcoin&rsquo;s power law is a fitted growth law, like Moore&rsquo;s law or the curve of world population. Some of those held for a century. Some broke, and the way they broke is instructive.</p>
+      <p>Bitcoin&rsquo;s trend is a <a href="/the-power-law">power law</a>: price rises with time since 2009 raised to a fixed power. Other growth laws make good comparisons. Two of the ones below are power laws too; Moore&rsquo;s law is exponential, a fixed doubling time. Some held for a century. Some broke, and the way they broke is instructive.</p>
     </section>
 
     <section class="sp-section">
       <div class="sp-prose"><h3 class="sp-sub-h">How long each law held</h3></div>
-      <div class="sp-figure"><svg id="spLawsChart" viewBox="0 0 640 250" role="img" aria-label="Timeline of growth laws: when each was fitted, how long it held, and whether it broke"></svg>
-      <p class="sp-cap">Solid: the period the law described well. Faded: after it bent or broke. Population&rsquo;s law fits records back millennia; shown here from 1900.</p></div>
+      <div class="sp-figure"><svg id="spLawsChart" viewBox="0 0 640 300" role="img" aria-label="Timeline of growth laws: what each says, how long it held, and whether it broke"></svg>
+      <p class="sp-cap">Solid: the period the law described well. Faded: after it bent or broke. Population&rsquo;s law fits records back millennia; shown here from 1900. The population curve was fitted to records up to 1960 and pointed to infinite population on 13 November 2026. Growth slowed in the 1960s instead.</p></div>
+      <p class="sp-prose sp-note">Why the population law broke: birth rates fell as incomes rose and people moved to cities, so growth stopped accelerating. What each law said, and how it broke, is in the <a href="#sp-cases-h">case files below</a>.</p>
     </section>
 
     <section class="sp-prose">
       <h3 class="sp-sub-h">What every spike above a law has done</h3>
-      <p>Across the cases we examined, spikes above a long-running law came back to it. Earthquake aftershocks fade on a schedule. Manias in credit, commodities and paper assets returned to where they started. The exceptions, where a spike marked a new and higher path, involved a change in the mechanism underneath: a new technology, or a currency losing value.</p>
+      <p>Across the cases I examined, spikes above a long-running law came back to it. Earthquake aftershocks fade on a schedule. Manias in credit, commodities and paper assets returned to where they started. The exceptions, where a spike marked a new and higher path, involved a change in the <em>mechanism</em> underneath: <em>a new technology</em>, or <em>a currency losing value</em>.</p>
       <h3 class="sp-sub-h">Mechanism, not chart</h3>
-      <p>The best predictor of whether a law holds is whether something drives it. Wright&rsquo;s law, which ties falling costs to how much has been produced, has held for 90 years. Moore&rsquo;s law, tied to the calendar, bent when transistors hit physical limits. A 1960 paper in <em>Science</em> fitted world population to a curve that reached infinity on Friday, 13 November 2026. Within a few years of publication, birth rates fell and the law broke.</p>
+      <p>The best predictor of whether a law holds is whether something <em>drives</em> it. Wright&rsquo;s law, which ties falling costs to how much has been produced, has held for 90 years. Moore&rsquo;s law, tied to the calendar, bent when transistors hit physical limits. A 1960 paper in <em>Science</em> fitted world population to a curve that reached infinity on Friday, 13 November 2026. Within a few years of publication, birth rates fell and the law broke.</p>
       <p>Bitcoin&rsquo;s law is fitted to time, the weaker kind. Its proposed mechanism is a fixed supply meeting a growing network. The trend is credible to the extent that mechanism holds.</p>
     </section>
 
     <section class="sp-section">
-      <div class="sp-prose"><h3 class="sp-sub-h">Case files</h3><p class="sp-dim">What we looked at, graded by how well the record supports it. Open a card for the detail.</p></div>
+      <div class="sp-prose"><h3 class="sp-sub-h" id="sp-cases-h">Case files</h3><p class="sp-dim">What I looked at, graded by how well the record supports it. Open a card for the detail.</p></div>
       <div class="sp-cases" id="spCases"></div>
     </section>
 
     <section class="sp-prose">
       <h3 class="sp-sub-h">No supply glut</h3>
-      <p>Many past manias ended when high prices brought new supply: mines reopened, track was overbuilt, new shares flooded the market. Bitcoin&rsquo;s difficulty adjustment keeps new coins arriving on schedule whatever the price. Since the 2024 halving that is about 450 coins a day, against roughly 20 million in circulation. The supply that answers a bitcoin spike is existing holders selling. Which means the readers of this page are part of how spikes end.</p>
+      <p>Many past manias ended when high prices brought new supply: mines reopened, railroad track was overbuilt, new shares flooded the market. Bitcoin&rsquo;s issuance follows a fixed schedule written into the protocol. The difficulty adjustment keeps blocks, and so new coins, arriving on that schedule whatever the price. Since the 2024 halving that is about 450 coins a day, against roughly 20 million in circulation. Issuance halves about every four years and ends around 2140. The supply that answers a bitcoin spike is existing HODLers selling. Which means the readers of this page are part of how spikes end.</p>
+      <p>One change could tighten supply further. As lending against bitcoin matures, more HODLers may borrow against their coins rather than sell them. Fewer sellers at a spike would leave even less supply to meet demand. That is a possibility, not yet a measured effect, and it does not change the warning on the first tab: borrowing near a spike is the risky moment.</p>
     </section>
+
+    <div class="sp-takeaway"><strong>Takeaway.</strong> Laws hold while their mechanism holds. Bitcoin&rsquo;s is a fixed supply meeting a growing network; watch the mechanism, not just the chart.</div>
   </div>
 
   <!-- ══════════ TAB 4 · THIS TIME IS DIFFERENT? ══════════ -->
@@ -277,39 +310,40 @@ eleventyComputed:
     <section class="sp-prose sp-first">
       <div class="sp-eyebrow">This Time Is Different?</div>
       <h2>How to tell a breakaway from a spike</h2>
-      <p>Someone says it at every peak. Sometimes they&rsquo;re right about the technology and wrong about the price. Here is how to tell the difference, and what we&rsquo;d need to see.</p>
+      <p class="sp-def">A breakaway here means a lasting move to a steeper trend, not a spike that comes back.</p>
+      <p>Someone says it at every peak. Sometimes they&rsquo;re right about the technology and wrong about the price and the timing. Here is how to tell the difference, and what I&rsquo;d need to see.</p>
     </section>
 
     <section class="sp-section">
       <div class="sp-vs">
         <div class="sp-against"><h3>Claims about price</h3><p class="sp-dim sp-sm">Old metrics don&rsquo;t apply. Prices only go up. The cycle is dead.</p><p class="sp-sm sp-flush">Wrong at essentially every peak on record, from 1720 to 2021.</p></div>
-        <div class="sp-for"><h3>Claims about the technology</h3><p class="sp-dim sp-sm">Railways will reshape commerce. The internet will dominate business.</p><p class="sp-sm sp-flush">Often right, but early. Investors misjudged the timing, not the change.</p></div>
+        <div class="sp-for"><h3>Claims about the technology</h3><p class="sp-dim sp-sm">Railroads will reshape commerce. The internet will dominate business.</p><p class="sp-sm sp-flush">Often right, but early. Investors misjudged the timing, not the societal impact.</p></div>
       </div>
-      <p class="sp-prose sp-after-vs">You can believe bitcoin will matter enormously and still judge that a spike has priced in too much, too soon.</p>
+      <p class="sp-prose sp-after-vs">You can believe bitcoin will ultimately matter enormously and still judge that a spike has priced in too much, too soon.</p>
     </section>
 
     <section class="sp-prose">
       <h3 class="sp-sub-h">What a real break upward would look like</h3>
-      <p>Not price rising further above trend. The trend itself steepening, because the things that drive it, such as holders, hashrate and network use, are growing faster than before. And it would show against everything, not just the dollar.</p>
+      <p>Not price rising further above trend. The trend itself steepening, because the things that drive it, such as HODLers, hashrate, wallet addresses holding a balance, and network use, are growing faster than before. And it would show against everything, not just the dollar.</p>
     </section>
 
     <section class="sp-section">
       <div class="sp-prose"><h3 class="sp-sub-h">The denominator test</h3>
-      <p id="spDenomTxt">In Weimar Germany, Venezuela and Zimbabwe, local stock markets soared while losing value in real terms. A rise that shows only in dollars may be the dollar falling. So we priced bitcoin in inflation-adjusted dollars and in ounces of gold and fitted the trend again. It holds in both. The exponent falls only from 5.5 in dollars to 5.3 after inflation and 5.2 in gold, and the fit stays nearly as tight. Bitcoin&rsquo;s trend is bitcoin&rsquo;s, not the dollar&rsquo;s.</p></div>
+      <p id="spDenomTxt">In Weimar Germany, Venezuela and Zimbabwe, local stock markets soared while losing value in real terms. A rise that shows only in dollars may be the dollar falling. So I priced bitcoin in inflation-adjusted dollars and in ounces of gold and fitted the trend again. It holds in both. The exponent falls only from 5.5 in dollars to 5.3 after inflation and 5.2 in gold, and the fit stays nearly as tight. Bitcoin&rsquo;s trend is bitcoin&rsquo;s, not the dollar&rsquo;s.</p></div>
       <div class="sp-unit-stats" id="spUnitStats"></div>
       <div class="sp-figure"><svg id="spUnitsChart" viewBox="0 0 640 280" role="img" aria-label="Bitcoin's distance from its own trend, priced in dollars, real dollars and gold"></svg>
       <p class="sp-cap">Each line is bitcoin&rsquo;s price divided by its own trend in that unit (log scale), 2011 onward. These are a 2011-onward cross-check fitted by ordinary least squares, computed <span id="spUnitsAsOf">2026-10-04</span>; they differ from the site&rsquo;s canonical model, which is fitted from genesis with an exponent of 5.77.</p></div>
-      <p class="sp-prose">One surprise. Priced in gold, bitcoin sits at <span id="spGoldNow">0.28</span>&times; its trend, against <span id="spUsdNow">0.60</span>&times; in dollars on the same fit, because gold has risen so far since 2024. In gold terms the October 2025 high was not a spike at all: it sat below trend.</p>
+      <p class="sp-prose">One surprise. Priced in gold, bitcoin sits at <span id="spGoldNow">0.28</span>&times; its trend, against <span id="spUsdNow">0.60</span>&times; in dollars on the same fit, because gold has risen so far since 2024. In gold terms the October 2025 price high was not a spike at all: it sat below trend.</p>
     </section>
 
     <section class="sp-prose">
       <h3 class="sp-sub-h">Policy can bend a trend</h3>
-      <p>Gold&rsquo;s price history is broken by policy: private ownership banned in 1933, a fixed price until 1971. Bitcoin&rsquo;s largest test so far, China&rsquo;s 2021 ban on mining and trading, cut price by about half and pushed hashrate out of the country. Both recovered within the year and the trend held. Self-custody makes bitcoin hard to seize; bitcoin held through ETFs and exchanges is as reachable as gold in a vault.</p>
+      <p>Gold&rsquo;s price history is broken by policy. Americans were barred from owning it from 1933 to 1974, and the dollar was fixed to it at $35 an ounce until 1971, when the link was cut. Bitcoin&rsquo;s largest test so far, China&rsquo;s 2021 ban on bitcoin mining and trading, cut bitcoin&rsquo;s price by about half and pushed hashrate out of the country. Both recovered within the year and the trend held. Self-custody makes bitcoin hard to seize; bitcoin held through ETFs and exchanges is as reachable as gold in a vault.</p>
     </section>
 
     <section class="sp-section">
       <div class="sp-falsify">
-        <div class="sp-eyebrow">What would change our view</div>
+        <div class="sp-eyebrow">What would change my view</div>
         <ul>
           <li>Price staying below the floor longer than any precedent.</li>
           <li>The fitted exponent drifting materially as new data arrives.</li>
@@ -323,15 +357,18 @@ eleventyComputed:
       <div class="sp-steel">
         <div class="sp-eyebrow">The other side</div>
         <p>The power law&rsquo;s strongest critics argue the fit is weaker than it looks. Regressing a trending series on time inflates the fit, the exponent shifts with the start date, and a stack of three adoption S-curves fits the history better. The same researchers found that the simple power law forecasts 12 to 24 months ahead better than any alternative they tested (Baquero &amp; Menezes, 2026). Weak structure, strong forecasts.</p>
+        <p class="sp-flush">My reading: the critics and the model agree on what matters for this page. The power law is not a law of nature, and it has still been the best guide to where price sits a year or two out. That is all this page asks of it: a yardstick for how far above trend price has run, and what followed.</p>
       </div>
     </section>
+
+    <div class="sp-takeaway"><strong>Takeaway.</strong> A real breakaway would show in the trend itself and against every unit, gold included. So far it hasn&rsquo;t; spikes have come back every time.</div>
   </div>
 
   <!-- ══════════ SOURCES ══════════ -->
   <section class="sp-prose sp-sources" id="sources">
     <div class="sp-eyebrow">Sources</div>
     <h2>Where the numbers come from</h2>
-    <p>Every bitcoin figure is computed in your browser from the site&rsquo;s shared price series and the Power Law model: trend 1.6&times;10<sup>&minus;17</sup> &middot; days<sup>5.77</sup> since genesis, floor 0.42&times;, upper band 3&times;. Prices are ~12-day closes, measured on 2011 onward as on <a href="/the-bitcoin-floor">The Bitcoin Floor</a>. The live price, when it loads, moves only the readout at the top of the first tab.</p>
+    <p>Every bitcoin figure is computed in your browser from the site&rsquo;s shared price series and the Power Law model: trend 1.6&times;10<sup>&minus;17</sup> &middot; days<sup>5.77</sup> since genesis, floor 0.42&times;, upper band 3&times;. Prices are ~12-day closes, measured on 2011 onward as on <a href="/the-bitcoin-floor">The Bitcoin Floor</a>. The live price, when it loads, moves only the readout at the top of the first tab and the &ldquo;never bought back&rdquo; figures.</p>
     <ul>
       <li>Cycle indicators in 2025, including Pi Cycle and the seven of eleven classic top indicators that missed: Galaxy Research, bitcoin cycle report, June 2026.</li>
       <li>The power law&rsquo;s critics and its forecasting record: Baquero &amp; Menezes, &ldquo;Bitcoin&rsquo;s Power Law: Weak Structure, Strong Forecasts,&rdquo; arXiv 2605.21316.</li>
