@@ -587,6 +587,29 @@ CARDS = [
         },
         "output_filename": "og-compare-retirement-plans-v2.jpg",
     },
+    {
+        # The cycle range chart lives on Tab 2 (The Record), so click that tab
+        # first. Product-forward: the chart reads live PL_DATA, so this card
+        # goes stale with the data — MONTHLY_REFRESH_CHECKLIST §6 regen line.
+        "name": "bitcoin-spikes",
+        "url": "https://lastcoinstanding.com/bitcoin-spikes",
+        "hero_selector": "#spDecayChart",
+        "click_before_capture": "#spT2",
+        "wait_after_navigate_ms": 1500,
+        "wait_after_scroll_ms": 1500,
+        "chrome": {
+            "title": "Bitcoin&rsquo;s ",
+            "titleAccent": "Spikes",
+            "titleAfter": "",
+            "subtitle": "Every spike above the power law trend has come back. Each one smaller than the last. What that means for HODLers.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Largest spike: 14&times; trend in 2011, 1.19&times; in 2024</strong>'
+                '  ·  43% of the time above trend'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-spikes",
+        },
+        "output_filename": "og-bitcoin-spikes.jpg",
+    },
 ]
 
 
