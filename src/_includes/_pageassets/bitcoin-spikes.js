@@ -313,7 +313,10 @@
     $('spCNote').textContent = cRebuy === 'ath80'
       ? 'A rebuy waiting for an 80% fall has not triggered since 2013, so the sale stayed in cash. Fixed drawdown targets fail as cycles shrink.'
       : 'Coins after the round trip as a multiple of coins sold, whole position, no tax.' + (t13.fired ? ' Note 2013: the rule fired in ' + monthYear(t13.sell.d) + ' and price rose more than ' + Math.floor(R13.highP / t13.sell.p) + '× by ' + monthYear(R13.highD) + '.' : '');
-    $('spCCta').setAttribute('href', '/disciplined-rebalancing?account=' + cAcct);
+    // The link carries the whole rule (DR v2 Stage A reads it: sx, st, f, rx, account, from).
+    // Card C's buy back is trend (rx=1) or 80% below the high, which DR can't do yet: rb=ath80
+    // tells DR to say so. Card C's own figures are computed here, separately from DR's engine.
+    $('spCCta').setAttribute('href', '/disciplined-rebalancing?sx=' + cTrig + '&st=up&f=100&rx=1&account=' + cAcct + '&from=spikes' + (cRebuy === 'ath80' ? '&rb=ath80' : ''));
   }
 
   // ═══════════ TAX HURDLE ═══════════
@@ -612,6 +615,10 @@
     seg('spCAcct', function (v) { cAcct = v; updC(); });
     seg('spHAcct', function (v) { hAcct = v; updH(); });
     $('spHRate').addEventListener('input', updH); $('spHBasis').addEventListener('input', updH); $('spHState').addEventListener('change', updH);
+    // The shared list carries Washington at 0%, right for real estate (exempt there) but not for
+    // bitcoin: WA taxes long-term gains, crypto included, at 7% above about $270k (DATA_AUDIT DR-WA).
+    // Relabel it so the label the rate is read from says what applies to bitcoin.
+    var wa = $('spHState').querySelector('option[value="WA"]'); if (wa) wa.textContent = 'Washington (7% on long-term gains above about $270k)';
     $('spHState').value = 'NONE';
     document.querySelectorAll('.sp-intent').forEach(function (b) { b.addEventListener('click', function () { selectIntent(b, true); }); });
     document.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { var t = $(b.getAttribute('data-go')); selectIntent(t, true); t.focus(); }); });
