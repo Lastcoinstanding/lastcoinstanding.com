@@ -527,8 +527,12 @@
     if ($('dr2State').value !== S.O.state) $('dr2State').value = S.O.state;
     $('dr2StateCtx').textContent = BTC_STATE_OVERRIDE[S.O.state] && BTC_STATE_OVERRIDE[S.O.state].help ? BTC_STATE_OVERRIDE[S.O.state].help : 'Top state rates on long-term gains, from the site’s shared list.';
     $('dr2RuleSentence').innerHTML = ruleText(R);
-    // The sticky bar mirrors the card: presets, account, and the short rule.
-    document.querySelectorAll('#dr2Bar .dr2-chip[data-p]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.p === S.preset)); });
+    // The sticky bar mirrors the card: preset, levels, deadline, account and
+    // the short rule. A field the reader is typing in is left alone; it is
+    // normalised on blur.
+    $('dr2BarPreset').value = S.preset; $('dr2BarCap').value = String(R.cap);
+    BAR_FIELDS.forEach(function(f){ var el = $(f.id); if (el !== document.activeElement) el.value = String(R[f.k]); });
+    $('dr2BarSz').max = R.sx; $('dr2BarSzWrap').hidden = R.timing !== 'fade';
     document.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === S.O.acct)); });
     $('dr2BarRule').textContent = shortRule(R);
     $('dr2BarSum').textContent = settingSummary() + ' · ' + stackText() + ' · from ' + S.start.slice(0, 4);
@@ -987,11 +991,48 @@
   // the moment the rule card has scrolled out of view until the end of the
   // presets block, where it scrolls away with that block's bottom edge. Its
   // controls set the same state as the card's, so render() keeps both in sync.
+  // The bar's level fields (2026-10-05): the panel sliders' ranges and steps.
+  // Typing applies after a 200ms pause when the value is in range; blur
+  // clamps an out-of-range value, and an empty or invalid one reverts to the
+  // last good value. Any edit switches the preset to Custom.
+  var BAR_FIELDS = [
+    { id: 'dr2BarSx', k: 'sx', lo: 1.1, hi: function(){ return 5; }, step: 0.05 },
+    { id: 'dr2BarSz', k: 'sz', lo: 1, hi: function(){ return S.R.sx; }, step: 0.05 },
+    { id: 'dr2BarF', k: 'f', lo: 5, hi: function(){ return 100; }, step: 5 },
+    { id: 'dr2BarRx', k: 'rx', lo: 0.42, hi: function(){ return 1.5; }, step: 0.01 }
+  ];
+  function setLevel(k, v){
+    if (k === 'sx') { S.R.sx = v; S.R.sz = S.R.timing === 'up' ? v : Math.min(S.R.sz, v); }
+    else if (k === 'sz') S.R.sz = Math.min(v, S.R.sx);
+    else S.R[k] = v;
+    toCustom(); render();
+  }
+  function wireBarFields(){
+    BAR_FIELDS.forEach(function(f){
+      var el = $(f.id), t = null;
+      function snap(v){ return f.k === 'f' ? Math.round(v / f.step) * f.step : r2(Math.round(v / f.step) * f.step); }
+      function parse(){ var s = String(el.value).trim(); if (s === '') return NaN; var v = parseFloat(s); return isFinite(v) ? v : NaN; }
+      el.addEventListener('input', function(){
+        clearTimeout(t);
+        t = setTimeout(function(){ var v = parse(); if (isFinite(v) && v >= f.lo && v <= f.hi() && snap(v) !== S.R[f.k]) setLevel(f.k, snap(v)); }, 200);
+      });
+      function commit(){
+        clearTimeout(t);
+        var v = parse();
+        if (isFinite(v)) { v = snap(clamp(v, f.lo, f.hi())); if (v !== S.R[f.k]) setLevel(f.k, v); }
+        el.value = String(S.R[f.k]);
+      }
+      el.addEventListener('change', commit);
+      el.addEventListener('blur', commit);
+    });
+    $('dr2BarPreset').addEventListener('change', function(e){ selectPreset(e.target.value); });
+    $('dr2BarCap').addEventListener('change', function(e){ S.R.cap = +e.target.value; toCustom(); render(); });
+  }
   function selectPreset(p){ S.preset = p; if (PRESETS[p]) S.R = copy(PRESETS[p]); else $('dr2Build').open = true; track('dr_preset', { preset: p }); render(); }
   function wireBar(){
     var bar = $('dr2Bar'), card = $('dr2RuleCard'), end = $('dr2PresetsCard'), nav = document.querySelector('.site-nav'), tab = $('tab-calculator');
     if (!bar || !card || !end) return;
-    bar.querySelectorAll('.dr2-chip[data-p]').forEach(function(b){ b.addEventListener('click', function(){ selectPreset(b.dataset.p); }); });
+    wireBarFields();
     bar.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.addEventListener('click', function(){ S.O.acct = b.dataset.v; render(); }); });
     $('dr2BarEdit').addEventListener('click', function(){
       var d = $('dr2Build'); d.open = true;
@@ -1022,6 +1063,7 @@
     function onScroll(){ place(); }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);   // STYLE_GUIDE §6.45: re-measure once fonts settle
     document.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ setTimeout(place, 0); }); });
     bar.addEventListener('animationend', function(){ bar.classList.remove('is-entering'); });
     place();

@@ -2227,20 +2227,35 @@ table.dr2-cmp td.mult { font-weight: 600; font-size: .95rem; }
 .dr2-bar[hidden] { display: none; }
 .dr2-bar.is-entering { animation: dr2BarIn .18s ease-out; }
 @keyframes dr2BarIn { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
-.dr2-bar-text { min-width: 0; flex: 1 1 18rem; display: grid; gap: .1rem; }
-.dr2-bar-rule { margin: 0; font-size: .86rem; color: var(--text-bright); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dr2-bar-sum { margin: 0; font-size: .74rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dr2-bar-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; flex: 0 1 auto; }
-.dr2-bar-chips, .dr2-bar-acct { display: flex; gap: .2rem; }
+/* Since 2026-10-05: one row of controls (preset, levels, deadline, account,
+   Edit rules), then the rule sentence and the setting summary in smaller
+   text. 601–1000px the controls wrap; 600px and below, sentence + Edit only. */
+.dr2-bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: .2rem; }
+.dr2-bar-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; min-width: 0; }
+.dr2-bf { display: inline-flex; align-items: center; gap: .3rem; font-size: .76rem; color: var(--text-dim); white-space: nowrap; }
+.dr2-bf[hidden] { display: none; }
+.dr2-bf-u { color: var(--text-dim); margin-left: -.15rem; }
+.dr2-bf input, .dr2-bf select { background: var(--bg-card); color: var(--text-bright); border: 1px solid var(--border-lt); border-radius: 6px; min-height: 44px; font-family: inherit; font-size: .84rem; font-variant-numeric: tabular-nums; box-sizing: border-box; }
+.dr2-bf input { width: 4.4rem; padding: 0 .3rem 0 .45rem; }
+.dr2-bf select { padding: 0 .4rem; max-width: 9.5rem; }
+.dr2-bf input:hover, .dr2-bf select:hover { border-color: var(--text-muted); }
+.dr2-bar-acct { display: flex; gap: .2rem; }
+.dr2-bar-edit { margin-left: auto; }
+.dr2-bar-line { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .74rem; color: var(--text-dim); }
+.dr2-bar-rule { font-size: .76rem; color: var(--text); font-weight: 500; }
+.dr2-bar-sum::before { content: " · "; }
 .dr2-chip { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: 0 .55rem; min-height: 44px; min-width: 44px; font-family: inherit; font-size: .74rem; font-weight: 500; cursor: pointer; }
 .dr2-chip:hover { border-color: var(--text-muted); }
 .dr2-chip[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
 .dr2-bar-edit { background: var(--orange-soft); border: 1px solid var(--orange); color: var(--orange); border-radius: 6px; padding: 0 .9rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.dr2-bar button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.dr2-bar button:focus-visible, .dr2-bar input:focus-visible, .dr2-bar select:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+@media (max-width: 1000px) { .dr2-bar-ctls { gap: .3rem .5rem; } .dr2-bar-edit { margin-left: 0; } }
 @media (max-width: 600px) {
-  .dr2-bar { flex-wrap: nowrap; padding: .3rem 16px; }
-  .dr2-bar-sum, .dr2-bar-chips, .dr2-bar-acct { display: none; }
-  .dr2-bar-text { flex: 1 1 auto; }
-  .dr2-bar-ctls { flex: 0 0 auto; }
+  .dr2-bar { flex-direction: row; align-items: center; gap: .6rem; padding: .3rem 16px; }
+  .dr2-bar-ctls { order: 2; flex: 0 0 auto; }
+  .dr2-bar-ctls > :not(.dr2-bar-edit) { display: none; }
+  .dr2-bar-line { order: 1; flex: 1 1 auto; }
+  .dr2-bar-rule { font-size: .86rem; color: var(--text-bright); }
+  .dr2-bar-sum { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .dr2-bar.is-entering { animation: none; } }
