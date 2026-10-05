@@ -2184,6 +2184,8 @@ A slim fixed bar that re-presents a page's primary inputs once they scroll out o
 
 Below the width where the bar cannot hold its controls in one legible row (~760px), hide it and give mobile a **slim repeat of the controls** in the page flow instead. Stack that repeat one control per row: three across at 375px spends 216px on arrows and clips each value to a few pixels.
 
+**Variant: inputs in the bar (`/disciplined-rebalancing`, 2026-10-05).** When the reader needs to tune values against a chart, put compact fields in the bar rather than copies of the sliders. Use one row of labelled controls (selects for discrete choices, `type="number"` fields with the source control's min, max and step, each with a visible label and an accessible name), with the state sentence below in smaller text. Apply typing after a ~200ms debounce only when the value is in range. On blur, clamp an out-of-range value and revert an empty one. Never rewrite the field that has focus. Every control writes the same state object the main controls use, so one render keeps both in sync. On DR this bar is placed synchronously on scroll and re-measured on `document.fonts.ready`, and it keeps a sentence-plus-button form at 600px and below rather than hiding.
+
 ### 6.46 Inherited-preset note (reduced sitewide-picker chip sets)
 
 **Rule: any page that exposes a REDUCED chip set for a sitewide picker must render the inherited value when no chip matches.**
