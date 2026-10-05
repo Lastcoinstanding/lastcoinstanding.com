@@ -2296,6 +2296,35 @@ A `<details>` card whose summary carries a pill grading how well the record supp
 
 **Failure list.** Where a card shows outcomes of a trade, the cases where it lost coins or never happened sit in a red-bordered box below the results (`.sp-fail`), each case named with its date and its multiple. Every case is computed; a case from another page's set is read from that page's shared module so the two agree. Results below 1× in result rows are red and labelled "Lost coins". Showing the failures beside the successes is the point; a card that only lists wins is a sales page.
 
+
+### 6.54 Preset chips with a live rule sentence (`/disciplined-rebalancing`, 2026-10-04)
+
+A row of preset buttons over one sentence that states the active rule in plain words, for a calculator whose inputs are a rule rather than a number. Page-scoped prefix `dr2-`.
+
+```html
+<div class="dr2-presets" role="group" aria-label="Presets">
+  <button type="button" class="dr2-preset" data-p="conservative" aria-pressed="true"><span class="k">Conservative</span><span class="d">Trim a quarter after a big spike turns. Rarely fires.</span></button>
+  … <button type="button" class="dr2-preset" data-p="custom" aria-pressed="false"><span class="k">Custom</span><span class="d">Your own levels. Any change below lands here.</span></button>
+</div>
+<p class="dr2-rule" id="dr2RuleSentence" aria-live="polite">Sell <strong>25%</strong> when price falls back below <strong>2× trend</strong> after reaching it. Buy back at <strong>1× trend</strong>, or at market after <strong>24 months</strong>.</p>
+```
+
+- **Any edit lands on Custom.** A preset is a starting point, not a mode; changing any rule control below switches the chip. Choosing Custom opens the panel (§6.55).
+- **The sentence is the read-back.** It rewrites on every change (`aria-live="polite"`), so the reader never has to reconstruct the rule from the controls. Bold the numbers, nothing else.
+- **Buttons with `aria-pressed`, 44px minimum.** Four across on desktop, two by two below 760px.
+- **Use it** when presets stand for different behaviours a reader can name. **Skip it** for a single numeric input; that is a slider with tick labels.
+
+### 6.55 "Build your own rule": the disclosure panel (`/disciplined-rebalancing`, 2026-10-04)
+
+A `<details>` element, collapsed by default, holding every rule control in labelled groups (When to sell · When to buy back · Account and tax · Your stack). The summary is the only always-visible affordance: "Build your own rule" with a `+` / `–` marker.
+
+- **Collapsed by default.** Most readers stay on a preset; the panel is for the ones who want full control (D1). Custom opens it.
+- **Every level shows its context line** (the share of the record at or above it, since 2011 and since 2017), so a reader sees how rare a level is while choosing it.
+- **Conditional controls hide, not disable.** The fade level hides for "on the way up"; the tax group hides in an IRA. A warning line in red appears where a choice can strand the rule ("Never" as the deadline).
+- **Native controls only:** `<details>`/`<summary>`, range inputs (no `cursor` rules; base.njk owns them), `aria-pressed` segments, a checkbox, the shared state `<select>`. Focus is visible on all of them.
+
+The failure box under the cycle table is the §6.53 component, generated for the current rule.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.

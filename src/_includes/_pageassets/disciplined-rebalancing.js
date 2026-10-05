@@ -973,6 +973,10 @@
     return { pass: f.length === 0, failures: f, anchor: ANCHOR, spikesQA: sq, live: { conservativeIRA11: +RE.run(PRESETS.conservative, engineOpts(DEF_O, '2011-01')).end.toFixed(3) } };
   }
   window.drQA = drQA;
+  // Console hook for preview checks: renders the failure box for a given list,
+  // so the neutral "No losing round trips" state can be seen without hunting
+  // for a rule that reaches it. Changes nothing else; the next render restores.
+  window.drDebug = { renderFailBox: renderFailBox };
 
   // ═══ Live figures in the Question and Math tabs (spec §3) ═══
   // Each [data-dr-math] span and the percentile table are computed here, so

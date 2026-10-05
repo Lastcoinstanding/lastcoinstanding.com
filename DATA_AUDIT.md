@@ -302,6 +302,22 @@ One row per card. The value column is the card's headline figures; the full card
 
 The Disciplined Rebalancing page applies the same Power Law channel as `/the-bitcoin-retirement` and `/bitcoin-vs-real-estate#projection`. Constants `PL_A`, `PL_B`, `PL_FLOOR`, `PL_CEIL` are copied locally from PL-1 / BR-1 to BR-3 (no separate citation rows needed). Historical price series (`PL_DATA`) is the canonical Power Law dataset, sourced via the shared module `/_pageassets/shared/power-law-data.js`.
 
+**v2 Stage A (2026-10-04).** The calculator now runs on `shared/rule-engine.js`; every bitcoin figure on the Calculator, Question and Math tabs computes live from `PL_DATA`. `drQA()` pins the rows marked "fixture" to the 2026-09-30 sample (MONTHLY_REFRESH_CHECKLIST §5.1c).
+
+| # | Component | Value | Source | URL | Last audited | Next due |
+|---|---|---|---|---|---|---|
+| DR-1 | Preset results, coins vs HODL (fixture) | IRA since 2011 / 2014: Conservative 1.10× / 1.35×, Balanced 1.35× / 2.25×, Adventurous 1.12× / 2.59×. Taxable (20% + NIIT, no state, FIFO, cash 0%, 24-month deadline): 0.82× / 1.18×, 0.75× / 1.68×, 0.48× / 1.75× | Live, `RuleEngine.run`; asserted ±0.01× by `drQA()` at 2026-09-30 | — | 2026-10-04 | each PL_DATA refresh (QA) |
+| DR-2 | Conservative per cycle, IRA, from 2011 (fixture) | 2011 Sep 2011 $5.02 1.65× → Oct 2011 $3.32 0.89×, 1.13×; 2013 Apr 2013 $68 1.58× → Jan 2015 $270 0.87×, 0.81×; 2017 Apr 2018 $6,828 1.87× → Nov 2018 $3,828 0.70×, 1.20×; 2021 Jan 2021 $30,419 1.79× → May 2022 $30,279 0.98×, 1.00×; 2024–25 never sold, peak 1.19× | Live; asserted | — | 2026-10-04 | each refresh (QA) |
+| DR-3 | Context shares (fixture) | At or above 2× trend: 17% since 2011, 13% since 2017; at or below 1×: 56% since 2011 (share of ~12-day samples) | Live, `RuleEngine.pctAtOrAbove` / `pctAtOrBelow`; asserted | — | 2026-10-04 | each refresh (QA) |
+| DR-4 | Percentile levels (Math §1 table) | 80th: 1.74× full record, 1.78× since 2011, 1.59× since 2017; 50th since 2011 0.87×; legacy `sell=80&rebuy=50` → 1.78× / 0.87× (asserted) | Live, `RuleEngine.ratioAtPercentile` (interpolated, share of samples). The drafting spec's 1.75 / 1.60 / 2.20 used a different interpolation; the page prints the live values | — | 2026-10-04 | moves with the data |
+| DR-5 | Trend growth rates (era note, Math §7) | ~219% a year over the 12 months from 2013-07-01; ~37% over the 12 months from the latest sample | Live, `RuleEngine.trendGrowth` on the canonical trend (a = 1.6e-17, b = 5.77) | — | 2026-10-04 | the 37% moves with each sample |
+| DR-6 | Partial sales, sell timing, the deadline (Question tab, Math §5–§6) | Same triggers (up through 1.75×, buy back 0.85×), IRA since 2011: sell 100% 0.61×, 50% 0.95×. Fade at 2× selling half: 1.35× / 2.25× (2011 / 2014); up through 1.75× selling half: 0.95× / 1.32×. 2× / 0.5× / 100%, no deadline: 0.13×; with 24 months: 0.61× | Live, engine | — | 2026-10-04 | moves with the data |
+| DR-7 | Cost-basis methods (Math §4) | FIFO default; specific identification allowed with records; average cost not allowed for directly held bitcoin; per-wallet tracking from 2025 | IRS Rev. Proc. 2024-28 | https://www.irs.gov/pub/irs-drop/rp-24-28.pdf | 2026-10-04 | 2027-01 |
+| DR-8 | Short-term rate | 32% federal ordinary rate on lots held under a year, plus NIIT and state | Bracket per TX-3 (32%: MFJ $403,550–$512,450 in 2026); NIIT per TX-5; long-term thresholds per TX-2 | — | 2026-10-04 | with TX-2 / TX-3 |
+| DR-9 | Cash yield option | 4% a year, a money-market rate held flat; "real rates ran from 0% to about 5% over the record" | Effective federal funds rate, about 0.1% (2011–15, 2020–21) to 5.33% (2023–24) | https://fred.stlouisfed.org/series/FEDFUNDS | 2026-10-04 | 2027-10 |
+| DR-WA | Washington's rate for bitcoin (DR and Bitcoin's Spikes override the shared list's 0%) | 7% on long-term gains above an inflation-adjusted deduction (~$270k); 2.9% surcharge above ~$1.27M from 2025 (9.9% top). Crypto counts as intangible property. Real estate is exempt, so the shared list's 0% stays right for the real-estate pages | Washington DOR capital gains tax FAQ; 2025 rate change (SB 5813) | https://dor.wa.gov/taxes-rates/other-taxes/capital-gains-tax/frequently-asked-questions-about-washingtons-capital-gains-tax | 2026-10-04 | 2027-01 |
+
+
 ### bitcoin-fixed-income
 
 | # | Component | Value | Source | URL | Last audited | Next due |

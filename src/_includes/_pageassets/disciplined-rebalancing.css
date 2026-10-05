@@ -2102,7 +2102,8 @@ input[type="range"]::-moz-range-track {
 .dr2-stack h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; color: var(--text-bright); font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; margin: 0; text-wrap: balance; }
 .dr2-stack p { margin: 0; }
 .dr2-eyebrow { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--orange); }
-.dr2-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem 1.4rem; display: grid; gap: 1rem; min-width: 0; }
+.dr2-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem 1.4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; min-width: 0; }
+.dr2-stack { grid-template-columns: minmax(0, 1fr); }
 .dr2-small { font-size: .8rem; color: var(--text-muted); line-height: 1.55; }
 .dr2-num { font-variant-numeric: tabular-nums; }
 .dr2-strong { color: var(--text); }
