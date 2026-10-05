@@ -69,6 +69,7 @@
     "display": "10/1/26",
     "date": "2026-10-01",
     "page": "/bitcoin-vs-the-stock-market",
+    "badge": false,
     "summary": "Bitcoin vs. the Stock Market: data through September 2026. At five years bitcoin and the S&P 500 are now almost level; a 2021 claim corrected."
   },
   {
@@ -105,6 +106,7 @@
     "display": "10/1/26",
     "date": "2026-10-01",
     "page": "/disciplined-rebalancing",
+    "badge": false,
     "summary": "Disciplined Rebalancing: the Math tab’s percentile table now matches the calculator (median 0.85× trend); results unchanged."
   },
   {
@@ -171,6 +173,7 @@
     "display": "9/30/26",
     "date": "2026-09-30",
     "page": "/living-on-bitcoin",
+    "badge": false,
     "summary": "Living on Bitcoin: The CLARITY Act's status updated: the Senate's September 15 cloture vote failed, 49 to 50, and a motion to reconsider keeps the bill alive."
   },
   {

@@ -326,12 +326,29 @@ for f in src/*.njk; do s=$(basename "$f" .njk); \
 ```
 
 > **Do not back-fill entries for old pages to silence that check.**
-> `freshness.js` derives NEW from a slug's *first* entry in this file, not
-> from its launch date (the documented CAVEAT at the top of that module),
-> so adding a 2026 entry for a 2025 page lights a false NEW badge in the
-> nav for 30 days. 19 pages predate the strip and correctly have no entry;
-> leaving them alone is the right call. The check is for pages shipping
-> *now*.
+> Without a launch date, `freshness.js` falls back to a slug's *first*
+> entry in this file, so adding a 2026 entry for a 2025 page lights a false
+> NEW badge in the nav for 30 days. 19 pages predate the strip and correctly
+> have no entry; leaving them alone is the right call. The check is for
+> pages shipping *now*.
+
+> **Logging an old page for the first time? Set `launched` first
+> (2026-10-04).** When a page that has never appeared here gets its first
+> entry (a fix, a rework), add `"launched": "YYYY-MM-DD"` to its
+> `explorations.json` entry, taken from the page's first commit:
+> `git log --diff-filter=A --follow --format=%ad --date=short -- src/<slug>.njk | tail -1`
+> (for pages older than the April 2026 Eleventy migration, run it on the
+> root `<slug>.html` instead). NEW then means a real launch, and the entry
+> reads UPDATED. A hub that gathers existing tools takes its series' start,
+> not its own commit (JM ruling, Bitcoin and Real Estate). New pages can set
+> `launched` too; it is required only for re-logged old pages.
+
+> **Routine refreshes don't badge: `"badge": false` (2026-10-04).** An entry
+> with `"badge": false` still shows on the updates page but counts toward
+> neither NEW nor UPDATED. **Rule:** data refreshes, dated status lines and
+> wording fixes get `"badge": false`; new features, new tabs and changed
+> results don't. If a reader who checked last week would find nothing new to
+> look at, it is a routine refresh.
 
 New entries should write `"page"` in the clean form (`"/your-page"`).
 `freshness.js` normalizes either form and `updates.njk` strips a trailing

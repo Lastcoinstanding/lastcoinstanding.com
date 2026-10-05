@@ -100,6 +100,7 @@
   },
   {
     "slug": "not-a-bubble",
+    "launched": "2026-03-09",
     "title": "Is Bitcoin a Bubble?",
     "category": "arguments",
     "group": "Objections, Answered",
@@ -193,6 +194,7 @@
   {
     "_comment": "The Bitcoin Rundown — the briefing: where bitcoin sits in its channel, read against the reader's situation and the question they carry, each module routed to the tool that owns it. Placed beside discount-or-premium deliberately: base.njk iterates this file in array order, so array position IS dropdown position, and this is what puts it next to the page it most resembles. NO calculator_tile — the page takes inputs but issues no personal calculation; it filters which record is shown (same posture as discount-or-premium / bull-and-bear-cycles), and the /calculators grid is for tools that compute *your* number. Listed 2026-09-07 at the listing pass, after the register review and the counsel pass.",
     "slug": "the-rundown",
+    "launched": "2026-08-29",
     "title": "The Bitcoin Rundown",
     "category": "numbers",
     "group": "Models & Trends",
@@ -200,6 +202,7 @@
   },
   {
     "slug": "bitcoin-vs-the-stock-market",
+    "launched": "2026-05-14",
     "title": "Bitcoin vs. The Stock Market",
     "category": "numbers",
     "group": "Models & Trends",
@@ -214,8 +217,9 @@
     }
   },
   {
-    "_comment": "Bitcoin and Real Estate — the real-estate series hub (SITE_GUIDE §60), built when the fourth spoke (Compare Housing Plans) landed, per the retirement precedent (§53: 'a family earns a hub before nav grows'). Same shape as the retirement hub: category 'numbers' so it rides the data-driven dropdown, first in its own 'Real Estate' group with the 'start here' note; no bar change. The 'Real Estate' group replaced the 'Bitcoin vs. Other Assets' column, whose only other member, Bitcoin vs. The Stock Market, moved to Models & Trends (2026-10-02; a JM-reversible call, flagged in the PR). Bitcoin-Backed Mortgages is NOT a spoke (JM 2026-10-01) and stays in Living on Bitcoin, linked from the hub as a neighbour. Tile position 65 sits it immediately before its own family's tiles (BvRE 70, BvRP 80, mortgage 85, compare 87). No page_scripts: a landing page, not an instrument.",
+    "_comment": "Bitcoin and Real Estate — the real-estate series hub (SITE_GUIDE §60), built when the fourth spoke (Compare Housing Plans) landed, per the retirement precedent (§53: 'a family earns a hub before nav grows'). Same shape as the retirement hub: category 'numbers' so it rides the data-driven dropdown, first in its own 'Real Estate' group with the 'start here' note; no bar change. The 'Real Estate' group replaced the 'Bitcoin vs. Other Assets' column, whose only other member, Bitcoin vs. The Stock Market, moved to Models & Trends (2026-10-02; a JM-reversible call, flagged in the PR). Bitcoin-Backed Mortgages is NOT a spoke (JM 2026-10-01) and stays in Living on Bitcoin, linked from the hub as a neighbour. Tile position 65 sits it immediately before its own family's tiles (BvRE 70, BvRP 80, mortgage 85, compare 87). No page_scripts: a landing page, not an instrument. Freshness badge (JM ruling, 2026-10-04): UPDATED, not NEW — the hub gathers existing tools, so launched is the start of the real-estate series (first Bitcoin vs. Real Estate commit, e8cadb0, 2026-04-04, when the page was the-opportunity-cost.html), not the hub's own 2026-10-01 commit.",
     "slug": "bitcoin-and-real-estate",
+    "launched": "2026-04-04",
     "title": "Bitcoin and Real Estate",
     "category": "numbers",
     "group": "Real Estate",
@@ -255,6 +259,7 @@
   {
     "_comment": "Bitcoin vs. Paying Down the Mortgage (2026-10-02): the homeowner, step three of the real-estate series (tenant · landlord · homeowner), on the pair's shared engine. Group 'Bitcoin vs. Other Assets' beside the pair; the series earns its hub, nav grouping and homepage strip at four pages (JM 2026-10-01; Compare Housing Plans is next). Tile position 85 lands it between BvRP (80) and the next tile (90).",
     "slug": "bitcoin-vs-paying-down-the-mortgage",
+    "launched": "2026-10-01",
     "title": "BTC vs. Paying Down the Mortgage",
     "category": "numbers",
     "group": "Real Estate",
@@ -268,6 +273,7 @@
   {
     "_comment": "Compare Housing Plans (2026-10-02): step four of the real-estate series, the Compare Retirement Plans pattern on the pair's engine (housingCompare, parity with bvreProjection to the cent). With it the series has four pages: the hub, nav grouping and homepage strip follow (JM 2026-10-01). Tile 87, after the mortgage page (85).",
     "slug": "compare-housing-plans",
+    "launched": "2026-10-01",
     "title": "Compare Housing Plans",
     "category": "numbers",
     "group": "Real Estate",
@@ -412,6 +418,7 @@
   {
     "_comment": "The upper side of the channel, as a counterpart to the-bitcoin-floor: where price sits now, every spike above trend since 2011 measured (shared/spike-record.js, modern set from MODERN_FROM, as on the Floor), and what holders did with them. interactive: true — live readout, an intent chooser with three answer cards (fund a bill, a one-time trim, a standing rule) and a tax-hurdle widget. Card B's headline is How Much Cash's own bandMetrics figure and hands off to /how-much-cash with ?pos&rebuy=trend&share&tax&from=spikes. No URL scenario params of its own; tabs take bare-token hash links (#decide, #record, #laws, #different). spikesQA() pins the record to the 2026-09-30 sample. Plural title signed off by JM 2026-10-04 (STYLE_GUIDE §10.4). Tile position 62 sits beside how-much-cash (60), its handoff target. SVG tile at components/calc-tile-icons/bitcoin-spikes.njk.",
     "slug": "bitcoin-spikes",
+    "launched": "2026-10-04",
     "title": "Bitcoin's Spikes",
     "category": "numbers",
     "group": "Models & Trends",
@@ -439,6 +446,7 @@
   },
   {
     "slug": "disciplined-rebalancing",
+    "launched": "2026-05-06",
     "title": "Disciplined Rebalancing",
     "category": "numbers",
     "group": "Positioning & Strategy",
@@ -534,6 +542,7 @@
   {
     "_comment": "Borrowing against bitcoin: the lenders (2026-10-01). The landscape sister of Borrowing Against Your Stack: one card per lender from src/_data/lenders.json. interactive: true (live trigger prices, the reader's-own-LTV control, filters). NO calculator_tile by design — it describes a market, it is not a personal-decision tool (same posture as Bitcoin as Collateral and Living on Bitcoin). Plain nav title per STYLE_GUIDE §10.4; the page H1 is the evocative form.",
     "slug": "bitcoin-lenders",
+    "launched": "2026-09-30",
     "title": "Bitcoin Lenders Compared",
     "category": "numbers",
     "group": "Living on Bitcoin",
@@ -554,6 +563,7 @@
   {
     "_comment": "Living on Bitcoin is a personal-decision tool but currently does not have a /calculators tile. Add a calculator_tile block when wiring it in.",
     "slug": "living-on-bitcoin",
+    "launched": "2026-05-19",
     "title": "Living on Bitcoin",
     "category": "numbers",
     "group": "Living on Bitcoin",

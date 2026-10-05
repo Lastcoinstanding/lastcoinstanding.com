@@ -2686,17 +2686,27 @@ Quiet `NEW` / `UPDATED` chips computed **at build** from `updates.json` only —
 no client JS, no manual flags, self-expiring by construction.
 
 - **Source of truth & rules** (`_data/freshness.js`, exposes the `freshness`
-  map): **NEW** = the slug's FIRST `updates.json` entry is within 30 days;
-  **UPDATED** = its LATEST entry is within **7 days** (was 30 until
-  2026-09-30, JM: "changed this week", so the chip stays a signal) and it is not NEW (NEW
-  suppresses UPDATED). Windows are measured from the build clock (`new Date()`),
-  so a badge expires at the first deploy after its window closes — acceptable
-  staleness for a constantly-deploying site.
-- **Documented caveat:** "first entry" means first entry *in updates.json*, not
-  original launch. A long-standing page whose only logged history is a recent
-  rework reads NEW for 30 days rather than UPDATED. `updates.json` is the only
-  machine-readable signal (explorations.json has no launch date), and a heavy
-  rework arguably earns the louder badge — accepted, not worked around.
+  map): **NEW** = the page launched within 30 days, where the launch date is
+  the `launched` field ("YYYY-MM-DD") on its `explorations.json` entry when
+  present, otherwise its FIRST badge-counting `updates.json` entry;
+  **UPDATED** = its LATEST badge-counting entry is within **7 days** (was 30
+  until 2026-09-30, JM: "changed this week", so the chip stays a signal) and it
+  is not NEW (NEW suppresses UPDATED). Windows are measured from the build clock
+  (`new Date()`), so a badge expires at the first deploy after its window
+  closes — acceptable staleness for a constantly-deploying site.
+- **`launched` (added 2026-10-04).** The old caveat, "first entry means first
+  entry *in updates.json*", stopped being acceptable: long-standing pages whose
+  first logged entry was a recent refresh read NEW (Disciplined Rebalancing,
+  Bitcoin vs. the Stock Market, Living on Bitcoin and seven others in October
+  2026). `launched` pins the real date, taken from the page's first commit
+  (`git log --diff-filter=A --follow`, or the root `.html` for pages older than
+  the April 2026 Eleventy migration). **Hub ruling (JM, 2026-10-04):** a hub
+  that gathers existing tools takes its series' start, not its own commit, so
+  Bitcoin and Real Estate reads UPDATED, not NEW.
+- **`"badge": false` on an `updates.json` entry (added 2026-10-04).** The entry
+  still appears on the updates page but counts toward neither badge. Data
+  refreshes, dated status lines and wording fixes get it; new features, new tabs
+  and changed results don't.
 - **Surfaces:** (a) nav dropdown items + mobile overlay — a small chip after the
   label, via the `freshnessBadge(slug)` macro in base.njk (`.nav-badge`,
   amber-family NEW / dimmer UPDATED, **never red**, STYLE_GUIDE §6.39); (b)
