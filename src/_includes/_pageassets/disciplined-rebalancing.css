@@ -2231,23 +2231,25 @@ table.dr2-cmp td.mult { font-weight: 600; font-size: .95rem; }
    Edit rules), then the rule sentence and the setting summary in smaller
    text. 601–1000px the controls wrap; 600px and below, sentence + Edit only. */
 .dr2-bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: .2rem; }
-.dr2-bar-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; min-width: 0; }
-.dr2-bf { display: inline-flex; align-items: center; gap: .3rem; font-size: .76rem; color: var(--text-dim); white-space: nowrap; }
+.dr2-bar-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .45rem; min-width: 0; }
+.dr2-bf { display: inline-flex; align-items: center; gap: .25rem; font-size: .72rem; color: var(--text-dim); white-space: nowrap; }
 .dr2-bf[hidden] { display: none; }
 .dr2-bf-u { color: var(--text-dim); margin-left: -.15rem; }
 .dr2-bf input, .dr2-bf select { background: var(--bg-card); color: var(--text-bright); border: 1px solid var(--border-lt); border-radius: 6px; min-height: 44px; font-family: inherit; font-size: .84rem; font-variant-numeric: tabular-nums; box-sizing: border-box; }
-.dr2-bf input { width: 4.4rem; padding: 0 .3rem 0 .45rem; }
-.dr2-bf select { padding: 0 .4rem; max-width: 9.5rem; }
+.dr2-bf input { width: 3.3rem; padding: 0 .35rem; text-align: right; -moz-appearance: textfield; appearance: textfield; }
+/* Spinners hidden for width; arrow keys still step by the field's step. */
+.dr2-bf input::-webkit-inner-spin-button, .dr2-bf input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.dr2-bf select { padding: 0 .3rem; max-width: 9.5rem; }
 .dr2-bf input:hover, .dr2-bf select:hover { border-color: var(--text-muted); }
 .dr2-bar-acct { display: flex; gap: .2rem; }
 .dr2-bar-edit { margin-left: auto; }
 .dr2-bar-line { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .74rem; color: var(--text-dim); }
 .dr2-bar-rule { font-size: .76rem; color: var(--text); font-weight: 500; }
 .dr2-bar-sum::before { content: " · "; }
-.dr2-chip { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: 0 .55rem; min-height: 44px; min-width: 44px; font-family: inherit; font-size: .74rem; font-weight: 500; cursor: pointer; }
+.dr2-chip { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: 0 .5rem; min-height: 44px; min-width: 44px; font-family: inherit; font-size: .74rem; font-weight: 500; cursor: pointer; }
 .dr2-chip:hover { border-color: var(--text-muted); }
 .dr2-chip[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
-.dr2-bar-edit { background: var(--orange-soft); border: 1px solid var(--orange); color: var(--orange); border-radius: 6px; padding: 0 .9rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.dr2-bar-edit { background: var(--orange-soft); border: 1px solid var(--orange); color: var(--orange); border-radius: 6px; padding: 0 .75rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .dr2-bar button:focus-visible, .dr2-bar input:focus-visible, .dr2-bar select:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 @media (max-width: 1000px) { .dr2-bar-ctls { gap: .3rem .5rem; } .dr2-bar-edit { margin-left: 0; } }
 @media (max-width: 600px) {
