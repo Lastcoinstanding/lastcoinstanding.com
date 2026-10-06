@@ -1175,45 +1175,42 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-     B1 — how far are the rebalancing bands from triggering?
-     A NOW-READ at Disciplined Rebalancing's own STANDARD preset (JM ruling 8):
-     the tool's defaults, named as the tool's defaults, with "set your own" as
-     the route. The v2 input set gains no allocation fields for this.
+     B1 — how far are the rebalancing levels from triggering?
+     A NOW-READ at Disciplined Rebalancing's own STARTING RULES (JM ruling 8;
+     since DR Stage B, 2026-10-06, the page has no presets): sell 25% when a
+     spike reaches 2× trend and falls back below it; buy back at 1× trend.
+     Named as the tool's defaults, with "set your own" as the route. Keep
+     DR_START equal to DEF_R in disciplined-rebalancing.js.
      ═══════════════════════════════════════════════════════════ */
-  var DR_RATIOS = (function () {
-    var a = [];
-    for (var i = 0; i < PL_DATA.length; i++) { var t = plPrice(PL_DATA[i][0]); if (t > 0) a.push(PL_DATA[i][1] / t); }
-    a.sort(function (x, y) { return x - y; });
-    return a;
-  })();
-  // Disciplined Rebalancing's calculator IIFE — the one whose readouts the
-  // reader sees. (Its channel-viz IIFE interpolates instead; verified in Phase 0
-  // to agree exactly at both preset percentiles, so the route reproduces.)
-  function drRatio(P) {
-    if (P <= 0) return DR_RATIOS[0];
-    if (P >= 100) return DR_RATIOS[DR_RATIOS.length - 1];
-    return DR_RATIOS[Math.floor(DR_RATIOS.length * P / 100)];
-  }
+  var DR_START = { sx: 2, rx: 1 };
   function renderB1(spot) {
     var trendNow = plPrice(TODAY_DAYS), k = spot / trendNow;
-    var sell = drRatio(80), rebuy = drRatio(50);
+    var sell = DR_START.sx, rebuy = DR_START.rx;
     var sellP = sell * trendNow, rebuyP = rebuy * trendNow;
-    setHTML('rdB1Verdict',
-      'Neither band is near. At the standard settings the rebuy line sits <strong>' + pct0((rebuy / k - 1) * 100) +
-      '</strong> above spot, which is another way of saying a protocol like this one would be buying here rather than selling.');
+    function rel(x) { var d = (x / k - 1) * 100; return pct0(Math.abs(d)) + (d >= 0 ? ' above spot' : ' below spot'); }
+    setHTML('rdB1Verdict', k < rebuy
+      ? 'Neither level is near. At the starting rules the buy-back level sits <strong>' + pct0((rebuy / k - 1) * 100) +
+        '</strong> above spot, which is another way of saying a protocol like this one would be buying here rather than selling.'
+      : k < sell
+        ? 'Price sits between the two levels: no buy back is due, and the sell rule needs a spike to <strong>' + sell.toFixed(2) + '×</strong> trend before it arms.'
+        : 'Price is at or above the sell level. At the starting rules the sell rule arms here and sells when price falls back below it.');
     setHTML('rdB1Cards', cards([
-      { k: 'Sell band (80th pctile)' + tip('The price-to-trend ratio at or above which Disciplined Rebalancing&rsquo;s standard preset sells. The 80th percentile means priced higher than 80% of days in the record, relative to trend &mdash; not a percentile of price itself.'), v: sell.toFixed(2) + '×', sub: fmtUSDshort(sellP) + ' — ' + pct0((sell / k - 1) * 100) + ' above spot' },
-      { k: 'Rebuy band (50th pctile)' + tip('The ratio at or below which that preset buys back after a sell. The 50th percentile is the historical median position relative to trend.'), v: rebuy.toFixed(2) + '×', sub: fmtUSDshort(rebuyP) + ' — ' + pct0((rebuy / k - 1) * 100) + ' above spot' },
-      { k: 'Today', v: k.toFixed(2) + '×', sub: 'below both' }
+      { k: 'Sell level' + tip('Disciplined Rebalancing&rsquo;s starting sell rule: sell 25% when a spike reaches 2&times; trend and falls back below it. A multiple of the power law trend, not of price.'), v: sell.toFixed(2) + '×', sub: fmtUSDshort(sellP) + ' — ' + rel(sell) },
+      { k: 'Buy-back level' + tip('The starting buy-back rule: buy back at 1&times; trend, the trend itself, or at market after 24 months.'), v: rebuy.toFixed(2) + '×', sub: fmtUSDshort(rebuyP) + ' — ' + rel(rebuy) },
+      { k: 'Today', v: k.toFixed(2) + '×', sub: k < rebuy ? 'below both' : k < sell ? 'between the two' : 'above both' }
     ]));
 
-    // A vertical ladder of the channel with the two bands and spot on it.
+    // A vertical ladder of the channel with the two levels and spot on it.
+    // The buy-back level is the trend itself, so the trend gets no row of its own.
     var W = 700, H = 176, PADT = 18, PADB = 26, X0 = 150, X1 = W - 150;
-    var top = Math.max(sell, 1.0) * 1.12, bot = Math.min(k, rebuy) * 0.82;
+    var top = Math.max(sell, 1.0, k) * 1.12, bot = Math.min(k, rebuy) * 0.82;
     function Y(v) { return PADT + (Math.log(top) - Math.log(v)) / (Math.log(top) - Math.log(bot)) * (H - PADT - PADB); }
-    var s = svgOpen(W, H, 'Where spot sits against the tool’s standard sell and rebuy bands');
+    var s = svgOpen(W, H, 'Where spot sits against the tool’s starting sell and buy-back levels');
     s += '<line class="rd-ladder" x1="' + ((X0 + X1) / 2) + '" y1="' + PADT + '" x2="' + ((X0 + X1) / 2) + '" y2="' + (H - PADB) + '"/>';
-    [[sell, 'Sell band', 'rd-band-sell'], [1.0, 'Trend', 'rd-band-trend'], [rebuy, 'Rebuy band', 'rd-band-rebuy']].forEach(function (row) {
+    var rows = [[sell, 'Sell level', 'rd-band-sell']];
+    if (rebuy !== 1) rows.push([1.0, 'Trend', 'rd-band-trend']);
+    rows.push([rebuy, rebuy === 1 ? 'Buy back (trend)' : 'Buy-back level', 'rd-band-rebuy']);
+    rows.forEach(function (row) {
       var y = Y(row[0]);
       s += '<line class="' + row[2] + '" x1="' + X0 + '" y1="' + y + '" x2="' + X1 + '" y2="' + y + '"/>';
       s += '<text class="rd-barlbl" x="' + (X0 - 10) + '" y="' + (y + 4) + '" text-anchor="end">' + row[1] + '</text>';
