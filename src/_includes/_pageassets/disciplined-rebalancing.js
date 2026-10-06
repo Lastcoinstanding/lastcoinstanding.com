@@ -540,8 +540,6 @@
     segSet('dr2SegTiming', R.timing); segSet('dr2SegCap', String(R.cap)); segSet('dr2SegYield', String(S.O.yield)); segSet('dr2SegAcct', S.O.acct);
     segSet('dr2SegFed', String(S.O.fed)); segSet('dr2SegLots', S.O.lots); segSet('dr2SegStart', S.start); segSet('dr2SegUnit', S.unit);
     // The two sliders. A slider being dragged is left alone.
-    if (document.activeElement !== $('dr2SxR')) $('dr2SxR').value = R.sx;
-    if (document.activeElement !== $('dr2RxR')) $('dr2RxR').value = R.rx;
     if (document.activeElement !== $('dr2FIn')) $('dr2FIn').value = R.f;
     if (document.activeElement !== $('dr2Stack')) $('dr2Stack').value = stackNum(S.stack);
     levelLabels();
@@ -589,16 +587,75 @@
     $('dr2SxV').innerHTML = fx(R.sx) + '<small> trend</small>'; $('dr2RxV').innerHTML = fx(R.rx) + '<small> trend</small>';
     $('dr2SxR').setAttribute('aria-valuetext', fx(R.sx) + ' trend'); $('dr2RxR').setAttribute('aria-valuetext', fx(R.rx) + ' trend');
   }
-  // A strip drawn above a range input: ticks for the record, shaded zones,
-  // notes. Same 9-unit inset as the range thumb's travel, so ticks line up.
-  function strip(min, max, ticks, zones, notes){
-    var W = 600, H = 58, X = function(v){ return 9 + (Math.max(min, Math.min(max, v)) - min) / (max - min) * (W - 18); };
-    var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true" focusable="false">';
-    zones.forEach(function(z){ o += '<rect x="' + X(z.a) + '" y="22" width="' + Math.max(3, X(z.b) - X(z.a)) + '" height="12" rx="3" style="fill:var(' + z.c + ')"/>'; });
-    o += '<line x1="9" x2="' + (W - 9) + '" y1="28" y2="28" style="stroke:var(--border-lt)" stroke-width="2"/>';
-    ticks.forEach(function(t){ var x = X(t.v), c = t.c || '--dr2-tick'; o += '<line x1="' + x + '" x2="' + x + '" y1="18" y2="38" style="stroke:var(' + c + ')" stroke-width="2"/>'; if (t.l) o += '<text x="' + x + '" y="13" style="fill:var(' + c + ')" font-size="13" text-anchor="' + (t.a || 'middle') + '">' + t.l + '</text>'; });
-    (notes || []).forEach(function(n){ o += '<text x="' + (n.x === 'end' ? W - 9 : 9) + '" y="54" style="fill:var(--text-dim)" font-size="12.5" text-anchor="' + (n.x === 'end' ? 'end' : 'start') + '">' + n.t + '</text>'; });
-    return o + '</svg>';
+
+  // ─── One shared scale for both sliders (Stage B round 1, 2026-10-06) ───
+  // JM: two sliders that look alike but cover different ranges made a
+  // sensible rule look like "sell low, buy high". Both inputs span the same
+  // log scale, 0.42× (the floor) to 4×, as positions 0–1000; each rule is
+  // snapped to its own step and clamped to its own range. Marks are HTML at
+  // calc(10px + (100% − 20px) × f), which lines up with the 20px thumb.
+  var SC_MIN = 0.42, SC_MAX = 4, SC_SPAN = Math.log(SC_MAX / SC_MIN);
+  function scf(v){ return Math.max(0, Math.min(1, Math.log(v / SC_MIN) / SC_SPAN)); }
+  function toPos(v){ return Math.round(scf(v) * 1000); }
+  function fromPos(p){ return SC_MIN * Math.exp(SC_SPAN * p / 1000); }
+  function scL(v){ return 'calc(10px + (100% - 20px) * ' + scf(v).toFixed(4) + ')'; }
+  function scW(a, b){ return 'calc((100% - 20px) * ' + Math.max(0, scf(b) - scf(a)).toFixed(4) + ')'; }
+  var SNAP = { sx: 0.05, rx: 0.01 };
+  function snapLevel(k, v){
+    var st = SNAP[k], lo = k === 'sx' ? SX_MIN : RX_MIN, hi = k === 'sx' ? SX_MAX : RX_MAX;
+    return r2(clamp(Math.round(v / st) * st, lo, hi));
+  }
+  // The level a sale actually happens at: the fade level when selling "as the
+  // spike fades", else the sell level.
+  function sellEff(R){ return R.timing === 'fade' ? R.sz : R.sx; }
+  // Order: the buy-back level stays at least 0.05 below the effective sell
+  // level. A buy-back change pushes the sell level up; any other change
+  // pushes the buy-back level down.
+  var GAP = 0.05;
+  function enforceOrder(changed){
+    var R = S.R;
+    if (R.rx <= r2(sellEff(R) - GAP) + EPS) return;
+    if (changed === 'rx') {
+      var ns = Math.min(SX_MAX, r2(Math.ceil((R.rx + GAP) / 0.05 - 1e-9) * 0.05));
+      R.sx = Math.max(R.sx, ns); R.sz = S.szFollows || R.timing === 'up' ? R.sx : Math.max(R.sz, ns);
+      if (R.rx > r2(sellEff(R) - GAP)) R.rx = r2(Math.max(RX_MIN, sellEff(R) - GAP));
+    } else R.rx = r2(Math.max(RX_MIN, sellEff(R) - GAP));
+  }
+  function axisHTML(){
+    function ax(v, t, lg, c){ return '<span class="ax' + (c ? ' ' + c : '') + '" style="left:' + scL(v) + '">' + t + (lg ? '<span class="lg">' + lg + '</span>' : '') + '</span>'; }
+    return ax(SC_MIN, fx(SC_MIN), ' floor', 's') + ax(1, '1×', ' trend') + ax(2, '2×') + ax(PL_CEIL, fx(PL_CEIL), ' upper band') + ax(SC_MAX, fx(SC_MAX), '', 'e');
+  }
+  function marksHTML(kind){
+    var R = S.R, lo = kind === 'sell' ? SX_MIN : RX_MIN, hi = kind === 'sell' ? SX_MAX : RX_MAX, o = '<div class="base"></div>';
+    o += '<div class="allow" style="left:' + scL(lo) + ';width:' + scW(lo, hi) + '"></div>';
+    if (kind === 'sell') {
+      o += '<div class="zone z-green" style="left:' + scL(PROJ.zoneLo) + ';width:' + scW(PROJ.zoneLo, PROJ.zoneHi) + '"></div>';
+      o += '<div class="zone z-amber" style="left:' + scL(PROJ.zoneHi) + ';width:' + scW(PROJ.zoneHi, PROJ.altShown) + '"></div>';
+      // Lowest first, so the highest on-scale peak gets the end-aligned label.
+      var on = PEAKS.filter(function(p){ return p.m <= SC_MAX; }).sort(function(a, b){ return a.m - b.m; });
+      on.forEach(function(p, i){
+        var end = i === on.length - 1 && on.length > 1;
+        o += '<div class="tick" style="left:' + scL(p.m) + '"></div><span class="lab' + (end ? ' e' : '') + '" style="left:' + scL(p.m) + '"><span class="lg">' + p.y + ' peak </span><span class="sm">’' + p.y.slice(-2) + ' </span>' + fxs(p.m) + '</span>';
+      });
+    } else {
+      var lmin = LOWS_DESC[LOWS_DESC.length - 1], lmax = LOWS_DESC[0];
+      o += '<div class="zone z-low" style="left:' + scL(SC_MIN) + ';width:' + scW(SC_MIN, lmax) + '"></div>';
+      LOWS.forEach(function(l){ o += '<div class="tick t-low" style="left:' + scL(l.m) + '"></div>'; });
+      o += '<span class="lab s l-low" style="left:' + scL(SC_MIN) + '">Past cycle lows ' + lowx(lmin) + '–' + lowx(lmax) + '</span>';
+    }
+    var se = sellEff(R);
+    o += '<div class="spr" style="left:' + scL(R.rx) + ';width:' + scW(R.rx, se) + '"></div>';
+    o += '<div class="ghost" style="left:' + scL(kind === 'sell' ? R.rx : se) + '"></div>';
+    return o;
+  }
+  // Cheap enough for every input event: both thumbs (a pushed slider moves
+  // visibly), both value labels, and both tracks' marks.
+  function renderScales(){
+    var R = S.R;
+    if (document.activeElement !== $('dr2SxR')) $('dr2SxR').value = toPos(R.sx);
+    if (document.activeElement !== $('dr2RxR')) $('dr2RxR').value = toPos(R.rx);
+    levelLabels();
+    $('dr2SellMarks').innerHTML = marksHTML('sell'); $('dr2BuyMarks').innerHTML = marksHTML('buy');
   }
   function sellHits(sx){ return PEAKS.filter(function(p){ return p.m >= sx - EPS; }); }
   function buyHits(rx){ return LOWS.filter(function(l){ return l.m <= rx + EPS; }); }
@@ -610,12 +667,8 @@
     var early = PEAKS.slice(0, 3).map(function(p){ return p.m; });
     $('dr2KeyShrink').textContent = 'Next peak if spikes keep shrinking (about ' + mid + ')';
     $('dr2KeyAlt').textContent = 'If ' + lastY + ' was unusually small (up to about ' + alt + ')';
-    // Sell track: peaks on the scale get a tick; the rest are listed off the scale.
-    var on = PEAKS.filter(function(p){ return p.m <= SX_MAX; }), off = PEAKS.filter(function(p){ return p.m > SX_MAX; }).reverse();
-    $('dr2SellTrack').innerHTML = strip(SX_MIN, SX_MAX,
-      on.map(function(p, i){ return { v: p.m, l: p.y + ': ' + fxs(p.m), a: p.m < SX_MIN + 0.4 ? 'start' : 'middle' }; }).concat([{ v: SX_MAX, l: '', c: '--text-muted' }]),
-      [{ a: PROJ.zoneLo, b: PROJ.zoneHi, c: '--dr2-zone-green' }, { a: PROJ.zoneHi, b: PROJ.altShown, c: '--dr2-zone-amber' }],
-      off.length ? [{ x: 'end', t: 'Off the scale: ' + off.map(function(p){ return p.y + ' ' + fxs(p.m); }).join(', ') + ' →' }] : []);
+    $('dr2SellAxis').innerHTML = $('dr2BuyAxis').innerHTML = axisHTML();
+    renderScales();
     var hits = sellHits(R.sx);
     $('dr2SellHist').innerHTML = 'Spike peaks, newest first: ' + PEAKS.slice().reverse().map(function(p){ var t = p.y + ' ' + fxs(p.m); return p.m >= R.sx - EPS ? '<b>' + t + ' ✓</b>' : '<span class="miss">' + t + '</span>'; }).join(' · ') +
       '. <b>' + hits.length + ' of ' + PEAKS.length + '</b> reached ' + fx(R.sx) + ' (✓). The three earliest spikes were ' + Math.floor(Math.min.apply(null, early)) + '–' + Math.round(Math.max.apply(null, early)) + '× and are unlikely to be seen again.';
@@ -627,10 +680,6 @@
     // Buy-back track: every cycle low, the band they span, the trend.
     var lo = LOWS_DESC[LOWS_DESC.length - 1], hi = LOWS_DESC[0];
     $('dr2KeyLows').textContent = 'Where every past cycle bottomed (' + lowx(lo) + '–' + lowx(hi) + ')';
-    $('dr2BuyTrack').innerHTML = strip(RX_MIN, RX_MAX,
-      [{ v: RX_MIN, l: 'Lows ' + lowx(lo) + '–' + lowx(hi), a: 'start', c: '--dr2-low' }].concat(LOWS.map(function(l){ return { v: l.m, c: '--dr2-low' }; }), [{ v: 1, l: 'Trend 1×', c: '--amber' }]),
-      [{ a: RX_MIN, b: hi, c: '--dr2-zone-low' }],
-      [{ x: 'start', t: 'Floor ' + fx(PL_FLOOR) + ' (left end)' }]);
     var bh = buyHits(R.rx);
     $('dr2BuyHist').innerHTML = 'Cycle lows, newest first: ' + LOWS.slice().reverse().map(function(l){ var t = l.y + ' ' + lowx(l.m) + (l.open ? ' (so far)' : ''); return l.m <= R.rx + EPS ? '<b>' + t + ' ✓</b>' : '<span class="miss">' + t + '</span>'; }).join(' · ') +
       '. <b>' + bh.length + ' of ' + LOWS.length + '</b> fell to ' + fx(R.rx) + ' or below (✓). Unlike the spikes, the lows haven’t shrunk: every cycle bottomed between ' + lowx(lo) + ' and ' + lowx(hi) + '.';
@@ -657,6 +706,7 @@
       $(el + 'b').innerHTML = (O.acct === 'ira' ? 'IRA' : 'Taxable') + '. Your ' + stackText() + ' became <strong>' + btcf(endB) + '</strong>: ' + dTxt + (a.inCash ? '. <span class="down">Still in cash.</span>' : '.');
     }
     hero('dr2R11', a11); hero('dr2R14', a14);
+    renderWhy(a11, a14);
     renderPanel(a11);
 
     // Table + failure box
@@ -672,13 +722,16 @@
         if (c.i === 4) fails.push('<b>' + c.name + ': never sold.</b> The spike peaked at ' + fx(c.peak) + ' trend, below the sell rule\'s ' + fx(S.R.sx) + '.');
         return;
       }
-      var s = c.sell, b = c.buy, m, buyCell, cum0 = cum;
-      if (b) { m = b.after / s.before; cum *= m; buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>'); }
-      else { var held = s.before - s.amt, cashNow = (s.amt * s.p - s.tax) / LAST.p; m = (held + cashNow) / s.before; cum *= m; buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>'; }
+      var s = c.sell, b = c.buy, trip = tripOf(s, b, LAST.p), m = trip.m, buyCell, cum0 = cum;
+      cum *= m;
+      if (b) buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>');
+      else buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>';
       var row = m < 0.995 ? 'lost' : m > 1.005 ? 'won' : '';
       html += '<tr class="' + row + '">' + c1 + '<td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td>' + stackCells(stack * cum, stack * (cum - cum0), stack) + '</tr>';
-      if (m < 0.995) {
-        var r = b ? (b.why === 'fallback' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.' : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (b.p > s.p ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '')) : 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.';
+      if (trip.lost) {
+        var r = trip.kind === 'deadline' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.'
+          : trip.kind === 'cash' ? 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.'
+          : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (trip.kind === 'higher' ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '');
         fails.push('<b>' + c.name + ': ' + mult(m) + ' the bitcoin.</b> ' + r);
       }
     });
@@ -696,11 +749,55 @@
   // always lands.
   var _rT = null, _rLast = 0;
   function soon(){
-    levelLabels();
+    renderScales();
     var now = Date.now();
     clearTimeout(_rT);
     if (now - _rLast >= 90) { _rLast = now; render(); }
     else _rT = setTimeout(function(){ _rLast = Date.now(); render(); }, 90 - (now - _rLast));
+  }
+
+  // ─── One reading of a round trip (Stage B round 1) ───
+  // The failure box, the "why" box and the worst-round-trip row all classify
+  // a sale with this, so they can't disagree. kind: 'cash' (no buy back yet),
+  // 'deadline' (the deadline bought back), 'higher' (the level came at a
+  // higher price than the sale), 'lower' (it came lower; any loss is tax).
+  function tripOf(s, b, lastP){
+    var m = b ? b.after / s.before : ((s.before - s.amt) + (s.amt * s.p - s.tax) / lastP) / s.before;
+    var kind = !b ? 'cash' : b.why === 'fallback' ? 'deadline' : b.p > s.p ? 'higher' : 'lower';
+    return { s: s, b: b, m: m, kind: kind, lost: m < 0.995 };
+  }
+  function tripsOf(run){
+    var out = [];
+    run.ev.forEach(function(e, i){ if (e.t !== 'sell') return; var b = run.ev[i + 1]; out.push(tripOf(e, b && b.t === 'buy' ? b : null, run.last.p)); });
+    return out;
+  }
+  function tripCause(t){
+    return t.kind === 'deadline' ? (t.b.p > t.s.p ? 'deadline bought back higher' : 'deadline bought back') : t.kind === 'higher' ? 'bought back at a higher price' : t.kind === 'lower' ? 'tax took more than the dip saved' : 'still in cash';
+  }
+  // "Why" box: shown when a headline result is below HODL. The trades that
+  // did it, from the since-2011 and since-2014 runs, deduped by sale month,
+  // at most three (mockup v3 sentences).
+  function renderWhy(a11, a14){
+    var box = $('dr2Why'), R = S.R, bad11 = a11.end < 0.995, bad14 = a14.end < 0.995;
+    if (!bad11 && !bad14) { box.hidden = true; box.innerHTML = ''; return; }
+    var g13 = Math.round(RE.trendGrowth(RE.dayOfIso('2013-07-01'))), seen = {}, lines = [];
+    [bad11 ? a11 : null, bad14 ? a14 : null].forEach(function(run){
+      if (!run) return;
+      tripsOf(run).forEach(function(t){
+        var s = t.s, b = t.b, k = my(s.d);
+        if (seen[k] || (!t.lost && t.kind !== 'cash')) return;
+        seen[k] = 1;
+        var x = 'Sold ' + k + ' at ' + price(s.p) + '. ';
+        if (t.kind === 'cash') x += 'Price never came back down to your buy-back level (' + fx(R.rx) + ') and ' + (R.cap ? 'the ' + R.cap + '-month deadline hasn’t come yet' : 'there was no deadline') + ', so that bitcoin is still cash, valued at today’s price.';
+        else if (t.kind === 'deadline') x += 'Price didn’t fall to your buy-back level (' + fx(R.rx) + ') within ' + R.cap + ' months, so the deadline bought back in ' + my(b.d) + ' at ' + price(b.p) + (b.p > s.p ? ', above the sale price.' : '.') + ' Round trip: ' + mult(t.m) + '.';
+        else if (t.kind === 'higher') x += 'The buy back came in ' + my(b.d) + ' at ' + price(b.p) + ', a higher price: the trend rose faster than price fell' + (RE.ym(s.d) < '2016-01' ? ' (in those years it grew about ' + g13 + '% a year)' : '') + '. Round trip: ' + mult(t.m) + '.';
+        else x += 'The buy back came in ' + my(b.d) + ' at ' + price(b.p) + ', lower, but tax on the sale took more than the dip saved. Round trip: ' + mult(t.m) + '.';
+        lines.push(x);
+      });
+    });
+    box.hidden = false;
+    box.innerHTML = '<div><b>Why ' + (bad11 && bad14 ? 'both results are' : bad11 ? 'the since-2011 result is' : 'the since-2014 result is') + ' below HODL:</b></div>' +
+      lines.slice(0, 3).map(function(x){ return '<div>' + x + '</div>'; }).join('');
   }
 
   // ─── Results panel (Stage B) ───
@@ -713,9 +810,10 @@
     $('dr2RkFire').innerHTML = 'In <b>' + nc + ' of ' + cov.length + '</b> cycles since 2011' + (sells.length > nc ? ' (' + sells.length + ' sales)' : '') + (last.sell ? '' : '; <span class="down">not in ' + last.name + '</span>');
     var lvl = buys.filter(function(b){ return b.why === 'level'; }).length, dl = buys.length - lvl;
     $('dr2RkBuy').innerHTML = sells.length ? '<b>' + lvl + ' of ' + sells.length + '</b> at your level' + (dl ? ', ' + dl + ' by the deadline' : '') + (a11.inCash ? ', <span class="down">1 still in cash</span>' : '') : '—';
+    // Completed round trips only, as before; the short cause comes from tripOf.
     var worst = null;
-    a11.ev.forEach(function(e, i){ var b = a11.ev[i + 1]; if (e.t === 'sell' && b && b.t === 'buy') { var m = b.after / e.before; if (!worst || m < worst.m) worst = { m: m, y: my(e.d) }; } });
-    $('dr2RkWorst').innerHTML = worst ? '<span class="' + cls(worst.m) + '">' + mult(worst.m) + '</span> (sold ' + worst.y + ')' : '—';
+    tripsOf(a11).forEach(function(t){ if (t.b && (!worst || t.m < worst.m)) worst = t; });
+    $('dr2RkWorst').innerHTML = worst ? '<span class="' + cls(worst.m) + '">' + mult(worst.m) + '</span> (sold ' + my(worst.s.d) + (worst.lost ? '; ' + tripCause(worst) : '') + ')' : '—';
     var sv = sellVerdict(R.sx);
     $('dr2RkNext').innerHTML = sv === 'green' ? '<span class="up">Likely within reach</span>' : sv === 'amber' ? '<span class="amber">Only if ' + LAST_PEAK.y + ' was unusually small</span>' : '<span class="down">Above both projections</span>';
     var rb = RE.runRows(REPLAY.breakaway, R, fastOpts());
@@ -1161,7 +1259,7 @@
   function wire(){
     ['input', 'change', 'click'].forEach(function(ev){ document.addEventListener(ev, function(e){ if (e.target && e.target.closest && e.target.closest('#tab-calculator')) interacted = true; }, { capture: true }); });
     function seg(id, fn){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.addEventListener('click', function(){ fn(b.dataset.v); render(); }); }); }
-    seg('dr2SegTiming', function(v){ S.R.timing = v; S.R.sz = S.R.sx; S.szFollows = true; ruleChanged('timing'); });
+    seg('dr2SegTiming', function(v){ S.R.timing = v; S.R.sz = S.R.sx; S.szFollows = true; enforceOrder('timing'); ruleChanged('timing'); });
     seg('dr2SegCap', function(v){ S.R.cap = +v; ruleChanged('deadline'); });
     seg('dr2SegYield', function(v){ S.O.yield = +v; ruleChanged('cash_yield'); });
     // Taxable opens the tax settings, which live in "More tax and timing settings".
@@ -1171,9 +1269,33 @@
     seg('dr2SegStart', function(v){ S.start = v; });
     seg('dr2SegUnit', function(v){ S.unit = v; });
     // The two sliders: labels move at once, the page follows on soon().
-    $('dr2SxR').addEventListener('input', function(e){ S.R.sx = +e.target.value; S.R.sz = (S.szFollows || S.R.timing === 'up') ? S.R.sx : Math.min(S.R.sz, S.R.sx); ruleChanged('sell_level'); soon(); });
-    $('dr2RxR').addEventListener('input', function(e){ S.R.rx = +e.target.value; ruleChanged('buyback_level'); soon(); });
-    $('dr2Sz').addEventListener('input', function(e){ S.R.sz = Math.min(+e.target.value, S.R.sx); S.szFollows = S.R.sz === S.R.sx; ruleChanged('fade_level'); soon(); });
+    // Both sliders are positions 0–1000 on the shared log scale. A drag reads
+    // the position back as a level, snapped and clamped to that rule.
+    function setSx(v){ S.R.sx = v; S.R.sz = (S.szFollows || S.R.timing === 'up') ? v : Math.min(S.R.sz, v); enforceOrder('sx'); ruleChanged('sell_level'); }
+    function setRx(v){ S.R.rx = v; enforceOrder('rx'); ruleChanged('buyback_level'); }
+    $('dr2SxR').addEventListener('input', function(e){ setSx(snapLevel('sx', fromPos(+e.target.value))); soon(); });
+    $('dr2RxR').addEventListener('input', function(e){ setRx(snapLevel('rx', fromPos(+e.target.value))); soon(); });
+    // On release, the thumb settles on the snapped level's position.
+    ['dr2SxR', 'dr2RxR'].forEach(function(id){ $(id).addEventListener('change', function(){ $(id).value = toPos(id === 'dr2SxR' ? S.R.sx : S.R.rx); }); });
+    // Keyboard: one snap per arrow press (the 0–1000 positions are finer than a
+    // snap, so the browser's own step would often change nothing). Page keys
+    // move ten snaps; Home and End go to the rule's own ends.
+    function keyStep(id, k, set){
+      $(id).addEventListener('keydown', function(e){
+        var st = SNAP[k], cur = S.R[k], v = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') v = cur + st;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') v = cur - st;
+        else if (e.key === 'PageUp') v = cur + 10 * st;
+        else if (e.key === 'PageDown') v = cur - 10 * st;
+        else if (e.key === 'Home') v = k === 'sx' ? SX_MIN : RX_MIN;
+        else if (e.key === 'End') v = k === 'sx' ? SX_MAX : RX_MAX;
+        if (v == null) return;
+        e.preventDefault();
+        set(snapLevel(k, v)); $(id).value = toPos(S.R[k]); soon();
+      });
+    }
+    keyStep('dr2SxR', 'sx', setSx); keyStep('dr2RxR', 'rx', setRx);
+    $('dr2Sz').addEventListener('input', function(e){ S.R.sz = Math.min(+e.target.value, S.R.sx); S.szFollows = S.R.sz === S.R.sx; enforceOrder('sz'); ruleChanged('fade_level'); soon(); });
     $('dr2Reset').addEventListener('click', function(){ S.R = copy(DEF_R); S.szFollows = true; S.O.acct = 'ira'; ruleChanged('reset'); render(); });
     $('dr2Niit').addEventListener('change', function(e){ S.O.niit = e.target.checked; render(); });
     $('dr2State').addEventListener('change', function(e){ S.O.state = e.target.value; render(); });
@@ -1204,6 +1326,7 @@
     if (k === 'sx') { S.R.sx = v; S.R.sz = (S.szFollows || S.R.timing === 'up') ? v : Math.min(S.R.sz, v); }
     else if (k === 'sz') { S.R.sz = Math.min(v, S.R.sx); S.szFollows = S.R.sz === S.R.sx; }
     else S.R[k] = v;
+    enforceOrder(k);
     ruleChanged(LEVEL_GA[k]); render();
   }
   function wireBarFields(){
@@ -1420,6 +1543,7 @@
     removeOldKeys();
     var x = window.URLSearchParams ? parseParams(new URLSearchParams(location.search)) : { present: false };
     if (x.present) applyPatch(x); else loadSticky();
+    enforceOrder('sx');   // a link or stored rule with the buy-back level at or above the sale lands in order
     $('dr2Stack').value = S.stack;
     buildChart1(); buildChart2();
     wire();

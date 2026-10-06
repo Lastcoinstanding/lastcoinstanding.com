@@ -3583,6 +3583,12 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 - **GA4:** `dr_preset` retired; `dr_rule_change` (`control`), once per control per 2 s.
 - **`drQA()` additions:** the 1.2× case (0.95× since 2014, 4 of 5 cycles), the projection, the cycle-low days, the forward view (1.00×; 1.58× in 1.48–1.70×), breakaway 0.80×, and the history ticks.
 - **Possible later idea:** drag the level lines on the chart.
+- **Round 1 (JM, 2026-10-06; `fix-dr-sliders-scale`, mockup v3).**
+  - Both sliders sit on one log scale, 0.42× to 4×, as positions 0–1000, each snapped and clamped to its own rule. JM's reason: two look-alike sliders with different ranges made a sensible rule read as "sell low, buy high".
+  - Marks are HTML under a 20px thumb, with an axis row. Each track rings the other rule's level and draws an orange round-trip bar.
+  - The buy-back level stays at least 0.05× below the effective sell level. A buy-back change pushes the sell level up; any other change pushes the buy-back level down. Arrow keys step one snap.
+  - Column headings "Your inputs" and "Results: what history shows".
+  - A red "why" box explains a headline result below HODL from its trades. It shares `tripOf()` with the failure box and the worst-round-trip row, which now names the cause.
 
 ~~**Stage B (separate PR, not started):** calendar triggers with a four-cycles warning, extra sell steps, OR buy backs including drawdown from the high, and the forward view ("if the next cycles look like the last ones, but smaller", "if spikes stop", "if bitcoin breaks away"). PAGE_IDEAS_BACKLOG "Applied Disciplined Rebalancing".~~ Superseded by the Stage B entry above.
 
