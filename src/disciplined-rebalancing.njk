@@ -154,12 +154,13 @@ eleventyComputed:
           <p class="dr2-frame">Both levels are multiples of bitcoin&rsquo;s <a href="/the-power-law">power law trend</a>: 1&times; is the trend, 0.42&times; the floor. The strategy only pays if both rules work: the sell rule has to fire, and the buy-back rule has to bring you back in lower. <a href="#dr-fail">How this strategy can fail</a> covers what happens if price stops returning toward the trend.</p>
           <div class="dr2-cc">
             <div class="dr2-rulebox">
+              <div class="dr2-colh">Your inputs</div>
               <!-- SELL -->
               <div class="dr2-rb">
                 <div class="dr2-rule-h"><span class="k">1 &middot; Sell rule</span><span class="v" id="dr2SxV"></span></div>
                 <p class="dr2-q" id="dr2SellQ"></p>
-                <div class="dr2-track"><div id="dr2SellTrack"></div><input type="range" id="dr2SxR" min="1.05" max="4" step="0.05" value="2" aria-label="Sell level, times trend"></div>
-                <p class="dr2-key"><span><i class="z-green"></i><span id="dr2KeyShrink">Next peak if spikes keep shrinking (about 1.1&times;)</span></span><span><i class="z-amber"></i><span id="dr2KeyAlt">If 2024&ndash;25 was unusually small (up to about 2.2&times;)</span></span></p>
+                <div class="dr2-scale"><div class="dr2-marks" id="dr2SellMarks" aria-hidden="true"></div><input type="range" id="dr2SxR" min="0" max="1000" step="1" value="749" aria-label="Sell level, times trend"><div class="dr2-axis" id="dr2SellAxis" aria-hidden="true"></div></div>
+                <p class="dr2-key"><span><i class="z-green"></i><span id="dr2KeyShrink">Next peak if spikes keep shrinking (about 1.1&times;)</span></span><span><i class="z-amber"></i><span id="dr2KeyAlt">If 2024&ndash;25 was unusually small (up to about 2.2&times;)</span></span><span><i class="ring"></i>Your buy-back level</span><span><i class="spread"></i>Your round trip</span></p>
                 <dl class="dr2-facts">
                   <dt>History</dt><dd id="dr2SellHist"></dd>
                   <dt>Next cycle</dt><dd><p class="dr2-flag" id="dr2SellFlag"></p></dd>
@@ -173,8 +174,8 @@ eleventyComputed:
               <div class="dr2-rb">
                 <div class="dr2-rule-h"><span class="k">2 &middot; Buy-back rule</span><span class="v" id="dr2RxV"></span></div>
                 <p class="dr2-q">Buy back when price falls to this level.</p>
-                <div class="dr2-track"><div id="dr2BuyTrack"></div><input type="range" id="dr2RxR" min="0.42" max="1.5" step="0.01" value="1" aria-label="Buy-back level, times trend"></div>
-                <p class="dr2-key"><span><i class="z-low"></i><span id="dr2KeyLows">Where every past cycle bottomed (0.40&ndash;0.56&times;)</span></span></p>
+                <div class="dr2-scale"><div class="dr2-marks" id="dr2BuyMarks" aria-hidden="true"></div><input type="range" id="dr2RxR" min="0" max="1000" step="1" value="384" aria-label="Buy-back level, times trend"><div class="dr2-axis" id="dr2BuyAxis" aria-hidden="true"></div></div>
+                <p class="dr2-key"><span><i class="z-low"></i><span id="dr2KeyLows">Where every past cycle bottomed (0.40&ndash;0.56&times;)</span></span><span><i class="ring"></i>Your sell level</span><span><i class="spread"></i>Your round trip</span></p>
                 <dl class="dr2-facts">
                   <dt>History</dt><dd id="dr2BuyHist"></dd>
                   <dt>Next cycle</dt><dd><p class="dr2-flag" id="dr2BuyFlag"></p></dd>
@@ -229,11 +230,13 @@ eleventyComputed:
 
             <!-- RESULTS PANEL -->
             <aside class="dr2-panel" id="dr2Panel" aria-label="Results" aria-live="polite">
+              <div class="dr2-colh">Results: what history shows</div>
               <div class="dr2-heroes">
                 <div class="dr2-hn"><div class="lab">Since 2011</div><div class="big dr2-num" id="dr2R11"></div><div class="sub" id="dr2R11b"></div></div>
                 <div class="dr2-hn"><div class="lab">Since 2014</div><div class="big dr2-num" id="dr2R14"></div><div class="sub" id="dr2R14b"></div></div>
               </div>
               <p class="dr2-caveat" id="dr2PanelCaveat">History, not a forecast. These include spikes of 3&ndash;14&times;, far larger than the latest (1.19&times;). For smaller future spikes, see Looking ahead below.</p>
+              <div class="dr2-why" id="dr2Why" hidden></div>
               <div class="dr2-risk">
                 <h3>What it took, and what could go wrong</h3>
                 <div class="dr2-rk"><span class="l">Sell rule fired</span><span class="v" id="dr2RkFire"></span></div>

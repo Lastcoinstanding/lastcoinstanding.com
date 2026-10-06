@@ -54,6 +54,8 @@
     --dr2-green-border: rgba(111,174,111,.35);
     --dr2-amber-soft: rgba(224,148,34,.08);
     --dr2-amber-border: rgba(224,148,34,.35);
+    --dr2-allow: rgba(216,210,202,.28);
+    --dr2-spread: rgba(247,147,26,.75);
     --dr-sell: #e09422;
     --dr-fade: rgba(224,148,34,.55);
     --dr-rebuy: #27ae60;
@@ -2265,9 +2267,6 @@ table.dr2-table tr.won td.mult { color: var(--dr2-green); font-weight: 600; }
 .dr2-rule-h .v { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem; font-weight: 600; color: var(--text-bright); line-height: 1; font-variant-numeric: tabular-nums; }
 .dr2-rule-h .v small { font-size: .5em; color: var(--text-dim); font-weight: 500; }
 .dr2-q { font-size: .92rem; color: var(--text); }
-.dr2-track svg { width: 100%; height: auto; display: block; overflow: visible; }
-.dr2-track input[type=range] { width: 100%; accent-color: var(--orange); margin: 0; height: 28px; }
-.dr2-track input[type=range]:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 .dr2-key { font-size: .74rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: .2rem .9rem; align-items: center; }
 .dr2-key i, .dr2-flegend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: .3rem; vertical-align: middle; }
 .dr2-key i.z-green { background: var(--dr2-zone-green); }
@@ -2333,3 +2332,48 @@ details.dr2-how .body b { color: var(--text); }
 @media (max-width: 900px) { .dr2-cc { grid-template-columns: minmax(0, 1fr); } .dr2-panel { position: static; } }
 @media (max-width: 700px) { .dr2-cases { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 420px) { .dr2-heroes { grid-template-columns: minmax(0, 1fr); } .dr2-facts { grid-template-columns: minmax(0, 1fr); } .dr2-rk { grid-template-columns: minmax(0, 1fr); gap: .1rem; } }
+
+/* ─── Stage B round 1 (2026-10-06): one shared scale, ported from DR_TWO_SLIDER_MOCKUP v3 ─── */
+/* Column headings over the inputs and the results. */
+.dr2-colh { font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text-bright); font-weight: 600; border-bottom: 1px solid var(--border-lt); padding-bottom: .45rem; }
+/* Both sliders span 0.42×–4× on a log scale. Marks are HTML positioned at
+   calc(10px + (100% − 20px) × f), which lines up with the 20px thumb below.
+   No `cursor` here: base.njk owns slider cursors (build lint). */
+.dr2-scale { position: relative; padding-top: 20px; height: 92px; }
+.dr2-scale .dr2-marks { position: absolute; inset: 0; pointer-events: none; }
+.dr2-scale .dr2-axis { position: absolute; left: 0; right: 0; top: 58px; height: 30px; pointer-events: none; }
+.dr2-scale .lab { position: absolute; top: 0; font-size: 12px; white-space: nowrap; color: var(--dr2-tick); transform: translateX(-50%); }
+.dr2-scale .lab.s { transform: none; }
+.dr2-scale .lab.e { transform: translateX(-100%); }
+.dr2-scale .lab.l-low { color: var(--dr2-low); }
+.dr2-scale .ax { position: absolute; top: 6px; font-size: 11.5px; white-space: nowrap; color: var(--text-muted); transform: translateX(-50%); }
+.dr2-scale .ax.s { transform: none; }
+.dr2-scale .ax.e { transform: translateX(-100%); }
+.dr2-scale .ax::before { content: ""; position: absolute; left: 50%; top: -6px; width: 1px; height: 5px; background: var(--text-muted); }
+.dr2-scale .ax.s::before { left: 0; }
+.dr2-scale .ax.e::before { left: auto; right: 0; }
+.dr2-scale .base { position: absolute; left: 10px; right: 10px; top: 33px; height: 2px; background: var(--border-lt); }
+.dr2-scale .allow { position: absolute; top: 32px; height: 4px; background: var(--dr2-allow); border-radius: 2px; }
+.dr2-scale .zone { position: absolute; top: 28px; height: 12px; border-radius: 3px; }
+.dr2-scale .zone.z-green { background: var(--dr2-zone-green); }
+.dr2-scale .zone.z-amber { background: var(--dr2-zone-amber); }
+.dr2-scale .zone.z-low { background: var(--dr2-zone-low); }
+.dr2-scale .tick { position: absolute; top: 24px; width: 2px; height: 20px; transform: translateX(-1px); background: var(--dr2-tick); }
+.dr2-scale .tick.t-low { background: var(--dr2-low); }
+.dr2-scale .spr { position: absolute; top: 32px; height: 4px; background: var(--dr2-spread); border-radius: 2px; }
+.dr2-scale .ghost { position: absolute; top: 27px; width: 14px; height: 14px; border: 2px solid var(--orange); border-radius: 50%; background: var(--bg); transform: translateX(-7px); box-sizing: border-box; }
+.dr2-scale input[type=range] { position: relative; z-index: 2; -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 28px; margin: 0; padding: 0; border: 0; display: block; }
+.dr2-scale input[type=range]::-webkit-slider-runnable-track { height: 28px; background: transparent; }
+.dr2-scale input[type=range]::-moz-range-track { height: 28px; background: transparent; }
+.dr2-scale input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%; background: var(--orange); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--orange); margin-top: 4px; transform: none; }
+.dr2-scale input[type=range]::-moz-range-thumb { box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%; background: var(--orange); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--orange); }
+.dr2-scale input[type=range]::-webkit-slider-thumb:hover, .dr2-scale input[type=range]::-webkit-slider-thumb:active { transform: none; }
+.dr2-scale input[type=range]:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.dr2-scale .sm { display: none; }
+@media (max-width: 600px) { .dr2-scale .lg { display: none; } .dr2-scale .sm { display: inline; } }
+.dr2-key i.ring { width: 10px; height: 10px; border: 2px solid var(--orange); border-radius: 50%; background: transparent; box-sizing: border-box; }
+.dr2-key i.spread { width: 16px; height: 4px; background: var(--dr2-spread); }
+/* "Why" box: a headline result below HODL, explained by its trades. */
+.dr2-why { font-size: .8rem; color: var(--text); background: var(--dr2-red-soft); border: 1px solid var(--dr2-red-border); border-radius: 8px; padding: .55rem .7rem; line-height: 1.5; display: grid; gap: .3rem; }
+.dr2-why[hidden] { display: none; }
+.dr2-why b { color: var(--dr2-red-txt); }
