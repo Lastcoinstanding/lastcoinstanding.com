@@ -2337,7 +2337,11 @@ A range input that shows the record it is set against, for a level a reader pick
 
 1. **Heading with the live value** ("1 · Sell rule" … "2× trend"), updated on every input event.
 2. **One-line question** saying what the level does ("Sell when a spike reaches this level and then falls back below it.").
-3. **Track strip:** an inline SVG above the range, same horizontal inset as the thumb's travel so ticks line up with values. Ticks and labels for the record (spike peaks, cycle lows); shaded zones for a projection; values off the scale listed in a note under the strip ("Off the scale: 2017 5.4×, 2013 12×, 2011 14× →"). A key line under the slider names each zone.
+3. **Track:**
+   - **Marks are HTML on the range itself** (since 2026-10-06, replacing the first version's SVG strip): ticks and labels for the record (spike peaks, cycle lows), shaded zones for a projection, and the rule's own allowed range lightly shaded. Each mark sits at `calc(10px + (100% − 20px) × f)`, which lines up with a 20px thumb.
+   - **An axis row sits under the slider.** Long label parts go in `.lg` spans, hidden at 600px and below in favour of `.sm` short forms.
+   - A key line under the slider names each zone.
+   - **When two marked sliders set related levels, give them one shared scale** (DR: log, 0.42×–4×, positions 0–1000). Each slider rings the other's level with a hollow ghost and joins the two with a bar. Enforce the order between them, push the other slider visibly, and step arrow keys by one snap in a keydown handler, since the fine positions make the browser's own step too small.
 4. **History row:** every past value, newest first; the ones the level catches in bold with ✓, the rest muted; then the count ("4 of 5 reached 2×") and one closing sentence about the record.
 5. **Next cycle flag:** green / amber / red, one or two sentences, thresholds from the projection. A judgment about the next cycle, so its words carry the uncertainty ("Likely reached", "Uncertain", "Unlikely").
 
