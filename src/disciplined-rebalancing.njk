@@ -29,7 +29,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/disciplined-rebalancing-head.html' %}"
   page_styles: "{% include '_pageassets/disciplined-rebalancing.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/rule-engine.js' %}\n{% include '_pageassets/disciplined-rebalancing.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/spike-record.js' %}\n{% include '_pageassets/shared/rule-engine.js' %}\n{% include '_pageassets/disciplined-rebalancing.js' %}"
   body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
 ---
 {% import 'components/real-estate-baseline.njk' as reb %}
@@ -96,7 +96,7 @@ eleventyComputed:
             <p class="prose">Second, the historical distribution of <strong>price relative to trend</strong> is well-defined. Bitcoin has spent roughly half its history at or below trend, half above it. The 80th percentile of historical position corresponds to a specific multiple of trend; the 20th percentile to another. These are facts about the data, not predictions about the future. The Calculator sets its levels as multiples of trend and prints these historical-frequency anchors beside each one, so the user can see, in real time, how often a given trigger condition has actually existed.</p>
             <p class="prose">Third, inside a <strong>retirement-account wrapper</strong>, the rebalancing protocol generates no tax events. Sells trigger no capital gains; rebuys reset no holding-period clocks; the only friction is the bitcoin you fail to capture if a sell-and-rebuy bet doesn't complete. Outside that wrapper, every speculative sale is a taxable event, and the framework collapses into something far less defensible &mdash; the Calculator's account-type toggle makes that cost explicit.</p>
             <p class="prose">These three observations combine into the discipline: <em>Sell a defined fraction of the stack when price reaches a high-percentile zone. Re-buy when it returns to a lower-percentile zone. Accept that some cycles won't trigger; accept that the discipline only works inside a wrapper that absorbs the friction.</em></p>
-            <p class="prose"><strong>How much you sell matters as much as when.</strong> At the same triggers (sell on the way up through 1.75&times; trend, buy back at 0.85&times;), an IRA that sold the whole stack each time ended at <span id="drQ100">0.61&times;</span> HODL since 2011; one that sold half ended at <span id="drQ50">0.95&times;</span>. Partial sales cut both the damage and the upside. That is the honest trade, and it is why the calculator&rsquo;s presets sell a quarter to three quarters, never the whole stack.</p>
+            <p class="prose"><strong>How much you sell matters as much as when.</strong> At the same triggers (sell on the way up through 1.75&times; trend, buy back at 0.85&times;), an IRA that sold the whole stack each time ended at <span id="drQ100">0.61&times;</span> HODL since 2011; one that sold half ended at <span id="drQ50">0.95&times;</span>. Partial sales cut both the damage and the upside. That is the honest trade, and it is why the calculator starts at selling a quarter, not the whole stack.</p>
         </div>
 
         <div class="section">
@@ -128,7 +128,7 @@ eleventyComputed:
 
         <div class="section">
             <h3>What gets settled &mdash; and what doesn't</h3>
-            <p class="prose">The Calculator tab walks the discipline through fifteen years of actual bitcoin price history. The user picks a preset or sets a sell level, a share to sell and a buy-back level, each as a multiple of trend; the page finds every point in the record where the rule would have fired and tracks the stack across the cycles that resulted. The output is a record &mdash; <em>"starting from one bitcoin in 2011, or in 2014, here is what this rule would have done across the cycles bitcoin actually went through"</em> &mdash; not a forecast.</p>
+            <p class="prose">The Calculator tab walks the discipline through fifteen years of actual bitcoin price history. The user sets a sell level and a buy-back level, each as a multiple of trend, and a share to sell; the page finds every point in the record where the rule would have fired and tracks the stack across the cycles that resulted. The output is a record &mdash; <em>"starting from one bitcoin in 2011, or in 2014, here is what this rule would have done across the cycles bitcoin actually went through"</em> &mdash; not a forecast.</p>
             <p class="prose">What it does not settle: whether to follow the framework. Whether retirement-wrapped bitcoin makes sense for your situation. Whether your tax bracket warrants the slider you've chosen. Whether the next cycle will materialize, or in what shape. The calculator computes outcomes under your assumptions. The decision is yours.</p>
         </div>
 
@@ -143,58 +143,75 @@ eleventyComputed:
       <div class="dr2-stack">
         <div class="dr2-arrival" id="dr2Arrival" role="status" hidden></div>
 
-        <!-- 1. RULE -->
+        <!-- 1. YOUR TWO RULES (Stage B, 2026-10-06; ported from DR_TWO_SLIDER_MOCKUP v2).
+             Rules left, results right; the results panel is sticky beside the
+             rules on desktop and stacks at 900px and below. Slider markings
+             (spike peaks, cycle lows, the next-spike projection) are drawn from
+             shared/spike-record.js, never typed in. -->
         <section class="dr2-card" id="dr2RuleCard" aria-labelledby="dr2HRule">
-          <div class="dr2-eyebrow">Your rules</div>
-          <h2 id="dr2HRule">Pick a starting point, then make it yours</h2>
-          <p class="dr2-frame">Every level on this page is a multiple of bitcoin&rsquo;s <a href="/the-power-law">power law trend</a>: 1&times; is the trend, 0.42&times; the floor, 3&times; the upper band. A rule like this only makes sense if price keeps returning toward that trend. <a href="#dr-fail">How this strategy can fail</a> covers what happens if it doesn&rsquo;t.</p>
-          <div class="dr2-presets" role="group" aria-label="Presets">
-            <button type="button" class="dr2-preset" data-p="conservative" aria-pressed="true"><span class="k">Conservative</span><span class="d">Trim a quarter of the position after a big spike starts to reverse. Buy back at the trend.</span></button>
-            <button type="button" class="dr2-preset" data-p="balanced" aria-pressed="false"><span class="k">Balanced</span><span class="d">Half the position, after the spike starts to reverse. Buy back below trend.</span></button>
-            <button type="button" class="dr2-preset" data-p="adventurous" aria-pressed="false"><span class="k">Adventurous</span><span class="d">Most of the position, on the way up. Buy back well below trend.</span></button>
-            <button type="button" class="dr2-preset" data-p="custom" aria-pressed="false"><span class="k">Custom</span><span class="d">Your own levels. Any change below lands here.</span></button>
-          </div>
-          <p class="dr2-rule" id="dr2RuleSentence" aria-live="polite"></p>
-
-          <details class="dr2-build" id="dr2Build">
-            <summary>Build your own rules</summary>
-            <div class="dr2-build-body">
-              <div class="dr2-group">
-                <h3>When to sell</h3>
-                <div class="dr2-ctls">
-                  <div class="dr2-ctl"><span class="dr2-lbl" id="dr2TimingL">Timing</span>
-                    <div class="dr2-seg" id="dr2SegTiming" role="group" aria-labelledby="dr2TimingL"><button type="button" data-v="up">On the way up</button><button type="button" data-v="fade">As the spike fades</button></div>
-                    <span class="dr2-ctx" id="dr2TimingCtx"></span></div>
-                  <div class="dr2-ctl"><label class="dr2-lbl" for="dr2Sx"><span id="dr2SxLbl">Sell when price reaches</span><output id="dr2SxOut" for="dr2Sx"></output></label>
-                    <input type="range" id="dr2Sx" min="1.1" max="5" step="0.05" value="2">
-                    <span class="dr2-ctx" id="dr2SxCtx"></span></div>
-                  <div class="dr2-ctl" id="dr2SzWrap"><label class="dr2-lbl" for="dr2Sz">Then sell when it falls below<output id="dr2SzOut" for="dr2Sz"></output></label>
-                    <input type="range" id="dr2Sz" min="1" max="5" step="0.05" value="2">
-                    <span class="dr2-ctx">Can't be above the arming level. Equal to it is the usual choice.</span></div>
-                  <div class="dr2-ctl"><label class="dr2-lbl" for="dr2F">How much to sell<output id="dr2FOut" for="dr2F"></output></label>
-                    <input type="range" id="dr2F" min="5" max="100" step="5" value="25">
-                    <span class="dr2-ctx">Share of your stack at the moment of the sale.</span></div>
+          <div class="dr2-eyebrow">Your two rules</div>
+          <h2 id="dr2HRule">When would you sell, and when would you buy back?</h2>
+          <p class="dr2-frame">Both levels are multiples of bitcoin&rsquo;s <a href="/the-power-law">power law trend</a>: 1&times; is the trend, 0.42&times; the floor. The strategy only pays if both rules work: the sell rule has to fire, and the buy-back rule has to bring you back in lower. <a href="#dr-fail">How this strategy can fail</a> covers what happens if price stops returning toward the trend.</p>
+          <div class="dr2-cc">
+            <div class="dr2-rulebox">
+              <!-- SELL -->
+              <div class="dr2-rb">
+                <div class="dr2-rule-h"><span class="k">1 &middot; Sell rule</span><span class="v" id="dr2SxV"></span></div>
+                <p class="dr2-q" id="dr2SellQ"></p>
+                <div class="dr2-track"><div id="dr2SellTrack"></div><input type="range" id="dr2SxR" min="1.05" max="4" step="0.05" value="2" aria-label="Sell level, times trend"></div>
+                <p class="dr2-key"><span><i class="z-green"></i><span id="dr2KeyShrink">Next peak if spikes keep shrinking (about 1.1&times;)</span></span><span><i class="z-amber"></i><span id="dr2KeyAlt">If 2024&ndash;25 was unusually small (up to about 2.2&times;)</span></span></p>
+                <dl class="dr2-facts">
+                  <dt>History</dt><dd id="dr2SellHist"></dd>
+                  <dt>Next cycle</dt><dd><p class="dr2-flag" id="dr2SellFlag"></p></dd>
+                </dl>
+                <div class="dr2-opts">
+                  <span class="ol" id="dr2FL">How much</span><label class="dr2-fld"><input type="number" id="dr2FIn" min="5" max="100" step="5" inputmode="numeric" aria-labelledby="dr2FL dr2FU"> <span id="dr2FU">% of your stack</span></label>
+                  <span class="ol" id="dr2TL">When</span><div class="dr2-seg" id="dr2SegTiming" role="group" aria-labelledby="dr2TL"><button type="button" data-v="up">On the way up</button><button type="button" data-v="fade">As the spike fades</button></div>
                 </div>
               </div>
+              <!-- BUY BACK -->
+              <div class="dr2-rb">
+                <div class="dr2-rule-h"><span class="k">2 &middot; Buy-back rule</span><span class="v" id="dr2RxV"></span></div>
+                <p class="dr2-q">Buy back when price falls to this level.</p>
+                <div class="dr2-track"><div id="dr2BuyTrack"></div><input type="range" id="dr2RxR" min="0.42" max="1.5" step="0.01" value="1" aria-label="Buy-back level, times trend"></div>
+                <p class="dr2-key"><span><i class="z-low"></i><span id="dr2KeyLows">Where every past cycle bottomed (0.40&ndash;0.56&times;)</span></span></p>
+                <dl class="dr2-facts">
+                  <dt>History</dt><dd id="dr2BuyHist"></dd>
+                  <dt>Next cycle</dt><dd><p class="dr2-flag" id="dr2BuyFlag"></p></dd>
+                </dl>
+                <div class="dr2-opts">
+                  <span class="ol" id="dr2CapL">If it never comes</span><div class="dr2-seg" id="dr2SegCap" role="group" aria-labelledby="dr2CapL"><button type="button" data-v="0">Wait in cash</button><button type="button" data-v="24">Buy back after 24 months</button></div>
+                </div>
+              </div>
+              <!-- YOU -->
+              <div class="dr2-rb dr2-you">
+                <div class="dr2-opts">
+                  <span class="ol" id="dr2AcctL">Account</span><div class="dr2-seg" id="dr2SegAcct" role="group" aria-labelledby="dr2AcctL"><button type="button" data-v="ira">IRA</button><button type="button" data-v="tax">Taxable</button></div>
+                  <span class="ol"><label for="dr2Stack">Your stack</label></span><label class="dr2-fld"><input type="number" id="dr2Stack" min="0.01" step="0.01" value="1"> BTC</label>
+                  <button type="button" class="dr2-reset" id="dr2Reset">Reset to the starting rules</button>
+                </div>
+              </div>
+              <p class="dr2-rule" id="dr2RuleSentence" aria-live="polite"></p>
+
+          <details class="dr2-build" id="dr2Build">
+            <summary>More tax and timing settings</summary>
+            <div class="dr2-build-body">
               <div class="dr2-group">
-                <h3>When to buy back</h3>
+                <h3>Timing</h3>
                 <div class="dr2-ctls">
-                  <div class="dr2-ctl"><label class="dr2-lbl" for="dr2Rx">Buy back when price falls to<output id="dr2RxOut" for="dr2Rx"></output></label>
-                    <input type="range" id="dr2Rx" min="0.42" max="1.5" step="0.01" value="1">
-                    <span class="dr2-ctx" id="dr2RxCtx"></span></div>
-                  <div class="dr2-ctl"><span class="dr2-lbl" id="dr2CapL">If that never comes, buy back at market after</span>
-                    <div class="dr2-seg" id="dr2SegCap" role="group" aria-labelledby="dr2CapL"><button type="button" data-v="0">Never</button><button type="button" data-v="12">12 mo</button><button type="button" data-v="18">18 mo</button><button type="button" data-v="24">24 mo</button><button type="button" data-v="36">36 mo</button></div>
-                    <span class="dr2-ctx" id="dr2CapCtx"></span></div>
+                  <div class="dr2-ctl" id="dr2SzWrap"><label class="dr2-lbl" for="dr2Sz">As the spike fades, sell below<output id="dr2SzOut" for="dr2Sz"></output></label>
+                    <input type="range" id="dr2Sz" min="1" max="4" step="0.05" value="2">
+                    <span class="dr2-ctx">Follows the sell level unless you set it here or in the bar. It can&rsquo;t be above the sell level.</span></div>
                   <div class="dr2-ctl"><span class="dr2-lbl" id="dr2YieldL">Cash while waiting earns</span>
                     <div class="dr2-seg" id="dr2SegYield" role="group" aria-labelledby="dr2YieldL"><button type="button" data-v="0">0%</button><button type="button" data-v="4">4% a year</button></div>
                     <span class="dr2-ctx">4% is a money-market rate, held flat. Real rates ran from 0% to about 5% over the record.</span></div>
+                  <div class="dr2-ctl"><span class="dr2-lbl" id="dr2CapCtxL">Deadline</span>
+                    <span class="dr2-ctx" id="dr2CapCtx"></span></div>
                 </div>
               </div>
-              <div class="dr2-group">
-                <h3>Account and tax</h3>
+              <div class="dr2-group dr2-taxonly">
+                <h3>Tax, in a taxable account</h3>
                 <div class="dr2-ctls">
-                  <div class="dr2-ctl"><span class="dr2-lbl" id="dr2AcctL">Account</span>
-                    <div class="dr2-seg" id="dr2SegAcct" role="group" aria-labelledby="dr2AcctL"><button type="button" data-v="ira">IRA or other tax-advantaged</button><button type="button" data-v="tax">Taxable</button></div></div>
                   <div class="dr2-ctl dr2-taxonly"><span class="dr2-lbl" id="dr2FedL">Federal long-term rate</span>
                     <div class="dr2-seg" id="dr2SegFed" role="group" aria-labelledby="dr2FedL"><button type="button" data-v="0">0%</button><button type="button" data-v="15">15%</button><button type="button" data-v="20">20%</button></div>
                     <label class="dr2-chk"><input type="checkbox" id="dr2Niit"> Add 3.8% net investment income tax</label></div>
@@ -206,26 +223,42 @@ eleventyComputed:
                     <span class="dr2-ctx">FIFO is the default under US rules. Choosing specific lots needs records. Sales within a year of buying are taxed at 32% (federal ordinary rate).</span></div>
                 </div>
               </div>
-              <div class="dr2-group">
-                <h3>Your stack</h3>
-                <div class="dr2-ctls">
-                  <div class="dr2-ctl"><label class="dr2-lbl" for="dr2Stack">Bitcoin held</label><input type="number" id="dr2Stack" min="0.01" step="0.01" value="1">
-                    <span class="dr2-ctx">Used for the dollar figures. Never saved.</span></div>
-                </div>
-              </div>
             </div>
           </details>
+            </div>
+
+            <!-- RESULTS PANEL -->
+            <aside class="dr2-panel" id="dr2Panel" aria-label="Results" aria-live="polite">
+              <div class="dr2-heroes">
+                <div class="dr2-hn"><div class="lab">Since 2011</div><div class="big dr2-num" id="dr2R11"></div><div class="sub" id="dr2R11b"></div></div>
+                <div class="dr2-hn"><div class="lab">Since 2014</div><div class="big dr2-num" id="dr2R14"></div><div class="sub" id="dr2R14b"></div></div>
+              </div>
+              <p class="dr2-caveat" id="dr2PanelCaveat">History, not a forecast. These include spikes of 3&ndash;14&times;, far larger than the latest (1.19&times;). For smaller future spikes, see Looking ahead below.</p>
+              <div class="dr2-risk">
+                <h3>What it took, and what could go wrong</h3>
+                <div class="dr2-rk"><span class="l">Sell rule fired</span><span class="v" id="dr2RkFire"></span></div>
+                <div class="dr2-rk"><span class="l">Buy-back came</span><span class="v" id="dr2RkBuy"></span></div>
+                <div class="dr2-rk"><span class="l">Worst round trip</span><span class="v" id="dr2RkWorst"></span></div>
+                <div class="dr2-rk"><span class="l">Next cycle</span><span class="v" id="dr2RkNext"></span></div>
+                <div class="dr2-rk"><span class="l">If it breaks away</span><span class="v" id="dr2RkBreak"></span></div>
+              </div>
+              <div class="dr2-curve">
+                <h3>History at every sell level</h3>
+                <div id="dr2Curve"></div>
+                <p class="dr2-small">Bitcoin after your rules against HODLing since 2014, if only the sell level changed. The dot is yours. Peaks here fit the past by construction; they aren&rsquo;t targets.</p>
+              </div>
+            </aside>
+          </div>
         </section>
 
         <!-- STICKY RULE BAR (review round 1, item 9). Shown by JS once the rule
-             card has scrolled out of view, released at the end of the presets
-             block. Its controls drive the same state as the card's. Since
+             card has scrolled out of view, released at the end of the Looking
+             ahead section. Its controls drive the same state as the card's. Since
              2026-10-05 the levels are editable here, so a reader can match them
              to the chart: one row of controls, then the rule sentence. -->
         <div class="dr2-bar" id="dr2Bar" role="region" aria-label="Your rules, kept in view" hidden>
           <div class="dr2-bar-ctls">
-            <label class="dr2-bf dr2-bf-preset"><select id="dr2BarPreset" aria-label="Preset"><option value="conservative">Conservative</option><option value="balanced">Balanced</option><option value="adventurous">Adventurous</option><option value="custom">Custom</option></select></label>
-            <label class="dr2-bf"><span class="dr2-bf-l">Sell at</span><input type="number" id="dr2BarSx" min="1.1" max="5" step="0.05" inputmode="decimal" aria-label="Sell level, times trend"><span class="dr2-bf-u">&times;</span></label>
+            <label class="dr2-bf"><span class="dr2-bf-l">Sell at</span><input type="number" id="dr2BarSx" min="1.05" max="4" step="0.05" inputmode="decimal" aria-label="Sell level, times trend"><span class="dr2-bf-u">&times;</span></label>
             <label class="dr2-bf" id="dr2BarSzWrap"><span class="dr2-bf-l">then below</span><input type="number" id="dr2BarSz" min="1" max="5" step="0.05" inputmode="decimal" aria-label="Fade sell level, times trend"><span class="dr2-bf-u">&times;</span></label>
             <label class="dr2-bf"><span class="dr2-bf-l">Sell</span><input type="number" id="dr2BarF" min="5" max="100" step="5" inputmode="numeric" aria-label="Share to sell, percent"><span class="dr2-bf-u">%</span></label>
             <label class="dr2-bf"><span class="dr2-bf-l">Buy back at</span><input type="number" id="dr2BarRx" min="0.42" max="1.5" step="0.01" inputmode="decimal" aria-label="Buy-back level, times trend"><span class="dr2-bf-u">&times;</span></label>
@@ -236,28 +269,17 @@ eleventyComputed:
           <p class="dr2-bar-line"><span class="dr2-bar-rule" id="dr2BarRule"></span><span class="dr2-bar-sum" id="dr2BarSum"></span></p>
         </div>
 
-        <!-- 2. RESULTS -->
-        <section class="dr2-card" aria-labelledby="dr2HRes">
-          <div class="dr2-eyebrow">How it did</div>
-          <h2 id="dr2HRes">Your bitcoin stack after your rules, compared with HODLing</h2>
-          <div class="dr2-results">
-            <div class="dr2-res"><span class="lab">Since 2011</span><span class="big dr2-num" id="dr2R11"></span><span class="sub" id="dr2R11s"></span><span class="btc" id="dr2R11b"></span></div>
-            <div class="dr2-res"><span class="lab">Since 2014</span><span class="big dr2-num" id="dr2R14"></span><span class="sub" id="dr2R14s"></span><span class="btc" id="dr2R14b"></span></div>
-          </div>
-          <p class="dr2-small" id="dr2EraNote">Since 2011 includes 2013, when the trend was growing about 219% a year, so a buy back &ldquo;below trend&rdquo; could still cost more than the sale. Today the trend grows about 37% a year. Since 2014 matches How Much Cash.</p>
-          <p class="dr2-lastcycle" id="dr2LastCycle"></p>
-        </section>
-
-        <!-- 3. CYCLES -->
+        <!-- 2. CYCLES -->
         <section class="dr2-card" aria-labelledby="dr2HCyc">
           <div class="dr2-row-head">
             <div><div class="dr2-eyebrow">Cycle by cycle</div><h2 id="dr2HCyc">What your rules did each time</h2></div>
             <div class="dr2-seg" id="dr2SegStart" role="group" aria-label="Start of record"><button type="button" data-v="2011-01">From 2011</button><button type="button" data-v="2014-01">From 2014</button><button type="button" data-v="2017-01">From 2017</button></div>
           </div>
+          <p class="dr2-caveat">This is the record, not a forecast. The early cycles had spikes of 5&ndash;14&times; and a trend growing several times faster than today&rsquo;s, which made both rules easier to profit from and, in 2013, easier to lose with. Future cycles can play out very differently.</p>
           <p class="dr2-showing" id="dr2Showing"></p>
           <div class="dr2-tablewrap" tabindex="0" role="region" aria-label="What your rules did each cycle (scrolls sideways)"><table class="dr2-table">
             <thead><tr>
-              <th scope="col">Cycle</th>
+              <th scope="col">Cycle &middot; spike &middot; low</th>
               <th scope="col">Sold<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">When the sell rule sold, at what price and multiple of trend, and what share of your stack.</span></button></th>
               <th scope="col">Bought back<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">When the cash went back into bitcoin: at the buy-back level, at the deadline, or not yet (still in cash, valued at today&rsquo;s price).</span></button></th>
               <th scope="col" class="n">Tax paid<button type="button" class="dr-tt" aria-label="About this column">?<span class="dr-tt-card">Tax on the sale in a taxable account, on your stack. Zero in an IRA.</span></button></th>
@@ -312,11 +334,26 @@ eleventyComputed:
           <p class="dr2-small">While the rule holds cash, the line counts that cash in bitcoin at each day&rsquo;s price, so it moves even though nothing was traded.</p>
         </section>
 
-        <!-- PRESET COMPARISON (rewritten for v2; every figure live) -->
-        <section class="dr2-card" id="dr2PresetsCard" aria-labelledby="dr2HCmp">
-          <div class="dr2-eyebrow">The three presets</div>
-          <h2 id="dr2HCmp">Each preset, from 2011 and from 2014</h2>
-          <div id="drPresetComparison"></div>
+        <!-- LOOKING AHEAD (Stage B, 2026-10-06). Bitcoin only: no dollar
+             figures anywhere in this section. Method: RuleEngine.replays(). -->
+        <section class="dr2-card" id="dr2AheadCard" aria-labelledby="dr2HF">
+          <div class="dr2-eyebrow">Looking ahead</div>
+          <h2 id="dr2HF">What your rules might do in future cycles</h2>
+          <p class="dr2-frame">Nobody knows how big the next spikes will be, so this doesn&rsquo;t pick one. It replays the four past cycles in future order, resizes every spike to the height along the bottom of the chart, and runs your rules on each replay. Results are in bitcoin only, against HODLing the same stack, by about <span id="dr2FEnd">2040</span>.</p>
+          <div class="dr2-readout" id="dr2FRead"></div>
+          <div class="dr2-fchart" id="dr2FChart"></div>
+          <div class="dr2-flegend">
+            <span><i class="k-band"></i>Range across the replays</span>
+            <span><i class="k-mid"></i>Middle of the range</span>
+            <span><i class="k-green"></i><span id="dr2FKeyShrink">Next spike if the shrinking continues (about 1.1&times;)</span></span>
+            <span><i class="k-amber"></i><span id="dr2FKeyAlt">If 2024&ndash;25 was unusually small (up to about 2.2&times;)</span></span>
+          </div>
+          <div class="dr2-cases"><div class="dr2-case" id="dr2CStop"></div><div class="dr2-case bad" id="dr2CBreak"></div></div>
+          <details class="dr2-how"><summary>How this is built, and why it flatters the rules</summary><div class="body">
+            <p><b>The replays.</b> The four cycles from the 2012 low to the 2026 low, laid end to end from today in four rotations. Every spike is resized so its peak equals the height on the chart. Lows are run two ways: kept where they were (near the 0.42&times; floor, as in every past cycle) and shrunk in proportion to the spike. The band spans all eight runs, to about 2040.</p>
+            <p><b>The projection.</b> Each spike&rsquo;s height above trend has shrunk cycle after cycle. If it keeps shrinking at any of its past rates, the next spike peaks around <span data-dr-proj="mid">1.1&times;</span> trend. If 2024&ndash;25 (1.19&times;) was unusually small and the 2017-to-2021 rate resumes, around <span data-dr-proj="alt">2.2&times;</span>.</p>
+            <p><b>Why it flatters the rules.</b> The trend now grows about <span data-dr-math="gNow">37%</span> a year, so a buy back below trend nearly always costs less than the sale did. Past cycles also repeat here on schedule and in the same shape, which real cycles won&rsquo;t. This illustrates how your rules behave; it doesn&rsquo;t forecast bitcoin&rsquo;s price.</p>
+          </div></details>
         </section>
 
         <!-- FAILURE MODES (kept; the worked example is computed) -->
@@ -407,7 +444,7 @@ eleventyComputed:
     <div class="tab-content" id="tab-math">
         <div class="section-intro">
             <h2>The Math</h2>
-            <p>The Calculator tab runs a standing rule through the actual bitcoin price record. This page walks through how the rule&rsquo;s levels are set, how a trigger fires, how a round trip changes the stack, how tax and lots work, why selling as a spike fades beat selling on the way up, what the buy-back deadline does, why 2013 hurts, and what isn&rsquo;t modelled. The goal is not to convince you the discipline is right for you; it&rsquo;s to make the calculator&rsquo;s reasoning auditable.</p>
+            <p>The Calculator tab runs a standing rule through the actual bitcoin price record. This page walks through how the rule&rsquo;s levels are set, how a trigger fires, how a round trip changes the stack, how tax and lots work, why selling as a spike fades beat selling on the way up, what the buy-back deadline does, why 2013 hurts, how the Looking ahead replays and the next-spike projection work, and what isn&rsquo;t modelled. The goal is not to convince you the discipline is right for you; it&rsquo;s to make the calculator&rsquo;s reasoning auditable.</p>
         </div>
 
         <!-- §1: LEVELS ARE MULTIPLES OF TREND -->
@@ -469,7 +506,7 @@ eleventyComputed:
         <div class="dr-math-section">
             <h3>6. The buy-back deadline</h3>
             <p>A buy-back level set too deep can strand a sale in cash. Selling everything at 2&times; trend and waiting for 0.5&times; ended at <span data-dr-math="strand0">0.13&times;</span> HODL since 2011, because price never came back down far enough.</p>
-            <p>A deadline buys back at market after a set number of months. Twelve months hurt: it tended to buy back in the middle of a bear market. Twenty-four months was neutral when the buy-back level came anyway, and it rescued the stranded cases: the same rule with a 24-month deadline ended at <span data-dr-math="strand24">0.61&times;</span>. That is why the presets use 24 months. With no deadline, the cycle table marks a sale still waiting as &ldquo;still in cash&rdquo;, valued at today&rsquo;s price.</p>
+            <p>A deadline buys back at market after a set number of months. Twelve months hurt: it tended to buy back in the middle of a bear market. Twenty-four months was neutral when the buy-back level came anyway, and it rescued the stranded cases: the same rule with a 24-month deadline ended at <span data-dr-math="strand24">0.61&times;</span>. That is why the starting rules use 24 months. With no deadline, the cycle table marks a sale still waiting as &ldquo;still in cash&rdquo;, valued at today&rsquo;s price.</p>
         </div>
 
         <!-- §7: 2013 AND THE TREND'S GROWTH RATE -->
@@ -486,9 +523,21 @@ eleventyComputed:
             <p>Every result on this page carries that sampling error. It was larger in the fast early years than it is now, when price moves less between samples.</p>
         </div>
 
-        <!-- §9: HISTORICAL RECORD ≠ FORECAST -->
+        <!-- §9: LOOKING AHEAD (Stage B, 2026-10-06) -->
         <div class="dr-math-section">
-            <h3>9. The historical record is not a forecast</h3>
+            <h3>9. Looking ahead: how the replays work</h3>
+            <p>The Looking ahead section replays the record; it doesn&rsquo;t forecast a price. A cycle runs from one low against trend to the next. The 2012, 2015, 2019, 2023 and 2026 lows give four complete cycles, which I lay end to end from the latest sample, in four rotations. For each spike height on the chart, every spike is resized so its peak equals that height: each ratio above 1&times; is raised to the power ln(height) / ln(that cycle&rsquo;s own peak). The lows run two ways, unchanged and resized with the same power, so each height gets eight runs. Price on each run is the ratio times the power law trend on that future day, and your rules and tax settings go through the same engine as the record. The breakaway case is a separate path: price climbs from today&rsquo;s level to 2.3&times; trend over three years, then swings around 2.2&times; for the rest of 14 years.</p>
+        </div>
+
+        <!-- §10: THE NEXT-SPIKE PROJECTION (Stage B, 2026-10-06) -->
+        <div class="dr-math-section">
+            <h3>10. The next-spike projection</h3>
+            <p>Each spike&rsquo;s height above trend has shrunk cycle after cycle: about 14&times; in 2011, 12&times; in 2013, 5.4&times; in 2017, 3.2&times; in 2021 and 1.19&times; in 2024&ndash;25. I measure the shrinking on the logarithm of each peak. Four past rates are applied to the latest spike: the average rate per cycle from 2011, from 2013 and from 2017 to 2024&ndash;25, and the single step from 2017 to 2021. They put the next peak at <span data-dr-proj="lo">1.06&times;</span> to <span data-dr-proj="hi">1.13&times;</span> trend, which the sliders mark as about 1.1&times;. If 2024&ndash;25 was unusually small and the 2017-to-2021 step resumes from 2021&rsquo;s peak, the next spike reaches about <span data-dr-proj="altExact">2.23&times;</span>. Five cycles are too few for odds, so the page shows ranges and counts, not probabilities.</p>
+        </div>
+
+        <!-- §11: HISTORICAL RECORD ≠ FORECAST -->
+        <div class="dr-math-section">
+            <h3>11. The historical record is not a forecast</h3>
 
             <p>The Calculator tab shows what the discipline would have done across actual bitcoin price history at the user's chosen settings. That is a fact about the past. It is not a prediction about the future. Three concrete ways the future will differ from the historical record:</p>
 
@@ -498,12 +547,12 @@ eleventyComputed:
                 <li><strong>The strategy can fail without doing anything wrong.</strong> The historical record at certain settings shows cycles where both triggers fired correctly (high sell, low rebuy) and yet ended with less bitcoin than before, because the rebuy executed above the prior sell price. Detailed in the <em>How this strategy can fail</em> section on the Calculator tab.</li>
             </ul>
 
-            <p class="dr-math-note">When a rule never fires across the record, the Calculator says so, and the discipline reduces to HODL across that span. None of the presets fired in the 2024&ndash;25 cycle. That is information about the framework, not a bug.</p>
+            <p class="dr-math-note">When a rule never fires across the record, the Calculator says so, and the discipline reduces to HODL across that span. The starting rules didn&rsquo;t fire in the 2024&ndash;25 cycle. That is information about the framework, not a bug.</p>
         </div>
 
-        <!-- §10: COMPANION CHART -->
+        <!-- §12: COMPANION CHART -->
         <div class="dr-math-section">
-            <h3>10. Historical channel positions</h3>
+            <h3>12. Historical channel positions</h3>
             <p>The chart below shows bitcoin's price/trend ratio across all of <code>PL_DATA</code>. Horizontal reference lines mark the 50th, 70th, 80th and 90th percentiles since 2011. You can see where each excursion sat, how long it lasted, and how often each level was crossed.</p>
 
             <div class="dr-math-chart-container" data-chart-copy data-chart-heading="closest:.dr-math-section h3" data-chart-title="Price-to-trend ratio with percentile levels">
@@ -513,9 +562,9 @@ eleventyComputed:
             <p class="dr-math-note">Above-80th excursions occurred on roughly <strong>20% of historical days</strong>, with average excursion duration around <strong>88 days</strong>. Above-90th excursions occurred on roughly <strong>10% of days</strong>, with shorter average duration. These are facts about the historical record, not predictions about the future shape of cycles.</p>
         </div>
 
-        <!-- §11: WHAT I'M NOT MODELLING -->
+        <!-- §13: WHAT I’M NOT MODELLING -->
         <div class="dr-math-section">
-            <h3>11. What I&rsquo;m not modelling</h3>
+            <h3>13. What I&rsquo;m not modelling</h3>
             <p>The calculator focuses tightly on the cycle protocol. The following are deliberately out of scope:</p>
 
             <ul class="negative-space-list">
@@ -529,7 +578,7 @@ eleventyComputed:
             </ul>
         </div>
 
-        <!-- §12: METHODOLOGY DISCLOSURE FOOTER -->
+        <!-- §14: METHODOLOGY DISCLOSURE FOOTER -->
         <div class="dr-math-disclosure">
             <p><strong>Methodology disclosure</strong></p>
             <ul>
