@@ -631,7 +631,8 @@
     if (kind === 'sell') {
       o += '<div class="zone z-green" style="left:' + scL(PROJ.zoneLo) + ';width:' + scW(PROJ.zoneLo, PROJ.zoneHi) + '"></div>';
       o += '<div class="zone z-amber" style="left:' + scL(PROJ.zoneHi) + ';width:' + scW(PROJ.zoneHi, PROJ.altShown) + '"></div>';
-      var on = PEAKS.filter(function(p){ return p.m <= SC_MAX; });
+      // Lowest first, so the highest on-scale peak gets the end-aligned label.
+      var on = PEAKS.filter(function(p){ return p.m <= SC_MAX; }).sort(function(a, b){ return a.m - b.m; });
       on.forEach(function(p, i){
         var end = i === on.length - 1 && on.length > 1;
         o += '<div class="tick" style="left:' + scL(p.m) + '"></div><span class="lab' + (end ? ' e' : '') + '" style="left:' + scL(p.m) + '"><span class="lg">' + p.y + ' peak </span><span class="sm">’' + p.y.slice(-2) + ' </span>' + fxs(p.m) + '</span>';
