@@ -1025,6 +1025,19 @@ supplies its own voice. A local *port* of another page's logic is the
 anti-pattern — the Dashboard's copy of `scanDurations` is what let a
 samples-vs-episodes divergence go unnoticed.
 
+### Merging a PR: wait for the Cloudflare Pages check
+
+The standing rule from `SITE_GUIDE §0` ("The merge rule"), repeated here
+because this is where the merge happens:
+
+1. `gh pr checks <n> --watch --required=false`
+2. Merge only when **Cloudflare Pages** shows **pass**. Pending: wait.
+   Failed or missing: stop and tell JM; don't merge.
+3. Never `gh pr merge --admin`.
+
+Nothing in GitHub enforces this (no branch protection; TECH_DEBT, "Branch
+protection for `main`"), so skipping it is silent.
+
 ### Verifying a just-pushed change on Cloudflare Pages
 
 - **Cloudflare is the only authoritative deploy signal.** The site deploys

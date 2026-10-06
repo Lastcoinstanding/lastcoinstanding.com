@@ -56,6 +56,21 @@ to see inside the Code tab except via JM's screenshots.
 pastes it into Claude Code → Claude Code builds, PRs, and (on merge) deploys → JM
 verifies live.** Every page. No renegotiation.
 
+### The merge rule: Cloudflare Pages must pass (JM ruling, 2026-10-06)
+
+`main` has no branch protection or ruleset (TECH_DEBT, "Branch protection for
+`main`", closed decision), so this rule is the gate. Before any `gh pr merge`:
+
+1. Run `gh pr checks <n> --watch --required=false`.
+2. Merge only if **Cloudflare Pages** shows **pass**. If it is pending, wait.
+   If it failed or is missing, stop and tell JM. Do not merge.
+3. Never pass `--admin` to `gh pr merge`.
+
+Claude Code works through JM's GitHub account, so no repo setting can stop an
+early merge from this tab; the rule has to be followed, not enforced. It applies
+to every PR, including docs-only ones. It does not apply to JM's own direct
+pushes to `main` or to the STRC bot (§0.1).
+
 ### Legacy/exception mechanisms (NOT the default)
 
 Direct GitHub-API commits from a chat (PAT-based) remain documented for hot-fixes
