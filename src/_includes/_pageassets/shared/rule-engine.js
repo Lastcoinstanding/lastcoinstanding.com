@@ -74,6 +74,12 @@
     return gain;
   }
 
+  // EPS (Stage B): a level is "reached" within 1e-9, so a replayed spike
+  // resized to exactly the sell level still fires it. No recorded sample sits
+  // that close to a slider level, so the record's results don't move.
+  // O.fast skips the per-sample series and the per-cycle table: the replays
+  // and the sell-level curve only need the end figure and the events.
+  var EPS = 1e-9;
   function runRows(rows, R, O) {
     var last = rows[rows.length - 1];
     var lots = [{ b: 1, c: rows[0].p, d: rows[0].d }], cash = 0, st = 'hold', armed = false, prev = null, ts = null, ev = [], ser = [], lastD = rows[0].d;
@@ -86,8 +92,8 @@
       if (prev !== null) {
         if (st === 'hold') {
           var fire = false;
-          if (R.timing === 'up') { if (prev < R.sx && x.r >= R.sx) fire = true; }
-          else { if (x.r >= R.sx) armed = true; if (armed && prev >= R.sz && x.r < R.sz) fire = true; }
+          if (R.timing === 'up') { if (prev < R.sx && x.r >= R.sx - EPS) fire = true; }
+          else { if (x.r >= R.sx - EPS) armed = true; if (armed && prev >= R.sz && x.r < R.sz) fire = true; }
           if (fire) {
             var held = btc(), amt = held * R.f / 100;
             var gain = sellLots(lots, amt, x.p, x.d, O.lots, lt, sh);
@@ -102,10 +108,11 @@
           if (why) { var b = cash / x.p; lots.push({ b: b, c: x.p, d: x.d }); cash = 0; st = 'hold'; ev.push({ t: 'buy', d: x.d, p: x.p, r: x.r, why: why, after: btc() }); }
         }
       }
-      ser.push({ d: x.d, p: x.p, r: x.r, coins: btc() + cash / x.p, usd: btc() * x.p + cash });
+      if (!O.fast) ser.push({ d: x.d, p: x.p, r: x.r, coins: btc() + cash / x.p, usd: btc() * x.p + cash });
       prev = x.r;
     }
     var endC = btc() + cash / last.p;
+    if (O.fast) return { ev: ev, end: endC, inCash: st === 'cash' };
     var cyc = CYC.map(function (c, i) {
       var inWin = rows.filter(function (x) { return x.ym >= c[1] && x.ym <= c[2]; });
       var peak = inWin.reduce(function (m, x) { return Math.max(m, x.r); }, 0);
@@ -135,8 +142,52 @@
   // Trend growth over the 12 months from day d, % (the era note).
   function trendGrowth(d) { return 100 * (plPrice(d + 365.25) / plPrice(d) - 1); }
 
+  // ── Looking ahead (Stage B, 2026-10-06): replays of the record ──
+  // Ported from the approved mockup's fpath / BREAK. An explicit series runs
+  // through the same runRows as the record; nothing here forks the engine.
+  // A series is rows of { d, p, r, ym } with p = r × the trend on day d.
+  function seriesOf(pts) { return pts.map(function (q) { return { d: q[0], p: q[1] * plPrice(q[0]), r: q[1], ym: ym(q[0]) }; }); }
+  // lowDays: the sample days of the cycle lows (SpikeRecord.cycleLows), so the
+  // four complete low-to-low cycles are the segments. asOf: the day the replays
+  // start from (the latest sample, or drQA's anchor).
+  function replays(lowDays, asOf) {
+    var rows = asOf == null ? ALL : ALL.filter(function (x) { return x.d <= asOf; });
+    var today = rows[rows.length - 1].d, nowR = rows[rows.length - 1].r, seg = [], i;
+    for (i = 0; i + 1 < lowDays.length; i++) {
+      var a = lowDays[i], b = lowDays[i + 1];
+      var pts = rows.filter(function (x) { return x.d >= a && x.d < b; }).map(function (x) { return [x.d - a, x.r]; });
+      seg.push({ len: b - a, pts: pts, max: Math.max.apply(null, pts.map(function (q) { return q[1]; })) });
+    }
+    var ROT = seg.map(function (_, k) { return seg.map(function (__, j) { return (j + k) % seg.length; }); });
+    var cache = {};
+    // Resize every spike so its peak equals `peak`: ratio^a, a = ln peak / ln max,
+    // applied to ratios above 1. lows 'keep' leaves the rest alone; 'rise'
+    // scales the lows with the same exponent.
+    function path(order, peak, lows) {
+      var t0 = today, out = [];
+      order.forEach(function (ci) {
+        var s = seg[ci], a = Math.min(1, Math.log(peak) / Math.log(s.max));
+        s.pts.forEach(function (q) { var r = (q[1] > 1 || lows === 'rise') ? Math.pow(q[1], a) : q[1]; out.push([t0 + q[0], r]); });
+        t0 += s.len;
+      });
+      return seriesOf(out);
+    }
+    function series(peak, rot, lows) { var k = peak + '|' + rot + '|' + lows; return cache[k] || (cache[k] = path(ROT[rot], peak, lows)); }
+    // Breakaway: from today's ratio up to 2.3× over three years, then
+    // exp(ln 2.2 + 0.35 sin(1.4 (y − 3))), 14 years on the 12-day grid.
+    var brk = (function () {
+      var out = [];
+      for (var d = today; d < today + 14 * 365; d += 12) {
+        var y = (d - today) / 365, lr = y < 3 ? Math.log(nowR) + (Math.log(2.3) - Math.log(nowR)) * y / 3 : Math.log(2.2) + 0.35 * Math.sin((y - 3) * 1.4);
+        out.push([d, Math.exp(lr)]);
+      }
+      return seriesOf(out);
+    })();
+    return { today: today, nowR: nowR, segments: seg, rotations: ROT.length, series: series, breakaway: brk };
+  }
+
   window.RuleEngine = {
-    run: run, runRows: runRows, sellLots: sellLots, rowsFrom: rowsFrom,
+    run: run, runRows: runRows, sellLots: sellLots, rowsFrom: rowsFrom, seriesOf: seriesOf, replays: replays, EPS: EPS,
     CYC: CYC, MONTH_D: MONTH_D, ST_RATE: ST_RATE,
     pctAtOrAbove: pctAtOrAbove, pctAtOrBelow: pctAtOrBelow, ratioAtPercentile: ratioAtPercentile,
     trendGrowth: trendGrowth, ym: ym, monthYear: monthYear, isoOf: isoOf, dayOfIso: dayOfIso,

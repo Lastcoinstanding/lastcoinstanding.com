@@ -446,7 +446,7 @@
 // params (any) override storage, as before. The old sell/rebuy/tax keys are
 // removed on load, not migrated.
 (function(){
-  if (!window.RuleEngine || !document.getElementById('dr2RuleSentence')) return;
+  if (!window.RuleEngine || !window.SpikeRecord || !document.getElementById('dr2RuleSentence')) return;
   var RE = window.RuleEngine;
   function $(id){ return document.getElementById(id); }
   function cssVar(n, fb){ var v = getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v || fb; }
@@ -455,18 +455,39 @@
   var INITIAL_HREF = location.href;
   var interacted = false;
 
-  // ─── Presets (D1) ───
+  // ─── Stage B (2026-10-06): no presets on the page. Two sliders open at the
+  // old Conservative values, the "starting rules" (DEF_R); Reset returns there.
+  // PRESETS stays only for old ?preset= links and the drQA fixture.
   var PRESETS = {
     conservative: { timing: 'fade', sx: 2, sz: 2, f: 25, rx: 1.0, cap: 24 },
     balanced:     { timing: 'fade', sx: 2, sz: 2, f: 50, rx: 0.85, cap: 24 },
     adventurous:  { timing: 'up', sx: 1.5, sz: 1.5, f: 75, rx: 0.7, cap: 24 }
   };
-  var PRESET_NAMES = { conservative: 'Conservative', balanced: 'Balanced', adventurous: 'Adventurous', custom: 'Custom' };
+  var DEF_R = PRESETS.conservative;
+  var SX_MIN = 1.05, SX_MAX = 4, RX_MIN = 0.42, RX_MAX = 1.5;
   // Defaults. The state matches Bitcoin's Spikes' tax hurdle ("Not included"),
   // so a reader moving between the pages sees one assumption.
   var DEF_O = { acct: 'ira', fed: 15, niit: false, state: 'NONE', lots: 'fifo', yield: 0 };
-  var S = { preset: 'conservative', R: copy(PRESETS.conservative), O: copy(DEF_O), stack: 1, start: '2011-01', unit: 'coins', fromSpikes: false, rb: null };
+  // szFollows: the fade level tracks the sell level until the reader sets it
+  // on its own (the bar or "More tax and timing settings").
+  var S = { R: copy(DEF_R), szFollows: true, O: copy(DEF_O), stack: 1, start: '2011-01', unit: 'coins', fromSpikes: false, rb: null };
   function copy(o){ var r = {}; for (var k in o) r[k] = o[k]; return r; }
+
+  // ─── The record behind the sliders: spike peaks, cycle lows and the
+  // next-spike projection, all from shared/spike-record.js (one record for
+  // this page and Bitcoin's Spikes). REPLAY: the Looking ahead replays.
+  var SR = window.SpikeRecord, EPS = RE.EPS;
+  var PROJ = SR.nextSpike(), PEAKS = PROJ.peaks, LOWS = SR.cycleLows();
+  var LOWS_DESC = LOWS.map(function(l){ return l.m; }).sort(function(a, b){ return b - a; });
+  var LOW_GREEN = Math.round(LOWS_DESC[0] * 100) / 100, LOW_AMBER = Math.round(LOWS_DESC[1] * 100) / 100;
+  var REPLAY = RE.replays(LOWS.map(function(l){ return l.d; }));
+  var ROWS14 = RE.rowsFrom('2014-01');
+  function lowOf(cycle){ for (var i = 0; i < LOWS.length; i++) if (LOWS[i].cycle === cycle) return LOWS[i]; return null; }
+  function peakOf(cycle){ for (var i = 0; i < PEAKS.length; i++) if (PEAKS[i].y === cycle) return PEAKS[i]; return null; }
+
+  // ─── GA4 (Stage B): dr_rule_change, once per control per 2 s ───
+  var _gaT = {};
+  function ruleChanged(control){ clearTimeout(_gaT[control]); _gaT[control] = setTimeout(function(){ track('dr_rule_change', { control: control }); }, 2000); }
 
   // ─── State rates: the shared list's labels (reb.stateOptions), with one
   // bitcoin-specific override. The list was built for the real-estate pages,
@@ -501,9 +522,14 @@
   function share(x, from){ return Math.round(RE.pctAtOrAbove(x, from)); }
   function shareBelow(x, from){ return Math.round(RE.pctAtOrBelow(x, from)); }
 
+  // Record figures as the page prints them: 14×, 12×, 5.4×, 3.2×, 1.19×.
+  function fxs(v){ return (v >= 10 ? String(Math.round(v)) : v >= 2 ? String(parseFloat(v.toFixed(1))) : String(parseFloat(v.toFixed(2)))) + '×'; }
+  function lowx(v){ return v.toFixed(2) + '×'; }
+
+  // The rule sentence (mockup wording).
   function ruleText(R){
     var sell = R.timing === 'up' ? 'Sell <strong>' + R.f + '%</strong> when price rises through <strong>' + fx(R.sx) + ' trend</strong>.'
-      : 'Sell <strong>' + R.f + '%</strong> when price falls back below <strong>' + fx(R.sz) + ' trend</strong> after reaching ' + (R.sz === R.sx ? 'it' : fx(R.sx)) + '.';
+      : 'Sell <strong>' + R.f + '%</strong> when a spike reaches <strong>' + fx(R.sx) + ' trend</strong> and falls back below ' + (R.sz === R.sx ? 'it' : '<strong>' + fx(R.sz) + ' trend</strong>') + '.';
     var buy = ' Buy back at <strong>' + fx(R.rx) + ' trend</strong>' + (R.cap ? ', or at market after <strong>' + R.cap + ' months</strong>.' : ', with no deadline.');
     return sell + buy;
   }
@@ -511,26 +537,28 @@
   function segSet(id, v){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === v)); }); }
   function syncControls(){
     var R = S.R;
-    document.querySelectorAll('.dr2-preset').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.p === S.preset)); });
     segSet('dr2SegTiming', R.timing); segSet('dr2SegCap', String(R.cap)); segSet('dr2SegYield', String(S.O.yield)); segSet('dr2SegAcct', S.O.acct);
     segSet('dr2SegFed', String(S.O.fed)); segSet('dr2SegLots', S.O.lots); segSet('dr2SegStart', S.start); segSet('dr2SegUnit', S.unit);
-    $('dr2Sx').value = R.sx; $('dr2Sz').max = R.sx; $('dr2Sz').value = R.sz; $('dr2F').value = R.f; $('dr2Rx').value = R.rx;
-    $('dr2SxOut').textContent = fx(R.sx); $('dr2SzOut').textContent = fx(R.sz); $('dr2FOut').textContent = R.f + '%'; $('dr2RxOut').textContent = fx(R.rx);
-    $('dr2SxLbl').textContent = R.timing === 'up' ? 'Sell when price reaches' : 'Arm the rule when price reaches';
+    // The two sliders. A slider being dragged is left alone.
+    if (document.activeElement !== $('dr2SxR')) $('dr2SxR').value = R.sx;
+    if (document.activeElement !== $('dr2RxR')) $('dr2RxR').value = R.rx;
+    if (document.activeElement !== $('dr2FIn')) $('dr2FIn').value = R.f;
+    if (document.activeElement !== $('dr2Stack')) $('dr2Stack').value = stackNum(S.stack);
+    levelLabels();
+    $('dr2Sz').max = R.sx; $('dr2Sz').value = R.sz; $('dr2SzOut').textContent = fx(R.sz);
     $('dr2SzWrap').hidden = R.timing !== 'fade';
-    $('dr2TimingCtx').textContent = R.timing === 'up' ? 'Sells as price climbs through the level. Simple, but in past cycles it often sold well before the top.' : 'Waits for the spike to reach the level, then sells when it turns back down. It caught more of past spikes, but only fires if the spike gets that high.';
-    $('dr2SxCtx').textContent = 'Price has been at or above ' + fx(R.sx) + ' trend ' + share(R.sx, '2011-01') + '% of the time since 2011 and ' + share(R.sx, '2017-01') + '% since 2017. The 2024–25 spike peaked at ' + fx(lastPeak()) + '.';
-    $('dr2RxCtx').textContent = 'Price has been at or below ' + fx(R.rx) + ' trend ' + shareBelow(R.rx, '2011-01') + '% of the time since 2011. Cycle lows ran 0.40× to 0.56×; the floor is 0.42×.';
+    $('dr2SellQ').textContent = R.timing === 'fade' ? 'Sell when a spike reaches this level and then falls back below it.' : 'Sell as price rises through this level.';
+    renderMarks();
     $('dr2CapCtx').innerHTML = R.cap ? 'After ' + R.cap + ' months in cash the buy-back rule buys back at whatever the price is. 24 months was neutral when the buy-back level came, and it rescued sales that never got one.' : '<span class="dr2-warnline">No deadline can strand your sale in cash if price never falls to your level.</span>';
     document.querySelectorAll('.dr2-taxonly').forEach(function(e){ e.hidden = S.O.acct !== 'tax'; });
     $('dr2Niit').checked = S.O.niit;
     if ($('dr2State').value !== S.O.state) $('dr2State').value = S.O.state;
     $('dr2StateCtx').textContent = BTC_STATE_OVERRIDE[S.O.state] && BTC_STATE_OVERRIDE[S.O.state].help ? BTC_STATE_OVERRIDE[S.O.state].help : 'Top state rates on long-term gains, from the site’s shared list.';
     $('dr2RuleSentence').innerHTML = ruleText(R);
-    // The sticky bar mirrors the card: preset, levels, deadline, account and
-    // the short rule. A field the reader is typing in is left alone; it is
+    // The sticky bar mirrors the card: levels, deadline, account and the
+    // short rule. A field the reader is typing in is left alone; it is
     // normalised on blur.
-    $('dr2BarPreset').value = S.preset; $('dr2BarCap').value = String(R.cap);
+    $('dr2BarCap').value = String(R.cap);
     BAR_FIELDS.forEach(function(f){ var el = $(f.id); if (el !== document.activeElement) el.value = String(R[f.k]); });
     $('dr2BarSz').max = R.sx; $('dr2BarSzWrap').hidden = R.timing !== 'fade';
     document.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === S.O.acct)); });
@@ -553,39 +581,94 @@
   }
   function stackNum(v){ return String(parseFloat(v.toFixed(4))); }
   function stackText(){ return stackNum(S.stack) + ' BTC'; }
+  // ─── The marked sliders (Stage B; STYLE_GUIDE "Marked slider") ───
+  // Value labels update on every input event; the rest of the page follows
+  // on the throttled render.
+  function levelLabels(){
+    var R = S.R;
+    $('dr2SxV').innerHTML = fx(R.sx) + '<small> trend</small>'; $('dr2RxV').innerHTML = fx(R.rx) + '<small> trend</small>';
+    $('dr2SxR').setAttribute('aria-valuetext', fx(R.sx) + ' trend'); $('dr2RxR').setAttribute('aria-valuetext', fx(R.rx) + ' trend');
+  }
+  // A strip drawn above a range input: ticks for the record, shaded zones,
+  // notes. Same 9-unit inset as the range thumb's travel, so ticks line up.
+  function strip(min, max, ticks, zones, notes){
+    var W = 600, H = 58, X = function(v){ return 9 + (Math.max(min, Math.min(max, v)) - min) / (max - min) * (W - 18); };
+    var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true" focusable="false">';
+    zones.forEach(function(z){ o += '<rect x="' + X(z.a) + '" y="22" width="' + Math.max(3, X(z.b) - X(z.a)) + '" height="12" rx="3" style="fill:var(' + z.c + ')"/>'; });
+    o += '<line x1="9" x2="' + (W - 9) + '" y1="28" y2="28" style="stroke:var(--border-lt)" stroke-width="2"/>';
+    ticks.forEach(function(t){ var x = X(t.v), c = t.c || '--dr2-tick'; o += '<line x1="' + x + '" x2="' + x + '" y1="18" y2="38" style="stroke:var(' + c + ')" stroke-width="2"/>'; if (t.l) o += '<text x="' + x + '" y="13" style="fill:var(' + c + ')" font-size="13" text-anchor="' + (t.a || 'middle') + '">' + t.l + '</text>'; });
+    (notes || []).forEach(function(n){ o += '<text x="' + (n.x === 'end' ? W - 9 : 9) + '" y="54" style="fill:var(--text-dim)" font-size="12.5" text-anchor="' + (n.x === 'end' ? 'end' : 'start') + '">' + n.t + '</text>'; });
+    return o + '</svg>';
+  }
+  function sellHits(sx){ return PEAKS.filter(function(p){ return p.m >= sx - EPS; }); }
+  function buyHits(rx){ return LOWS.filter(function(l){ return l.m <= rx + EPS; }); }
+  function sellVerdict(sx){ return sx <= PROJ.zoneHi + EPS ? 'green' : sx <= PROJ.altShown + EPS ? 'amber' : 'red'; }
+  function buyVerdict(rx){ return rx >= LOW_GREEN - EPS ? 'green' : rx >= LOW_AMBER - EPS ? 'amber' : 'red'; }
+  var LAST_PEAK = PEAKS[PEAKS.length - 1];
+  function renderMarks(){
+    var R = S.R, mid = fx(PROJ.mid), alt = fx(PROJ.altShown), lastY = LAST_PEAK.y;
+    var early = PEAKS.slice(0, 3).map(function(p){ return p.m; });
+    $('dr2KeyShrink').textContent = 'Next peak if spikes keep shrinking (about ' + mid + ')';
+    $('dr2KeyAlt').textContent = 'If ' + lastY + ' was unusually small (up to about ' + alt + ')';
+    // Sell track: peaks on the scale get a tick; the rest are listed off the scale.
+    var on = PEAKS.filter(function(p){ return p.m <= SX_MAX; }), off = PEAKS.filter(function(p){ return p.m > SX_MAX; }).reverse();
+    $('dr2SellTrack').innerHTML = strip(SX_MIN, SX_MAX,
+      on.map(function(p, i){ return { v: p.m, l: p.y + ': ' + fxs(p.m), a: p.m < SX_MIN + 0.4 ? 'start' : 'middle' }; }).concat([{ v: SX_MAX, l: '', c: '--text-muted' }]),
+      [{ a: PROJ.zoneLo, b: PROJ.zoneHi, c: '--dr2-zone-green' }, { a: PROJ.zoneHi, b: PROJ.altShown, c: '--dr2-zone-amber' }],
+      off.length ? [{ x: 'end', t: 'Off the scale: ' + off.map(function(p){ return p.y + ' ' + fxs(p.m); }).join(', ') + ' →' }] : []);
+    var hits = sellHits(R.sx);
+    $('dr2SellHist').innerHTML = 'Spike peaks, newest first: ' + PEAKS.slice().reverse().map(function(p){ var t = p.y + ' ' + fxs(p.m); return p.m >= R.sx - EPS ? '<b>' + t + ' ✓</b>' : '<span class="miss">' + t + '</span>'; }).join(' · ') +
+      '. <b>' + hits.length + ' of ' + PEAKS.length + '</b> reached ' + fx(R.sx) + ' (✓). The three earliest spikes were ' + Math.floor(Math.min.apply(null, early)) + '–' + Math.round(Math.max.apply(null, early)) + '× and are unlikely to be seen again.';
+    var sv = sellVerdict(R.sx), fl = $('dr2SellFlag');
+    fl.className = 'dr2-flag ' + sv;
+    fl.textContent = sv === 'green' ? 'Likely reached. Even if spikes keep shrinking (next peak about ' + mid + '), this level is within reach. Lower levels earn less per sale and sell into more rallies that keep going.'
+      : sv === 'amber' ? 'Uncertain. Reached only if ' + lastY + ' was unusually small (next peak up to about ' + alt + '). If spikes keep shrinking (about ' + mid + '), this rule doesn’t fire next cycle.'
+      : 'Unlikely. Above both projections for the next spike (about ' + mid + ', or up to about ' + alt + '). On the record so far, this rule may not fire again.';
+    // Buy-back track: every cycle low, the band they span, the trend.
+    var lo = LOWS_DESC[LOWS_DESC.length - 1], hi = LOWS_DESC[0];
+    $('dr2KeyLows').textContent = 'Where every past cycle bottomed (' + lowx(lo) + '–' + lowx(hi) + ')';
+    $('dr2BuyTrack').innerHTML = strip(RX_MIN, RX_MAX,
+      [{ v: RX_MIN, l: 'Lows ' + lowx(lo) + '–' + lowx(hi), a: 'start', c: '--dr2-low' }].concat(LOWS.map(function(l){ return { v: l.m, c: '--dr2-low' }; }), [{ v: 1, l: 'Trend 1×', c: '--amber' }]),
+      [{ a: RX_MIN, b: hi, c: '--dr2-zone-low' }],
+      [{ x: 'start', t: 'Floor ' + fx(PL_FLOOR) + ' (left end)' }]);
+    var bh = buyHits(R.rx);
+    $('dr2BuyHist').innerHTML = 'Cycle lows, newest first: ' + LOWS.slice().reverse().map(function(l){ var t = l.y + ' ' + lowx(l.m) + (l.open ? ' (so far)' : ''); return l.m <= R.rx + EPS ? '<b>' + t + ' ✓</b>' : '<span class="miss">' + t + '</span>'; }).join(' · ') +
+      '. <b>' + bh.length + ' of ' + LOWS.length + '</b> fell to ' + fx(R.rx) + ' or below (✓). Unlike the spikes, the lows haven’t shrunk: every cycle bottomed between ' + lowx(lo) + ' and ' + lowx(hi) + '.';
+    var bv = buyVerdict(R.rx), bf = $('dr2BuyFlag');
+    bf.className = 'dr2-flag ' + bv;
+    bf.textContent = bv === 'green' ? 'Likely reached. Every past cycle fell at least this far, the latest included. If swings narrow in future, lows could stay higher; a level near trend is the safest.'
+      : bv === 'amber' ? 'Uncertain. Only the deeper past lows reached this. If swings narrow, the next low may stop short, and your cash waits (or the deadline buys back higher).'
+      : 'Unlikely. Only the deepest lows, at the floor, reached this. Without a deadline, the sale may never be bought back.';
+  }
+
   var _lastPeak = null;
   function lastPeak(){ if (_lastPeak == null) { var t = RE.run(PRESETS.conservative, engineOpts(DEF_O, '2011-01')); _lastPeak = t.cyc[4].peak; } return _lastPeak; }
 
   // ─── Render ───
   function render(){
     syncControls();
-    var O = S.O, other = copy(O); other.acct = O.acct === 'ira' ? 'tax' : 'ira';
+    var O = S.O;
     var a11 = RE.run(S.R, engineOpts(O, '2011-01')), a14 = RE.run(S.R, engineOpts(O, '2014-01'));
-    var b11 = RE.run(S.R, engineOpts(other, '2011-01')), b14 = RE.run(S.R, engineOpts(other, '2014-01'));
-    function hero(el, elS, a, b){
+    function hero(el, a){
       $(el).innerHTML = '<span class="' + cls(a.end) + '">' + mult(a.end) + '</span><small>HODL</small>';
-      // Item 8: the stack in BTC and dollars, at the live price when it has loaded.
+      // Review round 1, item 8: the stack in BTC and dollars, at the live price when it has loaded.
       var k = S.stack, endB = a.end * k, d = endB - k, sgn = d > 0 ? '+' : d < 0 ? '−' : '';
       var dTxt = Math.abs(d) < 0.0005 ? 'no change' : sgn + btcf(Math.abs(d)) + ', about ' + (d > 0 ? '+' : '') + usd(d * liveBtcPrice) + ' ' + priceNote();
-      $(el + 'b').innerHTML = 'Your ' + stackText() + ' became <strong>' + btcf(endB) + '</strong>: ' + dTxt + '.';
-      var n = a.ev.filter(function(e){ return e.t === 'sell'; }).length;
-      var acct = O.acct === 'ira' ? 'IRA' : 'Taxable';
-      $(elS).innerHTML = acct + ', ' + n + ' sale' + (n === 1 ? '' : 's') + (a.inCash ? ', <span class="down">still in cash</span>' : '') + '. ' + (O.acct === 'ira' ? 'Taxable' : 'In an IRA') + ': <span class="' + cls(b.end) + '">' + mult(b.end) + '</span>.';
+      $(el + 'b').innerHTML = (O.acct === 'ira' ? 'IRA' : 'Taxable') + '. Your ' + stackText() + ' became <strong>' + btcf(endB) + '</strong>: ' + dTxt + (a.inCash ? '. <span class="down">Still in cash.</span>' : '.');
     }
-    hero('dr2R11', 'dr2R11s', a11, b11); hero('dr2R14', 'dr2R14s', a14, b14);
-    var lastPk = a11.cyc[4].peak;
-    $('dr2LastCycle').innerHTML = a11.cyc[4].sell ? 'Your sell rule fired in the last cycle, which peaked at ' + fx(lastPk) + ' trend.' : '<b class="dr2-strong">Your sell rule did not fire in the last cycle.</b> The 2024–25 spike peaked at ' + fx(lastPk) + ' trend. As spikes shrink, a fixed level can go unreached; doing nothing is the most likely outcome of most rules next cycle, and in an IRA that costs nothing.';
-    // Era note: the two growth rates are templated from the trend function.
-    var g13 = Math.round(RE.trendGrowth(RE.dayOfIso('2013-07-01'))), gNow = Math.round(RE.trendGrowth(RE.lastDay));
-    $('dr2EraNote').textContent = 'Since 2011 includes 2013, when the trend was growing about ' + g13 + '% a year, so a buy back “below trend” could still cost more than the sale. Today the trend grows about ' + gNow + '% a year. Since 2014 matches How Much Cash.';
+    hero('dr2R11', a11); hero('dr2R14', a14);
+    renderPanel(a11);
 
     // Table + failure box
     var T = RE.run(S.R, engineOpts(O, S.start)), cum = 1, html = '', fails = [], stack = S.stack, LAST = T.last;
     T.cyc.forEach(function(c){
       if (!c.covered) return;
+      // First column (Stage B): the cycle, its spike and its low against trend.
+      var pk = peakOf(c.name), lw = lowOf(c.name);
+      var c1 = '<td>' + c.name + '<span class="s">' + (pk ? 'spike ' + fxs(pk.m) : '') + (lw ? ' · low ' + lowx(lw.m) + (lw.open ? ' so far' : '') : '') + '</span></td>';
       if (!c.sell) {
         var why = S.R.timing === 'fade' ? 'the sell rule arms at ' + fx(S.R.sx) : 'the sell rule fires at ' + fx(S.R.sx);
-        html += '<tr class="never"><td>' + c.name + '</td><td colspan="2">Never sold. Peak ' + fx(c.peak) + ' trend; ' + why + '.</td><td class="n">—</td><td class="n mult">1.00×</td>' + stackCells(stack * cum, null, stack) + '</tr>';
+        html += '<tr class="never">' + c1 + '<td colspan="2">Never sold. Peak ' + fx(c.peak) + ' trend; ' + why + '.</td><td class="n">—</td><td class="n mult">1.00×</td>' + stackCells(stack * cum, null, stack) + '</tr>';
         if (c.i === 4) fails.push('<b>' + c.name + ': never sold.</b> The spike peaked at ' + fx(c.peak) + ' trend, below the sell rule\'s ' + fx(S.R.sx) + '.');
         return;
       }
@@ -593,7 +676,7 @@
       if (b) { m = b.after / s.before; cum *= m; buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>'); }
       else { var held = s.before - s.amt, cashNow = (s.amt * s.p - s.tax) / LAST.p; m = (held + cashNow) / s.before; cum *= m; buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>'; }
       var row = m < 0.995 ? 'lost' : m > 1.005 ? 'won' : '';
-      html += '<tr class="' + row + '"><td>' + c.name + '</td><td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td>' + stackCells(stack * cum, stack * (cum - cum0), stack) + '</tr>';
+      html += '<tr class="' + row + '">' + c1 + '<td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td>' + stackCells(stack * cum, stack * (cum - cum0), stack) + '</tr>';
       if (m < 0.995) {
         var r = b ? (b.why === 'fallback' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.' : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (b.p > s.p ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '')) : 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.';
         fails.push('<b>' + c.name + ': ' + mult(m) + ' the bitcoin.</b> ' + r);
@@ -604,9 +687,125 @@
     renderFailBox(fails, S.start);
 
     updateChart1(T); updateChart2(T);
+    renderAhead();
     renderHandoffs();
-    renderPresetComparison();
     if (interacted) { saveSticky(); scheduleUrl(); }
+  }
+  // Slider drags: the value labels move on every input event; the full
+  // render runs at most every 90ms, with a trailing run so the last value
+  // always lands.
+  var _rT = null, _rLast = 0;
+  function soon(){
+    levelLabels();
+    var now = Date.now();
+    clearTimeout(_rT);
+    if (now - _rLast >= 90) { _rLast = now; render(); }
+    else _rT = setTimeout(function(){ _rLast = Date.now(); render(); }, 90 - (now - _rLast));
+  }
+
+  // ─── Results panel (Stage B) ───
+  function fastOpts(){ var o = engineOpts(S.O, null); o.fast = true; return o; }
+  function renderPanel(a11){
+    var R = S.R, sells = a11.ev.filter(function(e){ return e.t === 'sell'; }), buys = a11.ev.filter(function(e){ return e.t === 'buy'; });
+    var cov = a11.cyc.filter(function(c){ return c.covered; }), nc = cov.filter(function(c){ return c.sell; }).length, last = a11.cyc[a11.cyc.length - 1];
+    var early = PEAKS.slice(0, PEAKS.length - 1).map(function(p){ return p.m; });
+    $('dr2PanelCaveat').textContent = 'History, not a forecast. These include spikes of ' + Math.floor(Math.min.apply(null, early)) + '–' + Math.round(Math.max.apply(null, early)) + '×, far larger than the latest (' + fxs(LAST_PEAK.m) + '). For smaller future spikes, see Looking ahead below.';
+    $('dr2RkFire').innerHTML = 'In <b>' + nc + ' of ' + cov.length + '</b> cycles since 2011' + (sells.length > nc ? ' (' + sells.length + ' sales)' : '') + (last.sell ? '' : '; <span class="down">not in ' + last.name + '</span>');
+    var lvl = buys.filter(function(b){ return b.why === 'level'; }).length, dl = buys.length - lvl;
+    $('dr2RkBuy').innerHTML = sells.length ? '<b>' + lvl + ' of ' + sells.length + '</b> at your level' + (dl ? ', ' + dl + ' by the deadline' : '') + (a11.inCash ? ', <span class="down">1 still in cash</span>' : '') : '—';
+    var worst = null;
+    a11.ev.forEach(function(e, i){ var b = a11.ev[i + 1]; if (e.t === 'sell' && b && b.t === 'buy') { var m = b.after / e.before; if (!worst || m < worst.m) worst = { m: m, y: my(e.d) }; } });
+    $('dr2RkWorst').innerHTML = worst ? '<span class="' + cls(worst.m) + '">' + mult(worst.m) + '</span> (sold ' + worst.y + ')' : '—';
+    var sv = sellVerdict(R.sx);
+    $('dr2RkNext').innerHTML = sv === 'green' ? '<span class="up">Likely within reach</span>' : sv === 'amber' ? '<span class="amber">Only if ' + LAST_PEAK.y + ' was unusually small</span>' : '<span class="down">Above both projections</span>';
+    var rb = RE.runRows(REPLAY.breakaway, R, fastOpts());
+    $('dr2RkBreak').innerHTML = '<span class="' + cls(rb.end) + '">' + mult(rb.end) + '</span> HODL' + (rb.ev.length ? '' : ' (never sold)');
+    renderCurve();
+  }
+  // "History at every sell level": since 2014, only the sell level changed.
+  function curvePoints(R, opts){
+    var pts = [];
+    for (var x = SX_MIN; x <= SX_MAX + 1e-9; x += 0.05) {
+      var rr = copy(R); rr.sx = Math.round(x * 100) / 100;
+      if (rr.timing === 'fade') rr.sz = S.szFollows ? rr.sx : Math.min(R.sz, rr.sx); else rr.sz = rr.sx;
+      pts.push([rr.sx, RE.runRows(ROWS14, rr, opts).end]);
+    }
+    return pts;
+  }
+  function renderCurve(){
+    var R = S.R, opts = fastOpts(), pts = curvePoints(R, opts), vals = pts.map(function(p){ return p[1]; });
+    var W = 560, H = 150, PL = 36, PR = 8, PT = 8, PB = 22;
+    var ymax = Math.max(1.5, Math.ceil(Math.max.apply(null, vals) * 2) / 2), ymn = Math.min(0.5, Math.floor(Math.min.apply(null, vals) * 4) / 4);
+    var Xc = function(v){ return PL + (v - SX_MIN) / (SX_MAX - SX_MIN) * (W - PL - PR); }, Yc = function(v){ return PT + (ymax - v) / (ymax - ymn) * (H - PT - PB); };
+    var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Result since 2014 across sell levels, with your sell level marked">';
+    o += '<rect x="' + Xc(PROJ.zoneLo) + '" y="' + PT + '" width="' + (Xc(PROJ.zoneHi) - Xc(PROJ.zoneLo)) + '" height="' + (H - PT - PB) + '" style="fill:var(--dr2-zone-green-soft)"/>';
+    o += '<rect x="' + Xc(PROJ.zoneHi) + '" y="' + PT + '" width="' + (Xc(PROJ.altShown) - Xc(PROJ.zoneHi)) + '" height="' + (H - PT - PB) + '" style="fill:var(--dr2-zone-amber-soft)"/>';
+    for (var t = Math.ceil(ymn * 2) / 2; t <= ymax + 1e-9; t += 0.5) {
+      var one = Math.abs(t - 1) < 1e-9;
+      o += '<line x1="' + PL + '" x2="' + (W - PR) + '" y1="' + Yc(t) + '" y2="' + Yc(t) + '" style="stroke:var(' + (one ? '--text-muted' : '--dr2-svg-grid') + ')"' + (one ? ' stroke-dasharray="4 3"' : '') + '/><text x="' + (PL - 5) + '" y="' + (Yc(t) + 4) + '" style="fill:var(--text-muted)" font-size="10" text-anchor="end">' + t + '×</text>';
+    }
+    [1.5, 2, 2.5, 3, 3.5, 4].forEach(function(v){ o += '<text x="' + Xc(v) + '" y="' + (H - 6) + '" style="fill:var(--text-muted)" font-size="10" text-anchor="middle">' + v + '×</text>'; });
+    o += '<polyline fill="none" style="stroke:var(--orange)" stroke-width="2" points="' + pts.map(function(p){ return Xc(p[0]).toFixed(1) + ',' + Yc(p[1]).toFixed(1); }).join(' ') + '"/>';
+    var cur = RE.runRows(ROWS14, R, opts).end;
+    o += '<circle cx="' + Xc(R.sx) + '" cy="' + Yc(cur) + '" r="5" style="fill:var(--orange);stroke:var(--bg)" stroke-width="2"/></svg>';
+    $('dr2Curve').innerHTML = o;
+  }
+
+  // ─── Looking ahead (Stage B). Bitcoin only. ───
+  var FH = []; for (var _h = 1.05; _h <= 3.0001; _h += 0.05) FH.push(Math.round(_h * 100) / 100);
+  // Eight runs per spike height (four rotations × lows kept or resized):
+  // band = min to max, line = the middle of the eight.
+  function forwardRows(R, opts, rp){
+    rp = rp || REPLAY;
+    return FH.map(function(pk){
+      var v = [];
+      ['keep', 'rise'].forEach(function(l){ for (var ri = 0; ri < rp.rotations; ri++) v.push(RE.runRows(rp.series(pk, ri, l), R, opts).end); });
+      v.sort(function(a, b){ return a - b; });
+      return { h: pk, lo: v[0], hi: v[v.length - 1], mid: (v[v.length / 2 - 1] + v[v.length / 2]) / 2 };
+    });
+  }
+  function rowAt(rows, h){ return rows.reduce(function(a, r){ return Math.abs(r.h - h) < Math.abs(a.h - h) ? r : a; }); }
+  function renderAhead(){
+    var R = S.R, opts = fastOpts(), rows = forwardRows(R, opts);
+    var endY = new Date(GENESIS_TS * 1000 + REPLAY.series(FH[0], 0, 'keep').slice(-1)[0].d * 864e5).getUTCFullYear();
+    $('dr2FEnd').textContent = endY;
+    var mid = fx(PROJ.mid), alt = fx(PROJ.altShown);
+    $('dr2FKeyShrink').textContent = 'Next spike if the shrinking continues (about ' + mid + ')';
+    $('dr2FKeyAlt').textContent = 'If ' + LAST_PEAK.y + ' was unusually small (up to about ' + alt + ')';
+    drawAhead(rows);
+    var above = rows.filter(function(r){ return r.h >= R.sx - EPS; });
+    var lo = above.length ? Math.min.apply(null, above.map(function(r){ return r.lo; })) : null, hi = above.length ? Math.max.apply(null, above.map(function(r){ return r.hi; })) : null;
+    var pm = rowAt(rows, PROJ.mid), pa = rowAt(rows, PROJ.altShown);
+    function band(r){ return r.hi - r.lo > 0.005 ? ' (' + mult(r.lo) + '–' + mult(r.hi) + ')' : ''; }
+    $('dr2FRead').innerHTML = '<p>If the next spikes peak around ' + mid + ' (the shrinking continues), your rules end with <strong class="' + cls(pm.mid) + '">' + mult(pm.mid) + '</strong> HODL' + band(pm) + '. If they reach about ' + alt + ', <strong class="' + cls(pa.mid) + '">' + mult(pa.mid) + '</strong>' + band(pa) + '.</p>' +
+      (above.length ? '<p class="dr2-small">Your rules sell only if spikes reach ' + fx(R.sx) + '. Across ' + fx(FH[FH.length - 1]) + ' and below, the replays where they did ended with ' + mult(lo) + ' to ' + mult(hi) + ' the bitcoin.</p>' : '');
+    $('dr2CStop').innerHTML = '<span class="k">If spikes stop</span><span class="big flat">1.00×<small>HODL</small></span><p>If every future spike is like ' + LAST_PEAK.y + '’s (' + fxs(LAST_PEAK.m) + '), a sell rule above that never fires. That costs nothing in an IRA, and adds nothing either.</p>';
+    var rb = RE.runRows(REPLAY.breakaway, R, opts);
+    $('dr2CBreak').innerHTML = '<span class="k">If bitcoin breaks away</span><span class="big ' + cls(rb.end) + '">' + mult(rb.end) + '<small>HODL</small></span><p>Price climbs to about 2.3× trend and never returns below 1.5×. ' +
+      (rb.ev.length ? 'Your rules sold and ' + (rb.ev.some(function(e){ return e.why === 'fallback'; }) ? 'the deadline bought back higher.' : 'are still in cash.') : 'Your rules never sold, so nothing was lost.') + '</p>';
+  }
+  function drawAhead(rows){
+    var W = 900, H = 300, PL = 50, PR = 16, PT = 18, PB = 40, xmin = FH[0], xmax = FH[FH.length - 1];
+    var ymax = Math.max(2, Math.ceil(Math.max.apply(null, rows.map(function(r){ return r.hi; })) * 2) / 2), ymin = 0.5;
+    var X = function(v){ return PL + (v - xmin) / (xmax - xmin) * (W - PL - PR); }, Y = function(v){ return PT + (ymax - v) / (ymax - ymin) * (H - PT - PB); };
+    var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Bitcoin after your rules against HODL, by the height of future spikes">';
+    o += '<rect x="' + X(PROJ.zoneLo) + '" y="' + PT + '" width="' + (X(PROJ.zoneHi) - X(PROJ.zoneLo)) + '" height="' + (H - PT - PB) + '" style="fill:var(--dr2-zone-green-soft)"/>';
+    o += '<rect x="' + X(PROJ.zoneHi) + '" y="' + PT + '" width="' + (X(PROJ.altShown) - X(PROJ.zoneHi)) + '" height="' + (H - PT - PB) + '" style="fill:var(--dr2-zone-amber-soft)"/>';
+    var step = ymax > 3 ? 0.5 : 0.25;
+    for (var t = Math.ceil(ymin / step) * step; t <= ymax + 1e-9; t += step) {
+      var one = Math.abs(t - 1) < 1e-9;
+      o += '<line x1="' + PL + '" x2="' + (W - PR) + '" y1="' + Y(t) + '" y2="' + Y(t) + '" style="stroke:var(' + (one ? '--text-muted' : '--dr2-svg-grid') + ')"' + (one ? ' stroke-dasharray="5 4"' : '') + '/><text x="' + (PL - 8) + '" y="' + (Y(t) + 4) + '" style="fill:var(--text-muted)" font-size="11" text-anchor="end">' + (Math.round(t * 100) / 100) + '×</text>';
+    }
+    [1.2, 1.5, 2, 2.5, 3].forEach(function(v){ o += '<text x="' + X(v) + '" y="' + (H - PB + 18) + '" style="fill:var(--text-muted)" font-size="11" text-anchor="middle">' + v + '×</text>'; });
+    o += '<text x="' + ((PL + W - PR) / 2) + '" y="' + (H - 4) + '" style="fill:var(--text-dim)" font-size="11.5" text-anchor="middle">Height of future spikes (peak, times trend)</text>';
+    var top = [], bot = [], mid = [];
+    rows.forEach(function(r, i){ var x0 = i === 0 ? X(r.h) : X((rows[i - 1].h + r.h) / 2), x1 = i === rows.length - 1 ? X(r.h) : X((r.h + rows[i + 1].h) / 2); top.push(x0 + ',' + Y(r.hi), x1 + ',' + Y(r.hi)); bot.unshift(x1 + ',' + Y(r.lo), x0 + ',' + Y(r.lo)); mid.push(x0 + ',' + Y(r.mid), x1 + ',' + Y(r.mid)); });
+    o += '<polygon points="' + top.concat(bot).join(' ') + '" style="fill:var(--dr2-band)"/><polyline points="' + mid.join(' ') + '" fill="none" style="stroke:var(--orange)" stroke-width="2"/>';
+    var sx = S.R.sx;
+    if (sx <= xmax) o += '<line x1="' + X(sx) + '" x2="' + X(sx) + '" y1="' + PT + '" y2="' + (H - PB) + '" style="stroke:var(--dr2-red-txt)" stroke-dasharray="2 3"/><text x="' + (X(sx) + 4) + '" y="' + (PT + 12) + '" style="fill:var(--dr2-red-txt)" font-size="11">Your sell level, ' + fx(sx) + '</text>';
+    var lp = LAST_PEAK.m;
+    o += '<text x="' + (X(lp) + 4) + '" y="' + (H - PB - 8) + '" style="fill:var(--text-dim)" font-size="10.5">' + LAST_PEAK.y + ': ' + fxs(lp) + '</text><line x1="' + X(lp) + '" x2="' + X(lp) + '" y1="' + (H - PB - 20) + '" y2="' + (H - PB) + '" style="stroke:var(--text-dim)"/>';
+    $('dr2FChart').innerHTML = o + '</svg>';
   }
   // The table's last three columns (2026-10-05): the stack with this cycle's
   // change, the cumulative difference from HODLing the starting stack in
@@ -627,32 +826,13 @@
     else { fb.className = 'dr2-fail ok'; fb.innerHTML = '<h3>No losing round trips from ' + start.slice(0, 4) + '</h3><ul><li>That is the record, not a promise. Rules tuned to past cycles will fit them; the next cycle can still be the one where price rises after the sale and never comes back.</li></ul>'; }
   }
 
-  // ─── Preset comparison (rewritten for v2; every figure live) ───
-  function renderPresetComparison(){
-    var el = $('drPresetComparison'); if (!el) return;
-    var O = S.O, acctLbl = O.acct === 'ira' ? 'In an IRA' : 'In a taxable account, at the rates set above';
-    var rows = [], best11 = null, best14 = null, below11 = 0, fired25 = 0;
-    ['conservative', 'balanced', 'adventurous'].forEach(function(k){
-      var a = RE.run(PRESETS[k], engineOpts(O, '2011-01')), b = RE.run(PRESETS[k], engineOpts(O, '2014-01'));
-      if (!best11 || a.end > best11.v) best11 = { k: k, v: a.end };
-      if (!best14 || b.end > best14.v) best14 = { k: k, v: b.end };
-      if (a.end < 0.995) below11++;
-      if (a.cyc[4].sell) fired25++;
-      rows.push('<tr><th scope="row">' + PRESET_NAMES[k] + '</th><td class="dr2-cmp-rule">' + ruleText(PRESETS[k]) + '</td><td class="n mult ' + cls(a.end) + '">' + mult(a.end) + '</td><td class="n mult ' + cls(b.end) + '">' + mult(b.end) + '</td></tr>');
-    });
-    el.innerHTML = '<div class="dr2-tablewrap"><table class="dr2-table dr2-cmp"><thead><tr><th scope="col">Preset</th><th scope="col">Rule</th><th scope="col" class="n">From 2011</th><th scope="col" class="n">From 2014</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>' +
-      '<p class="dr2-small">' + acctLbl + ', your stack after these rules against HODLing. From 2011, ' + PRESET_NAMES[best11.k] + ' ended highest, at ' + mult(best11.v) + '; from 2014, ' + PRESET_NAMES[best14.k] + ', at ' + mult(best14.v) + '. ' +
-      (below11 ? below11 + ' of the three ended below HODLing from 2011. ' : 'None ended below HODLing from 2011. ') +
-      (fired25 ? '' : 'None of them fired in the last cycle; it peaked at ' + fx(lastPeak()) + ' trend.') + '</p>';
-  }
-
   // ─── Failure-mode worked example (computed, not remembered) ───
   function renderFailExample(){
     var el = $('dr2FailExample'); if (!el) return;
     var t = RE.run(PRESETS.conservative, engineOpts(DEF_O, '2011-01')), c = t.cyc[1];
     if (!c.sell || !c.buy) { el.textContent = ''; return; }
     var m = c.buy.after / c.sell.before;
-    el.innerHTML = '<strong>The clearest case:</strong> the Conservative preset sold a quarter of the stack in ' + my(c.sell.d) + ' at <strong>' + price(c.sell.p) + '</strong> (' + fx(c.sell.r) + ' trend). The buy back came in ' + my(c.buy.d) + ' at <strong>' + price(c.buy.p) + '</strong> (' + fx(c.buy.r) + ' trend). Both rules fired as designed, and the round trip ended at <strong>' + mult(m) + '</strong> the bitcoin.';
+    el.innerHTML = '<strong>The clearest case:</strong> the starting rules sold a quarter of the stack in ' + my(c.sell.d) + ' at <strong>' + price(c.sell.p) + '</strong> (' + fx(c.sell.r) + ' trend). The buy back came in ' + my(c.buy.d) + ' at <strong>' + price(c.buy.p) + '</strong> (' + fx(c.buy.r) + ' trend). Both rules fired as designed, and the round trip ended at <strong>' + mult(m) + '</strong> the bitcoin.';
   }
 
   // ─── Handoffs ───
@@ -878,24 +1058,26 @@
     KEYS.forEach(function(k){ if (p.has(k)) out.present = true; });
     if (p.has('from') && p.get('from') === 'spikes') { out.fromSpikes = true; out.present = true; }
     if (p.has('rb')) out.rb = p.get('rb');
+    // Old ?preset= links (Stage A) land on that preset's values; the writer
+    // never emits preset=, so it drops on the next write.
     var preset = p.get('preset'), base = PRESETS[preset] ? preset : 'conservative';
-    if (PRESETS[preset]) { out.preset = preset; out.R = copy(PRESETS[preset]); }
+    if (PRESETS[preset]) out.R = copy(PRESETS[preset]);
     var ruleKeys = ['sx', 'st', 'sz', 'f', 'rx', 'cap'].filter(function(k){ return p.has(k); });
     if (ruleKeys.length) {
       var R = copy(PRESETS[base]), v;
       if (p.has('st') && (p.get('st') === 'up' || p.get('st') === 'fade')) R.timing = p.get('st');
-      v = parseFloat(p.get('sx')); if (isFinite(v)) R.sx = r2(clamp(v, 1.1, 5));
+      v = parseFloat(p.get('sx')); if (isFinite(v)) R.sx = r2(clamp(v, SX_MIN, SX_MAX));
       R.sz = R.sx; v = parseFloat(p.get('sz')); if (R.timing === 'fade' && isFinite(v)) R.sz = r2(clamp(v, 1, R.sx));
       v = parseFloat(p.get('f')); if (isFinite(v)) R.f = clamp(Math.round(v / 5) * 5, 5, 100);
-      v = parseFloat(p.get('rx')); if (isFinite(v)) R.rx = r2(clamp(v, 0.42, 1.5));
+      v = parseFloat(p.get('rx')); if (isFinite(v)) R.rx = r2(clamp(v, RX_MIN, RX_MAX));
       v = parseInt(p.get('cap'), 10); if ([0, 12, 18, 24, 36].indexOf(v) >= 0) R.cap = v;
-      out.preset = 'custom'; out.R = R;
+      out.R = R;
     } else if (p.has('sell') || p.has('rebuy')) {
       // Legacy percentile links: the old rule sold everything on the way up
       // with no deadline; levels mapped on the since-2011 set.
       var sp = parseFloat(p.get('sell')), bp = parseFloat(p.get('rebuy'));
-      var sx = r2(clamp(RE.ratioAtPercentile(isFinite(sp) ? sp : 80, '2011-01'), 1.1, 5)), rx = r2(clamp(RE.ratioAtPercentile(isFinite(bp) ? bp : 50, '2011-01'), 0.42, 1.5));
-      out.preset = 'custom'; out.R = { timing: 'up', sx: sx, sz: sx, f: 100, rx: rx, cap: 0 };
+      var sx = r2(clamp(RE.ratioAtPercentile(isFinite(sp) ? sp : 80, '2011-01'), SX_MIN, SX_MAX)), rx = r2(clamp(RE.ratioAtPercentile(isFinite(bp) ? bp : 50, '2011-01'), RX_MIN, RX_MAX));
+      out.R = { timing: 'up', sx: sx, sz: sx, f: 100, rx: rx, cap: 0 };
     }
     if (p.has('account')) { var a = p.get('account'); if (a === 'retirement') out.acct = 'ira'; else if (a === 'regular') out.acct = 'tax'; }
     if (p.has('tax')) { var t = parseFloat(p.get('tax')); if (isFinite(t)) out.fed = nearestFed(clamp(t, 0, 40)); }
@@ -903,8 +1085,7 @@
     return out;
   }
   function applyPatch(x){
-    if (x.preset) S.preset = x.preset;
-    if (x.R) S.R = x.R;
+    if (x.R) { S.R = x.R; S.szFollows = x.R.sz === x.R.sx; }
     if (x.acct) S.O.acct = x.acct;
     if (x.fed != null) S.O.fed = x.fed;
     if (x.state) S.O.state = x.state;
@@ -913,13 +1094,13 @@
   }
   function writeParams(p){
     KEYS.forEach(function(k){ p.delete(k); });
-    if (S.preset === 'custom') {
-      var R = S.R;
+    var R = S.R, isDef = ['timing', 'sx', 'sz', 'f', 'rx', 'cap'].every(function(k){ return R[k] === DEF_R[k]; });
+    if (!isDef) {
       p.set('sx', String(R.sx)); p.set('st', R.timing);
       if (R.timing === 'fade' && R.sz !== R.sx) p.set('sz', String(R.sz));
       p.set('f', String(R.f)); p.set('rx', String(R.rx));
       if (R.cap !== 24) p.set('cap', String(R.cap));
-    } else if (S.preset !== 'conservative') p.set('preset', S.preset);
+    }
     if (S.O.acct === 'tax') {
       p.set('account', 'regular');
       if (S.O.fed !== DEF_O.fed) p.set('tax', String(S.O.fed));
@@ -940,19 +1121,20 @@
   function store(k, v){ try { localStorage.setItem('dr:' + k, v); } catch (e) {} }
   function load(k){ try { return localStorage.getItem('dr:' + k); } catch (e) { return null; } }
   function removeOldKeys(){
-    try { ['sellPct', 'rebuyPct', 'taxRate', 'accountType', 'era', 'customizeOpen', 'horizon'].forEach(function(k){ localStorage.removeItem('dr:' + k); }); var p = localStorage.getItem('dr:preset'); if (p && !PRESET_NAMES[p]) localStorage.removeItem('dr:preset'); } catch (e) {}
+    try { ['sellPct', 'rebuyPct', 'taxRate', 'accountType', 'era', 'customizeOpen', 'horizon'].forEach(function(k){ localStorage.removeItem('dr:' + k); }); } catch (e) {}
   }
+  // Stage B: the rule alone is stored (dr:rule). A Stage A dr:preset is read
+  // once, when there is no stored rule, then removed.
   function saveSticky(){
-    store('preset', S.preset); store('rule', JSON.stringify(S.R)); store('acct', S.O.acct); store('fed', String(S.O.fed)); store('niit', S.O.niit ? '1' : '0');
+    store('rule', JSON.stringify(S.R)); store('acct', S.O.acct); store('fed', String(S.O.fed)); store('niit', S.O.niit ? '1' : '0');
     store('state', S.O.state); store('lots', S.O.lots); store('yield', String(S.O.yield)); store('start', S.start); store('unit', S.unit);
   }
   function loadSticky(){
-    var p = load('preset');
-    if (p && PRESET_NAMES[p]) {
-      S.preset = p;
-      if (PRESETS[p]) S.R = copy(PRESETS[p]);
-      else { try { var R = JSON.parse(load('rule') || 'null'); if (R && R.sx) S.R = { timing: R.timing === 'up' ? 'up' : 'fade', sx: r2(clamp(+R.sx, 1.1, 5)), sz: r2(clamp(+R.sz, 1, +R.sx)), f: clamp(+R.f, 5, 100), rx: r2(clamp(+R.rx, 0.42, 1.5)), cap: [0, 12, 18, 24, 36].indexOf(+R.cap) >= 0 ? +R.cap : 24 }; } catch (e) {} }
-    }
+    var R = null;
+    try { R = JSON.parse(load('rule') || 'null'); } catch (e) {}
+    if (R && R.sx) { var sx = r2(clamp(+R.sx, SX_MIN, SX_MAX)); S.R = { timing: R.timing === 'up' ? 'up' : 'fade', sx: sx, sz: r2(clamp(+R.sz || sx, 1, sx)), f: clamp(Math.round(+R.f / 5) * 5 || 25, 5, 100), rx: r2(clamp(+R.rx, RX_MIN, RX_MAX)), cap: [0, 12, 18, 24, 36].indexOf(+R.cap) >= 0 ? +R.cap : 24 }; S.szFollows = S.R.sz === S.R.sx; }
+    else { var p = load('preset'); if (PRESETS[p]) S.R = copy(PRESETS[p]); }
+    try { localStorage.removeItem('dr:preset'); } catch (e) {}
     var a = load('acct'); if (a === 'ira' || a === 'tax') S.O.acct = a;
     var f = parseInt(load('fed'), 10); if ([0, 15, 20].indexOf(f) >= 0) S.O.fed = f;
     S.O.niit = load('niit') === '1';
@@ -968,31 +1150,31 @@
     var a = $('dr2Arrival'); if (!a || !S.fromSpikes) return;
     var R = S.R, acct = S.O.acct === 'ira' ? 'IRA' : 'taxable';
     var what = (R.f === 100 ? 'sell all' : 'sell ' + R.f + '%') + ' at ' + fx(R.sx) + ' trend, buy back at ' + (R.rx === 1 ? 'trend' : fx(R.rx) + ' trend') + ', ' + acct;
-    a.innerHTML = '<b>Picked up from Bitcoin\'s Spikes:</b> ' + what + '. I added the 24-month deadline this page uses by default to the buy-back rule. Most readers trim less than 100%; try <a href="#" id="dr2TryBal">Balanced</a> to compare.' +
+    a.innerHTML = '<b>Picked up from Bitcoin\'s Spikes:</b> ' + what + '. I added the 24-month deadline this page uses by default to the buy-back rule. Most readers trim less than 100%; try <a href="#" id="dr2Try25">selling 25% instead</a>.' +
       (S.rb === 'ath80' ? ' Spikes\' “80% below the high” buy back isn\'t available here yet, so this uses trend.' : '');
     a.hidden = false;
-    $('dr2TryBal').addEventListener('click', function(ev){ ev.preventDefault(); S.preset = 'balanced'; S.R = copy(PRESETS.balanced); track('dr_preset', { preset: 'balanced' }); render(); });
+    $('dr2Try25').addEventListener('click', function(ev){ ev.preventDefault(); S.R.f = 25; ruleChanged('share'); render(); });
     track('dr_arrival', { sx: R.sx, account: S.O.acct });
   }
 
   // ═══ Wiring ═══
-  function toCustom(){ S.preset = 'custom'; }
   function wire(){
     ['input', 'change', 'click'].forEach(function(ev){ document.addEventListener(ev, function(e){ if (e.target && e.target.closest && e.target.closest('#tab-calculator')) interacted = true; }, { capture: true }); });
-    document.querySelectorAll('.dr2-preset').forEach(function(b){ b.addEventListener('click', function(){ var p = b.dataset.p; S.preset = p; if (PRESETS[p]) S.R = copy(PRESETS[p]); else $('dr2Build').open = true; track('dr_preset', { preset: p }); render(); }); });
     function seg(id, fn){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.addEventListener('click', function(){ fn(b.dataset.v); render(); }); }); }
-    seg('dr2SegTiming', function(v){ S.R.timing = v; if (v === 'up' || S.R.sz > S.R.sx) S.R.sz = v === 'up' ? S.R.sx : Math.min(S.R.sz, S.R.sx); toCustom(); });
-    seg('dr2SegCap', function(v){ S.R.cap = +v; toCustom(); });
-    seg('dr2SegYield', function(v){ S.O.yield = +v; });
-    seg('dr2SegAcct', function(v){ S.O.acct = v; });
-    seg('dr2SegFed', function(v){ S.O.fed = +v; });
-    seg('dr2SegLots', function(v){ S.O.lots = v; });
+    seg('dr2SegTiming', function(v){ S.R.timing = v; S.R.sz = S.R.sx; S.szFollows = true; ruleChanged('timing'); });
+    seg('dr2SegCap', function(v){ S.R.cap = +v; ruleChanged('deadline'); });
+    seg('dr2SegYield', function(v){ S.O.yield = +v; ruleChanged('cash_yield'); });
+    // Taxable opens the tax settings, which live in "More tax and timing settings".
+    seg('dr2SegAcct', function(v){ S.O.acct = v; if (v === 'tax') $('dr2Build').open = true; ruleChanged('account'); });
+    seg('dr2SegFed', function(v){ S.O.fed = +v; ruleChanged('federal_rate'); });
+    seg('dr2SegLots', function(v){ S.O.lots = v; ruleChanged('lots'); });
     seg('dr2SegStart', function(v){ S.start = v; });
     seg('dr2SegUnit', function(v){ S.unit = v; });
-    $('dr2Sx').addEventListener('input', function(e){ S.R.sx = +e.target.value; if (S.R.timing === 'up') S.R.sz = S.R.sx; else S.R.sz = Math.min(S.R.sz, S.R.sx); toCustom(); render(); });
-    $('dr2Sz').addEventListener('input', function(e){ S.R.sz = Math.min(+e.target.value, S.R.sx); toCustom(); render(); });
-    $('dr2F').addEventListener('input', function(e){ S.R.f = +e.target.value; toCustom(); render(); });
-    $('dr2Rx').addEventListener('input', function(e){ S.R.rx = +e.target.value; toCustom(); render(); });
+    // The two sliders: labels move at once, the page follows on soon().
+    $('dr2SxR').addEventListener('input', function(e){ S.R.sx = +e.target.value; S.R.sz = (S.szFollows || S.R.timing === 'up') ? S.R.sx : Math.min(S.R.sz, S.R.sx); ruleChanged('sell_level'); soon(); });
+    $('dr2RxR').addEventListener('input', function(e){ S.R.rx = +e.target.value; ruleChanged('buyback_level'); soon(); });
+    $('dr2Sz').addEventListener('input', function(e){ S.R.sz = Math.min(+e.target.value, S.R.sx); S.szFollows = S.R.sz === S.R.sx; ruleChanged('fade_level'); soon(); });
+    $('dr2Reset').addEventListener('click', function(){ S.R = copy(DEF_R); S.szFollows = true; S.O.acct = 'ira'; ruleChanged('reset'); render(); });
     $('dr2Niit').addEventListener('change', function(e){ S.O.niit = e.target.checked; render(); });
     $('dr2State').addEventListener('change', function(e){ S.O.state = e.target.value; render(); });
     $('dr2Stack').addEventListener('input', function(e){ var v = +e.target.value; if (v > 0) { S.stack = v; render(); } });
@@ -1009,17 +1191,20 @@
   // Typing applies after a 200ms pause when the value is in range; blur
   // clamps an out-of-range value, and an empty or invalid one reverts to the
   // last good value. Any edit switches the preset to Custom.
+  // Stage B: the card's "How much" field uses the same handling (dr2FIn).
   var BAR_FIELDS = [
-    { id: 'dr2BarSx', k: 'sx', lo: 1.1, hi: function(){ return 5; }, step: 0.05 },
+    { id: 'dr2BarSx', k: 'sx', lo: SX_MIN, hi: function(){ return SX_MAX; }, step: 0.05 },
     { id: 'dr2BarSz', k: 'sz', lo: 1, hi: function(){ return S.R.sx; }, step: 0.05 },
     { id: 'dr2BarF', k: 'f', lo: 5, hi: function(){ return 100; }, step: 5 },
-    { id: 'dr2BarRx', k: 'rx', lo: 0.42, hi: function(){ return 1.5; }, step: 0.01 }
+    { id: 'dr2BarRx', k: 'rx', lo: RX_MIN, hi: function(){ return RX_MAX; }, step: 0.01 },
+    { id: 'dr2FIn', k: 'f', lo: 5, hi: function(){ return 100; }, step: 5 }
   ];
+  var LEVEL_GA = { sx: 'sell_level', sz: 'fade_level', f: 'share', rx: 'buyback_level' };
   function setLevel(k, v){
-    if (k === 'sx') { S.R.sx = v; S.R.sz = S.R.timing === 'up' ? v : Math.min(S.R.sz, v); }
-    else if (k === 'sz') S.R.sz = Math.min(v, S.R.sx);
+    if (k === 'sx') { S.R.sx = v; S.R.sz = (S.szFollows || S.R.timing === 'up') ? v : Math.min(S.R.sz, v); }
+    else if (k === 'sz') { S.R.sz = Math.min(v, S.R.sx); S.szFollows = S.R.sz === S.R.sx; }
     else S.R[k] = v;
-    toCustom(); render();
+    ruleChanged(LEVEL_GA[k]); render();
   }
   function wireBarFields(){
     BAR_FIELDS.forEach(function(f){
@@ -1039,25 +1224,25 @@
       el.addEventListener('change', commit);
       el.addEventListener('blur', commit);
     });
-    $('dr2BarPreset').addEventListener('change', function(e){ selectPreset(e.target.value); });
-    $('dr2BarCap').addEventListener('change', function(e){ S.R.cap = +e.target.value; toCustom(); render(); });
+    $('dr2BarCap').addEventListener('change', function(e){ S.R.cap = +e.target.value; ruleChanged('deadline'); render(); });
   }
-  function selectPreset(p){ S.preset = p; if (PRESETS[p]) S.R = copy(PRESETS[p]); else $('dr2Build').open = true; track('dr_preset', { preset: p }); render(); }
+  // The bar shows from when the rule card leaves the viewport to the end of
+  // Looking ahead. "Edit rules" goes back to the sell slider.
   function wireBar(){
-    var bar = $('dr2Bar'), card = $('dr2RuleCard'), end = $('dr2PresetsCard'), nav = document.querySelector('.site-nav'), tab = $('tab-calculator');
+    var bar = $('dr2Bar'), card = $('dr2RuleCard'), end = $('dr2AheadCard'), nav = document.querySelector('.site-nav'), tab = $('tab-calculator');
     if (!bar || !card || !end) return;
     wireBarFields();
-    bar.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.addEventListener('click', function(){ S.O.acct = b.dataset.v; render(); }); });
+    bar.querySelectorAll('#dr2BarAcct .dr2-chip').forEach(function(b){ b.addEventListener('click', function(){ S.O.acct = b.dataset.v; ruleChanged('account'); render(); }); });
     $('dr2BarEdit').addEventListener('click', function(){
-      var d = $('dr2Build'); d.open = true;
-      var first = d.querySelector('.dr2-build-body button, .dr2-build-body input, .dr2-build-body select');
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      d.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
-      if (first) first.focus({ preventScroll: true });
+      card.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+      $('dr2SxR').focus({ preventScroll: true });
     });
     function place(){
-      if (!tab || !tab.classList.contains('active')) { hide(); return; }
       var navB = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
+      // The results panel sticks just under the nav, measured, not assumed.
+      document.documentElement.style.setProperty('--dr2-panel-top', (navB + 12) + 'px');
+      if (!tab || !tab.classList.contains('active')) { hide(); return; }
       var cardB = card.getBoundingClientRect().bottom, endB = end.getBoundingClientRect().bottom;
       if (cardB > navB || endB <= navB) { hide(); return; }
       var entering = bar.hidden;
@@ -1100,7 +1285,15 @@
     ],
     lastPeak: 1.19,
     shares: { above2x2011: 17, above2x2017: 13, below1x2011: 56 },
-    legacy: { sell80: 1.78, rebuy50: 0.87 }
+    legacy: { sell80: 1.78, rebuy50: 0.87 },
+    // Stage B build prompt §8 (2026-10-06), IRA, starting rules unless noted.
+    stageB: {
+      sell12since14: 0.95, sell12fired: 4,
+      projLo: 1.06, projHi: 1.13, projAlt: 2.23,
+      lowDays: [1240, 2452, 3688, 5116, 6400],
+      fwd11: 1.00, fwd22: { mid: 1.58, lo: 1.48, hi: 1.70 }, breakaway: 0.80,
+      sellHits2: '2021,2017,2013,2011', buyHits045: '2026,2023,2015'
+    }
   };
   function drQA(){
     var f = [];
@@ -1140,6 +1333,29 @@
     near('legacy sell=80 → ×trend', lg.R && lg.R.sx, FIXTURE.legacy.sell80, 0.01);
     near('legacy rebuy=50 → ×trend', lg.R && lg.R.rx, FIXTURE.legacy.rebuy50, 0.01);
     if (lg.acct !== 'tax') f.push('legacy account=regular did not map to taxable');
+    // ── Stage B (2026-10-06), at the same anchor ──
+    var IRA0 = { acct: 'ira', fed: 15, niit: false, state: 0, lots: 'fifo', yield: 0, asOf: asOf };
+    var r12 = copy(DEF_R); r12.sx = 1.2; r12.sz = 1.2;
+    near('sell at 1.2× IRA since 2014', RE.run(r12, o(IRA0, '2014-01')).end, FIXTURE.stageB.sell12since14, 0.01);
+    var c12 = RE.run(r12, o(IRA0, '2011-01')).cyc.filter(function(c){ return c.sell; }).length;
+    if (c12 !== FIXTURE.stageB.sell12fired) f.push('sell at 1.2×: sell rule fired in ' + c12 + ' of 5 cycles ≠ ' + FIXTURE.stageB.sell12fired);
+    var pj = SR.nextSpike(asOf);
+    near('projection, shrinking continues (low)', pj.lo, FIXTURE.stageB.projLo, 0.01);
+    near('projection, shrinking continues (high)', pj.hi, FIXTURE.stageB.projHi, 0.01);
+    near('projection, 2024–25 unusually small', pj.alt, FIXTURE.stageB.projAlt, 0.01);
+    var lowsA = SR.cycleLows(asOf), lowDays = lowsA.map(function(l){ return l.d; });
+    if (lowDays.join(',') !== FIXTURE.stageB.lowDays.join(',')) f.push('cycle-low days ' + lowDays.join(',') + ' ≠ ' + FIXTURE.stageB.lowDays.join(','));
+    var rpA = RE.replays(lowDays, asOf), fo = copy(IRA0); fo.fast = true;
+    var fr = forwardRows(DEF_R, fo, rpA), f11 = rowAt(fr, 1.1), f22 = rowAt(fr, 2.2);
+    near('forward at about 1.1× (middle)', f11.mid, FIXTURE.stageB.fwd11, 0.01);
+    near('forward at about 2.2× (middle)', f22.mid, FIXTURE.stageB.fwd22.mid, 0.01);
+    near('forward at about 2.2× (band low)', f22.lo, FIXTURE.stageB.fwd22.lo, 0.01);
+    near('forward at about 2.2× (band high)', f22.hi, FIXTURE.stageB.fwd22.hi, 0.01);
+    near('breakaway at the starting rules', RE.runRows(rpA.breakaway, DEF_R, fo).end, FIXTURE.stageB.breakaway, 0.01);
+    function ys(a){ return a.map(function(x){ return x.y; }).reverse().join(','); }
+    var pkA = SR.nextSpike(asOf).peaks, sh = ys(pkA.filter(function(p){ return p.m >= 2 - EPS; })), bh = ys(lowsA.filter(function(l){ return l.m <= 0.45 + EPS; }));
+    if (sh !== FIXTURE.stageB.sellHits2) f.push('sell at 2× ticks ' + sh + ' ≠ ' + FIXTURE.stageB.sellHits2);
+    if (bh !== FIXTURE.stageB.buyHits045) f.push('buy back at 0.45× ticks ' + bh + ' ≠ ' + FIXTURE.stageB.buyHits045);
     // Lots: two lots, both long-term, rate 20%: FIFO sells the $100 lot (gain
     // $300 → $60), highest-cost-first the $300 lot ($100 → $20), and the old
     // average-cost method would use a $200 basis ($200 → $40).
@@ -1185,6 +1401,9 @@
     document.querySelectorAll('[data-dr-math="gNow"]').forEach(function(el){ el.textContent = Math.round(RE.trendGrowth(RE.lastDay)) + '%'; });
     var body = $('drMathPctBody');
     if (body) body.innerHTML = [50, 70, 80, 90].map(function(p){ return '<tr><td>' + p + 'th</td><td>' + fx(P(p, '2010-01')) + ' trend</td><td>' + fx(P(p, '2011-01')) + ' trend</td><td>' + fx(P(p, '2017-01')) + ' trend</td></tr>'; }).join('');
+    // The next-spike projection, in the Math tab and the Looking ahead disclosure.
+    var PJ = { lo: PROJ.lo.toFixed(2) + '×', hi: PROJ.hi.toFixed(2) + '×', altExact: PROJ.alt.toFixed(2) + '×', mid: fx(PROJ.mid), alt: fx(PROJ.altShown) };
+    document.querySelectorAll('[data-dr-proj]').forEach(function(el){ var k = el.getAttribute('data-dr-proj'); if (PJ[k]) el.textContent = PJ[k]; });
     if ($('drQ100')) $('drQ100').textContent = mult(end(upAll, '2011-01'));
     if ($('drQ50')) $('drQ50').textContent = mult(end(upHalf, '2011-01'));
   }

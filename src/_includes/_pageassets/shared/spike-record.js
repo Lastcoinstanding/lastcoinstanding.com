@@ -285,9 +285,40 @@
     return { pass: failures.length === 0, failures: failures, anchor: ANCHOR, record: R, live: { pctAbove: +pctAbove().toFixed(1), record: record() } };
   }
 
+  // ── Disciplined Rebalancing, Stage B (2026-10-06) ──
+  // The cycle lows as a list: each cycle's lowest point against trend after
+  // its price high (lowM), labelled by the year it fell in. `open` marks the
+  // current cycle, whose low is "so far". DR's buy-back slider and its
+  // low-to-low replays read this, so both pages share one record.
+  function cycleLows(asOf) {
+    return record(asOf).filter(function (r) { return r.lowM; }).map(function (r) {
+      return { y: isoOf(r.lowM.d).slice(0, 4), cycle: r.y, d: r.lowM.d, m: r.lowM.m, open: r.open };
+    });
+  }
+  // The next-spike projection, from the spike peaks alone. e = ln(peak). Each
+  // past per-cycle shrink rate, (e_last / e_k)^(1 / cycles between) for k =
+  // 2011, 2013 and 2017, plus the single 2017→2021 step, is applied to the
+  // latest spike: the "shrinking continues" range. The alternative assumes
+  // 2024–25 was unusually small and applies the 2017→2021 ratio to 2021's
+  // spike: exp(e_2021² / e_2017). DATA_AUDIT DR-PROJ. zoneLo/zoneHi round the
+  // range out to 0.05×; mid and alt are the "about" figures the page prints.
+  function nextSpike(asOf) {
+    var R = record(asOf), e = R.map(function (r) { return Math.log(r.spikeM); }), n = e.length - 1, rates = [], k;
+    for (k = 0; k < n - 1; k++) rates.push(Math.pow(e[n] / e[k], 1 / (n - k)));
+    rates.push(e[n - 1] / e[n - 2]);
+    var shrink = rates.map(function (q) { return Math.exp(e[n] * q); });
+    var lo = Math.min.apply(null, shrink), hi = Math.max.apply(null, shrink), alt = Math.exp(e[n - 1] * e[n - 1] / e[n - 2]);
+    return {
+      peaks: R.map(function (r) { return { y: r.y, m: r.spikeM, open: r.open }; }),
+      shrink: shrink, lo: lo, hi: hi, alt: alt,
+      zoneLo: Math.floor(lo * 20 + 1e-9) / 20, zoneHi: Math.ceil(hi * 20 - 1e-9) / 20,
+      mid: Math.round((lo + hi) / 2 * 10) / 10, altShown: Math.floor(alt * 10 + 1e-9) / 10
+    };
+  }
+
   window.SpikeRecord = {
     MODERN_FROM: MODERN_FROM, MONTH_D: MONTH_D, YEAR_D: YEAR_D, RUNUP_D: RUNUP_D, PARABOLIC: PARABOLIC, NEAR_FLOOR: NEAR_FLOOR,
-    fallingCeiling: fallingCeiling, bandRun: bandRun,
+    fallingCeiling: fallingCeiling, bandRun: bandRun, cycleLows: cycleLows, nextSpike: nextSpike,
     CYCLES: CYCLES, TRADE_CYCLES: TRADE_CYCLES, ANCHOR: ANCHOR, FIXTURE: FIXTURE,
     dayOfIso: dayOfIso, isoOf: isoOf, monthYear: monthYear,
     series: series, priceAt: priceAt, record: record, pctAbove: pctAbove, lastAbove: lastAbove,
