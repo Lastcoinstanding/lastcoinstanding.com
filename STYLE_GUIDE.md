@@ -2301,6 +2301,8 @@ A `<details>` card whose summary carries a pill grading how well the record supp
 
 ### 6.54 Preset chips with a live rule sentence (`/disciplined-rebalancing`, 2026-10-04)
 
+> **Retired on DR, 2026-10-06 (Stage B).** JM ruling: picking a card and then editing it mixed two actions, and "Conservative / Balanced / Adventurous" meant different things to different readers. DR now uses two marked sliders (§6.56). The pattern stays here for a page whose presets name behaviours readers agree on.
+
 A row of preset buttons over one sentence that states the active rule in plain words, for a calculator whose inputs are a rule rather than a number. Page-scoped prefix `dr2-`.
 
 ```html
@@ -2326,6 +2328,25 @@ A `<details>` element, collapsed by default, holding every rule control in label
 - **Native controls only:** `<details>`/`<summary>`, range inputs (no `cursor` rules; base.njk owns them), `aria-pressed` segments, a checkbox, the shared state `<select>`. Focus is visible on all of them.
 
 The failure box under the cycle table is the §6.53 component, generated for the current rule.
+
+**Since Stage B (2026-10-06)** the panel is "More tax and timing settings": the fade level, cash yield and the tax group only. The sell and buy-back levels, the share, timing, deadline, account and stack moved to the marked sliders (§6.56). Choosing Taxable opens the panel.
+
+### 6.56 Marked slider: track strip, History, Next cycle (`/disciplined-rebalancing`, 2026-10-06)
+
+A range input that shows the record it is set against, for a level a reader picks by judgment rather than by formula. One block per rule, top to bottom:
+
+1. **Heading with the live value** ("1 · Sell rule" … "2× trend"), updated on every input event.
+2. **One-line question** saying what the level does ("Sell when a spike reaches this level and then falls back below it.").
+3. **Track strip:** an inline SVG above the range, same horizontal inset as the thumb's travel so ticks line up with values. Ticks and labels for the record (spike peaks, cycle lows); shaded zones for a projection; values off the scale listed in a note under the strip ("Off the scale: 2017 5.4×, 2013 12×, 2011 14× →"). A key line under the slider names each zone.
+4. **History row:** every past value, newest first; the ones the level catches in bold with ✓, the rest muted; then the count ("4 of 5 reached 2×") and one closing sentence about the record.
+5. **Next cycle flag:** green / amber / red, one or two sentences, thresholds from the projection. A judgment about the next cycle, so its words carry the uncertainty ("Likely reached", "Uncertain", "Unlikely").
+
+Rules:
+- **Counts, not probabilities.** Five cycles can't support a percentage; say "4 of 5".
+- **Data from the shared record, never typed in** (`shared/spike-record.js` for DR). The projection is computed in the same module.
+- **Colours are tokens** (`--dr2-tick`, `--dr2-zone-*`, `--dr2-low`), applied through `style="fill:var(…)"` in the SVG.
+- **The rest of the page follows on a throttled render** (≤ one per 90ms, trailing run); the value label moves at once. `aria-valuetext` carries the value with its unit.
+- **Use it** when the reader is choosing a level against a short, known history. **Skip it** for a continuous input with no record behind it.
 
 ## 7. Mobile considerations
 

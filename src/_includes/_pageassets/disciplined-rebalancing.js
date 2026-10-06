@@ -1287,9 +1287,12 @@
     shares: { above2x2011: 17, above2x2017: 13, below1x2011: 56 },
     legacy: { sell80: 1.78, rebuy50: 0.87 },
     // Stage B build prompt §8 (2026-10-06), IRA, starting rules unless noted.
+    // projAlt is 2.21, not the prompt's 2.23: the prompt's figure used the
+    // rounded peaks (3.2×, 5.4×); the record's 3.19× and 5.41× give 2.214.
+    // Both print as "about 2.2×".
     stageB: {
       sell12since14: 0.95, sell12fired: 4,
-      projLo: 1.06, projHi: 1.13, projAlt: 2.23,
+      projLo: 1.06, projHi: 1.13, projAlt: 2.21,
       lowDays: [1240, 2452, 3688, 5116, 6400],
       fwd11: 1.00, fwd22: { mid: 1.58, lo: 1.48, hi: 1.70 }, breakaway: 0.80,
       sellHits2: '2021,2017,2013,2011', buyHits045: '2026,2023,2015'

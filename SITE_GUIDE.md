@@ -3572,7 +3572,19 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 
 **Bitcoin's Spikes card C** now hands its whole rule here (§61). Its own figures stay on `spike-record.js`; at its default rule they match this engine on every cycle it shows. Whether card C moves onto the engine is a Stage B decision (TECH_DEBT).
 
-**Stage B (separate PR, not started):** calendar triggers with a four-cycles warning, extra sell steps, OR buy backs including drawdown from the high, and the forward view ("if the next cycles look like the last ones, but smaller", "if spikes stop", "if bitcoin breaks away"). PAGE_IDEAS_BACKLOG "Applied Disciplined Rebalancing".
+**Stage B (JM, 2026-10-06; `feat-dr-stage-b`).** Build prompt `DR_STAGE_B_BUILD_PROMPT_2026-10-06` and the approved `DR_TWO_SLIDER_MOCKUP` v2 (both project side). Calendar triggers, extra sell steps and OR buy backs were dropped (JM).
+- **No presets.** "Your two rules": a marked sell slider (1.05–4×) and a marked buy-back slider (0.42–1.5×), with timing, share, deadline (wait in cash or 24 months), account and stack beside them (STYLE_GUIDE §6.56). They open at the old Conservative values, and "Reset to the starting rules" returns there. `?preset=` in old links maps to that preset's values and drops on the next write. The sticky bar keeps its fields without the preset select. "More tax and timing settings" holds the fade level, cash yield and tax.
+- **Results panel** beside the rules, sticky on desktop and stacked at 900px and below:
+  - the two headline results with the BTC line;
+  - five risk rows as counts: sell rule fired, buy-back came, worst round trip, next cycle, breakaway;
+  - "History at every sell level", the since-2014 result across sell levels.
+- **The record and the projection** come from `shared/spike-record.js`: `cycleLows()` and `nextSpike()`. The next spike is about 1.1× if the shrinking continues (1.06–1.13×), or about 2.2× if 2024–25 was unusually small (2.21× on the record's exact peaks). DATA_AUDIT DR-PROJ.
+- **Looking ahead** (bitcoin only) replays the four low-to-low cycles from the latest sample, in four rotations, with every spike resized to a chosen height. Lows run two ways, so each height gets eight runs. There is also a breakaway path. All of it runs through `RuleEngine.replays()` and the same `runRows` as the record. The engine gained `EPS` on sell-level comparisons and `O.fast`; the record's results don't move.
+- **GA4:** `dr_preset` retired; `dr_rule_change` (`control`), once per control per 2 s.
+- **`drQA()` additions:** the 1.2× case (0.95× since 2014, 4 of 5 cycles), the projection, the cycle-low days, the forward view (1.00×; 1.58× in 1.48–1.70×), breakaway 0.80×, and the history ticks.
+- **Possible later idea:** drag the level lines on the chart.
+
+~~**Stage B (separate PR, not started):** calendar triggers with a four-cycles warning, extra sell steps, OR buy backs including drawdown from the high, and the forward view ("if the next cycles look like the last ones, but smaller", "if spikes stop", "if bitcoin breaks away"). PAGE_IDEAS_BACKLOG "Applied Disciplined Rebalancing".~~ Superseded by the Stage B entry above.
 
 **Review round 1 (JM, 2026-10-05).** Engine, preset values and the `drQA()` fixture unchanged.
 - **Wording.** New hero paragraph and preset descriptions (JM's text). "Coins" is out of the reader's vocabulary on this page and on Bitcoin's Spikes: "bitcoin" or "your stack" instead (hero "1.10× HODL", table column "Round trip", "Lost bitcoin"); `STYLE_GUIDE §10.13`. "Rules", plural, where the page means the reader's whole setup (sell rule plus buy-back rule); "the sell rule" or "the buy-back rule" where only one applies. "How this strategy can fail" rewritten plain (`§10.12`) and given the anchor `#dr-fail`; a hash naming an element inside a tab now opens that tab.
