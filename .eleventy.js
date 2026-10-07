@@ -55,6 +55,7 @@ module.exports = function (eleventyConfig) {
     'og-bitcoin-vs-the-stock-market.jpg',
     'og-the-bitcoin-retirement.jpg',
     'og-disciplined-rebalancing.jpg',
+    'og-disciplined-rebalancing-v2.jpg',     // 2026-10-06 two-slider card; new name so X refetches after a cached failed fetch
     'og-borrowing-against-your-stack.jpg',
     'og-borrowing-against-your-stack-v2.jpg',
     'og-bitcoin-lenders.jpg',

@@ -610,6 +610,29 @@ CARDS = [
         },
         "output_filename": "og-bitcoin-spikes.jpg",
     },
+    {
+        # Two-slider calculator (Stage B): the rules card shows both marked
+        # sliders on the shared 0.42x-4x scale. Product-forward: reads live
+        # PL_DATA, so it goes stale with the data (MONTHLY_REFRESH §6).
+        "name": "disciplined-rebalancing",
+        "url": "https://lastcoinstanding.com/disciplined-rebalancing#calculator",
+        "hero_selector": "#dr2RuleCard",
+        "inject_js": "(()=>{const c=document.getElementById('dr2RuleCard');const st=document.createElement('style');st.textContent=`#dr2RuleCard .dr2-frame,#dr2RuleCard .dr2-key,#dr2RuleCard .dr2-facts,#dr2RuleCard .dr2-opts,#dr2RuleCard .dr2-you,#dr2RuleCard .dr2-q,#dr2RuleCard .dr2-eyebrow,#dr2RuleCard .dr2-colh{display:none!important}#dr2Panel{position:static!important}#dr2RuleCard .dr2-rb+.dr2-rb{padding-top:.6rem!important}`;document.head.appendChild(st);\nconst p=document.getElementById('dr2Panel');[...p.children].forEach(ch=>{if(!ch.querySelector('#dr2R11'))ch.style.display='none';});\n[...c.querySelectorAll('.dr2-rulebox > *')].forEach(ch=>{if(!(ch.classList.contains('dr2-rb')&&!ch.classList.contains('dr2-you')))ch.style.display='none';});\nc.querySelector('.dr2-cc').style.alignItems='center';})()",
+        "wait_after_navigate_ms": 2500,
+        "wait_after_scroll_ms": 1500,
+        "chrome": {
+            "title": "Disciplined ",
+            "titleAccent": "Rebalancing",
+            "titleAfter": "",
+            "subtitle": "Two rules: when to sell a spike, when to buy back lower. See what they did in every cycle since 2011, in bitcoin.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Sell rule + buy-back rule</strong>'
+                '  ·  marked with every past spike and low'
+            ),
+            "urlText": "lastcoinstanding.com/disciplined-rebalancing",
+        },
+        "output_filename": "og-disciplined-rebalancing-v2.jpg",
+    },
 ]
 
 
@@ -634,6 +657,9 @@ def build_card(page, card_config: dict, output_path: Path) -> None:
     started = time.time()
     print(f"  visit {card_config['url']}")
     page.goto(card_config["url"], wait_until="networkidle")
+    if card_config.get("inject_js"):
+        page.wait_for_timeout(card_config.get("wait_after_navigate_ms", 0))
+        page.evaluate(card_config["inject_js"])
     try:
         page.wait_for_selector(
             card_config["hero_selector"], state="attached", timeout=10_000)
