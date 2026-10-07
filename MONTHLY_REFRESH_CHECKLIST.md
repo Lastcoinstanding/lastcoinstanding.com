@@ -636,7 +636,7 @@ After a refresh, load the page and read the console line. Same rule as §5.1b: *
 
 The 2026-05-17 OG rollout introduced **product-forward OG cards** that
 embed live chart screenshots in their composition (STYLE_GUIDE §6.15.2).
-Five cards in this family will visibly drift from current data after a
+Seven cards in this family will visibly drift from current data after a
 monthly refresh and should be regenerated:
 
 | OG card file | Live visual embedded |
@@ -647,6 +647,7 @@ monthly refresh and should be regenerated:
 | `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
 | `og-compare-retirement-plans-v2.jpg` | the paired balance curves for Plan A and Plan B (added 2026-08-26; bumped to `-v2` the same day after the copy review changed the page title and cut the legend to two entries) |
 | `og-bitcoin-spikes.jpg` | the Tab 2 cycle range chart (`#spDecayChart`): each cycle's low and spike against trend, with the live upper-band caption (added 2026-10-04; the stats line is fixed copy: 14× in 2011, 1.19× in 2024, 43% above trend; recheck those if a new spike or a refresh moves them) |
+| `og-disciplined-rebalancing-v2.jpg` | the calculator's rules card (`#dr2RuleCard`): both sliders on the shared 0.42×–4× scale, marked with past spikes and lows, beside the results against HODLing; the script's `inject_js` hides the page's text blocks so it fits 1280×720 (added 2026-10-06 as `-v2` so X refetched after caching a failed fetch of the old card) |
 
 Each card embeds `weeklyBtc` / `PL_DATA` / projection state, so each monthly
 refresh advances the visible window by one month and changes the embedded
@@ -662,7 +663,7 @@ npm run build-ogs       # or: python3 scripts/build-og-images.py
 
 The script visits each page in headless Chromium, clones or screenshots
 the live visual, composes the editorial chrome, downsamples to 1280×720,
-and writes the five updated JPGs to the repo root. Re-commit alongside
+and writes the seven updated JPGs to the repo root. Re-commit alongside
 the monthly refresh commit (or as an immediate follow-up); the same
 filenames are reused so no head-file or `.eleventy.js` changes are
 needed.
