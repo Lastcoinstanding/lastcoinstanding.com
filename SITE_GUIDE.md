@@ -1267,6 +1267,7 @@ The calculator uses Porkopolis Power Law coefficients, matching `/the-power-law.
 - Upper multiplier: `3.0 × trend`
 - Live BTC price via the shared `fetchTodayPrice` (§40.2), falling back to the latest `PL_DATA` sample, labelled with its date (the hardcoded `LIVE_BTC_FALLBACK = 108000` was retired 2026-05-28)
 - Default withdrawal rate: 6% (sliderable 2–15%); Trinity-Study 4% rule referenced as anchor in slider labels but is not the default — bitcoin's growth profile under the Power Law makes 6% the more honest default
+- Traditional 60/40 benchmark: the `realReturns` preset (3 / 5 / 7% above CPI) converted to nominal at the CPI preset (3.5%), whatever the inflation setting: `(1 + real)(1 + 0.035) − 1`, so 5% is about 8.7% a year (STYLE_GUIDE §3.5, *Converting to nominal*). The inflation setting grows the withdrawals and deflates the Real view. **Corrected 2026-10-10 (`95994fc`):** it had converted at the inflation setting (M2, 6.5%, by default: 5% → ~11.8%); the Math tab carries a dated correction note, and the 81-plan grid (TECH_DEBT §1 recipe) showed the verdicts and audit rows unchanged.
 
 ### Chart datasets (six lines, asymmetric treatment)
 
@@ -1277,7 +1278,7 @@ The calculator uses Porkopolis Power Law coefficients, matching `/the-power-law.
 | Upper band | `#e8c820` (gold) | sparse-dashed `[1,6]` 1.2px | Spike envelope |
 | Drawdown | `#ece4d6` (cream) | solid 2px | User stack under sell-as-needed |
 | Current trajectory | `#a89c8a` (muted tan) | dashed `[4,3]` 1.5px | Anchored to live BTC price; plots from current year at mark-to-market |
-| Traditional 60/40 | `#5e7a92` (cool blue-gray) | dashed `[5,4]` 1.4px | Real-return benchmark; plots from current year at mark-to-market |
+| Traditional 60/40 | `#5e7a92` (cool blue-gray) | dashed `[5,4]` 1.4px | Benchmark at its return above CPI, converted at CPI (below); plots from current year at mark-to-market |
 
 Trend, drawdown, current-trajectory render with full saturation; floor and upper render with reduced visual weight to emphasize trend as the central case. A `bandFillPlugin` adds subtle amber `rgba(224,148,34,0.05)` fill between floor and upper. The legend has two group labels (`Power Law bands — per bitcoin` for the top three lines, `Portfolio value — total stack` for the bottom three).
 
@@ -1863,14 +1864,14 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 | The Income Question | `question` | The framing tab. Opens with the structural argument for *why* a bitcoin-anchored portfolio might want cashflow today. Default tab. |
 | The Instruments | `instruments` | Concrete instrument inventory: STRC (Strategy 11.5% ROC), SATA (Strive 13% ROC), 10yr Treasury, IG Corp. Capital stack diagram placeholder. |
 | The Mechanism | `mechanism` | How the mNAV+ATM machinery works — corporate side. Acknowledges this is the engine, not magic. |
-| The Calculator | `calculator` | Interactive head-to-head. Income path vs sell-as-needed bitcoin, with stress overlays (Base / Mild / 2008 mREIT-style / Bitcoin winter) and three Power-Law-anchored growth scenarios (Stay / Revert to trend / Reach upper channel). |
+| The Calculator | `calculator` | Interactive head-to-head. Income path vs sell-as-needed bitcoin, with stress overlays (Base / Mild / 2008 mREIT-style / Bitcoin winter) and four Power-Law-anchored bitcoin scenarios, the real-estate pair's set (Drifts to the floor / Today's gap persists, the default / Reverts to trend / Peaks at 2.5× trend). |
 | The Risks | `risks` | The bear case for the bear case. Where the mechanism can fail — bitcoin winter, ATM channel closure, structural arrears, dividend-rate spiral. |
 
 ### Editorial moves worth preserving
 
 - **The Tab IV reframing.** Title is *"Where the income path actually wins — bitcoin-backed preferreds as bear-case insurance"* — not "wealth maximization." This was the single most consequential editorial decision. Under base-case bitcoin growth, just holding bitcoin wins on terminal wealth, comfortably, at any reasonable Power Law assumption. The honest case for the instruments isn't beating bitcoin; it's: bear-case insurance, volatility elimination, and tax-efficient cashflow *today*. The intro prose, the chip framing, and the dynamic verdict logic all align to this thesis.
 - **Bitcoin winter not crypto winter.** Site-wide convention avoids the word "crypto" because it tends to legitimize the broader crypto space. Stress preset display name + Tab V prose both use "Bitcoin winter"; internal `data-preset="winter"` key unchanged for forward-compat.
-- **Verbatim BvRP growth-scenario language.** The three growth chips (Stay at current trend multiple / Revert to Power Law trend / Reach Power Law upper channel) carry the exact tooltip text used by Bitcoin vs Rental Property. Same Power Law model + same canonical phrasing = cross-page consistency. **No longer matched since PR 4c (2026-09-28):** BvRP moved to the pair's M3 set (Floor · Stay at today's multiple · Trend · Upper, default Stay); BFI keeps the three chips above with Trend as default. Whether BFI follows is an open decision (TECH_DEBT §5, *Bitcoin scenario vocabulary*).
+- **The real-estate pair's scenario set (rulings M3; adopted 2026-10-10, JM, `1053b53`).** Four chips, the same as Bitcoin vs. Real Estate and Bitcoin vs. Rental Property: Drifts to the floor (0.42×) · Today's gap persists (the default) · Reverts to trend (1×) · Peaks at 2.5× trend. Each moves bitcoin's multiple of the trend in a straight line from today's to its target at the horizon end, and the price is that multiple times the trend (`scenarioPrice`, 365.25-day years, rulings M10); the chips show the implied annual growth over the horizon (`resolveScenarioCagr`). Drifts to the floor is drawn faintly on the chart whichever scenario is picked, and drops out of the legend when it is the selected one. Tooltips come from `scenarioTipHTML()`, worded as BvRP's: Trend carries the ruled sentence verbatim, Stay reads today's multiple, Floor's record matches The Floor, and Upper's record is computed from `SpikeRecord` (`shared/spike-record.js`, loaded on this page for it), worded as `RealEstateModel.upperRecordText` words it. **One wording difference from BvRP, on purpose:** Upper is "an upside case to test the income path against" and its chip says "not a forecast", because on this page "stress" already names the drawdown presets. **Before 2026-10-10:** three chips (Stay at current trend multiple / Revert to Power Law trend, the default and "central case" / Reach Power Law upper channel), each a constant-CAGR path to its end point, and an Upper tooltip calling 2.5× "the historical above-cycle peak" (the record is 12×, 5.4× and 3.2× trend, and 1.2× so far this cycle). The path change leaves the chip rates as they were and raises the sell-as-needed result about 7% at 15 years; the default change ends the bitcoin path at $9.63M real at defaults, where Trend gave $18.48M.
 
 ### Calculator architecture
 
@@ -1904,13 +1905,15 @@ Six dimensions of calculator state are carried in the URL query string per the c
 | `in` | `incomeNeed` | number | 60000 | 10000–500000, step 5000 |
 | `po` | `position` | number | 1000000 | 100000–10000000, step 50000 |
 | `hz` | `horizon` | number | 15 | 1–30 |
-| `sc` | `btcScenario` | enum | `trend` | `stay` \| `trend` \| `upper` |
+| `sc` | `btcScenario` | enum | `stay` | `floor` \| `stay` \| `trend` \| `upper` |
 | `pa` | `incomePath` | enum | `strc` | `strc` \| `sata` \| `treasury` \| `igcorp` |
 | `st` | `stressPreset` | enum | `base` | `base` \| `mild` \| `mreit` \| `winter` |
 
 Defaults are omitted from the URL — a clean `/bitcoin-fixed-income` represents the default scenario. The decoder applies overrides via the existing slider/chip click handlers before the first render so all side effects (active class, stress-preset table values, etc.) fire correctly. `recalc()` debounces a `history.replaceState` write at ~250ms so dragging a slider doesn't hammer the browser's history API. Advanced state fields (`taxBracket`, `ltcgRate`, `inflation`, `preferredTaxTreatment`) are intentionally NOT in the URL — they're modeling assumptions, not scenario inputs.
 
-Example: `/bitcoin-fixed-income?in=120000&po=3000000&hz=20&sc=upper&pa=sata&st=mreit` decodes to $120k annual income on a $3M position over a 20-year horizon, Upper-channel growth, SATA path, with 2008-mREIT-style stress overlay.
+Example: `/bitcoin-fixed-income?in=120000&po=3000000&hz=20&sc=upper&pa=sata&st=mreit` decodes to $120k annual income on a $3M position over a 20-year horizon, the Peaks at 2.5× trend scenario, SATA path, with 2008-mREIT-style stress overlay.
+
+**Default change, 2026-10-10.** The `sc` default moved from `trend` to `stay`. A link shared before that date with Trend selected carries no `sc` (defaults were omitted), so it now opens at Today's gap persists. Not worth a version marker: share links on this page are rare, and every non-default scenario still round-trips.
 
 ### Recently closed
 
