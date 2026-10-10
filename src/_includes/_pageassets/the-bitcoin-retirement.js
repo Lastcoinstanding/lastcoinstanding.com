@@ -584,15 +584,37 @@
   // visual comparison (§9.2.1: realReturns picker drives this line).
   // Same starting capital as the bitcoin drawdown line (btcStack × trend
   // price today), same DCA contributions pre-retirement, same nominal
-  // income withdrawals post-retirement. Grows at nominal = (1+real)(1+infl)−1.
+  // income withdrawals post-retirement.
+  //
+  // Growth: nominal = (1 + real)(1 + CPI) − 1, at the site's CPI rate,
+  // whatever inflation setting is picked. The presets (3 / 5 / 7%) are real
+  // returns over CPI (STYLE_GUIDE §3.5: the S&P 500's ~6.7% real, 1928–2024,
+  // and the 60/40 mix built from it), so CPI is the rate that turns them
+  // back into the nominal returns they were measured from: 5% real is about
+  // 8.7% a year, 7% real about 10.7%, close to the S&P's own long-run
+  // nominal ~10%. The inflation setting still sets how the income target
+  // grows (below) and how the Real view deflates, as for the bitcoin lines.
+  // Until 2026-10-10 this converted at the picked inflation, M2 growth
+  // (6.5%) by default, so the 5% preset compounded at about 11.8% a year and
+  // 7% at about 14%, well above the S&P 500's own long-run ~10%: the
+  // same construction error REAL_ESTATE_PAIR_RULINGS M1 fixed for home
+  // appreciation (TECH_DEBT, "Sitewide real-return conversion", closed
+  // 2026-10-10). The fix lowers the benchmark, which favors bitcoin's line,
+  // so the page says so in the Math tab and the updates feed.
   // Returns an array of {x:year, y:usd|null} aligned with the bitcoin lines.
+  function benchmarkCpiPct() {
+    var MA = window.ModelingAssumptions;
+    var v = MA && MA._dimensions && MA._dimensions.inflation &&
+            MA._dimensions.inflation.presetValues['cpi-official'];
+    return (typeof v === 'number' && isFinite(v)) ? v : 3.5;
+  }
   function projectTraditionalPortfolio(scenario, realReturnPct, inflationPct, startingCapital) {
     var startYear = (new Date()).getFullYear();
     var endYear = scenario.retirementYear + scenario.yearsInRetirement;
     var realRate = realReturnPct / 100;
     var infl = inflationPct / 100;
-    // Nominal compounding rate via Fisher equation
-    var nominalRate = (1 + realRate) * (1 + infl) - 1;
+    // Nominal compounding rate via the Fisher equation, at CPI (see above)
+    var nominalRate = (1 + realRate) * (1 + benchmarkCpiPct() / 100) - 1;
 
     var balance = startingCapital;
     var points = [];
@@ -1222,9 +1244,10 @@
       // Visually subordinate per design doc §9.2.1 ("for comparison only;
       // not core to the calc's primary computation"). Same starting capital
       // as the bitcoin drawdown above, so the two lines are directly
-      // comparable. Picks up the realReturns picker value (3% / 5% / 7%).
+      // comparable. Picks up the realReturns picker value (3% / 5% / 7% over
+      // CPI, converted at CPI: projectTraditionalPortfolio).
       {
-        label: 'Traditional 60/40 (' + realReturns.value + '% real)',
+        label: 'Traditional 60/40 (' + realReturns.value + '% above CPI)',
         data: benchmark,
         type: 'line',
         borderColor: '#5e7a92',
