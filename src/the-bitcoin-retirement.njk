@@ -594,7 +594,7 @@ eleventyComputed:
         </div>
 
         <div class="picker-group">
-          <div class="picker-label">Traditional portfolio benchmark <span class="help">&mdash; for comparison only; what your money would earn in a traditional 60/40 portfolio after inflation</span></div>
+          <div class="picker-label">Traditional portfolio benchmark <span class="help">&mdash; for comparison only; a traditional 60/40 portfolio&rsquo;s return above CPI inflation. It grows at this plus CPI (3.5%), whichever inflation you pick.</span></div>
           <div class="picker cols-3" data-dim="realReturns">
             <button type="button" class="picker-card" data-preset="conservative">
               <span class="val">3% real</span>
@@ -783,7 +783,11 @@ eleventyComputed:
 
       <h2 class="section-title">Traditional 60/40 benchmark</h2>
 
-      <p class="prose">The blue-gray comparison line on the projection chart represents a Traditional 60/40 portfolio with the same starting capital (today&rsquo;s stack value at the live BTC price). It compounds at a real return rate &mdash; selectable from the baseline assumptions &mdash; using the Fisher equation to produce nominal growth, and applies the same DCA contributions and inflation-adjusted withdrawals as the bitcoin scenario. This makes it a fair direct comparator: same money, same goal, different asset.</p>
+      <p class="prose">The blue-gray comparison line on the projection chart represents a Traditional 60/40 portfolio with the same starting capital (today&rsquo;s stack value at the live BTC price). It applies the same DCA contributions and inflation-adjusted withdrawals as the bitcoin scenario. This makes it a fair direct comparator: same money, same goal, different asset.</p>
+
+      <p class="prose">Its growth rate comes from the benchmark choice in the baseline assumptions: 3%, 5% or 7% a year above CPI inflation. Those are real returns measured against CPI, so the line converts them to nominal growth at CPI (3.5%) using the Fisher equation: 5% real becomes about 8.7% a year, and 7% real about 10.7%, close to the S&amp;P 500&rsquo;s long-run nominal return of about 10%. The inflation setting doesn&rsquo;t change this rate. It still sets how fast the withdrawals grow and what the Real view deflates by, for this line and the bitcoin lines alike.</p>
+
+      <p class="prose"><em>Correction, October 10, 2026:</em> until this date the line converted the benchmark at the inflation setting instead of CPI. At the default, M2 growth (6.5%), that grew the 5% benchmark at about 11.8% a year and the 7% benchmark at about 14%, well above what those portfolios have returned over the long run. The corrected line is lower, which makes the comparison look better for bitcoin; it is a fix to the arithmetic, not a change of assumption.</p>
 
       <h2 class="section-title">Tax handling</h2>
 

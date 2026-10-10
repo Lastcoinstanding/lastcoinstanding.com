@@ -2,6 +2,12 @@
   {
     "display": "10/10/26",
     "date": "2026-10-10",
+    "page": "/the-bitcoin-retirement",
+    "summary": "Correction to The Bitcoin Retirement: the 60/40 comparison line now grows at its return above CPI plus CPI (3.5%), as the benchmark intends. It had been converted at the inflation setting, M2 growth (6.5%) by default, which grew the 5% benchmark at about 11.8% a year instead of about 8.7%. The line is now lower, which favors bitcoin; it is a fix to the arithmetic, not a new assumption, and the Math tab says so."
+  },
+  {
+    "display": "10/10/26",
+    "date": "2026-10-10",
     "page": "/bitcoin-fixed-income",
     "summary": "Bitcoin and Fixed Income: the calculator's bitcoin scenarios are now the four the real-estate pages use (drifts to the floor, today's gap persists, reverts to trend, peaks at 2.5× trend), and the default no longer assumes bitcoin returns to its trend. The floor case is always drawn faintly on the chart, and the upside case now gives the record of past peaks: 12×, 5.4× and 3.2× trend, and 1.2× so far this cycle. Its note had called 2.5× the historical peak."
   },
