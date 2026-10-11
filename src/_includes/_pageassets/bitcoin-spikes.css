@@ -214,10 +214,7 @@ table.sp-rec tr:last-child td { border-bottom: 0; }
 .sp-ul { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
 .sp-uv { font-family: var(--font-d); font-size: 2rem; font-weight: 600; color: var(--text-bright); line-height: 1.1; }
 .sp-us { font-size: .75rem; color: var(--text-muted); }
-.sp-falsify { border: 1px solid var(--gold); border-radius: 12px; padding: 1.1rem 1.3rem; background: var(--gold-soft); }
-.sp-falsify .sp-eyebrow { color: var(--gold); }
-.sp-falsify ul { margin: .3rem 0 0; padding-left: 1.1rem; }
-.sp-falsify li { margin: .35rem 0; }
+/* .sp-falsify retired 2026-10-11: the box is components/what-would-change-my-view.njk (.wcv). */
 .sp-steel { border-left: 2px solid var(--border-lt); padding: .2rem 0 .2rem 1rem; color: var(--text-dim); }
 .sp-steel .sp-eyebrow { color: var(--text-dim); }
 

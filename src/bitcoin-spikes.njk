@@ -342,15 +342,10 @@ eleventyComputed:
     </section>
 
     <section class="sp-section">
-      <div class="sp-falsify">
-        <div class="sp-eyebrow">What would change my view</div>
-        <ul>
-          <li>Price staying below the floor longer than any precedent.</li>
-          <li>The fitted exponent drifting materially as new data arrives.</li>
-          <li>A breakaway that appears in dollars but not in gold or real terms. That would be a dollar story, not a bitcoin one.</li>
-          <li>Spikes stopping entirely while the trend flattens, the pattern of an S-curve reaching its top.</li>
-        </ul>
-      </div>
+      {#- Shared with The Power Law and The Floor since 2026-10-11 (one list, one
+          set of thresholds: components/what-would-change-my-view.njk). -#}
+      {% set wcv_here = 'spikes' %}
+      {% include 'components/what-would-change-my-view.njk' %}
     </section>
 
     <section class="sp-prose">

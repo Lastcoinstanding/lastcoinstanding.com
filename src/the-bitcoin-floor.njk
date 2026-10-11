@@ -64,6 +64,7 @@ eleventyComputed:
     <div class="fl-eyebrow">The line</div>
     <h2 class="fl-h2">What the floor is</h2>
     <p class="fl-lead">The floor is the lower-bound line of bitcoin&rsquo;s price history over the long term &mdash; a lower edge the price has held with remarkable consistency and fit, to the point where &ldquo;floor&rdquo; is the accurate description. That consistency is in sharp contrast with the upper edge, where price action has been far more volatile, with brief violent spikes.</p>
+    <p class="fl-lead"><strong>Precisely:</strong> the floor is the 0.42&times; trend line. It is a level that rises with the trend, not a fixed price, so a price that sat above the floor a few years ago can sit below it today.</p>
 
     <div class="fl-chart-block">
       <div class="fl-chart-head">
@@ -233,10 +234,13 @@ eleventyComputed:
         <div class="fl-tripwire-status-v" id="flTripwireStatusV">&mdash;</div>
       </div>
 
-      <p class="fl-tripwire-ceiling">Secondary watch, the other direction: a sustained break <em>above</em> the 3&times; ceiling, beyond the brief cyclical visits the record already contains, would not falsify the model so much as suggest the denominator had changed &mdash; that the thing being priced, or the money pricing it, is no longer the same measurement.</p>
+      <p class="fl-tripwire-ceiling">Secondary watch, the other direction: a sustained break <em>above</em> the 3&times; upper band, beyond the brief cyclical visits the record already contains, would not falsify the model so much as suggest the denominator had changed &mdash; that the thing being priced, or the money pricing it, is no longer the same measurement.</p>
 
       <p class="fl-tripwire-commit">If the tripwire fires &mdash; a close more than 10% below the floor, held for more than 30 consecutive days &mdash; this page will say so the same day, in this box.</p>
     </div>
+
+    {% set wcv_here = 'floor' %}
+    {% include 'components/what-would-change-my-view.njk' %}
   </section>
 
   <!-- ══════════ 5 · THE OTHER SIDE ══════════ -->

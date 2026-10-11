@@ -54,7 +54,7 @@
           order: 4
         },
         {
-          label: 'Ceiling (3x)',
+          label: 'Upper band (3×)',
           data: ceilLine,
           type: 'line',
           borderColor: 'rgba(192,57,43,0.5)',
@@ -154,7 +154,7 @@
               } else if(item.datasetIndex === 1){
                 lines.push('Trend: $' + Math.round(p).toLocaleString());
                 lines.push('Floor: $' + Math.round(fv).toLocaleString());
-                lines.push('Ceiling: $' + Math.round(cv).toLocaleString());
+                lines.push('Upper band: $' + Math.round(cv).toLocaleString());
                 lines.push('Days to double: ' + daysToDouble.toLocaleString() + ' (' + yearsToDouble + ' yrs)');
               } else {
                 return [];
@@ -909,7 +909,7 @@
     document.getElementById('projCeiling').textContent = fmt(ceil);
     document.getElementById('projFloorDetail').textContent = 'Most conservative boundary';
     document.getElementById('projTrendDetail').textContent = 'Days to double: '+daysToDouble.toLocaleString()+' ('+yearsToDouble+' yrs)';
-    document.getElementById('projCeilingDetail').textContent = 'Historical bull market peaks';
+    document.getElementById('projCeilingDetail').textContent = 'Not a cap: crossed at past cycle peaks';
   }
 
   slider.addEventListener('input', updateProjection);
@@ -1534,4 +1534,43 @@
 
   // QA hook (?qa): the figures the measurement script prints, for parity checks.
   try{ if(/[?&]qa\b/.test(location.search)) window.roosQA = { rows:rows, bRange:[bMin,bMax], todayRange:[tMin,tMax], worst:worst, fullB:full.b, fullX:fullX, floorRuns:runs }; }catch(e){}
+})();
+
+
+// ═══════ THE SPIKE RECORD (2026-10-11) ═══════
+// Bitcoin's Spikes owns the record (shared/spike-record.js): each cycle's
+// spike above trend and its low after the price high, on the modern set
+// (2011 onward). This page reads it for the Volatility Compression list, the
+// cycle lows beside it, and the share of time above the upper band in the
+// projection note, so the figures match Spikes and follow the data. Was a
+// typed list (8x, 4-5x, 2.5x) that matched neither the site's record nor
+// itself. The HTML carries the 2026-10-11 values as first paint.
+(function(){
+  var SR = window.SpikeRecord;
+  if (!SR || typeof SR.record !== 'function') return;
+  function x(m){ return (m >= 10 ? m.toFixed(0) : m.toFixed(1)) + '\u00d7'; }
+  var R = SR.record();
+  var peaks = document.getElementById('plVcPeaks');
+  if (peaks && R.length) {
+    peaks.innerHTML = R.map(function(r, i){
+      return r.y + ': ' + (i === 0 ? 'peaked at about ' : (r.spikeM >= 10 ? 'about ' : '')) +
+        '<strong>' + x(r.spikeM) + '</strong>' + (i === 0 ? ' trend' : '') + (r.open ? ' so far' : '') + '.';
+    }).join('<br>');
+  }
+  var lows = SR.cycleLows();
+  if (lows.length) {
+    var ms = lows.map(function(l){ return l.m; });
+    var rangeEl = document.getElementById('plVcLowRange'), lowsEl = document.getElementById('plVcLows');
+    if (rangeEl) rangeEl.textContent = Math.min.apply(null, ms).toFixed(2) + '\u00d7 and ' + Math.max.apply(null, ms).toFixed(2) + '\u00d7';
+    if (lowsEl) {
+      var parts = lows.map(function(l){ return l.m.toFixed(2) + '\u00d7 ' + (l.open ? 'so far ' : '') + '(' + l.y + ')'; });
+      lowsEl.textContent = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
+    }
+  }
+  var above = document.getElementById('plBandAbovePct');
+  if (above && typeof PL_CEIL === 'number') {
+    var S = SR.series(), up = 0, tot = 0;
+    for (var i = 0; i < S.length - 1; i++) { var sp = S[i + 1].d - S[i].d; tot += sp; if (S[i].m >= PL_CEIL) up += sp; }
+    if (tot > 0) above.textContent = Math.round(100 * up / tot) + '%';
+  }
 })();

@@ -21,7 +21,7 @@ companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-horizon-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-horizon.css' %}"
-  page_scripts: "{% include '_pageassets/shared/tr-comparator-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/the-bitcoin-horizon.js' %}"
+  page_scripts: "{% include '_pageassets/shared/tr-comparator-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/spike-record.js' %}\n{% include '_pageassets/the-bitcoin-horizon.js' %}"
 ---
 <main>
 
@@ -236,7 +236,7 @@ eleventyComputed:
     <a href="/the-power-law" class="crosslink" style="margin-top:2.6rem;">
       <div class="cl-label">Looking forward?</div>
       <div class="cl-title">The Power Law calculator</div>
-      <p class="cl-body">For projections from today into the future, using the power-law floor / trend / ceiling bounds, see the forward-looking calculator on the Power Law page.</p>
+      <p class="cl-body">For projections from today into the future, using the power-law floor, trend and upper band, see the forward-looking calculator on the Power Law page.</p>
     </a>
   </div>
 </section>
@@ -293,7 +293,7 @@ eleventyComputed:
             <td>Persistent, moderate</td>
             <td>Low, persistent</td>
             <td>Moderate, persistent</td>
-            <td class="btc-col"><strong>High, but compressing each cycle</strong></td>
+            <td class="btc-col"><strong>High; the spikes shrink each cycle</strong></td>
           </tr>
           <tr>
             <td class="row-label">Has a destination?</td>
@@ -344,9 +344,13 @@ eleventyComputed:
 
     <p>Compute the equivalent ratio with a four-year volatility denominator &mdash; the time horizon over which loss has not historically occurred &mdash; and the risk-adjusted picture inverts. What institutional analysis calls "Bitcoin's elevated risk" is largely an artifact of using a one-day measurement instrument to assess a multi-year holding horizon. Match the time windows, and the conclusion changes.</p>
 
-    <h3 style="margin-top:2.4rem;">Volatility is compressing on schedule</h3>
+    <h3 style="margin-top:2.4rem;">Volatility is compressing, at the top</h3>
 
-    <p>One last piece. Bitcoin's volatility is not just declining over time &mdash; it is declining <em class="mark">predictably</em>. Giovanni Santostasi's analysis of Bitcoin's bull-market peaks shows that each successive peak has been smaller than the last by a margin that fits an exponential decay curve with a goodness-of-fit (R&sup2;) of 0.98 &mdash; meaning the model explains 98% of the variation in observed peak heights. Early cycles produced bubble growth rates of roughly 1.6% per day; recent cycles have seen that rate fall to about 0.46% per day. Bitcoin's volatility is decreasing at a rate that can be written down, on a curve that has held across more than a decade.</p>
+    <p>One last piece. Bitcoin's volatility is not just declining over time; on one well-known analysis it is declining <em class="mark">predictably</em>. Giovanni Santostasi's analysis of Bitcoin's bull-market peaks shows that each successive peak has been smaller than the last by a margin that fits an exponential decay curve with a goodness-of-fit (R&sup2;) of 0.98 &mdash; meaning the model explains 98% of the variation in observed peak heights. Early cycles produced bubble growth rates of roughly 1.6% per day; recent cycles have seen that rate fall to about 0.46% per day. Bitcoin's volatility has been decreasing at a rate that can be written down.</p>
+
+    <p>The site&rsquo;s own record agrees on the direction and adds two qualifications. Measured against the power law trend, each cycle&rsquo;s spike has been smaller than the last: <span id="hzPeaks">about 14&times; trend in 2011, 12&times; in 2013, 5.4&times; in 2017, 3.2&times; in 2021 and 1.2&times; so far in 2024&ndash;25</span>. But &ldquo;on schedule&rdquo; would overstate it. An exponential decay curve fitted through the first three spikes put the 2021 spike at <span id="hzCurve0">3.5&times;</span> and the 2024&ndash;25 spike at <span id="hzCurve1">2.0&times;</span>; they came in at <span id="hzActual0">3.2&times;</span> and <span id="hzActual1">1.2&times;</span>, the latest far below the curve. The decay is real; its pace hasn&rsquo;t been steady.</p>
+
+    <p>And the compression is at the top, not the bottom. Each cycle&rsquo;s low has landed between <span id="hzLowRange">0.40&times; and 0.56&times;</span> of trend, close to the floor, in every cycle since 2011. Falls from the price high have shrunk because the highs are lower, not because the lows are higher, and so far every bear market has still reached the floor zone. <a href="/bitcoin-spikes#record">Bitcoin&rsquo;s Spikes</a> measures every spike and low.</p>
 
     <a href="/the-power-law" class="crosslink">
       <div class="cl-label">Structural model</div>
