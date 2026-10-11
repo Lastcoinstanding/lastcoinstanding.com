@@ -327,7 +327,21 @@ function bdBindEvents() {
 }
 
 /* ─── INIT ─── */
+/* The sticky sentence sits just below the sticky site-nav, whose height
+   depends on the width (the link row from 1100px, the menu button below that)
+   and on the page's own nav overrides. Measure it rather than hardcode it, as
+   Bitcoin as Collateral does (--bac-nav-h); the CSS falls back to 65px. */
+function bdNavHeight() {
+    var nav = document.querySelector('.site-nav');
+    var h = nav ? Math.round(nav.getBoundingClientRect().height) : 65;
+    document.documentElement.style.setProperty('--bd-nav-h', h + 'px');
+    return h;
+}
+
 function bdInit() {
+    bdNavHeight();
+    window.addEventListener('resize', bdNavHeight);
+
     /* Initial word: URL hash if valid, otherwise word 0 */
     var startIdx = bdParseHash();
     if (startIdx < 0) startIdx = 0;
@@ -347,7 +361,7 @@ function bdInit() {
                 var rect = card.getBoundingClientRect();
                 if (rect.top < 50 || rect.top > window.innerHeight - 200) {
                     var sticky = document.querySelector('.bd-sticky-wrap');
-                    var offset = (sticky ? sticky.offsetHeight : 80) + 65 + 20;
+                    var offset = (sticky ? sticky.offsetHeight : 80) + bdNavHeight() + 20;
                     window.scrollTo({ top: window.scrollY + rect.top - offset, behavior: 'smooth' });
                 }
             }
