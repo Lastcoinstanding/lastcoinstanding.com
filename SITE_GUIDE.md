@@ -467,7 +467,7 @@ _See section 14 for latest Chart.js patterns. See section 11 for Power Law page 
 - `a = 1.6 × 10⁻¹⁷`, `b = 5.77`
 - Genesis Block: January 3, 2009
 - Floor multiplier: 0.42× trend (R² > 0.99)
-- Ceiling multiplier: 3× trend
+- Upper band multiplier: 3× trend (named the *upper band*, not "ceiling", since 2026-10-11; STYLE_GUIDE §10.13)
 - Key insight: "For every ~13% increase in Bitcoin's age, the trend price doubles"
 - Doubling factor derivation: `2^(1/5.77) ≈ 1.1276`, i.e., **12.76%** more age per doubling (≈ 12.8% in prose; "~13%" is used only as the loosest hero hook). This canonical figure is enforced by the v2 proportionality sweep (below).
 - Alternative coefficients exist and are surveyed openly (Power Law v2): a table + page-local **exponent explorer** ranks the competing fits by the *price each implies* at 2026/2035/2045/2060 — never by the bare exponent, since `a` and `b` trade off. Five documented (a, b) pairs are plotted (canonical Porkopolis 1.6×10⁻¹⁷/5.77; later Porkopolis refit 1.69×10⁻¹⁷/5.763; BitcoinPower.law 10⁻¹⁶·⁴⁹³/5.68; bitcoinretirement.net 1.0117×10⁻¹⁷/5.82; this page's OOS self-fit 3.9×10⁻¹⁷/5.657); b-only sources (b1m.io 5.566, a naive full-series 5.63) are listed but not drawn, because an exponent without its constant cannot be placed. Selecting canonical stays pinned site-wide (annual review); the explorer is presentation-only and moves nothing downstream.
@@ -496,7 +496,7 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 
 - Hero: the ~13% doubling insight with "proportional and sustainable" attribution
 - **Live doubling stat strip (v2, item c; polished 2026-08-05):** three kicker / value / caption blocks — "Bitcoin is · N days old · since the genesis block", "It takes · ~820 days · for the *trend* to double from here", "The constant · 12.76% · …2^(1/5.77)". Age and interval (`age × (2^(1/PL_B) − 1)`) computed live from `TODAY_DAYS` — never hardcoded. The doubling tile carries a tooltip clarifying it is the *trend's* doubling, not price's, and adapts to the above/below-trend state. §6.10a-declarative.
-- Interactive log-log Chart.js chart: historical BTC price scatter + trend/floor/ceiling corridors
+- Interactive log-log Chart.js chart: historical BTC price scatter + trend, floor and upper band
 - Tooltip shows: date, price, trend, floor, position, days-to-double
 - "What Proportional Growth Means" section with concrete doubling examples (1000→128 days, 5000→638, 6000→766)
 - Note on CAGR being technically wrong lens for Bitcoin
@@ -506,7 +506,7 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 - Out-of-Sample Validation chart (**reader-driven since v2, item a; readout redesigned 2026-08-05**): the training-window cutoff is a drag handle + preset chips (end-2014/2016/2017/2020/2023). Default cutoff **end-2017 (slope 5.657)**; the regression, projection, and readout recompute in-browser on input. The readout is fitted a, b · implied trend today · **Δ vs the full-data self-fit** (the fourth field was changed from "actual vs. fit" — that number was contaminated by channel position, reading ~−57% even for a perfect fit; the trend-vs-trend Δ isolates what the extra years changed, and lands ~−1% at end-2017). A live drive-home sentence ("a fit that saw nothing after {cutoff} lands within {Δ}% … {N} years have barely moved the line") and a channel-position line ("today's price sits at {mult}× this fitted trend") sit under the readout; both adapt on drag / preset / cold-load. Every readout field, plus "out-of-sample" and "fit window", carries a `.help-tip`. Deep-linkable via **`?fit=YYYY-MM`** (restored before first render; the tab handler preserves the query string). The **end-2014 preset reproduces the documented bad fit (slope 6.787)**; the "we shipped the bad window" footer was cut and its one clause folded into the intro prose. (Original refit in commit `6604126`, 2026-05-07 — see DATA_AUDIT's Architectural change log.)
 - **Exponent survey + explorer (v2, item b; restructured 2026-08-05):** copy is organized around **five reader questions** — what the exponent and coefficients are; why authors differ; whether fits change over time (the two Porkopolis snapshots answer this: drift, not revision); what the differences imply (fan-out with horizon); and why the site uses the one it does (the "reference fit" — longest-standing published, tightest floor, stable-by-design). A page-local explorer redraws the reference vs. a selected pair and tabulates implied price + deviation at 2026/2035/2045/2060 (ranks by implied price, not exponent). The five questions are mirrored into the page's **FAQ block** (`faq:` front-matter → `components/page-faq.njk` + FAQPage JSON-LD, §6.40). Reader-facing "canonical" was swept to "reference fit" per STYLE_GUIDE §5.
 - **Time above/below trend (v2, item d):** a split bar computed live from `PL_DATA` (~43% above / ~57% below; mean log-deviation ≈ 0), framed as candor — below trend is the normal condition; returns arrive in bursts. Cross-links the Doubling Ladder (which owns the month-end treatment).
-- Price Projection Widget: year slider (2025-2045) showing Floor/Trend/Ceiling projections with days-to-double
+- Price Projection Widget: year slider (2025-2045) showing Floor/Trend/Upper band projections with days-to-double
 - Caveats section: empirical not physical law, Santostasi's ~2040 horizon warning, and **"two ways the model could break" (v2, item e)** — floor breach (down) + Mežinskis's upside break (graded as speculation).
 - Credits with links to all primary sources
 
@@ -525,7 +525,7 @@ Full credits section lists: Giovanni Santostasi (theory creator), Matthew Mežin
 - Difficulty adjustment as thermostat (corrected: prevents premature emission schedule completion, not "runaway network growth")
 - Triple feedback loop: Adoption → Value → Security → Trust → Adoption
 - "Bottom-side physics" vs "top-side noise" explaining why floor R² > trend R²
-- Volatility compression: Cycle 1 peaked ~8× over trend, Cycle 4 ~2.5×
+- Volatility compression: each cycle's spike from `SpikeRecord` (14×, 12×, 5.4×, 3.2×, 1.2× so far), plus the cycle lows (0.40–0.56×): the compression is at the top (2026-10-11; was a typed 8× / 4–5× / 2.5×)
 - Zero monetary entropy: fixed supply, no dependence on perpetual expansion; cross-links to Half-Life and Melting Ice Cube pages
 - Further Reading links to all primary sources
 
@@ -575,6 +575,14 @@ Tab 1 has a small interactive widget — **"Project a Future Date"** (`#projSlid
 
 A section after the out-of-sample chart, on JM's rulings of 2026-10-01 (#116). It sweeps the chart's single cutoff: one fit per quarter-end 2012-Q1 to 2024-Q4, each the page's own log-log OLS over `PL_DATA` up to that cutoff, and shows two panels on one time axis (no dual y-scales): the trend each fit implies today as a multiple of the reference line (log, with the 0.68–1.24× band shaded from 2016), and the share of the next four years inside each fit's own 0.42–3.0× channel (dashed 80%). Grey before 2016, amber after, with a labelled divider so era is never colour alone; a year-end table view; tooltips per fit. Then the honest limits (≈2.5 cycles; overlapping fits; the stress test that two years at the floor would move b 5.63 → 5.47), the **three falsifiability tests with live Holding/Broken status** (thresholds fixed on 2026-09-23; MONTHLY_REFRESH §9.8a), and the **"reads richer" note**: a fresh full-record fit (b 5.63) puts today's trend ~9% below the reference line, so price reads less far below trend than the site's channel says, computed against the live price. Every figure is computed at load; nothing is stored. `?qa` → `window.roosQA` must agree with `scripts/measure-rolling-oos.js`.
 
+
+### 11.y Spikes findings (2026-10-11, `755e402`)
+
+- **"What would change my view"** (`components/what-would-change-my-view.njk`) sits after the caveats card, shared with Bitcoin's Spikes and The Floor. The caveats' downward-break sentence now points to it ("a sustained break of the floor would mean the model is failing its own test"). Its item 1 restates the Floor's tripwire and this page's check 1; item 2 is check 2. **Change a threshold in its ruled home first, then in the component.**
+- **Upper band.** The 3× line is the upper band everywhere on the page (chart subtitle and source, projection widget, channel tab, dataset label, tooltip). The projection note says it is not a cap and reads the share of time above it since 2011 from `SpikeRecord.series()` (`#plBandAbovePct`, ~8%).
+- **The page loads `shared/spike-record.js`** for the Volatility Compression list (`#plVcPeaks`), the cycle lows (`#plVcLows`, `#plVcLowRange`) and the band share. HTML carries the 2026-10-11 values as first paint.
+- **Caveats:** the out-of-sample claim now says since 2016, matching #when-reliable and the out-of-sample section.
+- **The Bitcoin Horizon** (no section of its own here) reads the same record for "Volatility is compressing, at the top": peaks (`#hzPeaks`), the falling-ceiling fit vs actual (`#hzCurve0/1`, `#hzActual0/1`) and the lows' range (`#hzLowRange`).
 ## 12. What Money Has To Be (`/what-money-has-to-be.html`)
 
 The site's most foundational concept page. Thesis: a good money must simultaneously serve as Store of Value (persistence across time), Medium of Exchange (movement across space), and Unit of Account (shared measurement). These three functions are structurally coupled — unbundling degrades each. Bitcoin is the first money to deliver all three simultaneously.
@@ -3168,6 +3176,8 @@ Fourth page of the Power Law family (**Bitcoin and The Power Law** · **The Bitc
 
 **Styling.** Clones `/about`'s palette and layout approach — `base.njk` carries no site-wide palette, link rules, or page background, so the page declares its own `:root` and paints the dark canvas via `body { background: var(--bg) }` (`NEW_PAGE_CHECKLIST §1`). Classes are `wwm-` prefixed; the shared `.page-title` treatment is reused so the two utility pages read as a pair. Container is 48rem, matching About's editorial width.
 
+**Definition and the shared falsifiers (2026-10-11, `755e402`).** A second lead line defines the floor as a rising level ("Precisely: the floor is the 0.42× trend line…", STYLE_GUIDE §10.13). After the tripwire card, `components/what-would-change-my-view.njk` (`wcv_here = 'floor'`, left-aligned to match the page's sections) lists the four falsifiers; its item 1 names this page's tripwire as the first test. The tripwire's secondary-watch line says "upper band", not "ceiling".
+
 **Open items.**
 - **OG card is a placeholder.** `og:image` reuses `og-synthesis.jpg` pending a dedicated Work With Me card (`NEW_PAGE_CHECKLIST §7`). The `og:image:alt` describes the site rather than the Synthesis artwork so it stays honest when the image is swapped.
 - **No `-chrome.html` asset.** The page needs no body chrome, so `body_chrome` is not declared — the fourth file in the usual `_pageassets` quartet would be an empty stub. `/about`'s own chrome file is a single HTML comment.
@@ -3553,7 +3563,7 @@ Fifth page of the Power Law family, and the upper-side counterpart to The Bitcoi
 
 **Static snapshots** (`src/_data/spikeSnapshots.json`): peak-buyer recovery for Nasdaq, Nikkei and gold, and the 2011-onward unit refits (USD / real USD / gold; exponents 5.51 / 5.32 / 5.19). The refits are labelled a cross-check that differs from the canonical model. Annual refresh (MONTHLY_REFRESH_CHECKLIST).
 
-**Open items.** ~~OG card and carousel slide~~ both shipped 2026-10-04 (`og-bitcoin-spikes.jpg`; slide at §13 row 14). Still open: DR parameter handoff; the Power Law falsifiers box and channel-band wording audit; "roughly half the time above trend" wording elsewhere against the measured 43%; the Horizon volatility-decay follow-up. All logged in TECH_DEBT.
+**Open items.** ~~OG card and carousel slide~~ both shipped 2026-10-04 (`og-bitcoin-spikes.jpg`; slide at §13 row 14). Still open: DR parameter handoff. Closed 2026-10-11 (`755e402`): the falsifiers box is now shared (`components/what-would-change-my-view.njk`, also on The Power Law and The Floor; this page's `.sp-falsify` styles retired), the channel-band wording audit, the 43% wording check, and the Horizon volatility-decay follow-up (§11.y).
 
 **Review round 1 (JM, 2026-10-04, 50 items).** All four tabs revised on the branch. What changed in kind, not item by item:
 - **Vocabulary.** A short "What a spike means here" section now opens Tab 1: a spike is a multiple of trend, the price high is the highest price, the floor is a rising level. HODL / HODLer in caps; first person singular ("What would change my view"). Both are site rules now (`STYLE_GUIDE §10.13`); the sweep of other pages is in TECH_DEBT.

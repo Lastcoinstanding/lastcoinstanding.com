@@ -2,6 +2,24 @@
   {
     "display": "10/11/26",
     "date": "2026-10-11",
+    "page": "/the-power-law",
+    "summary": "Bitcoin and The Power Law: a \"What would change my view\" box, shared with The Bitcoin Floor and Bitcoin's Spikes, so the three pages state one test for a break. The volatility-compression figures now come from the spike record (14×, 12×, 5.4×, 3.2× and 1.2× so far), with the cycle lows beside them: the compression is at the top. And the 3× line is called the upper band, not a ceiling: price has crossed it at past cycle peaks."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/the-bitcoin-floor",
+    "summary": "The Bitcoin Floor: a one-line definition of the floor as a level that rises with the trend, and the \"What would change my view\" box after the tripwire, shared with The Power Law and Bitcoin's Spikes."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/the-bitcoin-horizon",
+    "summary": "The Bitcoin Horizon: the volatility-compression section now checks its claim against the spike record. Spikes have shrunk every cycle, but not on a steady schedule, and the cycle lows haven't compressed at all."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
     "page": "/the-bitcoin-retirement",
     "summary": "Correction to The Bitcoin Retirement: the 60/40 comparison line now grows at its return above CPI plus CPI (3.5%), as the benchmark intends. It had been converted at the inflation setting, M2 growth (6.5%) by default, which grew the 5% benchmark at about 11.8% a year instead of about 8.7%. The line is now lower, which favors bitcoin; it is a fix to the arithmetic, not a new assumption, and the Math tab says so."
   },
