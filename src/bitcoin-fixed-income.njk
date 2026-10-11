@@ -6,7 +6,7 @@ title: The Income Question
 eleventyComputed:
   head_extras:  "{% include '_pageassets/bitcoin-fixed-income-head.html' %}"
   page_styles:  "{% include '_pageassets/bitcoin-fixed-income.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/bitcoin-fixed-income.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/spike-record.js' %}\n{% include '_pageassets/bitcoin-fixed-income.js' %}"
 related:
   - slug: the-strc-mechanism
     desc: "The deeper look at one instrument on this page. STRC now trades below its $100 par — what its discount is saying, tracked live, with the coverage math recomputed from the current balance sheet."
@@ -578,23 +578,37 @@ related:
           <input type="range" id="horizonSlider" min="1" max="30" step="1" value="15" />
         </div>
 
+        <!-- Bitcoin scenario (REAL_ESTATE_PAIR_RULINGS M3, adopted here 2026-10-10):
+             the same four as Bitcoin vs. Real Estate and Bitcoin vs. Rental Property.
+             Each moves bitcoin's multiple of the Power Law trend in a straight line
+             from today's to a target at the horizon end; the chips show the implied
+             annual growth. Default: Today's gap persists. scenarioTipHTML() in
+             bitcoin-fixed-income.js fills the chip tooltips (Stay reads today's
+             multiple, Upper reads the peak record); the text here is first paint.
+             Was: Stay / Revert to trend (default, "central case") / Upper, whose
+             tooltip called 2.5x trend "the historical above-cycle peak". -->
         <div class="input-group">
-          <label>Bitcoin growth scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Annualized bitcoin growth (CAGR) over the chosen horizon. Three scenarios mapped to Power Law channel positions — same framing used in Bitcoin vs Rental Property. Implied CAGR is computed dynamically from today's price-vs-trend position and your horizon, so the chip rates shift as bitcoin moves.</span></span></label>
+          <label>Bitcoin scenario, based on the Power Law<span class="help-tip" tabindex="0">?<span class="tip-content">Each scenario moves bitcoin&rsquo;s multiple of the Power Law trend in a straight line from today&rsquo;s to a target at the end of the horizon. The rate on each chip is the implied annual growth over your horizon, and it shifts as bitcoin moves. The selected chip drives the results; Drifts to the floor is always drawn faintly on the chart. All four scenarios assume the Power Law trend itself continues. Bitcoin vs. Real Estate and Bitcoin vs. Rental Property use the same four.</span></span></label>
           <div class="calc-cagr-chips">
-            <button class="calc-cagr-chip" data-scenario="stay">
-              <span class="calc-cagr-chip-name">Stay at current trend multiple<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin grows at the Power Law trend rate from today's price, never reverting up to trend. The bear / no-reversion case — you get just trend growth and miss the catch-up upside an under-trend entry would normally deliver.</span></span></span>
-              <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
-              <span class="calc-cagr-chip-sub">no reversion</span>
+            <button class="calc-cagr-chip" data-scenario="floor">
+              <span class="calc-cagr-chip-name">Drifts to the floor<span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="floor">?<span class="tip-content">Bitcoin&rsquo;s multiple moves in a straight line from today&rsquo;s to 0.42&times; the Power Law trend, the channel&rsquo;s lower bound, by the end of the horizon. Drawn faintly on the chart whichever scenario you pick.</span></span></span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>&mdash;</span>
+              <span class="calc-cagr-chip-sub">ends at 0.42&times; trend</span>
             </button>
-            <button class="calc-cagr-chip active" data-scenario="trend">
-              <span class="calc-cagr-chip-name">Revert to Power Law trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin moves from today's multiple back to 1.0× the Power Law trend linearly over the holding period. The central case — assumes today's discount-or-premium-to-trend closes over time.</span></span></span>
-              <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
-              <span class="calc-cagr-chip-sub">central case</span>
+            <button class="calc-cagr-chip active" data-scenario="stay">
+              <span class="calc-cagr-chip-name">Today&rsquo;s gap persists<span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="stay">?<span class="tip-content">Bitcoin keeps today&rsquo;s multiple of the Power Law trend, so it grows at the trend&rsquo;s own rate from today&rsquo;s price. No reversion is assumed in either direction. This is the default.</span></span></span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>&mdash;</span>
+              <span class="calc-cagr-chip-sub">no reversion either way</span>
+            </button>
+            <button class="calc-cagr-chip" data-scenario="trend">
+              <span class="calc-cagr-chip-name">Reverts to trend<span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="trend">?<span class="tip-content">Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing.</span></span></span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>&mdash;</span>
+              <span class="calc-cagr-chip-sub">ends at 1&times; trend</span>
             </button>
             <button class="calc-cagr-chip" data-scenario="upper">
-              <span class="calc-cagr-chip-name">Reach Power Law upper channel<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin drifts toward 2.5× trend (the historical above-cycle peak) over the holding period. Not a trendline expectation — rather a recognition that bitcoin has historically spiked to ~2.5× trend in cycle peaks, and that such spikes have never been sustained. Worth modeling as a potential window for disciplined rebalancing or partial divestment — see Disciplined Rebalancing.</span></span></span>
-              <span class="calc-cagr-chip-rate" data-chip-rate>—</span>
-              <span class="calc-cagr-chip-sub">cycle peak</span>
+              <span class="calc-cagr-chip-name">Peaks at 2.5&times; trend<span class="help-tip calc-chip-help" tabindex="0" data-scenario-tip="upper">?<span class="tip-content">Bitcoin&rsquo;s multiple moves in a straight line from today&rsquo;s to 2.5&times; the Power Law trend by the end of the horizon: an upside case to test the income path against, not a forecast.</span></span></span>
+              <span class="calc-cagr-chip-rate" data-chip-rate>&mdash;</span>
+              <span class="calc-cagr-chip-sub">not a forecast</span>
             </button>
           </div>
           <a class="calc-cagr-pl-link" href="/the-power-law">What is the Power Law? &rarr;</a>
@@ -702,7 +716,7 @@ related:
           <canvas id="iqChart"></canvas>
         </div>
 
-        <p class="chart-caption" id="chartCaption">Wealth trajectory comparison in real terms (today's purchasing power). Income path receives dividends, redeems at par at end of horizon. Bitcoin path holds and sells lump-sum at end of horizon.</p>
+        <p class="chart-caption" id="chartCaption">Wealth trajectory comparison in real terms (today's purchasing power). Income path receives dividends and redeems at par at the end of the horizon. Bitcoin path holds and sells as needed, in the scenario you pick; the faint line is the same path if bitcoin drifts to the floor.</p>
 
         <details class="cashflow-table">
           <summary>Year-by-year cashflows <span class="cashflow-table-hint">(click to expand)</span></summary>

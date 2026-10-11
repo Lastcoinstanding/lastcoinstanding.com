@@ -338,6 +338,8 @@ Three-card picker, no Custom field. Default = 5% (diversified portfolio).
 
 **localStorage key:** `lcs.realReturns.preset` (string: `conservative` | `diversified` | `sp500-historical`).
 
+**Converting to nominal (rule, 2026-10-10).** The three values are returns above CPI. A calculator that needs a nominal growth rate converts them at the CPI preset (3.5%), never at the picked inflation: `(1 + real)(1 + 0.035) − 1`, so 5% is about 8.7% a year and 7% about 10.7%, close to the S&P 500's long-run nominal ~10%. The picked inflation grows spending and deflates a Real view; it never changes the benchmark's growth. Re-inflating a CPI-real rate at M2 growth is the error behind the real-estate dimension's move to nominal (below) and the retirement flagship's 60/40 line, corrected 2026-10-10 (`projectTraditionalPortfolio` reads the CPI preset from `ModelingAssumptions`).
+
 ### Real estate appreciation (nominal)
 
 **Nominal since PR 4a (2026-09-28; REAL_ESTATE_PAIR_RULINGS M1, C7).** Four-card picker including Custom. Default = **4.68% nominal (Since 2000)**. Home appreciation is quoted the way house prices and mortgage rates are, in nominal terms; inflation only deflates a calculator's Real view, dividing both paths by the same factor, so the inflation preset can never change which path is ahead.

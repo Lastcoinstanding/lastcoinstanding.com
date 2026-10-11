@@ -59,8 +59,8 @@
     incomeNeed: 60000,
     position: 1000000,
     horizon: 15,
-    btcScenario: 'trend',      // 'stay' | 'trend' | 'upper' — drives btcCagr via Power Law math
-    btcCagr: 0.28,             // derived from btcScenario + horizon; recomputed in resolveScenarioCagr()
+    btcScenario: 'stay',       // 'floor' | 'stay' | 'trend' | 'upper' (rulings M3); default Stay
+    btcCagr: 0.27,             // the scenario's implied annual growth over the horizon; recomputed in resolveScenarioCagr()
     incomePath: 'strc',
     taxBracket: 42,
     ltcgRate: 30,
@@ -96,25 +96,116 @@
   // currentTrendPrice = plPrice(TODAY_DAYS)              — Power Law trend at today's days-since-genesis
   // currentMultiple   = TODAY_PRICE / currentTrendPrice  — where bitcoin sits relative to trend
   //
-  // resolveScenarioCagr() projects a terminal price under each scenario and
-  // solves for the CAGR that connects today's price to it over the horizon.
-  // Scenario target multiples at end-of-horizon:
-  //   stay  → currentMultiple   (no reversion — same multiple)
-  //   trend → 1.0×              (full reversion to trend)
-  //   upper → 2.5×              (drift to historical above-cycle peak)
+  // The scenario set is the real-estate pair's (REAL_ESTATE_PAIR_RULINGS M3,
+  // adopted here 2026-10-10), so the three pages share one vocabulary. Each
+  // scenario moves bitcoin's multiple of the trend in a straight line from
+  // today's to a target at the horizon end, and the price is that multiple
+  // times the trend then:
+  //   floor → PL_FLOOR (0.42×)   the channel's lower bound, drawn faintly always
+  //   stay  → today's multiple  no reversion either way (the default)
+  //   trend → 1.0×              the gap to trend closes by the horizon end
+  //   upper → 2.5×              an upside case, not a forecast
+  // Was (to 2026-10-10): stay / trend (the default, "central case") / upper,
+  // each a constant-CAGR path to its end point, with Upper's tooltip calling
+  // 2.5× "the historical above-cycle peak". The record says otherwise (cycle
+  // peaks of 12×, 5.4×, 3.2× and, so far this cycle, 1.2×; upperRecordText()
+  // below), and the default assumed the gap to trend closes (TECH_DEBT,
+  // "Bitcoin scenario vocabulary", closed 2026-10-10).
   function currentTrendPrice(){ return window.plPrice(window.TODAY_DAYS); }
   function currentMultiple(){ return window.TODAY_PRICE / currentTrendPrice(); }
-  var SCENARIO_TARGET_MULT = { stay: null /* uses current multiple */, trend: 1.0, upper: 2.5 };
-
+  var UPPER_TARGET = 2.5;
+  var SCENARIO_NAMES = {   // for the chart caption: "…if <name> (about X% a year…)"
+    floor: 'bitcoin drifts to the floor',
+    stay:  'today’s gap to trend persists',
+    trend: 'bitcoin reverts to trend',
+    upper: 'bitcoin peaks at 2.5× trend'
+  };
+  function scenarioTarget(scenario, m0){
+    if (scenario === 'stay') return m0;
+    if (scenario === 'floor') return (typeof window.PL_FLOOR === 'number') ? window.PL_FLOOR : 0.42;
+    if (scenario === 'upper') return UPPER_TARGET;
+    return 1.0;
+  }
+  // Price t years from now: the multiple moves in a straight line from
+  // today's to the scenario's target over the horizon, times the trend at
+  // t. 365.25-day years, as on the real-estate pair (rulings M10).
+  function scenarioPrice(scenario, t, horizon){
+    var m0 = currentMultiple();
+    var p = Math.min(t / Math.max(1, horizon), 1);
+    var mult = m0 + (scenarioTarget(scenario, m0) - m0) * p;
+    return mult * window.plPrice(window.TODAY_DAYS + t * 365.25);
+  }
+  // The implied annual growth the chips and caption show: today's price to
+  // the horizon-end price as one constant rate. The path between is not
+  // constant: the trend's own growth slows over time.
   function resolveScenarioCagr(scenario, horizon){
-    var endDays = window.TODAY_DAYS + horizon * 365;
-    var endTrend = window.plPrice(endDays);
-    var targetMult = (scenario === 'stay') ? currentMultiple() : SCENARIO_TARGET_MULT[scenario];
-    if (targetMult == null || !isFinite(targetMult)) return 0;
-    var terminalPrice = targetMult * endTrend;
-    return Math.pow(terminalPrice / window.TODAY_PRICE, 1 / horizon) - 1;
+    if (!(horizon > 0) || !(window.TODAY_PRICE > 0)) return 0;
+    return Math.pow(scenarioPrice(scenario, horizon, horizon) / window.TODAY_PRICE, 1 / horizon) - 1;
   }
 
+  // Upper's record, computed from the price series so it can't go stale:
+  // each past cycle's peak multiple of trend and this cycle's peak so far,
+  // read from SpikeRecord (shared/spike-record.js), the record Bitcoin's
+  // Spikes and Disciplined Rebalancing use. Worded as the real-estate pair
+  // words it (RealEstateModel.upperRecordText), from 2013 on as there:
+  // "past cycle peaks reached at least 12× trend (2013), 5.4× (2017) and
+  // 3.2× (2021), each lower than the last and none sustained; the peak so far
+  // in this cycle is 1.2× (December 2024)". "At least" because the series is
+  // sampled about every 12 days, so the samples are lower bounds.
+  function upperRecordText(){
+    var SR = window.SpikeRecord;
+    if (!SR || typeof SR.record !== 'function') return '';
+    var R = SR.record().filter(function(r){ return r.y !== '2011' && isFinite(r.spikeM); });
+    var past = R.filter(function(r){ return !r.open; });
+    var cur = R.filter(function(r){ return r.open; })[0];
+    if (past.length < 2) return '';
+    function x(m){ return (m >= 10 ? m.toFixed(0) : m.toFixed(1)) + '×'; }
+    var parts = past.map(function(r, i){ return x(r.spikeM) + (i === 0 ? ' trend' : '') + ' (' + r.y + ')'; });
+    var list = parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1];
+    var falling = past.every(function(r, i){ return i === 0 || r.spikeM < past[i - 1].spikeM; }) &&
+                  (!cur || cur.spikeM < past[past.length - 1].spikeM);
+    var when = '';
+    if (cur && typeof window.GENESIS_TS === 'number') {
+      when = ' (' + new Date((window.GENESIS_TS + cur.spikeD * 86400) * 1000)
+        .toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }) + ')';
+    }
+    return 'past cycle peaks reached at least ' + list +
+           (falling ? ', each lower than the last and none sustained' : ', none sustained') +
+           (cur ? '; the peak so far in this cycle is ' + x(cur.spikeM) + when : '');
+  }
+
+  // Per-scenario tooltips, worded as on Bitcoin vs. Rental Property (rulings
+  // M3): Trend carries the ruled sentence verbatim; Stay is worded for
+  // bitcoin's position without judging it; Floor's record matches The Floor.
+  // One change for this page: Upper says "an upside case to test the income
+  // path against" where the rental page says "a stress test", because here
+  // "stress" already names the drawdown presets below.
+  function scenarioTipHTML(scenario){
+    if (scenario === 'stay') {
+      var mult = currentMultiple();
+      var base = 'Bitcoin keeps today’s multiple of the Power Law trend (' + mult.toFixed(2) + '×), so it grows at the trend’s own rate from today’s price. No reversion is assumed in either direction. This is the default.';
+      if (mult < 0.95) return base + ' Bitcoin is below trend today, so this assumes the gap stays open; Reverts to trend assumes it closes.';
+      if (mult > 1.05) return base + ' Bitcoin is above trend today, so this assumes the premium persists; Reverts to trend assumes it closes.';
+      return base + ' Bitcoin is close to trend today, so this and Reverts to trend give similar results.';
+    }
+    if (scenario === 'trend') {
+      return 'Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing.';
+    }
+    if (scenario === 'floor') {
+      return 'Bitcoin’s multiple moves in a straight line from today’s to 0.42× the Power Law trend, the channel’s lower bound, by the end of the horizon. Price has approached the floor three times since the genesis era and gone below it by 5.1% at most (2015), and each time it moved back above; the one deep breach, 42.6% below, was in 2010, in the genesis era (<a href="/the-bitcoin-floor">see The Floor</a>). Drawn faintly on the chart whichever scenario you pick.';
+    }
+    if (scenario === 'upper') {
+      var rec = upperRecordText();
+      return 'Bitcoin’s multiple moves in a straight line from today’s to 2.5× the Power Law trend by the end of the horizon: an upside case to test the income path against, not a forecast.' +
+             (rec ? ' For scale, ' + rec + '.' : '') +
+             ' Worth modeling as a possible window for disciplined rebalancing or partial divestment: see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
+    }
+    return '';
+  }
+
+  // Chip rates and tooltips. Re-runs on load, on horizon changes and when
+  // the live price arrives, so Stay's wording and every rate follow today's
+  // multiple.
   function refreshScenarioCagrs(){
     var chips = document.querySelectorAll('.calc-cagr-chip');
     chips.forEach(function(chip){
@@ -122,6 +213,11 @@
       var cagr = resolveScenarioCagr(scenario, state.horizon);
       var rateEl = chip.querySelector('[data-chip-rate]');
       if (rateEl) rateEl.textContent = '~' + Math.round(cagr * 100) + '% CAGR';
+      var tipEl = chip.querySelector('.calc-chip-help .tip-content');
+      if (tipEl) {
+        var html = scenarioTipHTML(scenario);
+        if (html) tipEl.innerHTML = html;
+      }
       if (scenario === state.btcScenario) state.btcCagr = cagr;
     });
   }
@@ -209,9 +305,9 @@
   bindSlider('positionSlider',   'val-position',   'position',   Number, fmtCurrency);
   bindSlider('horizonSlider',    'val-horizon',    'horizon',    Number, fmtYears);
 
-  // Horizon change must also re-derive the scenario CAGRs (their implied rates
-  // depend on horizon: longer horizons give reversion more time to play out,
-  // shifting the "Revert to trend" and "Reach upper" rates).
+  // Horizon change must also re-derive the chips' implied rates (they depend
+  // on the horizon: the trend's growth slows over time, and a target reached
+  // over a longer horizon shifts every scenario but Stay less per year).
   var horizonSliderEl = document.getElementById('horizonSlider');
   if (horizonSliderEl) horizonSliderEl.addEventListener('input', refreshScenarioCagrs);
 
@@ -246,7 +342,15 @@
       recalc();
     });
   });
-  // Initial CAGR render
+  // A chip's ? opens its tooltip (which can hold a link) without selecting
+  // the chip, as on Bitcoin vs. Rental Property.
+  document.querySelectorAll('.calc-cagr-chip .calc-chip-help').forEach(function(help){
+    help.addEventListener('click', function(e){ e.stopPropagation(); });
+    help.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+    });
+  });
+  // Initial render of the chips' rates and tooltips
   refreshScenarioCagrs();
 
   wireButtonGroup('.path-btn', 'incomePath', 'data-path');
@@ -277,7 +381,6 @@
   function computePaths(){
     var years = state.horizon;
     var infl = state.inflation / 100;
-    var btcCagr = state.btcCagr;
     var path = PATHS[state.incomePath] || PATHS.strc;
     var taxBracket = state.taxBracket / 100;
     var ltcgRate = state.ltcgRate / 100;
@@ -354,60 +457,74 @@
     }
 
     // === Bitcoin sell-as-needed path ===
-    // Convert position to BTC at today's price. Apply CAGR with optional stress overlay.
-    // Sell BTC each year to fund income need (nominal-inflated). Pay LTCG on gain.
-    var spotPrice = window.TODAY_PRICE;
-    var btcUnits = state.position / spotPrice;
-    var btcPriceTrajectory = [spotPrice];
-    var btcPrice = spotPrice;
-    var btcCostBasis = state.position;
-    var nominalBtcPath = [state.position];
-    var realBtcPath = [state.position];
-    var btcSoldPerYear = [];   // nominal USD value of BTC sold to fund need + tax each year
+    // Convert the position to bitcoin at today's price. The price follows the
+    // scenario's path (scenarioPrice: the multiple of trend moves in a
+    // straight line to the scenario's target, rulings M3; was a constant-CAGR
+    // path to the same end point), with the optional stress overlay on top.
+    // Sell bitcoin each year to fund the income need (inflated) and the tax
+    // on the gain. Run for the selected scenario, and for Drifts to the
+    // floor, which the chart always draws faintly (M3).
+    function btcSellAsNeeded(scenario){
+      var spotPrice = window.TODAY_PRICE;
+      var btcUnits = state.position / spotPrice;
+      var btcPriceTrajectory = [spotPrice];
+      var btcPrice = spotPrice;
+      var btcCostBasis = state.position;
+      var nominalBtcPath = [state.position];
+      var realBtcPath = [state.position];
+      var btcSoldPerYear = [];   // nominal USD value of BTC sold to fund need + tax each year
 
-    // Apply stress: drawdown happens in months 1..duration, recovery linear after that to trend
-    var stressDuration = state.stressDurationMonths / 12;
-    var stressMax = state.stressDrawdown;
+      // Apply stress: drawdown happens in months 1..duration, recovery linear after that to trend
+      var stressDuration = state.stressDurationMonths / 12;
+      var stressMax = state.stressDrawdown;
 
-    for (var y2 = 1; y2 <= years; y2++){
-      // Trend price (this is the scenario CAGR projection, not the Power Law trend)
-      var trendPrice = spotPrice * Math.pow(1 + btcCagr, y2);
-      // Apply stress overlay
-      var stressFactor = 1;
-      if (stressMax > 0 && y2 <= stressDuration * 2){
-        if (y2 <= stressDuration){
-          // Drawdown phase: linear to peak
-          stressFactor = 1 - stressMax * (y2 / stressDuration);
-        } else {
-          // Recovery phase
-          var recoveryProgress = (y2 - stressDuration) / stressDuration;
-          stressFactor = 1 - stressMax * (1 - recoveryProgress);
+      for (var y2 = 1; y2 <= years; y2++){
+        // The scenario's price this year (before any stress overlay)
+        var scenarioPx = scenarioPrice(scenario, y2, years);
+        // Apply stress overlay
+        var stressFactor = 1;
+        if (stressMax > 0 && y2 <= stressDuration * 2){
+          if (y2 <= stressDuration){
+            // Drawdown phase: linear to peak
+            stressFactor = 1 - stressMax * (y2 / stressDuration);
+          } else {
+            // Recovery phase
+            var recoveryProgress = (y2 - stressDuration) / stressDuration;
+            stressFactor = 1 - stressMax * (1 - recoveryProgress);
+          }
         }
+        btcPrice = scenarioPx * stressFactor;
+
+        // Sell BTC to fund income need this year
+        var needThisYearBtc = state.incomeNeed * Math.pow(1 + infl, y2 - 1);
+        var btcToSell = needThisYearBtc / btcPrice;
+
+        // Tax on gain portion of the sale
+        var avgBasisPerBtc = btcUnits > 0 ? btcCostBasis / btcUnits : 0;
+        var gainPerBtc = btcPrice - avgBasisPerBtc;
+        var totalGain = Math.max(0, gainPerBtc * btcToSell);
+        var btcSaleTax = totalGain * ltcgRate;
+        // Sell enough additional BTC to cover the tax
+        var extraSale = btcSaleTax / btcPrice;
+        btcToSell += extraSale;
+
+        btcSoldPerYear.push(btcToSell * btcPrice);
+        btcUnits = Math.max(0, btcUnits - btcToSell);
+        btcCostBasis = Math.max(0, btcCostBasis - (avgBasisPerBtc * btcToSell));
+
+        var nominalWealth = btcUnits * btcPrice;
+        nominalBtcPath.push(nominalWealth);
+        realBtcPath.push(nominalWealth / Math.pow(1 + infl, y2));
+        btcPriceTrajectory.push(btcPrice);
       }
-      btcPrice = trendPrice * stressFactor;
-
-      // Sell BTC to fund income need this year
-      var needThisYearBtc = state.incomeNeed * Math.pow(1 + infl, y2 - 1);
-      var btcToSell = needThisYearBtc / btcPrice;
-
-      // Tax on gain portion of the sale
-      var avgBasisPerBtc = btcUnits > 0 ? btcCostBasis / btcUnits : 0;
-      var gainPerBtc = btcPrice - avgBasisPerBtc;
-      var totalGain = Math.max(0, gainPerBtc * btcToSell);
-      var btcSaleTax = totalGain * ltcgRate;
-      // Sell enough additional BTC to cover the tax
-      var extraSale = btcSaleTax / btcPrice;
-      btcToSell += extraSale;
-
-      btcSoldPerYear.push(btcToSell * btcPrice);
-      btcUnits = Math.max(0, btcUnits - btcToSell);
-      btcCostBasis = Math.max(0, btcCostBasis - (avgBasisPerBtc * btcToSell));
-
-      var nominalWealth = btcUnits * btcPrice;
-      nominalBtcPath.push(nominalWealth);
-      realBtcPath.push(nominalWealth / Math.pow(1 + infl, y2));
-      btcPriceTrajectory.push(btcPrice);
+      return { nominalBtcPath: nominalBtcPath, realBtcPath: realBtcPath,
+               btcSoldPerYear: btcSoldPerYear, btcPriceTrajectory: btcPriceTrajectory };
     }
+    var btcRun = btcSellAsNeeded(state.btcScenario);
+    var nominalBtcPath = btcRun.nominalBtcPath;
+    var realBtcPath = btcRun.realBtcPath;
+    var btcSoldPerYear = btcRun.btcSoldPerYear;
+    var realFloorPath = (state.btcScenario === 'floor') ? null : btcSellAsNeeded('floor').realBtcPath;
 
     // Crossover detection
     var crossoverYear = null;
@@ -441,6 +558,7 @@
     return {
       realIncomePath: realIncomePath,
       realBtcPath: realBtcPath,
+      realFloorPath: realFloorPath,     // null when Floor is the selected scenario
       nominalIncomePath: nominalIncomePath,
       nominalBtcPath: nominalBtcPath,
       dividendsPerYear: dividendsPerYear,
@@ -477,11 +595,16 @@
     if (captionEl){
       var msg = 'Wealth trajectory comparison in real terms (today\'s purchasing power). ';
       msg += 'Income path: ' + result.pathLabel + '. ';
-      msg += 'Bitcoin path: hold and sell-as-needed at ' + (state.btcCagr * 100).toFixed(0) + '% trend CAGR';
+      // The rate is computed here rather than read from state.btcCagr, which
+      // the horizon slider refreshes only after this render has run.
+      var rate = resolveScenarioCagr(state.btcScenario, state.horizon);
+      msg += 'Bitcoin path: hold and sell as needed, if ' + (SCENARIO_NAMES[state.btcScenario] || SCENARIO_NAMES.stay) +
+             ' (about ' + Math.round(rate * 100) + '% a year over ' + state.horizon + ' year' + (state.horizon === 1 ? '' : 's') + ')';
       if (state.stressDrawdown > 0){
-        msg += ' with ' + (state.stressDrawdown * 100).toFixed(0) + '% drawdown over ' + state.stressDurationMonths + ' months';
+        msg += ', with a ' + (state.stressDrawdown * 100).toFixed(0) + '% drawdown over ' + state.stressDurationMonths + ' months';
       }
       msg += '.';
+      if (state.btcScenario !== 'floor') msg += ' The faint line is the same path if bitcoin drifts to the floor.';
       captionEl.textContent = msg;
     }
   }
@@ -522,6 +645,21 @@
             pointRadius: 0,
             pointHoverRadius: 4,
             fill: false
+          },
+          {
+            // Drifts to the floor, drawn faintly whichever scenario is picked
+            // (rulings M3), so the low case is always in view. Emptied, and
+            // dropped from the legend, when Floor is the selected scenario.
+            label: 'Bitcoin, if it drifts to the floor (real USD)',
+            data: [],
+            borderColor: 'rgba(247, 147, 26, 0.5)',
+            backgroundColor: 'rgba(247, 147, 26, 0)',
+            borderWidth: 1.5,
+            borderDash: [2, 4],
+            tension: 0.2,
+            pointRadius: 0,
+            pointHoverRadius: 3,
+            fill: false
           }
         ]
       },
@@ -536,7 +674,11 @@
               color: '#c8c2b8',
               font: { family: 'Inter', size: 12 },
               boxWidth: 16,
-              padding: 14
+              padding: 14,
+              filter: function(item, data){
+                var ds = data.datasets[item.datasetIndex];
+                return !!(ds && ds.data && ds.data.length);
+              }
             }
           },
           tooltip: {
@@ -582,6 +724,7 @@
     chart.data.labels = labels;
     chart.data.datasets[0].data = result.realIncomePath;
     chart.data.datasets[1].data = result.realBtcPath;
+    chart.data.datasets[2].data = result.realFloorPath || [];
     chart.update('none');
   }
 
@@ -637,7 +780,7 @@
     incomeNeed:   60000,
     position:     1000000,
     horizon:      15,
-    btcScenario:  'trend',
+    btcScenario:  'stay',     // was 'trend' to 2026-10-10 (rulings M3 default)
     incomePath:   'strc',
     stressPreset: 'base'
   };
@@ -647,7 +790,7 @@
   };
   var SHARE_NUMERIC = { incomeNeed: true, position: true, horizon: true };
   var SHARE_VALID = {
-    btcScenario:  ['stay', 'trend', 'upper'],
+    btcScenario:  ['floor', 'stay', 'trend', 'upper'],
     incomePath:   ['strc', 'sata', 'treasury', 'igcorp'],
     stressPreset: ['base', 'mild', 'mreit', 'winter']
   };
