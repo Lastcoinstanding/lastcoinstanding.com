@@ -64,7 +64,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-power-law-head.html' %}"
   page_styles: "{% include '_pageassets/the-power-law.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-power-law.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/spike-record.js' %}\n{% include '_pageassets/the-power-law.js' %}"
 ---
 <div class="page">
   <div class="page-header">
@@ -116,9 +116,9 @@ eleventyComputed:
     <!-- INTERACTIVE CHART -->
     <div class="chart-container">
       <div class="chart-title">Bitcoin Price vs. Power Law Trend</div>
-      <div class="chart-subtitle">Log-log scale &middot; Daily prices since 2010 with trend, floor, and ceiling corridors</div>
+      <div class="chart-subtitle">Log-log scale &middot; Daily prices since 2010 with the trend, the floor and the upper band</div>
       <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="Bitcoin price vs. the Power Law trend"><canvas id="powerLawChart"></canvas></div>
-      <div class="chart-source">Model uses Porkopolis coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77). Floor &asymp; 0.42&times; trend. Ceiling &asymp; 3&times; trend. Genesis block: January 3, 2009. Price data: Blockchain.info.</div>
+      <div class="chart-source">Model uses Porkopolis coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77). Floor &asymp; 0.42&times; trend. Upper band &asymp; 3&times; trend. Genesis block: January 3, 2009. Price data: Blockchain.info.</div>
     </div>
 
     <!-- THE 13% INSIGHT -->
@@ -311,8 +311,8 @@ eleventyComputed:
     <!-- PRICE PROJECTION WIDGET -->
     <div class="section">
       <h2>Project a Future Date</h2>
-      <p class="prose">The model does not return a number, it returns a corridor &mdash; and the width of it is the finding. Floor, trend and ceiling for any year are three different statements about the same date, not one forecast with error bars. Slide to any date and read all three.</p>
-      <p class="prose">The floor represents the most conservative estimate (R&sup2; &gt; 0.99); the trend is the median fair value; the ceiling marks the historical upper boundary.</p>
+      <p class="prose">The model does not return a number, it returns a corridor &mdash; and the width of it is the finding. Floor, trend and upper band for any year are three different statements about the same date, not one forecast with error bars. Slide to any date and read all three.</p>
+      <p class="prose">The floor represents the most conservative estimate (R&sup2; &gt; 0.99); the trend is the median fair value. The upper band, 3&times; trend, is not a cap: price has spent about <span id="plBandAbovePct">8%</span> of the time since 2011 above it, all of it within months of a cycle peak, and went far past it in the early ones (14&times; trend in 2011, 12&times; in 2013).</p>
       <div class="proj-widget">
         <div class="proj-controls">
           <label>Year</label>
@@ -322,7 +322,7 @@ eleventyComputed:
         <div class="proj-results" id="projResults">
           <div class="proj-card"><div class="proj-label floor">Floor (0.42&times;)</div><div class="proj-price" id="projFloor">—</div><div class="proj-detail" id="projFloorDetail"></div></div>
           <div class="proj-card"><div class="proj-label trend">Trend (Fair Value)</div><div class="proj-price" id="projTrend">—</div><div class="proj-detail" id="projTrendDetail"></div></div>
-          <div class="proj-card"><div class="proj-label ceiling">Ceiling (3&times;)</div><div class="proj-price" id="projCeiling">—</div><div class="proj-detail" id="projCeilingDetail"></div></div>
+          <div class="proj-card"><div class="proj-label ceiling">Upper band (3&times;)</div><div class="proj-price" id="projCeiling">—</div><div class="proj-detail" id="projCeilingDetail"></div></div>
         </div>
       </div>
     </div>
@@ -331,10 +331,13 @@ eleventyComputed:
     <div class="caveats" id="caveats">
       <h3>What This Model Is &mdash; and Isn't</h3>
       <p>The Power Law is an empirical observation, not a physical law. It fits 15 years of data with remarkable consistency, but it is not derived from first principles the way gravitational equations are. Its creator, Giovanni Santostasi, describes Bitcoin as a stochastic system that oscillates around its trend &mdash; the model describes the trajectory, not any specific price on any specific day.</p>
-      <p>Projections become less reliable as they extend further into the future. The prediction corridor widens with the horizon, so projections carry more uncertainty the further out they run. Some econometricians argue that the high R&sup2; could partly reflect the fact that both price and time trend upward. The out-of-sample track record since 2014 is the strongest counter to this critique, but it remains a legitimate statistical concern.</p>
-      <p>There are two ways this model could break, and both belong on this page. <strong>Downward:</strong> a sustained daily close below the structural floor would disprove it outright. This falsifiability is a strength, not a weakness &mdash; the model makes a testable claim rather than an unfalsifiable assertion &mdash; and to date the floor has survived every major stress test, including the COVID crash and the FTX collapse.</p>
+      <p>Projections become less reliable as they extend further into the future. The prediction corridor widens with the horizon, so projections carry more uncertainty the further out they run. Some econometricians argue that the high R&sup2; could partly reflect the fact that both price and time trend upward. The out-of-sample record since 2016 (<a href="#when-reliable">above</a>) is the strongest counter to this critique, but it remains a legitimate statistical concern.</p>
+      <p>There are two ways this model could break, and both belong on this page. <strong>Downward:</strong> a sustained break of the floor would mean the model is failing its own test; the box below says exactly what counts, and nothing since the genesis era has come close. This falsifiability is a strength, not a weakness &mdash; the model makes a testable claim rather than an unfalsifiable assertion &mdash; and to date the floor has survived every major stress test, including the COVID crash and the FTX collapse.</p>
       <p><strong>Upward:</strong> the model could also break in Bitcoin's favour. Matthew Me&#x17E;inskis has argued that if Bitcoin's size and importance relative to fiat destabilize in a good way, adoption could turn genuinely exponential and pull price <em>above</em> the power-law channel rather than tracking along it. We grade this as speculation, not forecast &mdash; but monetary regime transitions, where a new money supplants an old one, have historically been fast and nonlinear once they tip. A site willing to say the model may break against us has earned the right to say it may break for us; both are stated with the same humility. Past adherence guarantees nothing in either direction. This page presents the Power Law as a structural framework, not as investment advice.</p>
     </div>
+
+    {% set wcv_here = 'power-law' %}
+    {% include 'components/what-would-change-my-view.njk' %}
 
     <!-- CREDITS -->
     <div class="credits">
@@ -576,13 +579,12 @@ eleventyComputed:
 
     <div class="section">
       <h3>Volatility Compression</h3>
-      <p class="prose">As Bitcoin matures, the magnitude of its price cycles compresses. Each successive cycle sees smaller percentage deviations from trend:</p>
+      <p class="prose">As Bitcoin matures, its spikes above trend shrink. Each cycle&rsquo;s peak has sat lower against the trend than the last:</p>
       <div class="insight-box">
-        <p>Cycle 1: Price peaked at roughly <strong>8&times;</strong> over trend.<br>
-        Cycle 2&ndash;3: Peaks at roughly <strong>4&ndash;5&times;</strong> over trend.<br>
-        Cycle 4: Price peaked at roughly <strong>2.5&times;</strong> over trend.</p>
+        <p id="plVcPeaks">2011: peaked at about <strong>14&times;</strong> trend.<br>2013: about <strong>12&times;</strong>.<br>2017: <strong>5.4&times;</strong>.<br>2021: <strong>3.2&times;</strong>.<br>2024&ndash;25: <strong>1.2&times;</strong> so far.</p>
       </div>
-      <p class="prose">This narrowing is a natural consequence of power law dynamics &mdash; as the network grows and matures, the system becomes more resistant to speculative swings. The same amount of new capital produces proportionally less price impact. Volatility doesn't disappear, but it compresses, transitioning Bitcoin from a nascent, hyper-volatile network toward a stable global monetary asset. Each cycle is less dramatic than the last.</p>
+      <p class="prose">This narrowing is a natural consequence of power law dynamics &mdash; as the network grows and matures, the system becomes more resistant to speculative swings. The same amount of new capital produces proportionally less price impact. Volatility doesn't disappear, but it compresses, transitioning Bitcoin from a nascent, hyper-volatile network toward a stable global monetary asset. Each cycle&rsquo;s spike is less dramatic than the last.</p>
+      <p class="prose">The compression is at the top, not the bottom. Each cycle&rsquo;s low has landed in the same zone against the trend, between <span id="plVcLowRange">0.40&times; and 0.56&times;</span>, close to the floor: <span id="plVcLows">0.46&times; (2012), 0.40&times; (2015), 0.56&times; (2019), 0.42&times; (2023) and 0.42&times; so far (2026)</span>. Falls from the price high have shrunk because the highs are lower, not because the lows are higher. <a href="/bitcoin-spikes#record">Bitcoin&rsquo;s Spikes</a> measures every spike and low.</p>
     </div>
 
     <div class="section">
@@ -611,7 +613,7 @@ eleventyComputed:
 
     <div class="section">
       <h2>The Channel</h2>
-      <p class="prose">The Power Law isn't a single price line &mdash; it's a <em>channel</em>. A structured corridor with a conservative floor at 0.42&times; trend, the central trend itself, and an upper boundary at 3&times; trend. Bitcoin oscillates inside this channel: hugging the floor in deep drawdowns, spiking against the upper band in euphoria, returning to trend across the cycle. The chart below shows the channel across Bitcoin's lifetime, with daily price overlaid.</p>
+      <p class="prose">The Power Law isn't a single price line &mdash; it's a <em>channel</em>. A structured corridor with a conservative floor at 0.42&times; trend, the central trend itself, and an upper band at 3&times; trend. Bitcoin spends most of its time inside this channel, hugging the floor in deep drawdowns and returning to trend across the cycle. At the peaks of cycles it has spiked to the upper band and past it: far past it in the early cycles (12&times; trend in 2013), barely in 2021 (3.2&times;), and not at all in 2024&ndash;25. The chart below shows the channel across Bitcoin's lifetime, with daily price overlaid.</p>
       <p class="prose">Toggle the time axis below to see the same model two ways. <strong>Linear time</strong> shows the bands as expanding curves &mdash; the lived experience of Bitcoin's price. <strong>Logarithmic time</strong> collapses them into straight lines &mdash; the underlying mathematics. Both views are correct. They are the same Power Law rendered in different coordinate systems.</p>
     </div>
 

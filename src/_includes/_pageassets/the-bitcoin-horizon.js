@@ -603,3 +603,34 @@ document.getElementById('periodSlider').addEventListener('input', e => {
 });
 
 setPreset('2021-11');
+
+
+// ═══════ THE SPIKE RECORD (2026-10-11) ═══════
+// "Volatility is compressing, at the top" reads Bitcoin's Spikes' record
+// (shared/spike-record.js) so its figures match that page and follow the
+// data: each cycle's spike, the falling-ceiling fit through the first three
+// spikes against what came after, and the range of the cycle lows. The HTML
+// carries the 2026-10-11 values as first paint.
+(function () {
+  var SR = window.SpikeRecord;
+  if (!SR || typeof SR.record !== 'function') return;
+  function x(m) { return (m >= 10 ? m.toFixed(0) : m.toFixed(1)) + '\u00d7'; }
+  function set(id, t) { var el = document.getElementById(id); if (el && t) el.textContent = t; }
+  var R = SR.record();
+  if (R.length > 1) {
+    var parts = R.map(function (r, i) {
+      return (i === 0 ? 'about ' : '') + x(r.spikeM) + (i === 0 ? ' trend' : '') + ' ' + (r.open ? 'so far ' : '') + 'in ' + r.y;
+    });
+    set('hzPeaks', parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1]);
+  }
+  var c = SR.fallingCeiling();
+  if (c && c.later && c.later.length >= 2) {
+    set('hzCurve0', x(c.later[0].projected)); set('hzCurve1', x(c.later[1].projected));
+    set('hzActual0', x(c.later[0].actual)); set('hzActual1', x(c.later[1].actual));
+  }
+  var lows = SR.cycleLows();
+  if (lows.length) {
+    var ms = lows.map(function (l) { return l.m; });
+    set('hzLowRange', Math.min.apply(null, ms).toFixed(2) + '\u00d7 and ' + Math.max.apply(null, ms).toFixed(2) + '\u00d7');
+  }
+})();

@@ -1,0 +1,62 @@
+{#-
+  ════════ WHAT WOULD CHANGE MY VIEW ════════
+
+  The four falsifiers, shared by the three pages that lean on the power law's
+  channel (SPIKES_PAGE_DESIGN §6.5; TECH_DEBT "Power Law: 'what would change
+  our view' box", closed 2026-10-11). One list, so the pages can't drift:
+  before this component, The Floor, The Power Law and Bitcoin's Spikes each
+  stated a floor break differently ("a sustained daily close below", "longer
+  than any precedent", 10% for 30 days, six months).
+
+  The thresholds are not set here. Item 1 restates the two that were already
+  ruled: The Bitcoin Floor's tripwire (a close more than 10% below the floor
+  for more than 30 consecutive days, on daily closes) and The Power Law's
+  monthly check 1 (below the floor for more than six months in a row, fixed
+  2026-09-23). Item 2 is The Power Law's check 2 (a full-record refit putting
+  today's trend outside 0.68x-1.24x the reference line). Change them there
+  first, then here.
+
+  Usage, with the host page named ('floor', 'power-law' or 'spikes') so it
+  doesn't link to itself:
+      {% set wcv_here = 'floor' %}
+      {% include 'components/what-would-change-my-view.njk' %}
+
+  Built on the series strips' pattern: its own scoped <style>, every selector
+  prefixed `wcv-`, colours as vars with literal fallbacks (host palettes
+  differ). Styled as the Spikes box it replaces (gold frame, gold eyebrow).
+  880px wide like the hosts' prose: centred on Spikes and The Power Law,
+  left-aligned on The Floor, whose sections are left-aligned (`.wcv--left`).
+-#}
+{%- set wcvHere = wcv_here | default('') -%}
+<style>
+.wcv { max-width: 880px; margin: 1.6rem auto; padding: 1.1rem 1.3rem; border: 1px solid var(--gold, #d4a843); border-radius: 12px; background: rgba(212,168,67,0.05); box-sizing: border-box; text-align: left; }
+.wcv--left { margin-left: 0; margin-right: 0; }
+.wcv-eyebrow { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold, #d4a843); margin: 0 0 0.35rem; }
+.wcv-list { margin: 0.3rem 0 0; padding-left: 1.1rem; }
+.wcv-list li { margin: 0.45rem 0; line-height: 1.6; }
+.wcv-note { display: block; margin-top: 0.15rem; font-size: 0.88em; color: var(--text-dim, #9a9080); }
+.wcv a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(224,148,34,0.45); text-underline-offset: 2px; }
+.wcv a:hover { text-decoration-color: var(--amber, #e09422); }
+@media (max-width: 560px) { .wcv { padding: 0.95rem 1rem; } }
+</style>
+<aside class="wcv{% if wcvHere == 'floor' %} wcv--left{% endif %}" aria-labelledby="wcvHead">
+  <div class="wcv-eyebrow" id="wcvHead">What would change my view</div>
+  <ul class="wcv-list">
+    <li>A real break of the floor: price more than 10% below it for more than 30 days in a row, or below it at all for more than six months in a row. Since the genesis era the deepest dip went 5.1% below the line, in 2015, and price was back above it within weeks.
+      <span class="wcv-note">
+      {%- if wcvHere == 'floor' %}The first test is this page&rsquo;s tripwire, above, judged on daily closes; <a href="/the-power-law#when-reliable">The Power Law</a> checks the second every month.
+      {%- elif wcvHere == 'power-law' %}<a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> watches the first on daily closes; this page checks the second every month (<a href="#when-reliable">check 1</a>).
+      {%- else %}<a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> watches the first on daily closes; <a href="/the-power-law#when-reliable">The Power Law</a> checks the second every month.
+      {%- endif %}</span></li>
+    <li>The fitted trend moving materially as new data arrives: a refit over the whole record that puts today&rsquo;s trend outside 0.68&times;&ndash;1.24&times; the reference line, the range every fit since 2016 has stayed inside.
+      <span class="wcv-note">
+      {%- if wcvHere == 'power-law' %}Checked every month on this page (<a href="#when-reliable">check 2</a>).
+      {%- else %}Checked every month on <a href="/the-power-law#when-reliable">The Power Law</a>.
+      {%- endif %}</span></li>
+    <li>A breakaway that shows in dollars but not in gold or real terms. That would be a dollar story, not a bitcoin one.
+      {%- if wcvHere != 'spikes' %}
+      <span class="wcv-note">The test is <a href="/bitcoin-spikes#different">the denominator test on Bitcoin&rsquo;s Spikes</a>.</span>
+      {%- endif %}</li>
+    <li>Spikes stopping entirely while the trend flattens, the pattern of an S-curve reaching its top.</li>
+  </ul>
+</aside>
