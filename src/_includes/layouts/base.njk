@@ -145,35 +145,32 @@ input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
    A two-line lockup INSIDE the existing row: wordmark + tagline stack to ~30px,
    well under the 65px desktop / 55px mobile nav height, and the tagline is
    narrower than the wordmark, so the row's height and width are both unchanged
-   (measured, per page, at 375 / 1100 / 1280 / 1440px). It follows the mark's
-   fence below: hidden in the 769–1099px band where the wordmark already wraps. */
+   (measured, per page, at 375 / 1100 / 1280 / 1440px). It shows wherever the
+   mark does, which since 2026-10-11 is every width (see the menu-button note
+   below). */
 .site-nav .brand-text { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
 /* Tagline: Inter italic, not Cormorant (JM 2026-10-02, legibility). Cormorant's
    thin strokes and small x-height broke up at ~14px under the wordmark; Inter is
    the site's text face, so its italic holds at 12px. Full amber, not 85%. Pages
    that load Inter italic 400 but not 500 fall back to 400, which reads the same. */
 .site-nav .brand-tagline { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-style: italic; font-weight: 500; font-size: 0.95em; letter-spacing: 0.03em; text-transform: none; color: #e09422; margin-top: 0.15em; white-space: nowrap; }
-/* The mid-width band, and why the mark steps aside in it.
-   MEASURED ON THE DEPLOYED SITE, not inferred: the desktop nav row has no
-   headroom. The wordmark ALREADY wraps to two lines somewhere between 900px
-   and 1000px WITHOUT the mark, growing the nav 65px -> 90px, and several pages
-   hardcode sticky offsets against the 65px single-line height (SITE_GUIDE §47).
-   Adding the mark costs the brand ~42px and moves that break point out to
-   between 1040px and 1060px — roughly 100px more of broken nav, which is a
-   regression this project has no mandate to ship.
-   So the mark is shown only where it demonstrably fits: at or below 768px the
-   links are already a hamburger and the brand has the row to itself (measured
-   at 375px: no wrap, 75px of clearance to the hamburger), and at 1100px and up
-   there is room with 40px of margin over the measured threshold. Between them
-   it hides, and the nav keeps exactly today's geometry.
-   This fences a KNOWN defect; it does not fix it. The fix — collapsing the
-   wordmark to the mark so both always fit — belongs to the nav-capacity
-   project (PAGE_IDEAS_BACKLOG, "Desktop nav capacity + The Dashboard entry"),
-   which owns that decision and carries the measurement table for it. */
-@media (min-width: 769px) and (max-width: 1099px) {
-  .site-nav .brand-mark { display: none; }
-  .site-nav .brand-tagline { display: none; }
-}
+/* The menu button takes over below 1100px (JM's ruling 2026-10-11, option A;
+   PAGE_IDEAS_BACKLOG, "Desktop nav capacity + The Dashboard entry").
+   MEASURED ON THE DEPLOYED SITE before the change (15 pages x 15 widths): with
+   the links in the row from 769px, the wordmark wrapped to two lines on every
+   page from 769px to about 950px, growing the nav 65px -> 90px, and at
+   769-800px the last link ("About") ran past the edge, where the site-wide
+   `overflow-x: clip` hid it. The mark and the tagline were fenced out of
+   769-1099px for the same lack of room.
+   Now the links live in the menu below 1100px, as they already did at phone
+   widths, and the brand shows its full lockup (mark, wordmark, tagline) at
+   every width. At 1100px and up the row has the measured room for the lockup
+   and all six items (69-128px to spare at 1100px, by page). A seventh item
+   (about 115px) does not fit at 1100px: raise this breakpoint to roughly
+   1200px before adding one, and re-measure on the deploy.
+   Rejected: keeping the links down to 1000px (the brand would drop its mark and
+   tagline at 1000-1099px) or to 880px with the coin mark alone (no name or
+   tagline at 880-1099px). Comparison image and measurements in the PR. */
 .site-nav .nav-links { display: flex; gap: 8px; align-items: center; }
 .site-nav .nav-links a { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.9rem; font-weight: 500; color: #aaa; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
 .site-nav .nav-links a:hover { color: #ccc; background: rgba(255,255,255,0.04); }
@@ -278,7 +275,7 @@ input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
    the row shape. Indented one step (44px) under the 32px group sub-labels; the
    badge/marker stay inline with their own title only. */
 .mobile-overlay .m-acc-panel a { display: block; width: 100%; padding: 11px 32px 11px 44px; font-size: 1rem; text-align: left; border-radius: 6px; }
-@media (max-width: 768px) {
+@media (max-width: 1099px) {   /* was 768px until 2026-10-11; see the menu-button note above */
   .site-nav .nav-links { display: none; }
   .hamburger { display: block; }
 }
@@ -679,13 +676,11 @@ h1, h2, h3 {
         </div>
         {#- NO dashboard anchor here — deliberate, see the mobile-overlay note below
             and PAGE_IDEAS_BACKLOG "Desktop nav capacity + The Dashboard entry".
-            This row is a nowrap flex whose only shrinkable neighbour is .brand, and
-            it has no headroom left: adding a 7th item (115px) wraps the wordmark and
-            grows the nav 65px → 90px below ~1150px, then overflows and clips "About"
-            below ~919px (the hamburger does not take over until ≤768px, and
-            `overflow-x: clip` hides the spill rather than exposing it). The nav
-            height matters beyond looks — several pages hardcode sticky offsets
-            against 65px. Capacity has to be made before this row gains an item. -#}
+            This row is a nowrap flex whose only shrinkable neighbour is .brand. It
+            shows at 1100px and up (the menu button takes over below that, since
+            2026-10-11), and at 1100px it has 69-128px to spare with the full brand
+            lockup, by page: a 7th item (about 115px) would wrap the wordmark there.
+            Raise the menu-button breakpoint (to roughly 1200px) first. -#}
         <a href="/the-gallery"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
         <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About</a>

@@ -92,7 +92,9 @@
 /* ─── Sticky sentence ─── */
 .bd-sticky-wrap {
     position: sticky;
-    top: 65px;  /* sit just below the site-nav which is sticky at top:0, height ~65px */
+    top: var(--bd-nav-h, 65px);  /* just below the sticky site-nav; its height is measured by
+                                    bitcoin-defined.js (was a fixed 65px until 2026-10-11, which
+                                    left a gap under the 59px phone nav) */
     z-index: 50;
     background: linear-gradient(180deg, var(--bd-bg) 0%, var(--bd-bg) 85%, rgba(8,8,8,0.92) 100%);
     border-bottom: 1px solid rgba(247,147,26,0.06);
