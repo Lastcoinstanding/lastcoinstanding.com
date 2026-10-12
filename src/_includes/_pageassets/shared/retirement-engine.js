@@ -20,18 +20,34 @@
    claims to agree with would be invisible in exactly the place the page
    is supposed to be authoritative.
 
-   NOT YET ADOPTED BY THE OTHER THREE PAGES. This module is currently
-   loaded only by /compare-retirement-plans. Repointing the flagship, EV
-   and the Stress Test at it is the obvious follow-up and is filed as
-   such — it was out of scope for the batch this shipped in (no edits to
-   the three existing family pages). Until that lands, the guarantee
-   that this module agrees with them is carried by the golden vectors in
-   crpParityQA() (compare-retirement-plans.js), captured from the
-   deployed Escape Velocity page.
+   ADOPTED BY ALL FOUR FAMILY PAGES since 2026-08-26 (PR #93): the
+   flagship, Escape Velocity, Compare and the Stress Test all run this
+   module, and The Rundown's P1 reads its solver. (Until then only Compare
+   loaded it; this note said so until 2026-10-11.)
+
+   THE PRICE PATHS (DEFAULTS_POLICY_2026-10-11, PR B; JM 2026-10-11).
+   Every path starts at TODAY'S PRICE and is a multiple of the Power Law
+   trend, year by year (pathMultiple):
+     stay   today's multiple for the whole plan, so bitcoin grows at the
+            trend's own rate ("If bitcoin stays 47% below trend").
+     trend  the multiple moves in a straight line from today's to 1.0x over
+            3 years (PriceCases.REVERT_YEARS), then follows the trend ("If
+            bitcoin returns to trend over 3 years"). Until 2026-10-11 this
+            basis re-set the price to trend at year 0, which valued a stack
+            held today at the trend price, not the market's.
+     floor  a stress test, not a scenario: the multiple falls in a straight
+            line to the floor (0.42x) over the same 3 years and stays there.
+            It replaces the retired sitewide growth-model setting, whose
+            Floor put the whole plan, today included, at 0.42x.
+   'current' is the old name for 'stay', kept for links (?basis=current)
+   and callers; a 'trend' call with growthKey 'powerlaw-floor' is 'floor'.
+   The pages pick the default (the lower of the two scenarios) with
+   PriceCases.defaultFor; this module only computes.
 
    Depends on (loaded before this file): shared/power-law-data.js
-   (PL_A/PL_B/PL_FLOOR/plPrice/TODAY_PRICE) and
-   shared/modeling-assumptions.js (window.ModelingAssumptions).
+   (PL_A/PL_B/PL_FLOOR/plPrice/TODAY_PRICE), shared/reversion-durations.js
+   and shared/price-cases.js (window.PriceCases: REVERT_YEARS and the
+   return path), and shared/modeling-assumptions.js (inflation).
    Pure — no DOM, no page state. Exposes window.RetirementEngine.
    ============================================================= */
 (function () {
@@ -63,6 +79,25 @@
     return (t > 0) ? (TODAY_PRICE / t) : 1;
   }
 
+  /* ─── The price paths (see the header). `tYears` is whole years from this
+         year: dateForYear keeps today's month and day, so year y is exactly
+         y − this year from today. At t = 0 every path is today's multiple,
+         so a stack held today is valued at the market's price. ─── */
+  var PC = window.PriceCases || null;
+  var REVERT_YEARS = PC ? PC.REVERT_YEARS : 3;
+  function normBasis(basis, growthKey) {
+    if (basis === 'current' || basis === 'stay') return 'stay';
+    if (basis === 'floor' || growthKey === 'powerlaw-floor') return 'floor';
+    return 'trend';
+  }
+  function pathMultiple(basis, m0, tYears) {
+    var b = normBasis(basis);
+    if (b === 'stay') return m0;
+    var p = Math.max(0, Math.min(1, tYears / REVERT_YEARS));
+    if (b === 'floor') return m0 + (PL_FLOOR - m0) * p;
+    return PC ? PC.multipleAt('trend', m0, 0, tYears) : m0 + (1 - m0) * p;
+  }
+
   /* ═══════════════════════════════════════════════════════════
      THE PROJECTION — ONE LOOP, four optional legs.
 
@@ -92,12 +127,18 @@
      modelled date — so adopting the safest of the three variants costs
      nothing and removes the divergence rather than preserving it.
 
-     opts: { multiplier, multFn, plotAccumulation, flexPct }
+     opts: { multiplier, multFn, plotAccumulation, flexPct, pathFn }
        multiplier        scalar price multiplier (default 1)
        multFn            per-year multiplier fn; overrides `multiplier`
        plotAccumulation  pre-retirement years carry a value, not null
        flexPct           cut withdrawals by this % in any year the price
                          path is below par (multFn(y) < 1)
+       pathFn            per-year MULTIPLE OF TREND (the price paths,
+                         2026-10-11): price = trend × pathFn(y) × multFn(y),
+                         and growthModelKey and `multiplier` are ignored.
+                         Kept apart from multFn on purpose: the spending cut
+                         binds to the crash (multFn < 1), never to a path
+                         that sits below trend.
   ═══════════════════════════════════════════════════════════ */
   function projectCore(scenario, growthModelKey, inflationPct, opts) {
     opts = opts || {};
@@ -108,13 +149,16 @@
       ? 1 : opts.multiplier;
     var multFn = opts.multFn || null;
     var flexPct = opts.flexPct || 0;
+    var pathFn = opts.pathFn || null;
 
     var stackBtc = scenario.btcStack;
     var points = [], btcPoints = [], depletionYear = null;
 
     for (var y = startYear; y <= endYear; y++) {
       var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growthModelKey) * (multFn ? multFn(y) : scalar);
+      var price = pathFn
+        ? plPriceAtDate(d) * pathFn(y) * (multFn ? multFn(y) : 1)
+        : projPriceForGrowth(d, growthModelKey) * (multFn ? multFn(y) : scalar);
 
       if (y < scenario.retirementYear) {
         // Pre-retirement DCA. Year-end approximation, the flagship's:
@@ -152,67 +196,68 @@
              startYear: startYear, endYear: endYear };
   }
 
-  // The flagship's signature, unchanged, so its call sites need no edit.
+  // Legacy entry points: the raw trend (or 0.42x) price times a scalar or a
+  // per-year multiplier, with no price path. No page calls them since
+  // 2026-10-11 (every page runs projectPath / projectForBasis); they stay so
+  // an old console call or QA script still gets an answer.
   function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation) {
     return projectCore(scenario, growthModelKey, inflationPct,
       { multiplier: priceMultiplier, plotAccumulation: plotAccumulation });
   }
+  function projectWithMultFn(scenario, growthModelKey, inflationPct, multFn, flexPct) {
+    return projectCore(scenario, growthModelKey, inflationPct, { multFn: multFn, flexPct: flexPct });
+  }
 
-  /* ─── Memoised projection. Two columns × (base + threshold probes) is a few
+  /* ─── One price path through the loop (2026-10-11). opts: { multFn (a
+         crash on top of the path), flexPct, plotAccumulation, growthKey,
+         inflationPct }. m0 is read once per call, so every year of one
+         projection uses the same starting multiple. ─── */
+  function projectPath(scenario, basis, opts) {
+    opts = opts || {};
+    var b = normBasis(basis, opts.growthKey), m0 = currentRatio(), y0 = (new Date()).getFullYear();
+    var infl = (opts.inflationPct !== undefined && opts.inflationPct !== null) ? opts.inflationPct : MA.get('inflation').value;
+    return projectCore(scenario, 'powerlaw-trend', infl, {
+      pathFn: function (y) { return pathMultiple(b, m0, y - y0); },
+      multFn: opts.multFn || null, flexPct: opts.flexPct || 0, plotAccumulation: !!opts.plotAccumulation });
+  }
+
+  /* ─── Memoised path. Two columns × (base + threshold probes) is a few
          hundred loops per render; the cache keeps that to a handful of real
          ones. Bounded so a long dragging session cannot grow it without limit.
-         The key includes the multiplier, so bear-on and bear-off never collide. ─── */
+         The key carries the path, today's multiple (to 1e-8, so a new live
+         price is a new entry) and the plot flag; monthlyDcaUSD joined it when
+         the DCA leg landed, since two scenarios differing only in contribution
+         would otherwise collide. ─── */
   var PROJ_CACHE = Object.create(null);
   var PROJ_CACHE_KEYS = [];
-  function projectMemo(scenario, growthModelKey, inflationPct, multiplier) {
-    // monthlyDcaUSD joined the key when the DCA leg landed: two scenarios
-    // differing only in contribution would otherwise collide on a cache hit
-    // and the second would silently get the first's projection.
+  function projectPathMemo(scenario, basis, growthKey, plotAccumulation) {
+    var b = normBasis(basis, growthKey), infl = MA.get('inflation').value;
     var key = [scenario.btcStack.toFixed(6), scenario.targetIncomeUSD, scenario.retirementYear,
-               scenario.yearsInRetirement, scenario.incomeBasis, growthModelKey,
-               inflationPct, (multiplier || 1).toFixed(6),
-               (scenario.monthlyDcaUSD || 0)].join('|');
+               scenario.yearsInRetirement, scenario.incomeBasis, b, currentRatio().toFixed(8),
+               infl, plotAccumulation ? 1 : 0, (scenario.monthlyDcaUSD || 0), (new Date()).getFullYear()].join('|');
     var hit = PROJ_CACHE[key];
     if (hit) return hit;
-    var out = projectStackOverTime(scenario, growthModelKey, inflationPct, multiplier);
+    var out = projectPath(scenario, b, { inflationPct: infl, plotAccumulation: plotAccumulation });
     PROJ_CACHE[key] = out;
     PROJ_CACHE_KEYS.push(key);
     if (PROJ_CACHE_KEYS.length > 480) { delete PROJ_CACHE[PROJ_CACHE_KEYS.shift()]; }
     return out;
   }
 
-  // Per-year multiplier path. Kept as a named entry point because a function
-  // has no cache key, so this deliberately bypasses projectMemo.
-  function projectWithMultFn(scenario, growthModelKey, inflationPct, multFn, flexPct) {
-    return projectCore(scenario, growthModelKey, inflationPct, { multFn: multFn, flexPct: flexPct });
-  }
-
   /* ─── One place that maps a price basis onto engine arguments, so two
          scenarios can never diverge in HOW they are computed — only in what
-         they are. `multFn` (optional) injects the shared crash path; it forces
-         the uncached loop because a function has no cache key. ─── */
-  /* `growthKey` (optional, added 2026-09-01 for The Rundown's P1 snack) overrides
-     the growth model this call runs under, WITHOUT touching the site-wide
-     ModelingAssumptions store. That distinction is the whole point: a consumer
-     that wants one floor-case read should not have to mutate a setting every
-     retirement page on the site shares. Omitted, it reads MA exactly as before,
-     so every existing caller is unchanged — and projectMemo's key already
-     carries growthModelKey, so an override cannot collide in the cache.
-
-     It has no effect on `basis: 'current'`, deliberately: that basis IS
-     "today's gap to trend persists", which is defined as the trend model scaled
-     by today's ratio. A floor read is `basis: 'trend'` with growthKey
-     'powerlaw-floor'. */
+         they are. `multFn` (optional) injects the shared crash path ON TOP OF
+         the price path; it forces the uncached loop because a function has
+         no cache key. `basis`: 'stay' (or 'current') | 'trend' | 'floor'. ─── */
+  /* `growthKey` (added 2026-09-01 for The Rundown's P1 snack): 'powerlaw-floor'
+     with basis 'trend' runs the floor stress test, without touching any
+     sitewide setting. Since 2026-10-11 nothing reads the old sitewide
+     growth-model setting (retired; DEFAULTS_POLICY decision 2), so the
+     override is the only way a caller reaches 'floor' besides naming it. */
   function projectForBasis(scenario, basis, noCache, multFn, growthKey) {
-    var infl = MA.get('inflation').value;
-    var growth = (basis === 'current') ? 'powerlaw-trend' : (growthKey || MA.get('btcGrowthModel').preset);
-    if (multFn) {
-      var ratio = (basis === 'current') ? currentRatio() : 1;
-      return projectWithMultFn(scenario, growth, infl, function (y) { return multFn(y) * ratio; });
-    }
-    var run = noCache ? projectStackOverTime : projectMemo;
-    if (basis === 'current') return run(scenario, 'powerlaw-trend', infl, currentRatio());
-    return run(scenario, growth, infl, 1);
+    if (multFn) return projectPath(scenario, basis, { multFn: multFn, growthKey: growthKey });
+    if (noCache) return projectPath(scenario, basis, { growthKey: growthKey });
+    return projectPathMemo(scenario, basis, growthKey, false);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -335,8 +380,7 @@
   // sitting at the original year while the plan walked away from it, solving
   // for a world nobody is being shown.
   // `growthKey` (optional) threads straight through to projectForBasis — see the
-  // note there. Omitted, this solves under the site-wide growth model exactly as
-  // it always has.
+  // note there. Omitted, the basis alone picks the price path.
   function lineFor(axis, scenario, basis, multFor, growthKey) {
     var infl = MA.get('inflation').value;
     function escapes(over) {
@@ -419,6 +463,22 @@
       + (v.ratio * 100).toFixed(0) + '% of starting real value at the end).';
   }
 
+  // The verdict as the two-scenario block states it (2026-10-11, DEFAULTS_POLICY
+  // PR B): a short headline for the half's number and its tail, the same three
+  // states in the family's words, so the flagship and Escape Velocity say the
+  // same thing about the same plan.
+  function blockVerdict(v, scenario) {
+    if (v.state === 'deplete') {
+      var n = Math.max(0, v.depletionYear - scenario.retirementYear);
+      return { num: 'Runs out in ' + v.depletionYear, tail: plural(n, 'year') + ' into retirement' };
+    }
+    if (v.state === 'shrink') {
+      return { num: v.turnedAtStart ? 'Shrinking throughout' : 'Shrinking from ' + v.turnYear,
+               tail: 'lasts to ' + v.horizonYear + ', still falling at the end' };
+    }
+    return { num: 'Escape velocity', tail: 'from ' + v.escapeYear + ' through ' + v.horizonYear };
+  }
+
   window.RetirementEngine = {
     // constants — read, never re-declared by a consumer
     LIMITS: LIMITS,
@@ -430,15 +490,22 @@
     dateForYear: dateForYear,
     projPriceForGrowth: projPriceForGrowth,
     currentRatio: currentRatio,
+    // the price paths (2026-10-11)
+    REVERT_YEARS: REVERT_YEARS,
+    normBasis: normBasis,
+    pathMultiple: pathMultiple,
     // projection
     projectCore: projectCore,
     projectStackOverTime: projectStackOverTime,
     projectWithMultFn: projectWithMultFn,
+    projectPath: projectPath,
+    projectPathMemo: projectPathMemo,
     projectForBasis: projectForBasis,
     // verdict + solver
     computeVerdict: computeVerdict,
     spectrumPosition: spectrumPosition,
     spectrumDetail: spectrumDetail,
+    blockVerdict: blockVerdict,
     realValueAtYear: realValueAtYear,
     lineFor: lineFor,
     cloneWith: cloneWith

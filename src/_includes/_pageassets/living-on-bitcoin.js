@@ -102,12 +102,12 @@
   var elSummaryFees         = document.getElementById('lobSummaryFees');
   var elSummaryTaxes        = document.getElementById('lobSummaryTaxes');
 
-  // New (Commit 4) — drawdown shock callout (trendline-recovery copy)
+  // New (Commit 4) — drawdown shock callout (the float recovers to its path)
   var elDrawdownShockValue     = document.getElementById('lobDrawdownShockValue');
   var elDrawdownShockMagnitude = document.getElementById('lobDrawdownShockMagnitude');
   var elDrawdownHorizonYear    = document.getElementById('lobDrawdownHorizonYear');
 
-  // New (Commit 4) — growth-scenario radios (current vs trendline)
+  // The two scenario radios (stays vs returns to trend over 3 years; 2026-10-11)
   var scenarioRadios = document.querySelectorAll('input[name="growthScenario"]');
 
   // Chart context
@@ -127,59 +127,43 @@
   var GENESIS = new Date(Date.UTC(2009, 0, 3)); // Jan 3, 2009 UTC
   var liveBtcPrice = TODAY_PRICE;   // shared seed: the latest PL_DATA sample
   var liveBtcSource = 'fallback';   // 'live' once the shared fetch resolves live
-  // Growth-model preset from sitewide modeling-assumptions (default: trend).
-  // Honored by projectedTrendPrice() — same as Retirement's growth-model
-  // semantics. 'powerlaw-floor' returns trend × PL_FLOOR; the others
-  // return trend.
-  var growthModel = 'powerlaw-trend';
-  // Growth scenario — LOCAL to this calculator. Picks the START price for
-  // the projection; the END is always projectedTrendPrice(horizon).
-  //   'current'  — start at today's actual price (mean-reversion bonus)
-  //   'trendline' — start at today's trend value (no mean-reversion)
-  // Wired to two radio buttons inside .projection-display. Default
-  // 'current' preserves Commit 1 behavior.
-  var growthScenario = 'current';
+  // Bitcoin's price: the two scenarios (DEFAULTS_POLICY_2026-10-11, PR B;
+  // JM 2026-10-11), picked with the two radios in .projection-display:
+  //   'stay'   bitcoin keeps today's multiple of trend ("If bitcoin stays 47%
+  //            below trend"), so it grows at the trend's own rate;
+  //   'trend'  the gap closes in a straight line over 3 years, then the trend
+  //            ("If bitcoin returns to trend over 3 years").
+  // The default is the lower of the two for today's price (PriceCases.
+  // defaultFor) until the reader picks. Until 2026-10-11 the default was
+  // "Current trajectory", described as starting at today's price but in fact
+  // a full return to trend by the horizon end, expressed as one rate (51.4% a
+  // year over 5 years; DEFAULTS_POLICY §3 bug 4), and the sitewide growth-
+  // model setting (retired) could swap the end point for the floor.
+  var growthScenario = 'stay';
+  var scenarioPicked = false;
+  var PC = window.PriceCases || null;
 
   function daysSince(date) {
     return (date.getTime() - GENESIS.getTime()) / 86400000;
   }
   function plPriceAtDate(date) { return plPrice(daysSince(date)); }
-  function projectedTrendPrice(date) {
-    var trend = plPriceAtDate(date);
-    if (growthModel === 'powerlaw-floor') return trend * PL_FLOOR;
-    return trend; // 'powerlaw-trend', 'linear-cagr-decay', or fallback
+  function todayMultiple() { return liveBtcPrice / plPriceAtDate(new Date()); }
+  function syncDefault() { if (!scenarioPicked && PC) growthScenario = PC.defaultFor(todayMultiple()); }
+  // The price h years out on a scenario: the trend then, times the multiple.
+  function scenarioEndPrice(sc, h) {
+    var future = new Date(Date.now() + h * 365.25 * 86400000);
+    var m0 = todayMultiple();
+    var m = (sc === 'trend') ? (PC ? PC.multipleAt('trend', m0, 0, h) : Math.min(1, m0 + (1 - m0) * h / 3)) : m0;
+    return plPriceAtDate(future) * m;
   }
-  // Starting price for the projection — depends on growthScenario.
-  //   'current'  — today's actual spot price (live, or the dated fallback).
-  //                Mean-reversion to trend = higher CAGR, higher end value.
-  //   'trendline' — today's trend value. No mean-reversion bonus = lower
-  //                CAGR, lower end value (more conservative for the user).
-  function scenarioStartPrice() {
-    if (growthScenario === 'trendline') return plPriceAtDate(new Date());
-    return liveBtcPrice;
-  }
-  // Implied annual CAGR from scenario-start to projected trend price h years out.
-  function computeProjectedCAGR(h) {
+  // Implied annual rate from today's price to the scenario's price h years out.
+  // The page compounds the float at this one rate (the Math tab says so); the
+  // end point is exact, the years between are smoothed.
+  function computeProjectedCAGR(h, sc) {
     if (h <= 0) return 0;
-    var startPrice = scenarioStartPrice();
-    if (startPrice <= 0) return 0;
-    var today = new Date();
-    var future = new Date(today.getTime() + h * 365.25 * 86400000);
-    var futurePrice = projectedTrendPrice(future);
-    return Math.pow(futurePrice / startPrice, 1 / h) - 1;
-  }
-
-  // ─── Pull initial growth model from ModelingAssumptions, if available ───
-  // The shared module exposes presets keyed by btcGrowthModel. Used here
-  // to drive projectedTrendPrice() — the model determines whether we
-  // project to trend or floor band.
-  if (window.ModelingAssumptions && window.ModelingAssumptions.get) {
-    try {
-      var growthPreset = window.ModelingAssumptions.get('btcGrowthModel');
-      if (growthPreset && growthPreset.preset) {
-        growthModel = growthPreset.preset;
-      }
-    } catch(_e) { /* keep default */ }
+    var startPrice = liveBtcPrice;
+    if (!(startPrice > 0)) return 0;
+    return Math.pow(scenarioEndPrice(sc || growthScenario, h) / startPrice, 1 / h) - 1;
   }
 
   // ─── Formatters ───
@@ -203,13 +187,15 @@
   }
 
   // ─── Calculation core ───
-  function calculate() {
+  // `sc` (optional) runs the other scenario for the radios' figures, so both
+  // scenarios stay on screen; omitted, the scenario picked.
+  function calculate(sc) {
     var B = parseFloat(floatSlider.value);
     var M = parseFloat(monthlyBills.value);
     var h = parseInt(horizonSlider.value, 10);
     var f = parseFloat(feeSlider.value);
     var g = parseFloat(capGainsSlider.value);
-    var r = computeProjectedCAGR(h); // Power Law projection from today
+    var r = computeProjectedCAGR(h, sc || growthScenario); // from today's price, on the scenario
     var deMinimisOn = deMinimisToggle.checked;
     var ddYear = Math.min(parseInt(drawdownSlider.value, 10), h);
 
@@ -310,7 +296,7 @@
     var drawdownDelta = drawdownEndValue - B;
     // Magnitude of the shock at ddYear — used by the callout to surface
     // the near-term cost (which is where the drawdown story actually lives
-    // under the trendline-recovery assumption).
+    // under the recover-to-the-path assumption).
     var lobValueAtDdYear = lobNetSeries[ddYear];
     var shockValueAtDdYear = drawdownSeries[ddYear];
     var shockMagnitude = lobValueAtDdYear - shockValueAtDdYear;
@@ -348,34 +334,49 @@
     valDeMinimis.textContent = deMinimisToggle.checked ? 'On' : 'Off';
     valDrawdown.textContent  = 'Year ' + drawdownSlider.value;
 
-    // Power Law projection display
+    // Power Law projection display: the scenario picked, from today's price.
     var h = parseInt(horizonSlider.value, 10);
     var r = computeProjectedCAGR(h);
-    var today = new Date();
-    var future = new Date(today.getTime() + h * 365.25 * 86400000);
-    var futurePrice = projectedTrendPrice(future);
-    var trendToday = plPriceAtDate(today);
-    var startPrice = scenarioStartPrice();
-    var pctOffTrend = (liveBtcPrice / trendToday - 1) * 100;
-    var offTrendLabel = pctOffTrend < 0
-      ? Math.abs(pctOffTrend).toFixed(0) + '% below trend'
-      : pctOffTrend.toFixed(0) + '% above trend';
-    var modelLabel = growthModel === 'powerlaw-floor' ? 'Power Law floor band' : 'Power Law trend';
-    var startLabel = growthScenario === 'trendline'
-      ? 'trend value today'
-      : (liveBtcSource === 'live' ? 'today' : 'on ' + lastSampleDateShort()) + ' (' + offTrendLabel + ')';
+    var futurePrice = scenarioEndPrice(growthScenario, h);
+    var m0 = todayMultiple(), gap = Math.round(Math.abs(1 - m0) * 100);
+    var offTrendLabel = gap + '% ' + (m0 < 1 ? 'below' : 'above') + ' trend';
+    var whenLabel = (liveBtcSource === 'live' ? 'today' : 'on ' + lastSampleDateShort());
+    var endLabel = growthScenario === 'trend'
+      ? (h >= 3 ? 'back on its Power Law trend, which it reaches in year 3' : Math.round(h / 3 * 100) + '% of the way back to its Power Law trend')
+      : 'still ' + offTrendLabel;
 
     if (projectionCAGR) {
       projectionCAGR.textContent = (r * 100).toFixed(1) + '%';
     }
     if (projectionDetail) {
       projectionDetail.innerHTML =
-        'From <strong>$' + Math.round(startPrice).toLocaleString() + '</strong> ' +
-        startLabel + ' ' +
-        'to <strong>$' + Math.round(futurePrice).toLocaleString() + '</strong> ' +
-        'at ' + modelLabel + ' in year ' + h +
+        'From <strong>$' + Math.round(liveBtcPrice).toLocaleString() + '</strong> ' + whenLabel + ' (' + offTrendLabel + ') ' +
+        'to <strong>$' + Math.round(futurePrice).toLocaleString() + '</strong> in year ' + h + ', ' + endLabel +
         ' &middot; <span class="projection-source">' + (liveBtcSource === 'live' ? 'live price' : 'live price unavailable') + '</span>';
     }
+  }
+
+  // The two radios: titles from PriceCases (STYLE_GUIDE §10.14) and each
+  // scenario's rate and result, so the one not picked stays on screen too.
+  function renderScenarioOptions(results) {
+    var m0 = todayMultiple(), T = PC ? PC.titles(m0) : { stay: 'If bitcoin stays where it is against trend', trend: 'If bitcoin returns to trend over 3 years' };
+    var h = parseInt(horizonSlider.value, 10);
+    var plan = { months: h * 12, phrase: h === 1 ? 'the whole year' : 'all ' + h + ' years', words: h + (h === 1 ? ' year' : ' years') };
+    var G = PC ? PC.tags(m0, plan.months) : null, N = PC ? PC.notes(m0, plan) : null;
+    var ft = document.querySelector('[data-lob="foot"]');
+    if (ft && PC) ft.textContent = 'Neither scenario is a forecast. ' + PC.foot(m0, plan);
+    ['stay', 'trend'].forEach(function (k) {
+      var nt = document.querySelector('.projection-scenario-option[data-scenario="' + k + '"] [data-lob="note"]');
+      if (nt && N) nt.textContent = N[k];
+      var opt = document.querySelector('.projection-scenario-option[data-scenario="' + k + '"]');
+      if (!opt) return;
+      var radio = opt.querySelector('input'); if (radio) radio.checked = (growthScenario === k);
+      opt.classList.toggle('is-selected', growthScenario === k);
+      var t = opt.querySelector('[data-lob="title"]'); if (t) t.textContent = T[k];
+      var tg = opt.querySelector('[data-lob="tag"]'); if (tg && G) { tg.textContent = G[k].text; tg.className = 'projection-scenario-tag lob-tag--' + G[k].cls; }
+      var hp = opt.querySelector('[data-lob="help"]');
+      if (hp && results[k]) hp.textContent = 'about ' + (results[k].r * 100).toFixed(1) + '% a year · nets ' + fmtSignedCurrency(results[k].differential) + ' over ' + results[k].h + (results[k].h === 1 ? ' year' : ' years');
+    });
   }
 
   // ─── Output rendering ───
@@ -415,7 +416,7 @@
     elNetDifferential.textContent = fmtSignedCurrency(result.differential);
     elNetDifferential.classList.toggle('lob-breakdown-negative', result.differential < 0);
 
-    // Drawdown callout — under the trendline-recovery model, the
+    // Drawdown callout — under the recover-to-the-path model, the
     // end-state delta is ~0 (drawdown recovers to LoB net by horizon).
     // The story is the near-term shock at ddYear: how deep the bitcoin
     // float dips and what that means for paying bills during recovery.
@@ -550,8 +551,12 @@
 
   // ─── Master render: slider values → calculation → outputs + chart ───
   function render() {
+    syncDefault();
     renderSliderValues();
     var result = calculate();
+    var other = calculate(growthScenario === 'stay' ? 'trend' : 'stay');
+    var both = {}; both[growthScenario] = result; both[growthScenario === 'stay' ? 'trend' : 'stay'] = other;
+    renderScenarioOptions(both);
     renderOutputs(result);
     renderChart(result);
   }
@@ -563,36 +568,21 @@
   });
   deMinimisToggle.addEventListener('change', render);
 
-  // ─── Growth scenario radios — switch between 'current' and 'trendline' ───
+  // ─── The two scenario radios — a pick holds for the visit ───
   if (scenarioRadios && scenarioRadios.length) {
     Array.prototype.forEach.call(scenarioRadios, function(radio){
       radio.addEventListener('change', function(){
-        if (radio.checked) {
+        if (radio.checked && (radio.value === 'stay' || radio.value === 'trend')) {
           growthScenario = radio.value;
+          scenarioPicked = true;
           render();
         }
       });
     });
   }
 
-  // ─── Subscribe to ModelingAssumptions changes (optional) ───
-  // If the user changes the btcGrowthModel preset on another page (via the
-  // sitewide modeling-assumptions picker), we update our projection accordingly.
-  // No on-page slider to keep in sync any more — the projection display
-  // re-computes naturally on render().
-  if (window.ModelingAssumptions && window.ModelingAssumptions.subscribe) {
-    window.ModelingAssumptions.subscribe(function(dim){
-      if (dim === 'btcGrowthModel' || dim === '*') {
-        try {
-          var growthPreset = window.ModelingAssumptions.get('btcGrowthModel');
-          if (growthPreset && growthPreset.preset) {
-            growthModel = growthPreset.preset;
-            render();
-          }
-        } catch(_e) { /* ignore */ }
-      }
-    });
-  }
+  // (The ModelingAssumptions subscription for the growth model went with the
+  // setting, 2026-10-11; nothing on this page reads the sitewide store now.)
 
   // ─── Live BTC price (the shared fetch, with its dated fallback) ───
   // Same pattern as the-bitcoin-retirement.js: fire-and-forget, re-render when

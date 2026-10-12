@@ -6,8 +6,10 @@
    the year-by-year sell-to-cover-income loop are copied from
    the-bitcoin-retirement.js so the baseline projection is bit-parity with
    the flagship. PL_A/PL_B/PL_FLOOR/PL_CEIL/plPrice()/PL_DATA/TODAY_PRICE
-   come from shared/power-law-data.js; inflation and growth model come from
-   shared/modeling-assumptions.js. Both are loaded before this file.
+   come from shared/power-law-data.js; inflation comes from
+   shared/modeling-assumptions.js; bitcoin's price paths come from
+   shared/retirement-engine.js with their words from shared/price-cases.js
+   (DEFAULTS_POLICY_2026-10-11, PR B). All are loaded before this file.
 
    The only deviation from the flagship engine is the deliberate absence of
    pre-retirement DCA — this page has three inputs and no contribution
@@ -37,19 +39,18 @@
      nothing here was a superset of anything. Local aliases keep every call
      site unchanged. */
   var RE = window.RetirementEngine;
+  var PC = window.PriceCases;
   var daysSince = RE.daysSince;
   var plPriceAtDate = RE.plPriceAtDate;
   var dateForYear = RE.dateForYear;
   var projPriceForGrowth = RE.projPriceForGrowth;
 
   // Live price ÷ today's trend price — how far below (<1) or above (>=1)
-  // trend bitcoin is right now. Drives the gap-persists basis and the
-  // above-trend copy guard (§5.2).
+  // trend bitcoin is right now. Drives the default scenario and the words.
   function currentRatio() {
     var t = projPriceForGrowth(dateForYear((new Date()).getFullYear()), 'powerlaw-trend');
     return (t > 0) ? (liveBtcPrice / t) : 1;
   }
-  function basisPhrase(ratio) { return ratio < 1 ? 'gap' : 'premium'; }
 
   /* ─── Scenario state — three primary inputs plus the horizon ─── */
   // Defaults: the wholecoiner plan — 1 BTC, $100K a year, retiring 2035 (JM's
@@ -74,33 +75,29 @@
   var EXTEND_CAP = 40;
 
   var GRAD = { btcStep: 0.25, incStep: 10000 };
-  var PRICE_BASIS = 'trend';   // 'trend' (reverts) | 'current' (today's gap persists)
+  /* Bitcoin's price (DEFAULTS_POLICY_2026-10-11, PR B; JM 2026-10-11): the
+     two scenarios, 'stay' ("If bitcoin stays 47% below trend") and 'trend'
+     ("If bitcoin returns to trend over 3 years"), plus the floor stress test.
+     The default is the lower of the two for today's price (PriceCases.
+     defaultFor) until the reader picks or a link carries a pick (?basis=
+     current|trend|floor). Until 2026-10-11 the page opened on 'trend', which
+     re-set the price to trend at year 0, and showed the other basis in a
+     robustness line; the block above the verdict now shows both. */
+  var PRICE_BASIS = 'stay';
+  var PICKED = false;
+  function syncDefault() { if (!PICKED) PRICE_BASIS = PC.defaultFor(currentRatio()); }
   var RT_DOLLARS  = 'real';    // 'real' (today's $, DEFAULT on this page) | 'nominal' (future $)
 
   var GRAD_STEPS = { btcStep: [0.05, 0.25, 1], incStep: [5000, 10000, 25000] };
 
-  /* ─── The projection. Same loop as the flagship's
-         projectStackOverTime, minus the DCA accumulation branch. ─── */
-  /* Engine repointed to shared/retirement-engine.js — bodies deleted, names
-     kept as aliases so every call site on this page is unchanged. */
-  var projectStackOverTime = RE.projectStackOverTime;
-
-  /* ─── Memoised projection. Every render runs both price bases plus three
-         sensitivity nudges plus ~90 crossing probes; the cache keeps that
-         to a handful of actual loops. Bounded so it cannot grow unbounded
-         across a long dragging session. ─── */
-  var PROJ_CACHE = Object.create(null);
-  var PROJ_CACHE_KEYS = [];
-  var projectMemo = RE.projectMemo;
-
-  // One place that maps a price basis onto engine arguments, so the two
-  // bases can never diverge in how they are computed. Mirrors the
-  // flagship's updateSustainability(): 'current' forces the trend growth
-  // key and scales price by today's ratio.
-  //
-  // `noCache` is set by the crossing probes (renderLine): every bisection
-  // step is a distinct stack/income value, so caching them would only
-  // evict the hot base-and-delta entries that DO repeat.
+  /* ─── The projection: shared/retirement-engine.js, the same loop and the
+         same price paths as the flagship (stay, the 3-year return, the
+         floor stress test). projectForBasis memoises per path (the engine's
+         projectPathMemo, bounded), because every render runs every path
+         plus three sensitivity nudges plus ~90 crossing probes.
+         `noCache` is set by the crossing probes (renderLine): every
+         bisection step is a distinct stack/income value, so caching them
+         would only evict the entries that DO repeat. ─── */
   var projectForBasis = RE.projectForBasis;
 
   /* ═══════════════════════════════════════════════════════════
@@ -134,22 +131,11 @@
   // "retire one year later" delta is not silently comparing two dates.
   var realValueAtYear = RE.realValueAtYear;
 
-  /* ─── Which basis is the conservative one is DYNAMIC (§5.2). It flips
-         with where spot sits relative to trend, so it is never hard-coded:
-         the conservative basis is whichever produces the worse answer. ─── */
-  function severityTier(v) {
-    if (v.state === 'deplete') return 0;
-    if (v.state === 'shrink')  return 1;
-    return 2;
-  }
-  // true when a is a worse (more conservative) outcome than b
-  function isWorse(a, b) {
-    var ta = severityTier(a), tb = severityTier(b);
-    if (ta !== tb) return ta < tb;
-    if (ta === 0) return a.depletionYear < b.depletionYear;     // depleting earlier is worse
-    if (ta === 2) return a.escapeYear > b.escapeYear;           // escaping later is worse
-    return false;
-  }
+  /* ─── Which basis is the conservative one used to be decided here
+         (severityTier / isWorse, §5.2) for the robustness line. Since
+         2026-10-11 the page starts on the lower of the two scenarios
+         (PriceCases.defaultFor) and the block shows both, so neither is
+         needed. ─── */
 
   /* ═══════════════════════════════════════════════════════════
      FORMATTERS — flagship canon
@@ -189,10 +175,19 @@
   }
   function dollarWord() { return RT_DOLLARS === 'real' ? 'in today’s dollars' : 'in future dollars'; }
 
-  function basisLabel(basis) {
-    return basis === 'current'
-      ? 'today’s ' + basisPhrase(currentRatio()) + ' to trend persists'
-      : 'reverts to trend';
+  // The words for a path, from PriceCases (STYLE_GUIDE §10.14): the block's
+  // title ("If bitcoin stays 47% below trend") and the short name.
+  function basisTitle(basis) {
+    var b = RE.normBasis(basis);
+    return b === 'floor' ? PC.FLOOR_FALL.title : PC.titles(currentRatio())[b];
+  }
+  function basisName(basis) {
+    var b = RE.normBasis(basis);
+    return b === 'floor' ? PC.FLOOR_FALL.name : PC.names(currentRatio())[b];
+  }
+  function basisLabel(basis) {   // in running text: "if bitcoin stays 47% below trend"
+    var t = basisTitle(basis);
+    return t.charAt(0).toLowerCase() + t.slice(1);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -354,7 +349,7 @@
   // claim, not parked in a footnote.
   var POWER_LAW_TIP = '<span class="help-tip" tabindex="0">?<span class="tip-content">'
     + 'Every figure on this page is computed against the <strong>Power Law trend</strong> — a regression of '
-    + 'bitcoin’s entire price history against time, used as a central-tendency assumption, not a forecast. '
+    + 'bitcoin’s entire price history against time. Both scenarios are multiples of it, and neither is a forecast. '
     + 'Its implied growth rate <em>declines</em> with time, which is exactly why “permanently” has to be '
     + 'checked across the whole horizon instead of asserted from a single crossing. '
     + '<a href="/the-power-law">What the Power Law is, and where it breaks →</a>'
@@ -364,12 +359,12 @@
     // Name the arithmetic rather than dropping a bare year on the reader (#3).
     // The Power Law's first appearance in body copy gets three ways in (#19):
     // the phrase itself links out, the disclosure tooltip sits beside it, and
-    // the growth-model control and the FAQ carry their own links.
+    // the FAQ carries its own link.
     var basisTail = '<span class="ev-verdict-tail">Checked every year through <strong>' + v.horizonYear
       + '</strong> — your ' + SCENARIO.retirementYear + ' retirement plus the '
       + SCENARIO.yearsInRetirement + '-year horizon (set under Assumptions) — '
-      + dollarWord() + ', against the <a href="/the-power-law">Power Law</a> trend with price '
-      + basisLabel(basis) + '.' + POWER_LAW_TIP + '</span>';
+      + dollarWord() + ', against the <a href="/the-power-law">Power Law</a> trend, '
+      + basisLabel(basis) + (RE.normBasis(basis) === 'floor' ? ' (a stress test)' : '') + '.' + POWER_LAW_TIP + '</span>';
 
     if (v.state === 'escape') {
       return 'On these inputs, the stack’s growth permanently exceeds spending from <strong>'
@@ -392,64 +387,14 @@
       + ' — and it is still falling at <strong>' + v.horizonYear + '</strong>.' + tail + basisTail;
   }
 
-  // The robustness line mirrors the shape of the verdict it is reporting (#17).
-  // "No escape, but no depletion either" said nothing a reader could act on;
-  // the shrink state has a turn year and a trajectory, and the line that
-  // reports it should carry both — recomputed for whichever basis it describes.
-  function shortVerdict(v, basis) {
-    if (v.state === 'escape') return '<strong>' + v.escapeYear + '</strong>';
-    if (v.state === 'deplete') return 'depletion in <strong>' + v.depletionYear + '</strong>';
-    var ext = extendedDepletion(SCENARIO, basis);
-    return ext
-      ? '<strong>no escape</strong> — the stack turns over in <strong>' + v.turnYear
-        + '</strong> and is on pace to deplete around <strong>' + roundApprox(ext) + '</strong>, beyond the window'
-      : '<strong>no escape</strong> — the stack turns over in <strong>' + v.turnYear
-        + '</strong> and is still falling at the horizon';
-  }
-
-  function renderVerdict(vSel, vOther, basis, otherBasis) {
+  // The robustness line (#17) and the above-trend note went on 2026-10-11:
+  // the two-scenario block above the verdict shows both scenarios' answers
+  // side by side, with the record under each, so a line reporting "the other
+  // basis" would only repeat it.
+  function renderVerdict(vSel, basis) {
     var extDep = (vSel.state === 'shrink') ? extendedDepletion(SCENARIO, basis) : null;
     var sentEl = document.getElementById('evVerdictSentence');
     if (sentEl) sentEl.innerHTML = verdictSentence(vSel, basis, extDep);
-
-    // Robustness line. Never hard-codes which basis is conservative —
-    // it reports whichever of the two produced the worse answer, and says
-    // so in the opposite direction when the user is already on it (§5.2,
-    // open item #3: shown rather than suppressed, symmetry reads as
-    // confidence).
-    var robEl = document.getElementById('evRobustness');
-    if (robEl) {
-      var same = (vOther.state === vSel.state)
-        && (vOther.escapeYear === vSel.escapeYear)
-        && (vOther.depletionYear === vSel.depletionYear);
-      if (same) {
-        robEl.hidden = false;
-        robEl.innerHTML = 'Both price bases agree here — ' + basisLabel(otherBasis)
-          + ' gives the same answer.';
-      } else if (isWorse(vOther, vSel)) {
-        robEl.hidden = false;
-        robEl.innerHTML = 'Under the more conservative price basis (' + basisLabel(otherBasis)
-          + '): ' + shortVerdict(vOther, otherBasis) + '.';
-      } else {
-        robEl.hidden = false;
-        robEl.innerHTML = 'You are on the more conservative basis. The less conservative one ('
-          + basisLabel(otherBasis) + ') says: ' + shortVerdict(vOther, otherBasis) + '.';
-      }
-    }
-
-    // Above-trend copy guard (§5.2). The floor-vs-upper asymmetry the
-    // retirement page codifies, applied to basis selection: excursions
-    // below trend have held, excursions above it have been brief.
-    var noteEl = document.getElementById('evAboveTrendNote');
-    if (noteEl) {
-      var r = currentRatio();
-      if (r > 1.05 && basis === 'current') {
-        noteEl.hidden = false;
-        noteEl.textContent = 'Bitcoin currently trades above its long-term trend ('
-          + r.toFixed(2) + '×). Historically, excursions above trend have been brief spikes '
-          + 'rather than sustained plateaus — the trend basis is the more conservative read here.';
-      } else { noteEl.hidden = true; }
-    }
 
     var nomEl = document.getElementById('evNominalNote');
     if (nomEl) nomEl.hidden = (RT_DOLLARS !== 'nominal');
@@ -476,7 +421,7 @@
     var elHzNote = document.getElementById('evHorizonBasisNote');
     if (elHzNote) elHzNote.textContent = RT_DOLLARS === 'real' ? 'In today’s dollars.' : 'In future dollars.';
     var elBw = document.getElementById('evBasisWord');
-    if (elBw) elBw.textContent = basisLabel(basis) + (basis === 'current' ? ' (' + currentRatio().toFixed(2) + '×)' : '');
+    if (elBw) elBw.textContent = basisLabel(basis);
 
     updateSpectrum(vSel);
   }
@@ -619,8 +564,7 @@
   function lines() {
     var key = [SCENARIO.btcStack, SCENARIO.targetIncomeUSD, SCENARIO.retirementYear,
                SCENARIO.yearsInRetirement, SCENARIO.incomeBasis, PRICE_BASIS,
-               MA.get('inflation').value, MA.get('btcGrowthModel').preset,
-               liveBtcPrice].join('|');
+               MA.get('inflation').value, liveBtcPrice].join('|');
     if (key === LINE_KEY) return LINE_CACHE;
     LINE_KEY = key;
     /* PRICE_BASIS and SCENARIO are passed EXPLICITLY since the repoint. The
@@ -1036,7 +980,7 @@
           : 'The bars run positive until <strong>' + v.turnYear + '</strong>, then turn negative and stay that way through ' + v.horizonYear + '.';
       }
       cap.innerHTML = 'One bar per retirement year, ' + (first.year) + '–' + (last.year)
-        + ', in today’s dollars, with price ' + basisLabel(basis) + '. ' + tail;
+        + ', in today’s dollars, ' + basisLabel(basis) + '. ' + tail;
     }
   }
 
@@ -1045,7 +989,8 @@
   ═══════════════════════════════════════════════════════════ */
 
   function assumptionsSummary() {
-    return basisLabel(PRICE_BASIS)
+    var n = basisName(PRICE_BASIS);
+    return n.charAt(0).toLowerCase() + n.slice(1)
       + ' · ' + (RT_DOLLARS === 'real' ? 'today’s $' : 'future $')
       + ' · withdrawal ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation')
       + ' · ' + SCENARIO.yearsInRetirement + '-yr horizon'
@@ -1065,46 +1010,47 @@
     document.querySelectorAll('[data-grad="years"] .seg-btn').forEach(function (b) {
       b.classList.toggle('is-active', parseInt(b.getAttribute('data-years'), 10) === SCENARIO.yearsInRetirement);
     });
-    // The sitewide pickers can hold a preset this card has no chip for —
-    // Custom inflation, or the flagship's linear-CAGR growth model. Without
-    // this, no chip lights, and the card reads as unresponsive while the maths
-    // quietly uses the real value: a control that lies about its own state.
-    var INHERITED_NAMES = {
-      'custom': 'a custom rate',
-      'linear-cagr-decay': 'Linear CAGR with decay'
-    };
-    ['inflation', 'btcGrowthModel'].forEach(function (dim) {
-      var cur = MA.get(dim).preset;
-      var matched = false;
-      document.querySelectorAll('[data-dim="' + dim + '"] .seg-btn').forEach(function (b) {
+    // The sitewide inflation picker can hold a preset this card has no chip
+    // for (Custom). Without this, no chip lights, and the card reads as
+    // unresponsive while the maths quietly uses the real value: a control
+    // that lies about its own state. (The growth-model row went on 2026-10-11
+    // with the setting itself; the floor is the block's stress test.)
+    (function () {
+      var cur = MA.get('inflation').preset, matched = false;
+      document.querySelectorAll('[data-dim="inflation"] .seg-btn').forEach(function (b) {
         var on = b.getAttribute('data-preset') === cur;
         if (on) matched = true;
         b.classList.toggle('is-active', on);
       });
-      var note = document.querySelector('[data-inherited="' + dim + '"]');
+      var note = document.querySelector('[data-inherited="inflation"]');
       if (!note) return;
       if (matched) { note.hidden = true; return; }
       note.hidden = false;
-      var name = INHERITED_NAMES[cur] || cur;
-      note.textContent = (dim === 'inflation')
-        ? 'Set to ' + name + ' (' + MA.get('inflation').value + '%) on another calculator — the projection is using it. Pick one here to override.'
-        : 'Set to ' + name + ' on another calculator — the projection is using it. Pick one here to override.';
-    });
+      note.textContent = 'Set to a custom rate (' + MA.get('inflation').value + '%) on another calculator — the projection is using it. Pick one here to override.';
+    })();
     // Live inflation rate on the real-dollars button, flagship pattern.
     var infl = MA.get('inflation').value;
     document.querySelectorAll('.ev-dollars-btn[data-dollars="real"] .seg-btn-sub').forEach(function (el) {
       el.textContent = infl + '%';
     });
-    // Live basis labels with the multiple, flagship pattern.
-    var r = currentRatio();
-    document.querySelectorAll('.ev-basis-btn[data-basis="trend"] .ev-basis-text').forEach(function (el) {
-      el.textContent = 'Reverts to trend (1.0×)';
-    });
-    document.querySelectorAll('.ev-basis-btn[data-basis="current"] .ev-basis-text').forEach(function (el) {
-      el.textContent = 'Today’s ' + basisPhrase(r) + ' to trend persists (' + r.toFixed(2) + '×)';
+    // The two price buttons mirror the block (PriceCases.names); under the
+    // floor stress test neither is lit.
+    ['stay', 'trend'].forEach(function (k) {
+      document.querySelectorAll('.ev-basis-btn[data-basis="' + k + '"]').forEach(function (b) {
+        var t = b.querySelector('.ev-basis-text'); if (t) t.textContent = basisName(k);
+        b.setAttribute('aria-pressed', PRICE_BASIS === k ? 'true' : 'false');
+      });
     });
     var sum = document.getElementById('evAssumpSummary');
     if (sum) sum.textContent = assumptionsSummary();
+  }
+
+  // A pick, from the block or the assumptions card's mirror buttons.
+  function pickBasis(b) {
+    var nb = RE.normBasis(b);
+    if (nb === PRICE_BASIS && PICKED) return;
+    PRICE_BASIS = nb; PICKED = true;
+    syncAssumptionControls(); scheduleRender(); scheduleUrlSync();
   }
 
   function wireAssumptions() {
@@ -1121,10 +1067,10 @@
     document.querySelectorAll('.ev-basis-btn').forEach(function (b) {
       b.addEventListener('click', function (e) {
         if (e.target.closest('.help-tip')) return;
-        PRICE_BASIS = b.getAttribute('data-basis');
-        syncAssumptionControls(); scheduleRender(); scheduleUrlSync();
+        pickBasis(b.getAttribute('data-basis'));
       });
     });
+    PC.bind(document.getElementById('pcEv'), pickBasis);
     document.querySelectorAll('.ev-dollars-btn').forEach(function (b) {
       b.addEventListener('click', function (e) {
         if (e.target.closest('.help-tip')) return;
@@ -1139,12 +1085,10 @@
         syncAssumptionControls(); scheduleRender(); scheduleUrlSync();
       });
     });
-    ['inflation', 'btcGrowthModel'].forEach(function (dim) {
-      document.querySelectorAll('[data-dim="' + dim + '"] .seg-btn').forEach(function (b) {
-        b.addEventListener('click', function (e) {
-          if (e.target.closest('.help-tip')) return;
-          MA.set(dim, b.getAttribute('data-preset'));
-        });
+    document.querySelectorAll('[data-dim="inflation"] .seg-btn').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        if (e.target.closest('.help-tip')) return;
+        MA.set('inflation', b.getAttribute('data-preset'));
       });
     });
     // Canonical assumptions are sitewide-sticky; re-render on any change,
@@ -1168,7 +1112,7 @@
       + ', retiring in <strong>' + SCENARIO.retirementYear + '</strong>'
       + ', drawing <strong>' + formatCurrencyShort(SCENARIO.targetIncomeUSD) + '/yr</strong>'
       + ' · ' + SCENARIO.yearsInRetirement + ' yrs in retirement.'
-      + ' Price basis: ' + basisLabel(PRICE_BASIS) + '.'
+      + ' Price path: ' + basisLabel(PRICE_BASIS) + '.'
       + ' Dollars: ' + (RT_DOLLARS === 'real' ? 'real (today’s, ' + MA.get('inflation').value + '% infl)' : 'nominal (future)') + '.'
       + ' Withdrawal: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
   }
@@ -1215,7 +1159,6 @@
 
   function buildCsv(proj) {
     var s = SCENARIO;
-    var growth = MA.get('btcGrowthModel');
     var inflation = MA.get('inflation');
     var lines = [];
     lines.push('# Last Coin Standing — Bitcoin Escape Velocity');
@@ -1223,9 +1166,8 @@
     lines.push('# Retirement year,' + s.retirementYear);
     lines.push('# Annual withdrawal,' + s.targetIncomeUSD);
     lines.push('# Years in retirement,' + s.yearsInRetirement);
-    lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price assumption,' + basisLabel(PRICE_BASIS));
+    lines.push('# Price path,' + basisTitle(PRICE_BASIS) + (PRICE_BASIS === 'floor' ? ' (a stress test)' : ''));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? 'real (today’s dollars, ' + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
@@ -1319,9 +1261,12 @@
       var ib = params.get('incbasis');
       if (ib === 'today' || ib === 'fixed') SCENARIO.incomeBasis = ib;
     }
+    // A carried pick (DEFAULTS_POLICY R7): `basis` keeps its values
+    // (current = stays, trend, and floor since 2026-10-11) and is applied as
+    // a pick, so it holds whatever the price does.
     if (params.has('basis')) {
       var pb = params.get('basis');
-      if (pb === 'trend' || pb === 'current') PRICE_BASIS = pb;
+      if (pb === 'trend' || pb === 'current' || pb === 'stay' || pb === 'floor') { PRICE_BASIS = RE.normBasis(pb); PICKED = true; }
     }
     if (params.has('dollars')) {
       var d = params.get('dollars');
@@ -1346,7 +1291,7 @@
       else params.set(p, entry.isInt ? String(rounded) : rounded.toFixed(entry.decimals || 2));
     });
     if (SCENARIO.incomeBasis !== DEFAULTS.incomeBasis) params.set('incbasis', SCENARIO.incomeBasis); else params.delete('incbasis');
-    if (PRICE_BASIS !== 'trend') params.set('basis', PRICE_BASIS); else params.delete('basis');
+    if (PICKED) params.set('basis', PRICE_BASIS === 'stay' ? 'current' : PRICE_BASIS); else params.delete('basis');
     if (RT_DOLLARS !== 'real') params.set('dollars', RT_DOLLARS); else params.delete('dollars');
     if (GRAD.btcStep !== GRAD_DEFAULTS.btcStep) params.set('btcstep', String(GRAD.btcStep)); else params.delete('btcstep');
     if (GRAD.incStep !== GRAD_DEFAULTS.incStep) params.set('incstep', String(GRAD.incStep)); else params.delete('incstep');
@@ -1365,7 +1310,7 @@
          this site, and it must not outlive the tab. sessionStorage dies with
          the tab; localStorage would not. Nothing on this page writes the
          plan to localStorage — the only localStorage this page touches is
-         ModelingAssumptions (inflation, growth model), which holds no
+         ModelingAssumptions (inflation), which holds no
          position data.
          Load precedence: URL params > sessionStorage > defaults. ─── */
   var SESSION_KEY = 'lcs.ev.plan';
@@ -1416,6 +1361,7 @@
     p.set('income', String(Math.round(SCENARIO.targetIncomeUSD)));
     p.set('years', String(SCENARIO.yearsInRetirement));
     if (SCENARIO.incomeBasis !== 'today') p.set('incbasis', SCENARIO.incomeBasis);
+    if (PICKED) p.set('basis', PRICE_BASIS === 'stay' ? 'current' : PRICE_BASIS);
     a.href = '/the-bitcoin-retirement?' + p.toString();
   }
 
@@ -1430,20 +1376,49 @@
   }
 
   function render() {
+    syncDefault();
     var inflationPct = MA.get('inflation').value;
-    var otherBasis = (PRICE_BASIS === 'trend') ? 'current' : 'trend';
 
-    var projSel   = projectForBasis(SCENARIO, PRICE_BASIS);
-    var projOther = projectForBasis(SCENARIO, otherBasis);
-    var vSel   = computeVerdict(projSel, SCENARIO, inflationPct);
-    var vOther = computeVerdict(projOther, SCENARIO, inflationPct);
+    // Both scenarios (and the stress test when it is showing), one verdict each.
+    var P = { stay: projectForBasis(SCENARIO, 'stay'), trend: projectForBasis(SCENARIO, 'trend') };
+    if (PRICE_BASIS === 'floor') P.floor = projectForBasis(SCENARIO, 'floor');
+    var V = {};
+    Object.keys(P).forEach(function (k) { V[k] = computeVerdict(P[k], SCENARIO, inflationPct); });
+    var projSel = P[PRICE_BASIS], vSel = V[PRICE_BASIS];
 
-    renderVerdict(vSel, vOther, PRICE_BASIS, otherBasis);
+    renderBlock(P, V, inflationPct);
+    renderVerdict(vSel, PRICE_BASIS);
     renderThreshold(vSel, PRICE_BASIS);
     renderStrip(vSel, PRICE_BASIS);
     renderVerifyTable(projSel);
     syncAssumptionControls();
     updateFlagshipLink();
+  }
+
+  /* ─── Bitcoin's price: the two scenarios (components/price-cases.njk).
+         Each half: that scenario's verdict and the stack it retires with,
+         in the page's dollar basis. ─── */
+  function renderBlock(P, V, inflationPct) {
+    var el = document.getElementById('pcEv');
+    if (!el) return;
+    function atRet(k) {
+      var v = null;
+      P[k].points.forEach(function (pt) { if (pt.x === SCENARIO.retirementYear) v = pt.y; });
+      return rtDollars(v, SCENARIO.retirementYear, inflationPct);
+    }
+    function half(k) {
+      var bv = RE.blockVerdict(V[k], SCENARIO);
+      return { num: bv.num, sub: bv.tail + ' &middot; stack worth ' + formatCurrencyShort(atRet(k)) + ' at retirement in ' + SCENARIO.retirementYear + ', ' + dollarWord() };
+    }
+    var y0 = (new Date()).getFullYear(), end = SCENARIO.retirementYear + SCENARIO.yearsInRetirement, n = Math.max(1, end - y0);
+    var vs = V[PRICE_BASIS];
+    PC.render(el, {
+      mult: currentRatio(), selected: PRICE_BASIS, drives: 'the verdict and the thresholds below',
+      plan: { months: n * 12, phrase: 'the whole plan, to ' + end, words: 'the ' + n + ' years to ' + end },
+      values: { stay: half('stay'), trend: half('trend') },
+      showing: basisTitle(PRICE_BASIS) + ': the plan ' + statePhrase(vs) + '.' +
+        (PRICE_BASIS === 'floor' ? ' A stress test: 0.42× is the channel’s floor, which price has gone below by 5.1% at most since 2011, in 2015.' : '')
+    });
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -1513,7 +1488,7 @@
     var infl = MA.get('inflation').value;
     var failures = [], rows = [];
 
-    ['trend', 'current'].forEach(function (basis) {
+    ['stay', 'trend', 'floor'].forEach(function (basis) {
       QA_VECTOR.forEach(function (sc, idx) {
         var proj = projectForBasis(sc, basis);
         var mine = computeVerdict(proj, sc, infl);
@@ -1634,34 +1609,34 @@
     });
 
     /* (8) LIVE ASSUMPTION RECOMPUTE == HARD REFRESH (round 3 #9). Nothing may
-           be cached across an assumptions change. Both growth models and all
-           three inflation presets, checked against a projection computed from
-           scratch with the caches bypassed — if a memo key ever stops covering
-           an assumption, this is what catches it. */
-    var savedInfl = MA.get('inflation').preset, savedGrowth = MA.get('btcGrowthModel').preset;
+           be cached across an assumptions change. All three inflation presets
+           and all three price paths (2026-10-11: the growth-model setting
+           this looped over is retired; the paths took its place), checked
+           against a projection computed from scratch with the caches
+           bypassed — if a memo key ever stops covering an assumption, this
+           is what catches it. */
+    var savedInfl = MA.get('inflation').preset;
     ['cpi-official', 'm2-growth', 'shadow-stats'].forEach(function (ip) {
-      ['powerlaw-trend', 'powerlaw-floor'].forEach(function (gm) {
-        MA.set('inflation', ip); MA.set('btcGrowthModel', gm);
-        var iv = MA.get('inflation').value;
-        QA_VECTOR.forEach(function (sc, idx) {
-          ['trend', 'current'].forEach(function (b) {
-            var live = computeVerdict(projectForBasis(sc, b), sc, iv);
-            // Same inputs, caches bypassed — a "hard refresh" of this scenario.
-            var fresh = computeVerdict(projectForBasis(sc, b, true), sc, iv);
-            if (live.state !== fresh.state || live.escapeYear !== fresh.escapeYear
-                || live.depletionYear !== fresh.depletionYear) {
-              failures.push('assump/' + ip + '/' + gm + '/' + b + '#' + idx
-                + ': cached ' + live.state + ' vs fresh ' + fresh.state);
-            }
-          });
+      MA.set('inflation', ip);
+      var iv = MA.get('inflation').value;
+      QA_VECTOR.forEach(function (sc, idx) {
+        ['stay', 'trend', 'floor'].forEach(function (b) {
+          var live = computeVerdict(projectForBasis(sc, b), sc, iv);
+          // Same inputs, caches bypassed — a "hard refresh" of this scenario.
+          var fresh = computeVerdict(projectForBasis(sc, b, true), sc, iv);
+          if (live.state !== fresh.state || live.escapeYear !== fresh.escapeYear
+              || live.depletionYear !== fresh.depletionYear) {
+            failures.push('assump/' + ip + '/' + b + '#' + idx
+              + ': cached ' + live.state + ' vs fresh ' + fresh.state);
+          }
         });
       });
     });
-    MA.set('inflation', savedInfl); MA.set('btcGrowthModel', savedGrowth);
+    MA.set('inflation', savedInfl);
 
     var shrinkCount = rows.filter(function (r) { return r.state === 'shrink'; }).length;
     var result = { pass: failures.length === 0, failures: failures, rows: rows,
-                   shrinkBandCount: shrinkCount, vectors: QA_VECTOR.length * 2 };
+                   shrinkBandCount: shrinkCount, vectors: QA_VECTOR.length * 3 };
     if (result.pass) {
       console.log('%cevParityQA PASS', 'color:#7fc47f;font-weight:600',
         result.vectors + ' vectors, ' + shrinkCount + ' in the survives-but-shrinking band');
@@ -1685,7 +1660,7 @@
     fetchTodayPrice(function (price) {
       if (!isFinite(price) || price <= 0) return;
       liveBtcPrice = price;
-      LINE_KEY = null;          // crossings depend on the ratio under the gap-persists basis
+      LINE_KEY = null;          // every path starts at today's price, so the crossings move with it
       syncAssumptionControls();
       scheduleRender();
     });

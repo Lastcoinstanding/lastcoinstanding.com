@@ -36,7 +36,7 @@ faq:
   - q: "Can you really retire on bitcoin alone?"
     a: "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href='/the-bitcoin-retirement-stress-test'>Stress Test</a> models exactly that risk."
   - q: "How does the calculator project bitcoin’s future price?"
-    a: "It uses the Power Law trend — a regression of bitcoin’s full price history against time, with coefficients credited to Porkopolis Economics — as a central-tendency assumption, not a forecast. You choose the price basis and inflation assumptions yourself, and every projected number is reproducible from the adjacent ones. The model’s limits are stated on the page, not hidden."
+    a: "It uses the Power Law trend — a regression of bitcoin’s full price history against time, with coefficients credited to Porkopolis Economics — and shows two scenarios side by side: bitcoin stays as far below (or above) its trend as it is today, or it returns to the trend over three years. Neither is a forecast. The calculator starts on the lower of the two, a stress test drops bitcoin to its floor, and every projected number is reproducible from the adjacent ones. The model’s limits are stated on the page, not hidden."
   - q: "What withdrawal strategies does it model?"
     a: "Three: selling bitcoin as needed, borrowing against the stack, and disciplined rebalancing. Each has a different shape of risk — tax events, liquidation exposure, sequence risk — and each links to a dedicated page that treats it in depth."
   - q: "Is this financial advice?"
@@ -44,7 +44,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-retirement.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
 ---
 <div class="page">
 
@@ -103,7 +103,7 @@ eleventyComputed:
         </figcaption>
       </figure>
 
-      <p class="prose"><strong>When can I retire?</strong> The question for someone with a target lifestyle in mind. The answer involves a tradeoff of variables that include: withdrawal rate, a growth model, and an expectation about how many years retirement needs to last. For users still accumulating, the answer doubles as a finish line &mdash; <em>how long would I need to keep working and contributing before this stack supports the lifestyle I want?</em> For users with a position already roughly fixed, the answer is a projection: <em>under these assumptions, this is the year the math works out.</em></p>
+      <p class="prose"><strong>When can I retire?</strong> The question for someone with a target lifestyle in mind. The answer involves a tradeoff of variables that include: withdrawal rate, a path for bitcoin&rsquo;s price, and an expectation about how many years retirement needs to last. For users still accumulating, the answer doubles as a finish line &mdash; <em>how long would I need to keep working and contributing before this stack supports the lifestyle I want?</em> For users with a position already roughly fixed, the answer is a projection: <em>under these assumptions, this is the year the math works out.</em></p>
 
       <p class="prose"><strong>What income can I retire on?</strong> For some people, the answer here may be the least income that will allow them to survive comfortably, and thereby they may prioritize an earlier retirement vs. other people who may be looking for not just a survival-income, but a richer more affluent lifestyle, in which case they may be willing to continue to work longer (or just wait longer, in the case of a static bitcoin stack) to avail of the higher retirement income.</p>
 
@@ -123,7 +123,7 @@ eleventyComputed:
 
       <h2 class="section-title">What this calculator produces</h2>
 
-      <p class="prose">What follows are <em>legible scenarios</em> to explore, not plans or forecasts. The numbers are projections under <em>assumptions</em> you control &mdash; growth model, inflation, withdrawal rate, time horizon &mdash; and projections are not predictions. When the readout says your stack reaches <em>escape velocity</em>, it means the math closes under the model you selected; it does not mean bitcoin will continue to grow at the rate the model implies, and it does not mean any particular year will resemble the model&rsquo;s projection.</p>
+      <p class="prose">What follows are <em>legible scenarios</em> to explore, not plans or forecasts. The numbers are projections under <em>assumptions</em> you control &mdash; bitcoin&rsquo;s price path, inflation, withdrawal rate, time horizon &mdash; and projections are not predictions. When the readout says your stack reaches <em>escape velocity</em>, it means the math closes under the scenario you selected; it does not mean bitcoin will continue to grow at the rate the model implies, and it does not mean any particular year will resemble the model&rsquo;s projection.</p>
 
       <p class="prose closing"><em>The math below is legible. What you do with it is yours.</em></p>
 
@@ -171,12 +171,12 @@ eleventyComputed:
         <div class="projection-legend" role="group" aria-label="Click any line to toggle on or off">
           <div class="legend-hint">Click any line below to hide or show it on the chart</div>
           <div class="legend-group-label">Power Law bands &mdash; per bitcoin</div>
-          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="1"><span class="swatch swatch-trend"></span>Trend (central case)</div>
-          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="0"><span class="swatch swatch-floor"></span>Floor band (conservative anchor)</div>
+          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="1"><span class="swatch swatch-trend"></span>Trend</div>
+          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="0"><span class="swatch swatch-floor"></span>Floor (0.42&times; trend)</div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="2"><span class="swatch swatch-upper"></span>Upper band (spikes)</div>
           <div class="legend-group-label">Portfolio value &mdash; total stack</div>
-          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="3"><span class="swatch swatch-stack"></span>Your stack (if price follows trend)<span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></div>
-          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="4"><span class="swatch swatch-current"></span>Your stack (if today's gap to trend persists)<span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price (currently below trend) and projects forward at the same Power Law growth rate. When this line sits <em>below</em> the drawdown-strategy line, bitcoin is below trend today &mdash; and the vertical gap is the additional gain you&rsquo;d capture if the market mean-reverts to trend over your retirement window. When sitting <em>above</em>, the gap is the premium that trend says will fade. The two lines converge when the market is at trend. Useful as a sanity check on the primary projection: if you want to assume <em>no</em> mean-reversion happens, this line is closer to what you should plan for.</span></span></div>
+          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="3"><span class="swatch swatch-stack"></span><span id="rtLegendSel">Your stack, the scenario showing</span><span class="help-tip" tabindex="0">?<span class="tip-content">Your stack on the price path the Sustainability readout is showing: one of the two scenarios, or the floor stress test. Pick another there, or with the year-by-year tables&rsquo; buttons, and this line follows. It starts at your stack&rsquo;s market value today.</span></span></div>
+          <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="4"><span class="swatch swatch-current"></span><span id="rtLegendOther">Your stack, the other scenario</span><span class="help-tip" tabindex="0">?<span class="tip-content">Your stack on the other of the two scenarios, so both stay on the chart. Both lines start at your stack&rsquo;s market value today; the gap between them is what the plan depends on.</span></span></div>
           <div class="legend-item" role="button" tabindex="0" aria-pressed="true" data-dataset-idx="5"><span class="swatch swatch-benchmark"></span>Traditional 60/40 (same starting capital)</div>
         </div>
       </div>
@@ -196,10 +196,10 @@ eleventyComputed:
             <p class="rt-scenario-summary" id="rtGrowSummary"></p>
             <p class="rt-note">Did your stack outgrow your spending? Green means it grew that year; red means it shrank. Same yearly numbers as the audit view. <span class="rt-note-caveat"><strong>Growth %</strong> is the year-over-year change in portfolio value under your current assumptions (price basis, dollar basis, and withdrawal basis) &mdash; driven by the Power Law growth of your stack minus that year&rsquo;s withdrawal, not a fixed bitcoin-price CAGR.</span></p>
             <div class="rt-toggle-row">
-              <span class="rt-basis-label">Price assumption:</span>
-              <div class="seg-control seg-2" role="group" aria-label="Price assumption">
-                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+              <span class="rt-basis-label">Bitcoin&rsquo;s price:</span>
+              <div class="seg-control seg-2" role="group" aria-label="Bitcoin&rsquo;s price: two scenarios">
+                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="stay" aria-pressed="true"><span class="rt-basis-text">Stays where it is against trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps today&rsquo;s multiple of its Power Law trend for the whole plan, so it grows at the trend&rsquo;s own rate and no recovery is assumed. Below trend this is the conservative scenario, and where the page starts. The same switch as the Sustainability readout&rsquo;s.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn" data-basis="trend" aria-pressed="false"><span class="rt-basis-text">Returns to trend over 3 years</span><span class="help-tip" tabindex="0">?<span class="tip-content">The gap to the Power Law trend closes in a straight line over 3 years, then bitcoin follows its trend. Every earlier stretch below trend has ended; the Sustainability readout gives the record. Not a forecast.</span></span></button>
               </div>
             </div>
             <div class="rt-toggle-row">
@@ -241,10 +241,10 @@ eleventyComputed:
             </div>
             <p class="rt-note rt-income-note" id="rtIncomeNote"></p>
             <div class="rt-toggle-row">
-              <span class="rt-basis-label">Price assumption:</span>
-              <div class="seg-control seg-2" role="group" aria-label="Price assumption">
-                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="trend"><span class="rt-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-                <button type="button" class="rt-basis-btn seg-btn" data-basis="current"><span class="rt-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+              <span class="rt-basis-label">Bitcoin&rsquo;s price:</span>
+              <div class="seg-control seg-2" role="group" aria-label="Bitcoin&rsquo;s price: two scenarios">
+                <button type="button" class="rt-basis-btn seg-btn is-active" data-basis="stay" aria-pressed="true"><span class="rt-basis-text">Stays where it is against trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps today&rsquo;s multiple of its Power Law trend for the whole plan, so it grows at the trend&rsquo;s own rate and no recovery is assumed. Below trend this is the conservative scenario, and where the page starts. The same switch as the Sustainability readout&rsquo;s.</span></span></button>
+                <button type="button" class="rt-basis-btn seg-btn" data-basis="trend" aria-pressed="false"><span class="rt-basis-text">Returns to trend over 3 years</span><span class="help-tip" tabindex="0">?<span class="tip-content">The gap to the Power Law trend closes in a straight line over 3 years, then bitcoin follows its trend. Every earlier stretch below trend has ended; the Sustainability readout gives the record. Not a forecast.</span></span></button>
               </div>
             </div>
             <div class="rt-toggle-row">
@@ -349,17 +349,17 @@ eleventyComputed:
               <span class="stack-value-hint">Worth <strong id="stackValToday">&mdash;</strong> today, given bitcoin&rsquo;s price of <strong id="stackValLivePrice">&mdash;</strong></span>
             </div>
             <div class="stack-value-line2" id="stackValueLine2" aria-live="polite">
-              Worth <strong id="stackValTrend">&mdash;</strong> at the start of your retirement in <strong id="stackValRetYearTrend">&mdash;</strong>, assuming price reverts to trend, or
+              Worth <strong>&mdash;</strong> at the start of your retirement if bitcoin stays where it is against trend, or
             </div>
             <div class="stack-value-line2" id="stackValueLine3" aria-live="polite">
-              Worth <strong id="stackValCurrent">&mdash;</strong> at the start of your retirement in <strong id="stackValRetYearCurrent">&mdash;</strong> if today&rsquo;s <span id="stackValBasisWord">gap</span> to trend persists
+              <strong>&mdash;</strong> if bitcoin returns to trend over 3 years
             </div>
           </div>
 
           <div class="slider-control" data-key="monthlyDcaUSD">
             <div class="slider-row">
               <span class="slider-name">Monthly DCA
-                <span class="help-tip" tabindex="0">?<span class="tip-content">Dollar-cost averaging contribution per month between today and retirement. Each month adds BTC at the prevailing trend price.</span></span>
+                <span class="help-tip" tabindex="0">?<span class="tip-content">Dollar-cost averaging contribution per month between today and retirement. Each year adds bitcoin at that year&rsquo;s price on the price path showing, so a path below trend buys more of it.</span></span>
               </span>
               <span class="slider-val" id="val-monthlyDcaUSD">$0/mo</span>
             </div>
@@ -404,21 +404,15 @@ eleventyComputed:
       <div class="sustainability-header">
         <span class="sustainability-label">Sustainability</span>
       </div>
-      <div class="sustainability-values">
-        <div class="value-block">
-          <div class="value-label">Projected years stack lasts
-            <span class="help-tip" tabindex="0">?<span class="tip-content">Projected number of years the stack can fund your withdrawal, based on the projected Power Law trend price of bitcoin over time.</span></span>
-          </div>
-          <div class="value-display" id="sustYearsLast">&mdash;</div>
-        </div>
-        <div class="value-block">
-          <div class="value-label">Projected stack value at retirement
-            <span class="help-tip" tabindex="0">?<span class="tip-content">In today&rsquo;s dollars (inflation-adjusted), the projected value of your stack the moment retirement begins &mdash; before drawdown. Based on the projected Power Law trend price of bitcoin over time.</span></span>
-          </div>
-          <div class="value-display" id="sustStackValue">&mdash;</div>
-          <p class="sust-basis-note">Under: <strong id="sustBasisWord">reverts to trend</strong>.</p>
-        </div>
-      </div>
+      {# Bitcoin's price: the two scenarios (DEFAULTS_POLICY_2026-10-11, PR B).
+         The block replaces the two value readouts that stood here ("Projected
+         years stack lasts" and "Projected stack value at retirement"): each
+         half carries its own verdict and stack at retirement, and the half
+         showing drives the spectrum below, the chart and the tables. #}
+      {% set pc_id = 'pcRt' %}
+      {% set pc_stress_set = 'retirement' %}
+      {% set pc_stress_label = 'Stress test' %}
+      {% include 'components/price-cases.njk' %}
 
       <!-- ESCAPE VELOCITY SPECTRUM BAR — §9.2.6 -->
       <div class="sustainability-spectrum">
@@ -427,9 +421,9 @@ eleventyComputed:
           <div class="spectrum-marker" id="spectrumMarker" style="left: 50%"></div>
         </div>
         <div class="spectrum-labels">
-          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower the withdrawal, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
-          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
-          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
+          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower the withdrawal, or raise the stack to reach sustainability. On the price path showing above.</span></span></span>
+          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. On the price path showing above.</span></span></span>
+          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. On the price path showing above.</span></span></span>
         </div>
         <div class="spectrum-detail-wrap">
           <span class="spectrum-detail" id="spectrumDetail">&mdash;</span>
@@ -537,7 +531,7 @@ eleventyComputed:
     <div class="baseline-cluster" id="baselineCluster">
       <div class="baseline-cluster-header">
         <span class="title">Baseline assumptions</span>
-        <span class="help">Inflation rate &middot; Bitcoin growth model &middot; Traditional portfolio benchmark &mdash; adjust if you want to model a different world.</span>
+        <span class="help">Inflation rate &middot; Traditional portfolio benchmark &mdash; adjust if you want to model a different world. Bitcoin&rsquo;s price is set by the two scenarios in the Sustainability readout.</span>
         <a href="#" class="hide-link" id="baselineToggle">Hide</a>
       </div>
 
@@ -572,25 +566,6 @@ eleventyComputed:
             Toggle nominal/real in the year-by-year tables above. Real dollars use the inflation
             rate selected here, applied across every figure on the page.
           </p>
-        </div>
-
-        <div class="picker-group">
-          <div class="picker-label">Bitcoin growth model <span class="help">&mdash; how price evolves over time</span></div>
-          <div class="picker cols-3" data-dim="btcGrowthModel">
-            <button type="button" class="picker-card" data-preset="powerlaw-floor">
-              <span class="val">Power Law</span>
-              <span class="name">Floor band (5th percentile)</span>
-            </button>
-            <button type="button" class="picker-card" data-preset="powerlaw-trend">
-              <span class="val">Power Law</span>
-              <span class="name">Trend line (default)</span>
-            </button>
-            <button type="button" class="picker-card" data-preset="linear-cagr-decay">
-              <span class="val">Linear CAGR</span>
-              <span class="name">With decay (secondary)</span>
-            </button>
-          </div>
-          <a href="/the-power-law#summary" class="powerlaw-link">What is the Power Law? &rarr;</a>
         </div>
 
         <div class="picker-group">
@@ -720,11 +695,24 @@ eleventyComputed:
 
       <p class="prose">The floor is the line price has held through the modern record: since 2011 its deepest dip went 5.1% below it, in 2015, and price was back above within weeks; its R&sup2; against actual lows exceeds 0.99. The upper band, 3&times; trend, is not a cap: past cycle peaks went through it, the early ones far through it (14&times; trend in 2011, 12&times; in 2013), so it is best read as a level spikes reach, not a sustained one. For the deeper treatment of why bitcoin follows this model, see <a href="/the-power-law">Bitcoin and the Power Law</a>.</p>
 
+      <h2 class="section-title">Bitcoin&rsquo;s price: two scenarios and a stress test</h2>
+
+      <p class="prose">Every path starts at today&rsquo;s price, which is a multiple <em>m&#8320;</em> of the trend (the chart&rsquo;s caption gives today&rsquo;s), and is a multiple of the trend each year after:</p>
+
+      <div class="math-block">
+        <div class="math-eq">Price(y) = m(y) &times; Trend(y)</div>
+        <div class="math-eq math-eq-small">stays: m(y) = m&#8320; &nbsp;&middot;&nbsp; returns: m(y) = m&#8320; + (1 &minus; m&#8320;) &times; min(1, y/3) &nbsp;&middot;&nbsp; floor stress test: m(y) = m&#8320; + (0.42 &minus; m&#8320;) &times; min(1, y/3)</div>
+      </div>
+
+      <p class="prose"><em>If bitcoin stays below trend</em> assumes no recovery: bitcoin grows at the trend&rsquo;s own rate. <em>If bitcoin returns to trend over 3 years</em> closes the gap in a straight line, then follows the trend; 3 years is longer than any stretch on either side of trend in the record. Neither is a forecast. The calculator starts on the lower of the two for today&rsquo;s price, so below trend nothing depends on a recovery, and above trend nothing depends on a premium lasting. The <em>floor</em> stress test falls to 0.42&times; trend over the same 3 years and stays there for the whole plan.</p>
+
+      <p class="prose"><em>Changed October 11, 2026:</em> until then the calculator opened on &ldquo;reverts to trend&rdquo;, which valued the stack at the trend price from today, about double the market price on the day of the change, and a sitewide growth-model setting could swap that path for the floor. On the return path, a plan with no monthly buying that retires three or more years out gets exactly the verdict it got before, because its price is back on trend by then; monthly buying in the first three years now happens below trend, which buys more bitcoin. The default verdict is now the stays path&rsquo;s, which is harsher below trend.</p>
+
       <h2 class="section-title">The stack projection</h2>
 
       <p class="prose">Two phases: pre-retirement <em>accumulation</em> and post-retirement <em>drawdown</em>.</p>
 
-      <p class="prose"><strong>Accumulation.</strong> For each year between today and retirement, the dollar-cost-averaging contribution buys bitcoin at that year&rsquo;s modeled trend price:</p>
+      <p class="prose"><strong>Accumulation.</strong> For each year between today and retirement, the dollar-cost-averaging contribution buys bitcoin at that year&rsquo;s modeled price on the path showing:</p>
 
       <div class="math-block">
         <div class="math-eq">stack<sub>y+1</sub> = stack<sub>y</sub> + (12 &times; monthly DCA) &divide; Price(y)</div>
@@ -742,7 +730,7 @@ eleventyComputed:
 
       <h2 class="section-title">Sustainability and escape velocity</h2>
 
-      <p class="prose">The Sustainability readout reports two figures: <em>projected years stack lasts</em> and <em>projected stack value at retirement</em>. The spectrum bar places the plan in one of three states, decided by <em>where the stack&rsquo;s real value is heading at the end of the horizon</em>; within a state, the marker&rsquo;s position comes from the real-terms multiplier &mdash; the stack&rsquo;s purchasing power at the end of retirement divided by its purchasing power at retirement:</p>
+      <p class="prose">The Sustainability readout reports, for each of the two scenarios, how long the stack lasts and its value at retirement. The spectrum bar places the plan in one of three states, decided by <em>where the stack&rsquo;s real value is heading at the end of the horizon</em>; within a state, the marker&rsquo;s position comes from the real-terms multiplier &mdash; the stack&rsquo;s purchasing power at the end of retirement divided by its purchasing power at retirement:</p>
 
       <div class="math-block">
         <div class="math-eq">real multiplier = (stack<sub>end</sub> &divide; stack<sub>start</sub>) &divide; (1 + inflation)<sup>years in retirement</sup></div>
@@ -767,7 +755,7 @@ eleventyComputed:
 
       <h2 class="section-title">Inflation and real terms</h2>
 
-      <p class="prose">Every dollar amount on the calculator is in <em>today&rsquo;s dollars</em>. The projection inflation-adjusts the withdrawal so that the user&rsquo;s lifestyle stays constant in purchasing power across retirement. The inflation rate is selectable from the baseline assumptions:</p>
+      <p class="prose">The withdrawal you set is in <em>today&rsquo;s dollars</em>: the projection inflation-adjusts it so that your lifestyle stays constant in purchasing power across retirement. The figures show in future (nominal) dollars by default, or today&rsquo;s dollars with the toggle in the year-by-year tables. The inflation rate is selectable from the baseline assumptions:</p>
 
       <table class="math-table">
         <thead>

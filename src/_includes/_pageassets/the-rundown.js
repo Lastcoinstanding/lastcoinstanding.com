@@ -1258,7 +1258,7 @@
 
     var cs = [
       { k: 'If today’s gap persists' + tip('Prices projected forward at the trend&rsquo;s own growth rate, but starting from today&rsquo;s actual price rather than today&rsquo;s trend price &mdash; so the gap between the two never closes.'), v: btc(here) + ' BTC', sub: 'read from today’s price' },
-      { k: 'If price tracks the floor' + tip('The site-wide floor-case growth model: price sits at 0.42&times; the trend for the whole plan. The more conservative of the two, and reachable on Escape Velocity by switching the growth model.'), v: floor == null ? '—' : btc(floor) + ' BTC', sub: 'the 0.42× floor case' }
+      { k: 'If price tracks the floor' + tip('The floor stress test: price falls to 0.42&times; the trend over 3 years and stays there for the whole plan. The more conservative of the two, and on Escape Velocity as its stress test.'), v: floor == null ? '—' : btc(floor) + ' BTC', sub: 'the 0.42× floor case' }
     ];
     if (stackBTC) {
       var gap = stackBTC - here;

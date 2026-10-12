@@ -15,19 +15,19 @@ related:
     desc: "The same two-column pattern for housing: two plans, one shared set of assumptions, the difference stated."
 faq:
   - q: "What does Compare Retirement Plans do?"
-    a: "It runs two complete retirement plans side by side and states the difference between them in plain sentences. Each plan carries its own stack at retirement, retirement year and annual withdrawal; both are projected under the same growth model, the same inflation assumption and the same horizon, so every difference in the outcome traces back to a choice you made."
+    a: "It runs two complete retirement plans side by side and states the difference between them in plain sentences. Each plan carries its own stack at retirement, retirement year and annual withdrawal; both are projected under the same scenario for bitcoin&rsquo;s price, the same inflation assumption and the same horizon, so every difference in the outcome traces back to a choice you made."
   - q: "Why can&rsquo;t I give each plan a different growth assumption?"
-    a: "Because it would quietly break the comparison. If one column could carry a friendlier world than the other, every verdict row would become a model-vs-model claim rather than a plan-vs-plan one, and a plan could &ldquo;win&rdquo; because it was handed better luck rather than because it was a better choice. Assumptions are shared on purpose. The one environment control on the page &mdash; the bear-market toggle &mdash; applies to both plans identically for the same reason."
+    a: "Because it would quietly break the comparison. If one column could carry a friendlier world than the other, every verdict row would become a model-vs-model claim rather than a plan-vs-plan one, and a plan could &ldquo;win&rdquo; because it was handed better luck rather than because it was a better choice. Assumptions are shared on purpose. The environment controls on the page &mdash; bitcoin&rsquo;s price scenario and the bear-market toggle &mdash; apply to both plans identically for the same reason."
   - q: "What does the bear-market toggle do?"
     a: "It drops the <a href='/the-bitcoin-retirement-stress-test'>Retirement Stress Test</a>&rsquo;s crash into both plans at once, at each plan&rsquo;s own retirement year, using that page&rsquo;s own crash definition rather than a second one. The question it answers is decision-relevant and specific to comparing: does the advantage you are weighing grow or shrink when the market turns hostile? It is not a substitute for the Stress Test itself, which varies crash depth, timing and recovery."
   - q: "How is this different from the comparison panel on the retirement calculator?"
     a: "That panel takes one plan and applies canned relative nudges to it &mdash; variants derived from a base. This page has no base and no variant: both columns are independently configured plans, and either can be anything you like. Use the panel to feel the terrain around a plan you have; use this page when you are choosing between two plans you are actually weighing."
   - q: "Can I share a comparison?"
-    a: "Yes. Both plans and the bear toggle are written into the address bar as you edit, along with a horizon or withdrawal basis that differs from the defaults, so copying the URL carries the exact comparison you are looking at. The reset link strips every parameter and returns both columns to their defaults."
+    a: "Yes. Both plans, the bear toggle and a price scenario you picked are written into the address bar as you edit, along with a horizon or withdrawal basis that differs from the defaults, so copying the URL carries the exact comparison you are looking at. The reset link strips every parameter and returns both columns to their defaults."
 eleventyComputed:
   head_extras: "{% include '_pageassets/compare-retirement-plans-head.html' %}"
   page_styles: "{% include '_pageassets/compare-retirement-plans.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/compare-retirement-plans.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/compare-retirement-plans.js' %}"
 ---
 
 <section class="hero">
@@ -67,7 +67,7 @@ eleventyComputed:
          populated columns, which reads as symmetric — but the intended use is
          asymmetric: A is what you hold, B is what you are weighing against it.
          Saying so is what turns a symmetric-looking control into a decision. -->
-    <p class="crp-orient">Set <strong>Plan A</strong> to your base case &mdash; the plan you actually hold or intend &mdash; then make <strong>Plan B</strong> the variation you&rsquo;re weighing: retire a year later, draw a different amount, arrive with a bigger stack. Both run under the same <a href="#shared">shared assumptions</a>, with <a href="/the-power-law">the Power Law</a> as the growth engine.</p>
+    <p class="crp-orient">Set <strong>Plan A</strong> to your base case &mdash; the plan you actually hold or intend &mdash; then make <strong>Plan B</strong> the variation you&rsquo;re weighing: retire a year later, draw a different amount, arrive with a bigger stack. Both run under the same <a href="#shared">shared assumptions</a>, including one scenario for bitcoin&rsquo;s price against <a href="/the-power-law">the Power Law</a> trend.</p>
 
     <div class="crp-columns">
 
@@ -156,6 +156,11 @@ eleventyComputed:
            always-visible is the control itself and the one-line statement of
            the rule; the reasoning sits behind a plain expander. No storage —
            a remembered open state would defeat the reclaim on return visits. -->
+      {# Bitcoin's price: the two scenarios as one compact switch, shared by
+         both plans (DEFAULTS_POLICY_2026-10-11, PR B). #}
+      {% set pcs_id = 'pcsCrp' %}
+      {% include 'components/price-cases-switch.njk' %}
+
       <div class="crp-shared-row">
         <label class="crp-bear">
           <input type="checkbox" id="crpBearToggle">
@@ -165,8 +170,8 @@ eleventyComputed:
         <p class="crp-note crp-bear-note" id="crpBearBody" hidden>The crash always hits both plans, so the comparison stays about the choice, not the luck. It lands in the first year of <em>each</em> plan&rsquo;s own retirement, using the <a href="/the-bitcoin-retirement-stress-test">Retirement Stress Test</a>&rsquo;s crash definition &mdash; <span id="crpBearSpec">&mdash;</span> &mdash; not a second one. The question it answers: does your option&rsquo;s advantage grow or shrink when the market turns hostile?</p>
       </div>
 
-      <p class="crp-note crp-shared-foot">Growth path, inflation and horizon are shared <button type="button" class="crp-expander" id="crpWhyMore" aria-expanded="false" aria-controls="crpWhyBody"><span class="crp-caret" aria-hidden="true">&#9656;</span> why</button></p>
-      <p class="crp-note crp-shared-why" id="crpWhyBody" hidden>They cannot be set per column &mdash; if one plan could carry a friendlier world, every row below would be a model comparison rather than a plan comparison. <a href="/the-bitcoin-retirement">The flagship</a> holds the bands, the 60/40 foil and the gap-persists variant this page leaves out.</p>
+      <p class="crp-note crp-shared-foot">Bitcoin&rsquo;s price, inflation and horizon are shared <button type="button" class="crp-expander" id="crpWhyMore" aria-expanded="false" aria-controls="crpWhyBody"><span class="crp-caret" aria-hidden="true">&#9656;</span> why</button></p>
+      <p class="crp-note crp-shared-why" id="crpWhyBody" hidden>They cannot be set per column &mdash; if one plan could carry a friendlier world, every row below would be a model comparison rather than a plan comparison. <a href="/the-bitcoin-retirement">The flagship</a> holds the bands and the 60/40 foil this page leaves out.</p>
     </div>
 
   </section>

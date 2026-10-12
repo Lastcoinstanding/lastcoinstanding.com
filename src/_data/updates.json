@@ -2,6 +2,36 @@
   {
     "display": "10/11/26",
     "date": "2026-10-11",
+    "page": "/the-bitcoin-retirement",
+    "summary": "The Bitcoin Retirement: bitcoin's price is now two scenarios side by side, each with your plan's verdict and what the stack is worth when you retire: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. The page now starts on the lower of the two, so the default plan reads \"shrinking from 2064\" where it read \"escape velocity\", and that answer stays on screen beside it. The return used to put the price at trend from today, which valued the stack you hold now at about twice its market price; it now takes 3 years. The floor is a stress test, and the sitewide growth-model setting is gone. Also fixed: with monthly buys, the \"stays\" stack value had left out the extra bitcoin those buys get at the lower price."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/bitcoin-escape-velocity",
+    "summary": "Bitcoin Escape Velocity: the two scenarios for bitcoin's price now sit above the verdict, each with its own answer: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. The page starts on the lower of the two, so the default plan now runs out in 2045 rather than shrinking from 2057, with that answer beside it. The thresholds on each scenario are unchanged, and the floor is a stress test."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/compare-retirement-plans",
+    "summary": "Compare Retirement Plans: one switch now sets bitcoin's price for both plans, with both plans' answers on the other scenario shown under it: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two (the page ran on the return alone until now), so the default pair now runs out in 2045 and 2048. The summary names the scenario, and the floor is a stress test."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/the-bitcoin-retirement-stress-test",
+    "summary": "The Bitcoin Retirement Stress Test: the crash now lands on the scenario you pick for bitcoin's price, with the other scenario's answer to the same crash beside it: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two. There the default plan runs out in 2056 even without a crash, and the crash pulls that to 2039; on the return it survives, as before. When the crash would take price below the floor, the assumptions line says how that compares with the record."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/living-on-bitcoin",
+    "summary": "Living on Bitcoin: bitcoin's growth is now two scenarios side by side, each with its rate and what the float nets: if bitcoin stays as far below its trend as it is today (about 33% a year), or if it returns to trend over 3 years (about 51% a year over the default 5 years). It starts on the lower of the two, which lowers the default result from +$31,231 to +$12,774. Corrected: the old default, \"Current trajectory\", was described as starting at today's price but assumed a full return to trend; the Math tab dates the change."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
     "page": "/bitcoin-vs-real-estate",
     "summary": "Bitcoin vs. Real Estate: the projection now opens with bitcoin's price as two scenarios side by side, with your result under each: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two, so nothing depends on a recovery, and your default result is unchanged. The return now takes 3 years rather than the whole plan, which lowers that scenario's result a little, since the renter's later monthly buys are at trend prices. The floor and 2.5× trend are now stress tests."
   },

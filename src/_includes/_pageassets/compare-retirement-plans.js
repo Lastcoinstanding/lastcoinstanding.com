@@ -22,6 +22,7 @@
   var E = window.RetirementEngine;
   var CM = window.CrashModel;
   var MA = window.ModelingAssumptions;
+  var PC = window.PriceCases;
 
   /* ═══════════════════════════════════════════════════════════
      STATE — two plans and one shared environment flag.
@@ -51,7 +52,22 @@
   };
   var BEAR = false;
   var EDIT_COL = 'a';        // mobile only — which column's inputs are shown
-  var BASIS = 'trend';       // shared; the gap-persists variant is flagship territory
+  /* Bitcoin's price, shared by both plans (DEFAULTS_POLICY_2026-10-11, PR B;
+     JM 2026-10-11): 'stay' | 'trend' (the two scenarios) | 'floor' (the
+     stress test), picked in the compact switch on the shared card. The
+     default is the lower of the two for today's price until the reader picks
+     or a link carries a pick (?basis=current|trend|floor). Until 2026-10-11
+     this page ran 'trend' only, re-set to the trend price at year 0, and
+     called the gap-persists path flagship territory. */
+  var BASIS = 'stay';
+  var PICKED = false;
+  function syncDefault() { if (!PICKED) BASIS = PC.defaultFor(E.currentRatio()); }
+  function basisWords(b) {
+    var m = E.currentRatio();
+    return b === 'floor' ? { title: PC.FLOOR_FALL.title, name: PC.FLOOR_FALL.name }
+                         : { title: PC.titles(m)[b], name: PC.names(m)[b] };
+  }
+  function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
 
   var LIMITS = E.LIMITS;
   var STEP = { retirementYear: 1, btcStack: 0.25, targetIncomeUSD: 10000 };
@@ -131,7 +147,7 @@
     };
   }
   function allLines(ca, cb) {
-    var key = [stateKey(), MA.get('inflation').value, MA.get('btcGrowthModel').preset, TODAY_PRICE].join('|');
+    var key = [stateKey(), MA.get('inflation').value, BASIS, TODAY_PRICE].join('|');
     if (key === LINE_KEY) return LINE_CACHE;
     LINE_KEY = key;
     LINE_CACHE = { a: linesFor(ca), b: linesFor(cb) };
@@ -698,8 +714,8 @@
     if (sm) {
       sm.innerHTML = '<strong>' + formatBtc(c.scn.btcStack) + ' BTC</strong>, retiring <strong>' + c.scn.retirementYear +
         '</strong>, drawing <strong>' + formatUsdFull(c.scn.targetIncomeUSD) + '</strong> a year ' + (c.scn.incomeBasis === 'fixed' ? 'fixed in future dollars' : 'in today&rsquo;s dollars') + ' over ' +
-        yearsWord(c.scn.yearsInRetirement) + '. Inflation ' + MA.get('inflation').value + '%, growth ' +
-        MA.get('btcGrowthModel').preset.replace('powerlaw-', 'Power Law ') + (BEAR ? ', with the bear-market test on' : '') + '.';
+        yearsWord(c.scn.yearsInRetirement) + '. Inflation ' + MA.get('inflation').value + '%, ' +
+        lowerFirst(basisWords(BASIS).title) + (BASIS === 'floor' ? ' (a stress test)' : '') + (BEAR ? ', with the bear-market test on' : '') + '.';
     }
     var lk = document.getElementById(linkId);
     if (lk) lk.setAttribute('href', flagshipHref(c.scn));
@@ -715,7 +731,9 @@
   function familyParams(scn) {
     return 'stack=' + scn.btcStack + '&retire=' + scn.retirementYear +
            '&income=' + Math.round(scn.targetIncomeUSD) + '&years=' + scn.yearsInRetirement +
-           '&incbasis=' + scn.incomeBasis;
+           '&incbasis=' + scn.incomeBasis +
+           // The price path rides along only when the reader picked one (R7).
+           (PICKED ? '&basis=' + (BASIS === 'stay' ? 'current' : BASIS) : '');
   }
   function flagshipHref(scn) { return '/the-bitcoin-retirement?' + familyParams(scn); }
   function stressHref(scn) { return '/the-bitcoin-retirement-stress-test?' + familyParams(scn); }
@@ -771,6 +789,11 @@
       }
     });
     if (p.has('bear')) BEAR = (p.get('bear') === '1' || p.get('bear') === 'true');
+    // A carried pick of the price path (the family's `basis` values).
+    if (p.has('basis')) {
+      var pb = p.get('basis');
+      if (pb === 'current' || pb === 'stay' || pb === 'trend' || pb === 'floor') { BASIS = E.normBasis(pb); PICKED = true; }
+    }
 
     /* Shared settings a sender carries (coherence F3, 2026-09-23). The
        horizon and the withdrawal basis are one setting for BOTH plans (design
@@ -804,6 +827,7 @@
         });
       });
       if (BEAR) p.set('bear', '1');
+      if (PICKED) p.set('basis', BASIS === 'stay' ? 'current' : BASIS);
       // Written only when they differ from the defaults, so an untouched
       // comparison keeps the short URL it always had.
       if (PLANS.a.yearsInRetirement !== DEFAULT_A.yearsInRetirement) p.set('years', String(PLANS.a.yearsInRetirement));
@@ -876,7 +900,14 @@
     btn.addEventListener('click', function () { if (!repeatTimer) fn(); });
   }
 
+  // A pick in the compact switch (components/price-cases-switch.njk).
+  function pickBasis(b) {
+    BASIS = E.normBasis(b); PICKED = true;
+    LINE_KEY = null; render(); syncUrl();
+  }
+
   function wireControls() {
+    PC.bind(document.getElementById('pcsCrp'), pickBasis);
     var bear = document.getElementById('crpBearToggle');
     if (bear) bear.addEventListener('change', function () { BEAR = bear.checked; render(); syncUrl(); });
 
@@ -892,6 +923,7 @@
       PLANS.b = planFrom(DEFAULT_A, { retirementYear: DEFAULT_A.retirementYear + 1 });
       BEAR = false;
       if (bear) bear.checked = false;
+      PICKED = false; LINE_KEY = null;   // back to the default path for today's price
       if (window.history && window.history.replaceState) window.history.replaceState(null, '', window.location.pathname);
       render();
     });
@@ -939,9 +971,30 @@
   ═══════════════════════════════════════════════════════════ */
 
   function render() {
+    syncDefault();
     var ca = computeCol('a'), cb = computeCol('b');
     var L = allLines(ca, cb);
     LAST_COLS = [ca, cb];
+
+    // Bitcoin's price: the compact switch, with the other scenario's answer
+    // for both plans on the line under it, so both scenarios stay on screen.
+    (function () {
+      var otherKey = BASIS === 'stay' ? 'trend' : BASIS === 'trend' ? 'stay' : PC.defaultFor(E.currentRatio());
+      var infl = MA.get('inflation').value;
+      function shortV(scn) {
+        var v = E.computeVerdict(E.projectForBasis(scn, otherKey, false, multFor(scn)), scn, infl);
+        return v.state === 'escape' ? 'crosses the threshold from ' + v.escapeYear
+             : v.state === 'shrink' ? 'lasts to ' + v.horizonYear + ' but shrinks'
+             : 'runs out in ' + v.depletionYear;
+      }
+      var y0 = (new Date()).getFullYear(), end = Math.max(PLANS.a.retirementYear, PLANS.b.retirementYear) + PLANS.a.yearsInRetirement, n = Math.max(1, end - y0);
+      PC.renderSwitch(document.getElementById('pcsCrp'), {
+        mult: E.currentRatio(), selected: BASIS,
+        plan: { months: n * 12, phrase: 'both plans, to ' + end, words: 'the ' + n + ' years to ' + end },
+        other: (BASIS === 'floor' ? 'Showing the stress test. ' : '') + '<strong>' + basisWords(otherKey).title + '</strong>' + (BEAR ? ', with the same bear market' : '') +
+          ': Plan A ' + shortV(PLANS.a) + '; Plan B ' + shortV(PLANS.b) + '.'
+      });
+    })();
 
     // steppers
     document.querySelectorAll('.crp-stepper').forEach(function (el) {
@@ -957,9 +1010,10 @@
     // shared card
     var sm = document.getElementById('crpSharedSummary');
     if (sm) {
-      // "reverts to trend" is what the flagship and EV call this same path
-      // (multiplier 1: the Power Law trend price throughout) — coherence F6(a).
-      sm.textContent = 'Power Law trend · reverts to trend · inflation ' + MA.get('inflation').value + '% · ' +
+      // The price path in the family's words (2026-10-11; was a fixed
+      // "Power Law trend · reverts to trend", coherence F6(a), which also read
+      // "Power Law trend" under the old Floor setting: DEFAULTS_POLICY bug 9).
+      sm.textContent = basisWords(BASIS).name + (BASIS === 'floor' ? ' (stress test)' : '') + ' · inflation ' + MA.get('inflation').value + '% · ' +
         yearsWord(PLANS.a.yearsInRetirement) + ' horizon' +
         (PLANS.a.incomeBasis === 'fixed' ? ' · withdrawal fixed in future $' : '') +
         (BEAR ? ' · bear-market test on' : '');
@@ -1081,9 +1135,10 @@
     });
 
     // (b) this page's columns reproduce the family's answers.
-    //   b1 — against the DEPLOYED Escape Velocity page's own output (golden).
+    //   b1 — against the shared engine directly (the snapshot of the deployed
+    //        Escape Velocity page's output was retired 2026-08-26; see above).
     //   b2 — internal identities that must hold for the port to be the port:
-    //        memo ≡ raw, and the multFn path with a flat multiplier ≡ scalar.
+    //        memo ≡ raw, and the multFn path with a flat multiplier ≡ the path.
     BEAR = false;
     VECTORS.forEach(function (g, i) {
       var scn = planFrom(DEFAULT_A, { btcStack: g.stack, targetIncomeUSD: g.income, retirementYear: g.retire });
@@ -1095,13 +1150,15 @@
       // than by comparing against a snapshot of what EV once printed. No
       // tolerances and no drift tier: this is an identity, not a measurement,
       // so it holds on any date.
-      var viaRaw = E.projectStackOverTime(scn, MA.get('btcGrowthModel').preset, infl, 1);
+      // Since 2026-10-11 the columns run a price path (BASIS), so "raw" is the
+      // same path uncached, and the flat crash multiplier rides on the path.
+      var viaRaw = E.projectForBasis(scn, BASIS, true, null);
       if (proj.depletionYear !== viaRaw.depletionYear) failures.push(tag + ': memo and raw depletionYear differ');
       for (var k = 0; k < viaRaw.points.length; k++) {
         var m = proj.points[k] && proj.points[k].y, r = viaRaw.points[k].y;
         if ((m === null) !== (r === null) || (m !== null && Math.abs(m - r) > 1e-6)) { failures.push(tag + ': memo and raw series differ at ' + viaRaw.points[k].x); break; }
       }
-      var viaMult = E.projectWithMultFn(scn, MA.get('btcGrowthModel').preset, infl, function () { return 1; });
+      var viaMult = E.projectForBasis(scn, BASIS, false, function () { return 1; });
       if (viaMult.depletionYear !== viaRaw.depletionYear) failures.push(tag + ': multFn identity broke depletionYear');
       for (var j = 0; j < viaRaw.points.length; j++) {
         var a2 = viaMult.points[j].y, b2 = viaRaw.points[j].y;
@@ -1116,7 +1173,7 @@
     if (!failures.length) {
       console.log('%ccrpParityQA PASS', 'color:#7fc47f;font-weight:600',
         '(' + VECTORS.length + ' vectors × 2 bear states A≡B; ' + VECTORS.length +
-        ' vectors against the shared engine directly; memo/raw/multFn identities hold)');
+        ' vectors against the shared engine directly; memo/raw/multFn identities hold; path ' + BASIS + ')');
       return true;
     }
     console.error('crpParityQA FAIL', failures);
@@ -1151,8 +1208,8 @@
     render();
     _suppressUrlWrite = false;
 
-    // The live quote lands after first paint; the trend basis does not use it,
-    // but currentRatio() and the flagship link do, so re-render once it is in.
+    // The live quote lands after first paint. Every price path starts at
+    // today's price, and the default path is chosen from it, so re-render.
     if (typeof fetchTodayPrice === 'function') {
       fetchTodayPrice(function () { LINE_KEY = null; render(); });
     }

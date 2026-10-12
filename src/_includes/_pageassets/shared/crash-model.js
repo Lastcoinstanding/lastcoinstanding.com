@@ -15,10 +15,14 @@
   // Recovery shapes → {years, shape, ceiling?, label, note}. All four; consumers
   // pick subsets (allocation exposes fast/historical/weak; the Stress Test all four).
   var RECOVERY = {
-    fast:       { years: 2, shape: 'fast',       label: 'Fast', note: 'back to trend in about 2 years' },
-    historical: { years: 3, shape: 'historical', label: 'Historical', note: 'about 3 years to trend, the reliable past pattern' },
-    slow:       { years: 6, shape: 'slow',       label: 'Slow', note: 'a long, grinding 6 years to trend' },
-    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak', note: 'never fully returns to trend, settling toward the Power Law floor' }
+    // Notes say "the path it fell from", not "trend" (2026-10-11): the
+    // retirement family's crash now lands on the price path the reader picked
+    // (DEFAULTS_POLICY PR B), which is the trend only on the return path.
+    // Allocation Sizing shows the labels, not the notes.
+    fast:       { years: 2, shape: 'fast',       label: 'Fast', note: 'back to the path it fell from in about 2 years' },
+    historical: { years: 3, shape: 'historical', label: 'Historical', note: 'about 3 years back to the path it fell from, the reliable past pattern' },
+    slow:       { years: 6, shape: 'slow',       label: 'Slow', note: 'a long, grinding 6 years back to the path' },
+    weak:       { years: 6, shape: 'never', ceiling: 0.6, label: 'Weak', note: 'never fully recovers, settling 40% below the path it fell from' }
   };
 
   // Per-year price multiplier (≤1). Before the crash: 1. Slides to the trough over

@@ -1,0 +1,78 @@
+{#-
+  ════════ BITCOIN'S PRICE: THE COMPACT SWITCH ════════
+
+  The two scenarios as one compact switch (DEFAULTS_POLICY_2026-10-11 PR B,
+  JM 2026-10-11): Compare Retirement Plans and the Stress Test, where one
+  figure per scenario would have to speak for two plans or for a crash, so
+  the options carry the titles and tags but no number. The page fills the
+  "other" line with the other scenario's answer, so both stay on screen.
+  Same words and same clicks as the block (components/price-cases.njk):
+  PriceCases.renderSwitch fills it, PriceCases.bind reports picks.
+
+  Usage, with an id unique on the page:
+      {% set pcs_id = 'pcsCrp' %}
+      {% include 'components/price-cases-switch.njk' %}
+  Optional: pcs_class.
+
+  Own scoped <style>, every rule under .pcs; colours as vars with literal
+  fallbacks (host palettes differ).
+-#}
+{%- set pcsId = pcs_id | default('pcsSwitch') -%}
+<style>
+.pcs { margin: 0 0 1.1rem; padding: 0.85rem 1rem 0.8rem; border: 1px solid rgba(212,168,67,0.32); border-radius: 10px; background: rgba(212,168,67,0.04); text-align: left; box-sizing: border-box; }
+.pcs .pcs-head { font-size: 0.86rem; line-height: 1.55; color: var(--text, #e8e0d0); margin: 0 0 0.6rem; }
+.pcs .pcs-eyebrow { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold, #d4a843); margin-right: 0.5rem; }
+.pcs .pcs-head strong { color: var(--text, #e8e0d0); }
+.pcs .pcs-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.5rem; align-items: stretch; }
+.pcs .pcs-opt { display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; width: 100%; margin: 0; padding: 0.6rem 0.75rem; text-align: left; font: inherit; color: inherit; cursor: pointer; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; transition: background 0.15s, border-color 0.15s; }
+.pcs .pcs-opt:hover { border-color: rgba(224,148,34,0.5); }
+.pcs .pcs-opt.active { background: rgba(224,148,34,0.09); border-color: var(--amber, #e09422); box-shadow: inset 0 0 0 1px var(--amber, #e09422); }
+.pcs .pcs-opt:focus-visible { outline: 2px solid var(--amber, #e09422); outline-offset: 2px; }
+.pcs .pcs-opt.is-muted .pcs-title { opacity: 0.8; }
+.pcs .pcs-title { font-size: 0.9rem; font-weight: 600; line-height: 1.35; color: var(--text, #e8e0d0); }
+.pcs .pcs-top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; }
+.pcs .pcs-tag { display: inline-block; font-family: 'Inter', -apple-system, sans-serif; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+.pcs .pcs-tag--cons { color: #b9c7d2; background: rgba(185,199,210,0.12); border: 1px solid rgba(185,199,210,0.3); }
+.pcs .pcs-tag--hist { color: var(--gold, #d4a843); background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.35); }
+.pcs .pcs-tag--never { color: #cf9a8a; background: rgba(207,154,138,0.1); border: 1px solid rgba(207,154,138,0.3); }
+.pcs .pcs-state { font-size: 0.72rem; color: var(--amber, #e09422); white-space: nowrap; }
+.pcs .pcs-opt:not(.active) .pcs-state-on, .pcs .pcs-opt.active .pcs-state-off { display: none; }
+.pcs .pcs-note { font-size: 0.76rem; line-height: 1.5; color: var(--text-dim, #a89f8f); }
+.pcs .pcs-or { display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: 1.05rem; color: var(--gold, #d4a843); padding: 0 0.1rem; }
+.pcs .pcs-other { font-size: 0.82rem; line-height: 1.55; color: var(--text-dim, #a89f8f); margin: 0.6rem 0 0; }
+.pcs .pcs-other strong { color: var(--text, #e8e0d0); }
+.pcs .pcs-foot { font-size: 0.8rem; line-height: 1.55; color: var(--text-muted, #8a8070); margin: 0.5rem 0 0; }
+.pcs .pcs-foot a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; white-space: nowrap; }
+.pcs .pcs-stress { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.5rem; margin: 0.6rem 0 0; font-size: 0.76rem; }
+.pcs .pcs-stress-lbl { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted, #8a8070); }
+.pcs .pcs-chip { font: inherit; font-size: 0.76rem; color: var(--text-dim, #a89f8f); background: transparent; border: 1px dashed rgba(255,255,255,0.22); border-radius: 999px; padding: 0.22rem 0.65rem; margin: 0; cursor: pointer; }
+.pcs .pcs-chip:hover { border-color: rgba(224,148,34,0.55); }
+.pcs .pcs-chip.active { color: var(--amber, #e09422); border-style: solid; border-color: var(--amber, #e09422); background: rgba(224,148,34,0.08); }
+@media (max-width: 640px) {
+  .pcs .pcs-eyebrow { display: block; margin: 0 0 0.25rem; }
+  .pcs .pcs-row { grid-template-columns: 1fr; }
+  .pcs .pcs-or { padding: 0; }
+}
+</style>
+<div class="pcs{% if pcs_class %} {{ pcs_class }}{% endif %}" id="{{ pcsId }}">
+  <p class="pcs-head"><span class="pcs-eyebrow">Bitcoin&rsquo;s price &middot; two scenarios to consider</span><span data-pcs="lead">Neither scenario is a forecast.</span></p>
+  <div class="pcs-row" role="group" aria-label="Bitcoin&rsquo;s price: two scenarios to consider">
+    <button type="button" class="pc-opt pcs-opt active" data-scenario="stay" aria-pressed="true">
+      <span class="pcs-top"><span class="pcs-tag pcs-tag--cons" data-pcs="tag">Conservative</span><span class="pcs-state"><span class="pcs-state-on">&check; Showing</span><span class="pcs-state-off">Show this scenario</span></span></span>
+      <span class="pcs-title" data-pcs="title">If bitcoin stays where it is against trend</span>
+      <span class="pcs-note" data-pcs="note"></span>
+    </button>
+    <span class="pcs-or" aria-hidden="true">or</span>
+    <button type="button" class="pc-opt pcs-opt" data-scenario="trend" aria-pressed="false">
+      <span class="pcs-top"><span class="pcs-tag pcs-tag--hist" data-pcs="tag">Historical pattern</span><span class="pcs-state"><span class="pcs-state-on">&check; Showing</span><span class="pcs-state-off">Show this scenario</span></span></span>
+      <span class="pcs-title" data-pcs="title">If bitcoin returns to trend over 3 years</span>
+      <span class="pcs-note" data-pcs="note"></span>
+    </button>
+  </div>
+  <p class="pcs-other" data-pcs="other" hidden></p>
+  <div class="pcs-stress">
+    <span class="pcs-stress-lbl">Stress test</span>
+    <button type="button" class="pc-opt pcs-chip" data-scenario="floor" aria-pressed="false">Falls to the floor (0.42&times;) and stays</button>
+  </div>
+  <p class="pcs-foot"><span data-pcs="foot"></span> <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a></p>
+</div>
