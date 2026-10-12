@@ -2,6 +2,36 @@
   {
     "display": "10/11/26",
     "date": "2026-10-11",
+    "page": "/bitcoin-vs-real-estate",
+    "summary": "Bitcoin vs. Real Estate: the projection now opens with bitcoin's price as two scenarios side by side, with your result under each: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two, so nothing depends on a recovery, and your default result is unchanged. The return now takes 3 years rather than the whole plan, which lowers that scenario's result a little, since the renter's later monthly buys are at trend prices. The floor and 2.5× trend are now stress tests."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: bitcoin's price is now two scenarios side by side, each with how your path ends against keeping the rental: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two, and the floor and 2.5× trend are now stress tests. End values are unchanged for holding periods of 3 years or more; a shorter one now ends part-way back to trend in that scenario, and says how far."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/compare-housing-plans",
+    "summary": "Compare Housing Plans: bitcoin's price is now two scenarios side by side, each with which plan ends ahead and by how much: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two, and your default result is unchanged. The return now takes 3 years rather than the whole plan, which widens that scenario's lead for the plan holding bitcoin. The floor and 2.5× trend are now stress tests."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/bitcoin-vs-paying-down-the-mortgage",
+    "summary": "Bitcoin vs. Paying Down the Mortgage: bitcoin's price is now two scenarios side by side, each with how far holding bitcoin ends ahead of paying down, or behind: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two, and your default result is unchanged. The return now takes 3 years rather than the whole plan, which lowers holding's lead in that scenario. Also fixed: the ledger's Bitcoin held column showed dollars at today's price under a ₿ heading; it now shows bitcoin."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
+    "page": "/bitcoin-fixed-income",
+    "summary": "Bitcoin and Fixed Income: the bitcoin scenarios are now two, side by side, each with what selling bitcoin as needed ends with: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It starts on the lower of the two, and your default result is unchanged. The return now takes 3 years rather than the whole plan, which raises that scenario's result, since the yearly sales happen at higher prices sooner. The floor and 2.5× trend are listed as other paths to test."
+  },
+  {
+    "display": "10/11/26",
+    "date": "2026-10-11",
     "page": "/the-power-law",
     "summary": "Bitcoin and The Power Law: a \"What would change my view\" box, shared with The Bitcoin Floor and Bitcoin's Spikes, so the three pages state one test for a break. The volatility-compression figures now come from the spike record (14×, 12×, 5.4×, 3.2× and 1.2× so far), with the cycle lows beside them: the compression is at the top. And the 3× line is called the upper band, not a ceiling: price has crossed it at past cycle peaks."
   },

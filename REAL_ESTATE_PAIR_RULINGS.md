@@ -56,6 +56,8 @@ The spec says every default leans against bitcoin's case. Phase 0 shows that rul
 - Show the selected scenario's **implied annual growth rate** beside the selector.
 - Labels stay position-neutral; review copy at a simulated above-trend position before shipping (Hurdle Rate v2 rule).
 
+> **Amended 2026-10-11 by DEFAULTS_POLICY (JM; `claude/DEFAULTS_POLICY_2026-10-11.md` in the project; SITE_GUIDE §55.5, STYLE_GUIDE §10.14).** Four changes, the rest of M3 stands. (1) **Trend's period:** the gap closes in a straight line over **3 years**, then the multiple follows the trend; a plan shorter than 3 years ends part-way back. Floor and Upper keep the horizon-long line above. (2) **The default is the lower of the two scenarios:** Stay below trend (unchanged), **Trend at or above it** (was Stay in every regime, which above trend kept a premium never sustained). The price the page uses decides it, until the reader picks; a link carries the scenario only once picked. (3) **Two scenarios, two stress tests:** Stay and Trend are shown side by side in one block with both results; Floor and Upper are stress tests in a row under it. (4) **Names:** *If bitcoin stays 47% below trend* (the gap computed live) and *If bitcoin returns to trend over 3 years*; *Today's gap persists* and *Reverts to trend* are retired. The keys (`stay`, `trend`, `floor`, `upper`) and every URL value are unchanged.
+
 ### M4 · Default rent: Zillow (R3 → candidate B)
 
 - Default rent = home price ÷ (12 × price-to-rent), with price-to-rent from **Zillow ZORI (all homes) and ZHVI (typical value, middle tier), US**. At August 2026 values: P/R 15.8, rent $2,219 on a $420K home (§g).
