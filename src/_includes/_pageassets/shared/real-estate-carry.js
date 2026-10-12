@@ -12,7 +12,10 @@
      happr        home appreciation, nominal %/yr (both: lcs.homeApprNominal)
      sell         selling costs, % of the sale price
      btctx        bitcoin trading cost, % of each purchase or sale
-     pscenario    bitcoin scenario: floor | stay | trend | upper (M3)
+     pscenario    bitcoin scenario: floor | stay | trend | upper (M3); since
+                  2026-10-11 carried only once the reader has picked one
+                  (DEFAULTS_POLICY R7: the default follows each viewer's
+                  own live price, so a link never pins it)
      displaymode  real | nominal
      tax          tax regime: us | none (custom exists on BvRE only)
      bracket      federal bracket, % (12, 22, 24, 32, 35, 37)
@@ -27,6 +30,9 @@
    A PAGE registers once its calculator is bound:
      RealEstateCarry.register({
        read()        → { horizon: 10, happr: 4.68, … } (the page's current values)
+       scenarioPicked() → optional: true once the reader has picked a
+                       scenario (or a link carried one); pscenario is
+                       written only then, whatever its value
        apply(values) → optional: set the page's inputs from carried values
                        (BvRP; BvRE's own URL reader already reads these names)
        writeUrl      → optional true: keep the address bar's carried params
@@ -73,6 +79,10 @@
       var x = v[k];
       if (x === undefined || x === null || x === '') return;
       if (typeof x === 'number') { if (!isFinite(x)) return; x = round2(x); }
+      if (k === 'pscenario' && adapter.scenarioPicked) {
+        if (adapter.scenarioPicked()) p.set(k, String(x));
+        return;
+      }
       if (same(x, d[k])) return;
       p.set(k, String(x));
     });

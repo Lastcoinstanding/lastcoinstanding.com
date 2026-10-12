@@ -592,6 +592,10 @@ html, body {
   }
 }
 
+/* The two-scenario block (components/price-cases.njk) spans both columns,
+   under the entry readout (DEFAULTS_POLICY 2026-10-11). */
+.calc-wrapper > .pc--span { grid-column: 1 / -1; margin: 0 0 1.1rem; }
+
 /* --- Calc inputs --- */
 .calc-inputs {
   display: flex;
@@ -685,79 +689,6 @@ html, body {
   background: var(--amber, #e09422);
   border-radius: 50%;
   border: none;
-}
-
-/* --- BvRP-style scenario chips, stacked vertically.
-   Each chip is a full-width horizontal row: the scenario name (with its
-   help-tip) takes the left side; the implied CAGR rate sits on the right,
-   with the sub-caption directly below it. This is roomier than the prior
-   3-column layout, where long names like "Reach Power Law upper channel"
-   wrapped awkwardly inside narrow columns. */
-.calc-cagr-chips {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-.calc-cagr-chip {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 1rem;
-  row-gap: 0.05rem;
-  padding: 0.7rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-faint, rgba(255, 255, 255, 0.06));
-  border-radius: 0.4rem;
-  font-family: var(--font-body, "Inter", sans-serif);
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, transform 0.15s;
-  text-align: left;
-  color: var(--ink, #ccc6b8);
-}
-.calc-cagr-chip:hover {
-  background: rgba(224, 148, 34, 0.05);
-  border-color: rgba(224, 148, 34, 0.35);
-  transform: translateY(-1px);
-}
-.calc-cagr-chip.active {
-  background: rgba(224, 148, 34, 0.10);
-  border-color: var(--amber, #e09422);
-}
-.calc-cagr-chip-name {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  align-self: center;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.005em;
-  color: var(--ink-bright, #ece4d6);
-  line-height: 1.3;
-}
-.calc-cagr-chip.active .calc-cagr-chip-name {
-  color: var(--amber-bright, #F7931A);
-}
-.calc-cagr-chip-rate {
-  grid-column: 2;
-  grid-row: 1;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--ink-faint, #5a5247);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  white-space: nowrap;
-}
-.calc-cagr-chip.active .calc-cagr-chip-rate {
-  color: var(--amber, #e09422);
-}
-.calc-cagr-chip-sub {
-  grid-column: 2;
-  grid-row: 2;
-  font-size: 0.72rem;
-  color: var(--ink-faint, #5a5247);
-  font-style: italic;
-  text-align: right;
-  white-space: nowrap;
 }
 
 /* --- Legacy input-row (retained for the advanced section's percent inputs:
@@ -1394,22 +1325,6 @@ html, body {
   .entry-conditions-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 }
 
-/* --- "What is the Power Law?" link below growth chips ---
-   Same pattern as Bitcoin vs Rental Property's calc-cagr-pl-link. */
-.calc-cagr-pl-link {
-  display: inline-block;
-  margin-top: 0.65rem;
-  font-family: var(--font-body, "Inter", sans-serif);
-  font-size: 0.85rem;
-  color: var(--amber, #e09422);
-  text-decoration: none;
-  letter-spacing: 0.005em;
-  transition: color 0.2s;
-}
-.calc-cagr-pl-link:hover {
-  color: var(--amber-bright, #F7931A);
-}
-
 /* ─── Calculator action buttons (print, share) ─── */
 .calc-actions {
   display: flex;
@@ -1495,7 +1410,6 @@ html, body {
   .related-pages, .related-links, .footer-links,
   .help-tip, .tip-content,
   .editorial-hero .subtitle, /* shorten the hero for print */
-  .calc-cagr-pl-link,
   [data-no-print] {
     display: none !important;
   }
@@ -1560,12 +1474,10 @@ html, body {
   .calc-slider-val { font-variant-numeric: tabular-nums; }
 
   /* ─── Chip/button groups: only show the active selection ─── */
-  .calc-cagr-chip:not(.active),
   .stress-chip:not(.active),
   .path-btn:not(.active) {
     display: none !important;
   }
-  .calc-cagr-chip.active,
   .stress-chip.active,
   .path-btn.active {
     display: inline-block !important;
@@ -1575,7 +1487,7 @@ html, body {
     margin: 0.1cm 0 !important;
     color: #111 !important;
   }
-  .calc-cagr-chips, .stress-chips-row, .path-buttons {
+  .stress-chips-row, .path-buttons {
     display: block !important;
   }
   .input-group label, .stress-chips-label {
@@ -1688,7 +1600,6 @@ html, body {
   }
 }
 
-
 /* --- Strategy at a glance (Tab II) ---
    Snapshot indicator providing factual ground-truth for the capital-structure
    analysis below. BTC treasury USD value is the one truly live field
@@ -1799,7 +1710,6 @@ html, body {
   .sg-grid { grid-template-columns: 1fr; }
   .sg-cell-wide { grid-column: 1 / -1; }
 }
-
 
 /* --- Strategy at a glance: insight callout (Tab II enhancement) ---
    Subtle left-bordered callout that translates the snapshot values into a

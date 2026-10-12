@@ -37,15 +37,25 @@
     cheaper: { a: { kind: 'now' }, b: { kind: 'now', price: 300000 } },
     rent:    { a: { kind: 'now' }, b: { kind: 'rent' } }
   };
-  var SC_NAME = { floor: 'Drifts to the floor', stay: 'Today’s gap persists', trend: 'Reverts to trend', upper: 'Peaks at 2.5× trend' };
+  // Scenario names (2026-10-11, DEFAULTS_POLICY): the shared words, which carry
+  // today's gap ("Stays 47% below trend"), so they're made per render (scWords).
   // JM review round 1 (2026-10-02): the path described in prices, not as a flat
   // rate (the Power Law's rate slows), with the Power Law linked where it is named.
   var PL_LINK = '<a href="/the-power-law">Power Law</a>';
   // The headline names the path it rests on (claims read 2026-10-03): a
   // projection reads as a condition, never as a plain statement of fact.
-  var SC_IF = { floor: 'drifts down to its floor', stay: 'keeps today’s gap to its trend', trend: 'reverts to its trend', upper: 'peaks at 2.5× its trend' };
+  function scWords(m) {
+    var g = Math.round(Math.abs(1 - m) * 100), dir = m < 1 ? 'below' : 'above';
+    return { name: window.PriceCases.names(m), title: window.PriceCases.titles(m),
+             cond: { floor: 'drifts down to its floor', stay: g === 0 ? 'stays on its trend' : 'stays ' + g + '% ' + dir + ' its trend',
+                     trend: 'returns to its trend over ' + window.PriceCases.REVERT_YEARS + ' years', upper: 'peaks at 2.5× its trend' } };
+  }
   var UPPER_TIP = '<span class="help-tip" tabindex="0">?<span class="tip-content">A peak, not a level: this path ends at a cycle-top multiple of the trend, so an average a year says little about it. Past tops have faded within months.</span></span>';
+  // The scenario: 'stay' | 'trend' (the two scenarios) or 'floor' | 'upper'
+  // (the stress tests). Until the reader picks, or a link carries a pick,
+  // the default is the lower of the two for today's price (R2, render()).
   var st = { scenario: 'stay', display: 'real' };
+  var picked = false;
 
   // ─── inputs ───
   function pl(p, k) { return $('ch_' + p + '_' + k); }
@@ -122,17 +132,18 @@
 
   function render() {
     var a = readPlan('a'), b = readPlan('b'), s = readShared(); lastA = a; lastB = b; lastS = s;
+    var mNow = window.PriceCases.multipleOf(btcNow()), W = scWords(mNow);
+    if (!picked) st.scenario = window.PriceCases.defaultFor(mNow);
     var R = M.housingCompare(input(a, b, s)), H = s.horizon, Dh = defl(H);
     var A = R.plans[0], B = R.plans[1];
 
     $('chAssumeHint').textContent = yrs(H) + ' · homes ' + s.appr + '% a year · ' + (s.tax === 'none' ? 'no capital-gains tax' : s.bracket + '% bracket') + ' · ' + (st.display === 'real' ? 'real (today’s $)' : 'nominal (future $)');
     $('chDeflLine').textContent = st.display === 'real' ? 'Divided by inflation at ' + inflPct() + '% a year, the site’s setting.' : 'Dollars of each future year, before inflation.';
-    document.querySelectorAll('.ch-chip[data-scenario]').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-scenario') === st.scenario); });
 
     // Headline
     var d = R.diffAfter / Dh, mult = (Math.pow(R.priceEnd / btcNow(), 1 / H) - 1);
     $('chHeadV').innerHTML = Math.abs(d) < 1 ? 'After ' + yrs(H) + ', the two plans end level.'
-      : 'After ' + yrs(H) + ', if bitcoin ' + SC_IF[st.scenario] + ', <strong>Plan ' + (d > 0 ? 'B' : 'A') + '</strong> ends <strong>' + usd(Math.abs(d)) + '</strong> ahead.';
+      : 'After ' + yrs(H) + ', if bitcoin ' + W.cond[st.scenario] + ', <strong>Plan ' + (d > 0 ? 'B' : 'A') + '</strong> ends <strong>' + usd(Math.abs(d)) + '</strong> ahead.';
     // The downside beside the headline (claims read 2026-10-03): the two plain
     // what-ifs from the table, so the bad cases sit next to the verdict.
     var half = Math.pow(0.5, 1 / H) - 1;
@@ -191,15 +202,15 @@
     // Scenario table, with plain what-ifs first
     var paths = [{ k: 'half', label: 'Bitcoin halves over the ' + yrs(H), over: { growth: half }, g: half },
                  { k: 'flat', label: 'Bitcoin goes nowhere', over: { growth: 0 }, g: 0 }]
-      .concat(['floor', 'stay', 'trend', 'upper'].map(function (sc) { return { k: sc, label: SC_NAME[sc] + (sc === 'upper' ? ' (stress test)' : ''), over: { scenario: sc } }; }));
-    $('chScenSub').innerHTML = 'Each row reruns both plans with a different path for bitcoin’s price: two plain what-ifs, then the four ' + PL_LINK +
-      ' paths. Each plan’s column is everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', in today’s dollars' : ', in future dollars') + '; the last column is the difference, orange where Plan B is ahead and blue where Plan A is.';
+      .concat(['floor', 'stay', 'trend', 'upper'].map(function (sc) { return { k: sc, label: W.name[sc] + (sc === 'upper' || sc === 'floor' ? ' (stress test)' : ''), over: { scenario: sc } }; }));
+    $('chScenSub').innerHTML = 'Each row reruns both plans with a different path for bitcoin’s price: two plain what-ifs, then the two scenarios and two stress tests from the ' + PL_LINK +
+      '. Each plan’s column is everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', in today’s dollars' : ', in future dollars') + '; the last column is the difference, orange where Plan B is ahead and blue where Plan A is.';
     $('chScenTable').innerHTML = '<thead><tr><th>Bitcoin path</th><th>Averages a year</th><th>Plan A</th><th>Plan B</th><th>B minus A</th></tr></thead><tbody>' +
       paths.map(function (p) {
         var r = M.housingCompare(input(a, b, s, p.over)), g = p.g !== undefined ? p.g : Math.pow(r.priceEnd / btcNow(), 1 / H) - 1, dd = r.diffAfter / Dh;
         return '<tr' + (p.k === st.scenario ? ' class="mine"' : '') + '><td>' + p.label + '</td><td>' + (p.k === 'upper' ? 'n/a' + UPPER_TIP : pctS(g)) + '</td><td>' + usd(r.plans[0].end.after / Dh) + '</td><td>' + usd(r.plans[1].end.after / Dh) +
           '</td><td class="' + (dd > 0.5 ? 'pos' : dd < -0.5 ? 'neg' : '') + '">' + (dd > 0 ? '+' : '') + usd(dd) + '</td></tr>';
-      }).join('') + '</tbody><caption>Everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', today’s dollars' : '') + '. The first two rows are plain what-ifs; the four paths are drawn from the ' + PL_LINK + ', not forecasts. Even <em>Drifts to the floor</em> assumes bitcoin keeps to the model’s lower line, and <a href="/the-bitcoin-floor">its price has closed below that line before</a>.</caption>';
+      }).join('') + '</tbody><caption>Everything sold after ' + yrs(H) + ', after costs and tax' + (st.display === 'real' ? ', today’s dollars' : '') + '. The first two rows are plain what-ifs; the other four are drawn from the ' + PL_LINK + ', not forecasts. Even <em>Drifts to the floor</em> assumes bitcoin keeps to the model’s lower line, and <a href="/the-bitcoin-floor">its price has closed below that line before</a>.</caption>';
     syncPresets(a, b);
 
     // Chart
@@ -237,11 +248,30 @@
           { label: 'Everything sold, after tax', values: fin(0, function (e) { return e.after / Dh; }) }
         ] },
         csv: { filename: 'compare-housing-plans.csv', meta: [
-          ['Plan A', describe(a)], ['Plan B', describe(b)], ['Years', H], ['Home appreciation %', s.appr], ['Scenario', SC_NAME[st.scenario]],
+          ['Plan A', describe(a)], ['Plan B', describe(b)], ['Years', H], ['Home appreciation %', s.appr], ['Scenario', W.name[st.scenario]],
           ['Bitcoin today', Math.round(btcNow())], ['Savings at the start', Math.round(R.savings)], ['Dollars', st.display === 'real' ? 'today’s, inflation ' + inflPct() + '%' : 'nominal']
         ] }
       });
     }
+
+    // Bitcoin's price: the two scenarios (components/price-cases.njk;
+    // DEFAULTS_POLICY_2026-10-11, version B). Each half: which plan ends
+    // ahead under that scenario, and by how much, as the verdict counts it.
+    var Rs = st.scenario === 'stay' ? R : M.housingCompare(input(a, b, s, { scenario: 'stay' }));
+    var Rt = st.scenario === 'trend' ? R : M.housingCompare(input(a, b, s, { scenario: 'trend' }));
+    function pcVal(r) {
+      var x = r.diffAfter / Dh, frame = st.display === 'real' ? 'in today’s dollars' : 'in future dollars';
+      if (Math.abs(x) < 1) return { num: 'Level', sub: 'the two plans end level after ' + yrs(H) + ', if both sell everything, after costs and tax' };
+      return { num: usd(Math.abs(x)), sub: 'Plan ' + (x > 0 ? 'B' : 'A') + ' ahead after ' + yrs(H) + ', if both sell everything, after costs and tax, ' + frame };
+    }
+    var pcNote = st.scenario === 'upper' ? ' A stress test, not a forecast: ' + (M.upperRecordText() || 'past cycle peaks were brief') + '.'
+               : st.scenario === 'floor' ? ' A stress test: 0.42× is the channel’s floor, which price has gone below by 5.1% at most since the genesis era (2015).' : '';
+    window.PriceCases.render($('pcChp'), {
+      mult: mNow, selected: st.scenario, drives: 'the verdict, the cards, the chart and the ledger below',
+      plan: { months: H * 12, phrase: 'all ' + yrs(H), words: yrs(H) },
+      values: { stay: pcVal(Rs), trend: pcVal(Rt) },
+      showing: W.title[st.scenario] + ': bitcoin goes from ' + usdK(btcNow()) + ' today to about ' + usdK(R.priceEnd) + ' in ' + yEnd + ' (prices before inflation).' + pcNote
+    });
     writeUrl();
   }
 
@@ -294,9 +324,7 @@
     x.addEventListener('change', function () { touched = true; render(); });
     if (x.tagName === 'INPUT' && x.type !== 'checkbox') x.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') x.blur(); });
   });
-  document.querySelectorAll('.ch-chip[data-scenario]').forEach(function (b) {
-    b.addEventListener('click', function () { st.scenario = b.getAttribute('data-scenario'); touched = true; render(); });
-  });
+  window.PriceCases.bind($('pcChp'), function (k) { st.scenario = k; picked = true; touched = true; render(); });
   document.querySelectorAll('.ch-chip[data-preset]').forEach(function (b) {
     b.addEventListener('click', function () {
       var pr = PRESETS[b.getAttribute('data-preset')];
@@ -331,14 +359,15 @@
       if (v.happr !== undefined) sh.appr.value = v.happr;
       if (v.sell !== undefined) sh.sell.value = v.sell;
       if (v.btctx !== undefined) sh.tx.value = v.btctx;
-      if (v.pscenario) st.scenario = v.pscenario;
+      if (['floor', 'stay', 'trend', 'upper'].indexOf(v.pscenario) !== -1) { st.scenario = v.pscenario; picked = true; }   // a carried pick (R7)
       if (v.displaymode) st.display = v.displaymode;
       if (v.tax && sh.tax.querySelector('option[value="' + v.tax + '"]')) sh.tax.value = v.tax;
       if (v.bracket && sh.bracket.querySelector('option[value="' + v.bracket + '"]')) sh.bracket.value = v.bracket;
       if (v.state && sh.state.querySelector('option[value="' + v.state + '"]')) sh.state.value = v.state;
       syncDisplay();
     },
-    writeUrl: true
+    writeUrl: true,
+    scenarioPicked: function () { return picked; }
   });
   syncDisplay();
   render();

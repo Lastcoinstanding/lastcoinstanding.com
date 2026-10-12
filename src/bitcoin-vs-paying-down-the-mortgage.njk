@@ -28,7 +28,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/btc-monthly-data.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-grid.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/bitcoin-vs-paying-down-the-mortgage.js' %}"
 ---
 {#
   Bitcoin vs. Paying Down the Mortgage — the homeowner, step three of the
@@ -96,14 +96,12 @@ eleventyComputed:
         <p class="mp-hurdle-s" id="mpHurdleS">The calculator needs JavaScript.</p>
     </div>
 
-    <div class="mp-scen" role="group" aria-label="Bitcoin scenario">
-        <span class="mp-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">Four paths for bitcoin&rsquo;s price from the <a href="/the-power-law">Power Law</a>, the long-run trend bitcoin&rsquo;s price has followed. Each moves bitcoin from where it sits today against that trend, in a straight line, to a target at the end of the years compared. <strong>Drifts to the floor</strong>: down to the model&rsquo;s lower line, 0.42&times; the trend. <strong>Today&rsquo;s gap persists</strong> (the default): bitcoin keeps today&rsquo;s distance from the trend and grows at the trend&rsquo;s own rate, which slows over time. <strong>Reverts to trend</strong>: the gap closes by the end. <strong>Peaks at 2.5&times; trend</strong>: a stress test that ends at a cycle-top level. The same four paths as the other real-estate pages. Each is a path, not a promise.</span></span></span>
-        <button type="button" class="mp-chip" data-scenario="floor">Drifts to the floor</button>
-        <button type="button" class="mp-chip on" data-scenario="stay">Today&rsquo;s gap persists</button>
-        <button type="button" class="mp-chip" data-scenario="trend">Reverts to trend</button>
-        <button type="button" class="mp-chip" data-scenario="upper">Peaks at 2.5&times; trend</button>
-        <p class="mp-scen-note" id="mpScenNote">These four paths come from the <a href="/the-power-law">Power Law</a>, the long-run trend bitcoin&rsquo;s price has followed since 2010. <a href="/the-power-law">What is the Power Law? &rarr;</a></p>
-    </div>
+    <!-- Bitcoin's price: two scenarios to consider (DEFAULTS_POLICY_2026-10-11,
+         version B). Replaces the four chips: Stay and Trend are the two scenarios
+         (each half shows how far holding bitcoin ends ahead of paying down, or
+         behind), Floor and Upper the stress tests. -->
+    {% set pc_id = 'pcMp' %}
+    {% include 'components/price-cases.njk' %}
 
     <div class="mp-cards" id="mpCards"></div>
     <p class="mp-diff" id="mpDiff"></p>
@@ -160,7 +158,7 @@ eleventyComputed:
     <h2 class="mp-h2" id="mpMethodTitle">How the page computes</h2>
     <ul class="mp-method">
         <li><strong>Month by month.</strong> Both households pay the same: the loan&rsquo;s scheduled payment plus the extra. One sends all of it to the loan until the loan is gone, then all of it to bitcoin; the other sends the scheduled payment to the loan and the extra to bitcoin, and the whole payment to bitcoin once its loan ends. A lump sum goes to the loan or to bitcoin on day one.</li>
-        <li><strong>Bitcoin&rsquo;s price</strong> follows the chosen scenario from today&rsquo;s price, the same paths as <a href="/bitcoin-vs-real-estate">Bitcoin vs. Real Estate</a> and <a href="/bitcoin-vs-rental-property">Bitcoin vs. Rental Property</a>. Each purchase pays the trading cost, and so does a sale.</li>
+        <li><strong>Bitcoin&rsquo;s price</strong> follows the chosen scenario from today&rsquo;s price, the same paths as <a href="/bitcoin-vs-real-estate">Bitcoin vs. Real Estate</a> and <a href="/bitcoin-vs-rental-property">Bitcoin vs. Rental Property</a>: it stays at today&rsquo;s multiple of the Power Law trend, or returns to the trend in a straight line over 3 years. The default is the lower of the two: below trend, bitcoin stays as far below as it is today, so no recovery is assumed; above trend, it returns to trend. Each purchase pays the trading cost, and so does a sale.</li>
         <li><strong>The hurdle</strong> is found by search: the steady yearly growth at which the two households end level, after the tax on a sale at the end (and, beside it, before tax).</li>
         <li><strong>Tax</strong> is on the gain over what was paid, at your federal long-term rate, your state&rsquo;s rate and the 3.8% net investment income tax where the bracket brings it in. With the deduction on, the interest&rsquo;s tax saving is invested in bitcoin by both households.</li>
         <li><strong>Real (today&rsquo;s $)</strong> divides each year&rsquo;s values by inflation compounded to that year, at the site&rsquo;s inflation setting (the same one every calculator uses). Sums over the years, the interest paid and what the bitcoin cost, stay in the dollars of each year and say so.</li>

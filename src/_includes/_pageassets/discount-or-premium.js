@@ -1055,19 +1055,15 @@
        months". Same record, two numbers, no label saying which was which.
        The rule now: the sample basis appears in its own labelled row and
        nowhere else. */
-    var epClosed = rec.episodes.filter(function (e) { return !e.ongoing; })
-                               .map(function (e) { return e.months; })
-                               .sort(function (a, b) { return a - b; });
-    var epN = epClosed.length;
-    var epMin = epN ? epClosed[0] : null;
-    var epMax = epN ? epClosed[epN - 1] : null;
-    var epMed = !epN ? null
-      : epN % 2 ? epClosed[(epN - 1) / 2]
-                : (epClosed[epN / 2 - 1] + epClosed[epN / 2]) / 2;
-    /* The N<3 rule, counted in episodes — the same rule the row applies and the
+    /* Since 2026-10-11 the figures come from the shared module
+       (RD.episodeStats, DEFAULTS_POLICY R4), which the forward calculators'
+       two-scenario block reads too; the arithmetic moved there unchanged.
+       The N<3 rule, counted in episodes — the same rule the row applies and the
        same one The Rundown applies. Below three, a median is a statistic with
-       the honesty removed, so the figures get named instead. */
-    var epThin = epN > 0 && epN < 3;
+       the honesty removed, so the figures get named instead (`thin`). */
+    var epStats = RD.episodeStats(rec);
+    var epClosed = epStats.closed, epN = epStats.n, epMin = epStats.min, epMax = epStats.max,
+        epMed = epStats.median, epThin = epStats.thin;
 
     (function () {
       function figs(min, med, max) {

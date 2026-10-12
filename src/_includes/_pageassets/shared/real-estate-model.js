@@ -184,30 +184,32 @@
   function depFuture(plan, t){ return plan.annual * (Math.min(plan.heldYears + t, DEP_YEARS) - Math.min(plan.heldYears, DEP_YEARS)); }
   function depTotal(plan, t){ return plan.annual * Math.min(plan.heldYears + t, DEP_YEARS); }
 
-  // ─── One bitcoin scenario set for both pages (M3, PR 4c) ─────────────
+  // ─── One bitcoin scenario set for both pages (M3, PR 4c; the two scenarios
+  //     since 2026-10-11, DEFAULTS_POLICY) ─────────────────────────────
   // Floor · Stay at today's multiple · Trend · Upper, all derived from
-  // shared/power-law-data.js, so they recalibrate as bitcoin's multiple
-  // of the trend moves. Each moves the multiple in a straight line from
-  // today's to a target at the horizon end, then multiplies by the trend
-  // on that day:
-  //   floor  → PL_FLOOR (0.42×), the channel's lower bound
-  //   stay   → today's multiple (the default: no reversion either way;
-  //            grows at the trend's own rate)
-  //   trend  → 1× (the gap to trend closes by the horizon end)
-  //   upper  → 2.5× (a stress test; see cyclePeakMultiples for the record)
-  // Both engines (BvRP's scenarioGrowthFactor, BvRE's bvreProjection)
-  // read scenarioMultiple, so the two pages can't drift apart again.
-  var UPPER_TARGET = 2.5;
+  // shared/power-law-data.js, so they recalibrate as bitcoin's multiple of
+  // the trend moves. The path math lives in shared/price-cases.js
+  // (PriceCases.multipleAt), which The Income Question reads too:
+  //   stay   → today's multiple for the whole plan (grows at the trend's
+  //            own rate); the default below trend
+  //   trend  → a straight line from today's multiple to 1x over
+  //            PriceCases.REVERT_YEARS (3) years, then the trend; the
+  //            default at or above trend. Until 2026-10-11 the line ran to
+  //            the horizon end, so a 10-year plan's end price is unchanged
+  //            and only the years between move.
+  //   floor  → a straight line to PL_FLOOR (0.42x) by the horizon end
+  //   upper  → a straight line to 2.5x by the horizon end (see
+  //            cyclePeakMultiples for the record)
+  // Floor and Upper are stress tests, not scenarios (DEFAULTS_POLICY R6).
+  // Both engines (BvRP's scenarioGrowthFactor, BvRE's bvreProjection) and
+  // housingCompare read scenarioMultiple, so the pages can't drift apart.
+  var UPPER_TARGET = window.PriceCases.UPPER;
   var SCENARIOS = ['floor', 'stay', 'trend', 'upper'];
-  function scenarioTarget(scenario, mult0){
-    if (scenario === 'stay') return mult0;
-    if (scenario === 'floor') return PL_FLOOR;
-    if (scenario === 'upper') return UPPER_TARGET;
-    return 1.0;
-  }
-  function scenarioMultiple(scenario, mult0, progress){
-    var p = Math.max(0, Math.min(1, progress));
-    return mult0 + (scenarioTarget(scenario, mult0) - mult0) * p;
+  function scenarioTarget(scenario, mult0){ return window.PriceCases.target(scenario, mult0); }
+  // progress: the fraction of the horizon elapsed (Floor's and Upper's
+  // clock); tYears: the years elapsed (Trend's clock).
+  function scenarioMultiple(scenario, mult0, progress, tYears){
+    return window.PriceCases.multipleAt(scenario, mult0, progress, tYears);
   }
 
   // The record behind Upper's caveat, computed from the price series so it
@@ -252,7 +254,7 @@
   }
 
   // currentBTCMultiple() reads today's multiple at call time so the
-  // chips and chart reflect the live Power Law state.
+  // two-scenario block and the chart reflect the live Power Law state.
 
   function currentBTCMultiple(){
     if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function' ||
@@ -268,7 +270,11 @@
     if (t === 0) return 1.0;
     if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function' ||
         typeof GENESIS_TS !== 'number') {
-      // Fallback to flat CAGR if Power Law data not loaded yet
+      // Fallback to flat CAGR if Power Law data not loaded yet. Unreachable
+      // on every page that loads this engine: power-law-data.js comes first,
+      // and price-cases.js (which this file reads at load) needs it too. The
+      // rates' order (stay below trend) assumes a below-trend start; if this
+      // path is ever made reachable, make it regime-neutral (DEFAULTS_POLICY §3).
       var fallbackCAGR = scenario === 'stay' ? 0.20
                        : scenario === 'upper' ? 0.45
                        : scenario === 'floor' ? 0.15
@@ -285,7 +291,7 @@
     var futureTrend = plPrice(todayDays + t * 365.25);
     var progress = Math.min(t / Math.max(1, holdingYears), 1.0);
 
-    var futurePrice = scenarioMultiple(scenario, currentMult, progress) * futureTrend;
+    var futurePrice = scenarioMultiple(scenario, currentMult, progress, t) * futureTrend;
     return futurePrice / todaySpot;
   }
 
@@ -1213,8 +1219,9 @@
   //  - Bitcoin's price each month follows the scenario's path (M3,
   //    scenarioMultiple above): its multiple of the Power Law trend moves
   //    in a straight line from today's multiple to the scenario's target
-  //    at the horizon end, times the trend on that day. Purchases and
-  //    sales pay the bitcoin transaction cost.
+  //    (Trend: over 3 years, then the trend; Floor and Upper: at the
+  //    horizon end), times the trend on that day. Purchases and sales pay
+  //    the bitcoin transaction cost.
   //  - At the end, If sold (before tax, which is PR 5): house value −
   //    selling costs − loan balance; bitcoin value − the transaction cost.
   //    Held: before those costs. Real = nominal ÷ (1 + inflation)^years for
@@ -1255,7 +1262,7 @@
     var d0 = (Date.now() / 1000 - GENESIS_TS) / 86400;
     var mult0 = btcNow / plPrice(d0);
     var target = scenarioTarget(i.scenario, mult0);
-    function priceAt(m){ return scenarioMultiple(i.scenario, mult0, m / n) * plPrice(d0 + (m / 12) * 365.25); }
+    function priceAt(m){ return scenarioMultiple(i.scenario, mult0, m / n, m / 12) * plPrice(d0 + (m / 12) * 365.25); }
 
     var btcUpfront = upfront * (1 - tx) / btcNow;
     var btc = btcUpfront;
@@ -1532,7 +1539,7 @@
     var mult0 = btcNow / plPrice(d0);
     // i.growth (optional): a flat yearly rate from today's price instead of the scenario path (the page's plain what-ifs)
     var flat = i.growth !== undefined && i.growth !== null;
-    function priceAt(m){ return flat ? btcNow * Math.pow(1 + i.growth, m / 12) : scenarioMultiple(i.scenario, mult0, m / n) * plPrice(d0 + (m / 12) * 365.25); }
+    function priceAt(m){ return flat ? btcNow * Math.pow(1 + i.growth, m / 12) : scenarioMultiple(i.scenario, mult0, m / n, m / 12) * plPrice(d0 + (m / 12) * 365.25); }
     var rule = i.cashRule === 'a' ? 'a' : 'max';
 
     var P = i.plans.map(function(q){

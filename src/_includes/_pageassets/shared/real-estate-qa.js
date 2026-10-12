@@ -295,7 +295,9 @@
     setInfl(x); MA.set('homeApprNominal', 'since-2000'); MA.set('realReturns', 'diversified');
     setTax(x);
     click('.purchase-btn[data-method="' + x.method + '"]');   // also resets the advanced box
-    click('.scenario-btn[data-scenario="' + x.scenario + '"]');
+    // M3's buttons until 2026-10-11, the two-scenario block's options since;
+    // either selector, so the same file still runs on the pre-change page.
+    click('.scenario-btn[data-scenario="' + x.scenario + '"], #pcBvre .pc-opt[data-scenario="' + x.scenario + '"]');
     click('.display-mode-btn[data-mode="' + x.display + '"]');
     setVal('fwdHorizon', x.horizon, ['change']);
     setVal('fwdBtcNow', String(FIXED_BTC));
@@ -310,13 +312,19 @@
     if (inv) { inv.checked = x.invest; fire(inv, 'change'); }
   }
   function captureProj(){
-    return { results: html('fwdResults'), cashOut: html('fwdCashOutLine') };
+    var c = { results: html('fwdResults'), cashOut: html('fwdCashOutLine') };
+    // The two-scenario block, since 2026-10-11 (absent before, so not captured then).
+    var pcB = html('pcBvre'); if (pcB !== null) c.block = pcB;
+    return c;
   }
   function captureGrowth(){
     var up = document.querySelector('[data-upper-record]');
+    var pcTitle = function(k){ var t = document.querySelector('#pcBvre .pc-half[data-scenario="' + k + '"] [data-pc="title"]'); return t ? t.textContent : null; };
     return ['floor', 'stay', 'trend', 'upper'].map(function(sc){
       applyProj({ scenario: sc });
-      return { scenario: sc, line: html('fwdScenarioGrowth'), stay: html('fwdStayMult'), upper: up ? up.textContent : null };
+      // Since 2026-10-11 the Stay button's multiple is the block's Stay
+      // title, and Upper's record rides on the scenario line.
+      return { scenario: sc, line: html('fwdScenarioGrowth'), stay: html('fwdStayMult') || pcTitle('stay'), upper: up ? up.textContent : null };
     });
   }
   function captureBvreStatic(){
@@ -387,12 +395,14 @@
     setVal('calc-mortgage-rate', x.mortRate); setVal('calc-mortgage-years', x.mortYears);
     setVal('calc-num-properties', x.props); setVal('calc-properties-retained', x.retained);
     ['strc', 'sata', 'lend', 'spot'].forEach(function(k, i){ setVal('calc-port-' + k, String(x.port[i])); });
-    click('.calc-cagr-chip[data-scenario="' + x.scenario + '"]');
+    click('.calc-cagr-chip[data-scenario="' + x.scenario + '"], #pcBvrp .pc-opt[data-scenario="' + x.scenario + '"]');   // M3's chips, or the block (2026-10-11)
   }
   function captureRp(){
     var c = { headline: html('calc-headline'), compHead: html('calc-comparison-headers'), comp: html('calc-comparison-body'),
              detail: html('calc-path-detail'), callout: html('calc-specific-callout'), desc: html('calc-path-description'),
              chips: html('calc-cagr-chips'), multiple: html('calc-current-multiple'), chart: chartData('calc-chart') };
+    // The two-scenario block replaced the chips on 2026-10-11 (null before).
+    var pcB = html('pcBvrp'); if (pcB !== null) c.block = pcB;
     // The Real view's own labels (PR 4f). Captured in the Real view only, so
     // a Nominal capture is the same object as before 4f and P1–P16 stay
     // byte-comparable.
@@ -748,7 +758,7 @@
       if (/total if held/.test(lab)) table.held = [money(c[1].textContent), money(c[2].textContent)];
       if (/^If sold, after tax/.test(lab)) table.after = [money(c[1].textContent), money(c[2].textContent)];
     });
-    var sc = (document.querySelector('.calc-cagr-chip.active') || {}).getAttribute('data-scenario');
+    var sc = (document.querySelector('.calc-cagr-chip.active, #pcBvrp .pc-opt.active') || {}).getAttribute('data-scenario');
     var IDX = { stay: 1, trend: 2, upper: 3, floor: 4 };
     function chart(basis){ click('.calc-chart-basis-btn[data-basis="' + basis + '"]'); var d = chartData('calc-chart'); return d; }
     var sold = chart('ifsold'), held = chart('held'); chart('ifsold');

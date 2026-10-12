@@ -101,7 +101,7 @@
 // growth factor is plPrice(t1) / plPrice(t0) and doesn't depend on spot.
 // Same formula and 365.25-day year as the calculator's 'stay' chip
 // (scenarioGrowthFactor, now in shared/real-estate-model.js), so the prose
-// and the chip agree.
+// and the calculator agree.
 //   data-pl-cagr="a,b"      annualised growth from year a to year b, "29%"
 //   data-pl-stay-fv="amt"   amt grown over data-years (default 10), "$813K";
 //                           data-show="gain" prints the gain instead
@@ -221,9 +221,12 @@
     taxRegime: 'us',
     adjustedBasisPct: 60,      // % of current value
     yearsAlreadyHeld: 10,
-    // Bitcoin scenario, one set on both pages (rulings M3, PR 4c):
-    // 'floor' | 'stay' | 'trend' | 'upper'. Default Stay at today's multiple
-    // (was 'trend'); the markup's active chip must match.
+    // Bitcoin scenario, one set on both pages (rulings M3, PR 4c; the two
+    // scenarios since 2026-10-11, DEFAULTS_POLICY): 'stay' | 'trend' are the
+    // scenarios, 'floor' | 'upper' the stress tests. Until the reader picks
+    // (or a link carries a pick), the default is the lower of the two for
+    // today's price: stay below trend, trend at or above it
+    // (applyScenarioDefault, R2).
     btcScenario: 'stay',
     helocLtv: 80,
     helocRatePct: 9.5,
@@ -323,16 +326,40 @@
   //   2 = Bitcoin: Trend
   //   3 = Bitcoin: Upper
   //   4 = Bitcoin: Floor (PR 4c; drawn faintly unless it is the selection)
-  // The chip selection (state.btcScenario) determines which line is the
+  // The selected scenario (state.btcScenario) determines which line is the
   // "primary" (bold) and which scenario drives the headline / table /
   // path-detail numbers. The user can toggle individual lines via the
   // custom legend.
   var chartInstance = null;
   // Legend visibility defaults: keep-rental, the default-primary scenario
-  // (Stay) and Floor, which M3 draws faintly on every chart. Clicking a
-  // different chip auto-hides the old primary (never Floor) and shows the
-  // new one; manual toggles on the others persist across chip switches.
+  // (Stay) and Floor, which M3 draws faintly on every chart. Picking a
+  // different scenario auto-hides the old primary (never Floor) and shows the
+  // new one; manual toggles on the others persist across picks.
   var legendVisibility = { 0: true, 1: true, 2: false, 3: false, 4: true, 5: true };
+  // Scenario code → dataset index in the chart (and in legendVisibility).
+  var SCENARIO_IDX = { stay: 1, trend: 2, upper: 3, floor: 4 };
+  var scenarioPicked = false;   // R2/R7: true once the reader picks, or a link carries a pick
+  // The chart's auto-swap, then a render: hide the previously-primary
+  // scenario, show the newly-selected. Other scenarios keep their manual
+  // toggle state; Floor is never auto-hidden (M3 draws it faintly).
+  function selectScenario(newScenario){
+    var oldScenario = state.btcScenario;
+    if (newScenario !== oldScenario) {
+      if (SCENARIO_IDX[oldScenario] !== undefined && oldScenario !== 'floor') legendVisibility[SCENARIO_IDX[oldScenario]] = false;
+      legendVisibility[SCENARIO_IDX[newScenario]] = true;
+      state.btcScenario = newScenario;
+    }
+    rerender();
+  }
+  // R2: the default follows today's price until the reader picks.
+  function applyScenarioDefault(){
+    if (scenarioPicked) return;
+    var d = window.PriceCases.defaultFor(currentBTCMultiple());
+    if (d === state.btcScenario) return;
+    if (SCENARIO_IDX[state.btcScenario] !== undefined && state.btcScenario !== 'floor') legendVisibility[SCENARIO_IDX[state.btcScenario]] = false;
+    legendVisibility[SCENARIO_IDX[d]] = true;
+    state.btcScenario = d;
+  }
   var chartZoom = 'full';  // 'full' | 'first3' — toggleable via UI above the chart
   // PR 6b (rulings M7, P4): what the lines value. 'ifsold' (the default):
   // both sides sold that year, after tax, as the headline and the table
@@ -353,7 +380,7 @@
   // and Upper dashed, Floor dotted) and the legend carry identity too.
   var CHART_COLORS = {
     rental:    '#3987e5',  // blue, dashed
-    stay:      '#e8801c',  // bitcoin orange (the default)
+    stay:      '#e8801c',  // bitcoin orange (the default below trend)
     trend:     '#199e70',  // green
     upper:     '#d55181',  // magenta, dashed
     floor:     '#d4cdc0',  // light neutral, dotted
@@ -412,7 +439,7 @@
         hidden: !legendVisibility[0]
       },
       {
-        label: 'Bitcoin · Today\u2019s gap persists',
+        label: 'Bitcoin · ' + scenarioLabel('stay'),
         data: pathStay,
         borderColor: CHART_COLORS.stay,
         backgroundColor: CHART_COLORS.stay,
@@ -425,7 +452,7 @@
         hidden: !legendVisibility[1]
       },
       {
-        label: 'Bitcoin · Reverts to trend',
+        label: 'Bitcoin · ' + scenarioLabel('trend'),
         data: pathTrend,
         borderColor: CHART_COLORS.trend,
         backgroundColor: CHART_COLORS.trend,
@@ -438,7 +465,7 @@
         hidden: !legendVisibility[2]
       },
       {
-        label: 'Bitcoin · Peaks at 2.5\u00d7 trend',
+        label: 'Bitcoin · ' + scenarioLabel('upper'),
         data: pathUpper,
         borderColor: CHART_COLORS.upper,
         backgroundColor: CHART_COLORS.upper,
@@ -453,7 +480,7 @@
       },
       {
         // Floor (M3): drawn faintly on every chart; bold when selected.
-        label: 'Bitcoin · Drifts to the floor',
+        label: 'Bitcoin · ' + scenarioLabel('floor'),
         data: pathFloor,
         borderColor: primary('floor') ? CHART_COLORS.floor : CHART_COLORS.floorFaint,
         backgroundColor: primary('floor') ? CHART_COLORS.floor : CHART_COLORS.floorFaint,
@@ -535,21 +562,17 @@
     });
   }
 
-  // Per-scenario tooltip content, shared by the chip help-tips and the
-  // legend help-tips. The set and wording follow rulings M3 (PR 4c): Trend
-  // carries the ruled sentence verbatim; Stay is worded for bitcoin's
-  // position without judging it; Upper's record is computed from the price
-  // data (RealEstateModel.upperRecordText), so it can't go stale.
+  // Per-scenario tooltip content for the legend's help-tips (the chips that
+  // shared it went on 2026-10-11). Stay and Trend read the two-scenario
+  // block's notes; Floor and Upper keep M3's wording (PR 4c), with Upper's
+  // record computed from the price data (RealEstateModel.upperRecordText),
+  // so it can't go stale.
   function scenarioTipHTML(scenario){
-    if (scenario === 'stay') {
-      var mult = currentBTCMultiple();
-      var base = 'Bitcoin keeps today\u2019s multiple of the Power Law trend (' + mult.toFixed(2) + '\u00d7), so it grows at the trend\u2019s own rate from today\u2019s price. No reversion is assumed in either direction. This is the default.';
-      if (mult < 0.95) return base + ' Bitcoin is below trend today, so this assumes the gap stays open; Reverts to trend assumes it closes.';
-      if (mult > 1.05) return base + ' Bitcoin is above trend today, so this assumes the premium persists; Reverts to trend assumes it closes.';
-      return base + ' Bitcoin is close to trend today, so this and Reverts to trend give similar results.';
-    }
-    if (scenario === 'trend') {
-      return 'Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing.';
+    // Stay and Trend: the block's own notes (DEFAULTS_POLICY R4), so the
+    // legend can't word them differently.
+    if (scenario === 'stay' || scenario === 'trend') {
+      var H = state.holdingYears;
+      return window.PriceCases.notes(currentBTCMultiple(), { months: H * 12, phrase: 'all ' + H + ' years', words: H + ' years' })[scenario];
     }
     if (scenario === 'floor') {
       return 'Bitcoin\u2019s multiple moves in a straight line from today\u2019s to 0.42\u00d7 the Power Law trend, the channel\u2019s lower bound, by the end of the holding period. Price has approached the floor three times since the genesis era and gone below it by 5.1% at most (2015), and each time it moved back above; the one deep breach, 42.6% below, was in 2010, in the genesis era (<a href="/the-bitcoin-floor">see The Floor</a>). Drawn faintly on the chart whichever scenario you pick.';
@@ -575,13 +598,13 @@
         tip: chartBasis === 'held'
           ? 'Net wealth if you keep the rental, collecting after-tax cash flow each year. Held: the property\u2019s market value, less the mortgage, before selling costs and the exit tax.'
           : 'Net wealth if you keep the rental and sell it that year: after-tax cash flow to date, plus the sale after selling costs, the mortgage and the exit tax.' },
-      { idx: 4, label: 'Bitcoin \u00b7 Drifts to the floor', color: CHART_COLORS.floor, dashed: true,  // dotted on the chart
+      { idx: 4, label: 'Bitcoin \u00b7 ' + scenarioLabel('floor'), color: CHART_COLORS.floor, dashed: true,  // dotted on the chart
         tip: scenarioTipHTML('floor') },
-      { idx: 1, label: 'Bitcoin \u00b7 Today\u2019s gap persists', color: CHART_COLORS.stay,
+      { idx: 1, label: 'Bitcoin \u00b7 ' + scenarioLabel('stay'), color: CHART_COLORS.stay,
         tip: scenarioTipHTML('stay') },
-      { idx: 2, label: 'Bitcoin \u00b7 Reverts to trend', color: CHART_COLORS.trend,
+      { idx: 2, label: 'Bitcoin \u00b7 ' + scenarioLabel('trend'), color: CHART_COLORS.trend,
         tip: scenarioTipHTML('trend') },
-      { idx: 3, label: 'Bitcoin \u00b7 Peaks at 2.5\u00d7 trend', color: CHART_COLORS.upper,
+      { idx: 3, label: 'Bitcoin \u00b7 ' + scenarioLabel('upper'), color: CHART_COLORS.upper,
         dashed: true,  // visually less confident — matches dashed chart line
         tip: scenarioTipHTML('upper') },
       { idx: 5, label: 'Difference', color: CHART_COLORS.diff,
@@ -632,11 +655,12 @@
     });
   }
 
+  // The scenario's short name, from the shared words (PriceCases.names):
+  // "Stays 47% below trend", "Returns to trend over 3 years", and the stress
+  // tests' "Drifts to the floor", "Peaks at 2.5× trend".
   function scenarioLabel(scenario){
-    if (scenario === 'floor') return 'Drifts to the floor';
-    if (scenario === 'trend') return 'Reverts to trend';
-    if (scenario === 'upper') return 'Peaks at 2.5\u00d7 trend';
-    return 'Today\u2019s gap persists';
+    var N = window.PriceCases.names(currentBTCMultiple());
+    return N[scenario] || N.stay;
   }
 
   // Path-specific plain-English description rendered below the path
@@ -818,7 +842,7 @@
     RealEstateGrid.render(document.getElementById('calc-grid'), {
       axes: [
         { id: 'scen', label: 'Scenario \u00d7 home prices',
-          rows: { label: 'Bitcoin', items: [['floor', 'Drifts to the floor'], ['stay', 'Today\u2019s gap persists'], ['trend', 'Reverts to trend']].map(function(x){ return { label: x[1], v: x[0] }; }) },
+          rows: { label: 'Bitcoin', items: [['floor', scenarioLabel('floor')], ['stay', scenarioLabel('stay')], ['trend', scenarioLabel('trend')]].map(function(x){ return { label: x[1], v: x[0] }; }) },
           cols: { label: 'Home prices a year', items: [{ label: 'Long run ' + pc(LR), v: LR }, { label: 'Yours ' + pc(s.appreciationPct), v: s.appreciationPct }, { label: 'Yours + 2 pts ' + pc(s.appreciationPct + 2), v: s.appreciationPct + 2 }] } },
         { id: 'hy', label: 'Holding period \u00d7 net yield',
           rows: { label: 'Holding period', items: hs.map(function(h){ return { label: h + ' years', v: h }; }) },
@@ -952,82 +976,38 @@
     el.innerHTML = html;
   }
 
-  function renderCAGRChips(s){
-    var scenarios = ['floor', 'stay', 'trend', 'upper'];
-    scenarios.forEach(function(sc){
-      var chip = document.querySelector('.calc-cagr-chip[data-scenario="' + sc + '"]');
-      if (!chip) return;
-      var sCopy = Object.assign({}, s, { btcScenario: sc });
-      var r = computeAll(sCopy);
-      // In the display frame (PR 4f); nominal as before.
-      // If both are sold at year N, after tax (PR 5b, M7), as the headline.
-      var delta = inFrame(r.path.ifSold.afterTax, s.holdingYears) - inFrame(r.keep.ifSold.afterTax, s.holdingYears);
-
-      // Effective CAGR display — derived dynamically from Power Law data
-      // and the current holding period, so the number recalibrates as
-      // the user drags the holding-period slider or as TODAY_PRICE
-      // updates from the live fetch.
-      var effCAGRPct = effectiveCAGR(sc, s.holdingYears) * 100;
-      var rateEl = chip.querySelector('.calc-cagr-chip-rate');
-      if (rateEl) rateEl.textContent = '~' + effCAGRPct.toFixed(0) + '% CAGR';
-
-      var deltaEl = chip.querySelector('.calc-cagr-chip-delta');
-      if (!deltaEl) {
-        deltaEl = document.createElement('span');
-        deltaEl.className = 'calc-cagr-chip-delta';
-        chip.appendChild(deltaEl);
-      }
-      deltaEl.textContent = (delta > 0 ? '+' : '') + fmtMoney(delta);
-      deltaEl.style.color = delta > 0 ? 'var(--green)' : '#e07a6d';
-      chip.classList.toggle('active', sc === s.btcScenario);
-
-      // Chip tooltip — populates the .tip-content span inside the chip's
-      // own .help-tip. Re-runs every rerender so 'stay' picks up the
-      // current multiple's bull/bear/neutral framing.
-      var chipTipEl = chip.querySelector('.calc-chip-help .tip-content');
-      if (chipTipEl) chipTipEl.innerHTML = scenarioTipHTML(sc);
-    });
-
-    // Update the current-multiple readout above the chips if present
-    var mEl = document.getElementById('calc-current-multiple');
-    if (mEl) {
-      var mult = currentBTCMultiple();
-      mEl.textContent = mult.toFixed(2) + '\u00d7 trend';
+  // Bitcoin's price: the two scenarios (components/price-cases.njk;
+  // DEFAULTS_POLICY_2026-10-11, version B; replaced M3's four chips). Each
+  // half shows the path minus keeping the rental, both sold at year N, after
+  // tax, in the display frame, as the verdict does; its line under the
+  // number keeps the chips' growth rate. Floor and Upper are the stress tests.
+  var PATH_SHORT = ['', 'Sell + Spot Bitcoin', 'HELOC + Bitcoin', 'Partial Sale + Yield', 'Sell + Yield Portfolio'];
+  function renderPriceCases(s){
+    var el = document.getElementById('pcBvrp');
+    if (!el) return;
+    var m = currentBTCMultiple(), H = s.holdingYears, real = isReal();
+    function val(sc){
+      var r = computeAll(Object.assign({}, s, { btcScenario: sc }));
+      var delta = inFrame(r.path.ifSold.afterTax, H) - inFrame(r.keep.ifSold.afterTax, H);
+      return { num: (delta > 0 ? '+' : '') + fmtMoney(delta),
+               sub: PATH_SHORT[s.path] + ' minus keeping the rental, both sold in year ' + H + ', after tax, ' +
+                    (real ? 'in today\u2019s dollars' : 'in future dollars') + ' \u00b7 bitcoin about ' + (effectiveCAGR(sc, H) * 100).toFixed(0) + '% a year' };
     }
+    var T = window.PriceCases.titles(m), sc = s.btcScenario;
+    var note = sc === 'upper' ? ' A stress test, not a forecast: ' + (window.RealEstateModel.upperRecordText() || 'past cycle peaks were brief') + '.'
+             : sc === 'floor' ? ' A stress test: 0.42\u00d7 is the channel\u2019s floor, which price has gone below by 5.1% at most since the genesis era (2015).' : '';
+    window.PriceCases.render(el, {
+      mult: m, selected: sc, drives: 'the chart, the verdict and the tables below',
+      plan: { months: H * 12, phrase: 'all ' + H + ' years', words: H + ' years' },
+      values: { stay: val('stay'), trend: val('trend') },
+      showing: T[sc] + ': bitcoin grows about <strong>' + (effectiveCAGR(sc, H) * 100).toFixed(1) + '% a year</strong>, today\u2019s price to its price in year ' + H + ', in nominal dollars.' + note
+    });
   }
 
-  function bindCAGRChips(){
-    // Scenario code → dataset index in the chart (and in legendVisibility)
-    var SCENARIO_IDX = { stay: 1, trend: 2, upper: 3, floor: 4 };
-
-    document.querySelectorAll('.calc-cagr-chip').forEach(function(chip){
-      chip.addEventListener('click', function(){
-        var newScenario = chip.dataset.scenario;
-        var oldScenario = state.btcScenario;
-        if (newScenario === oldScenario) return;
-
-        // Auto-swap visibility: hide the previously-primary scenario,
-        // show the newly-selected. Other scenarios retain their manual
-        // toggle state — so a user who turned 'Stay' on for comparison
-        // keeps it on when switching primary from Trend to Upper. Floor is
-        // never auto-hidden: M3 draws it faintly on every chart.
-        if (SCENARIO_IDX[oldScenario] !== undefined && oldScenario !== 'floor') {
-          legendVisibility[SCENARIO_IDX[oldScenario]] = false;
-        }
-        legendVisibility[SCENARIO_IDX[newScenario]] = true;
-
-        state.btcScenario = newScenario;
-        rerender();
-      });
-    });
-
-    // Stop chip help-tip clicks from bubbling to the chip button.
-    // Without this, clicking the ? glyph would toggle the chip selection.
-    document.querySelectorAll('.calc-cagr-chip .calc-chip-help').forEach(function(help){
-      help.addEventListener('click', function(e){ e.stopPropagation(); });
-      help.addEventListener('keydown', function(e){
-        if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
-      });
+  function bindPriceCases(){
+    window.PriceCases.bind(document.getElementById('pcBvrp'), function(k){
+      scenarioPicked = true;
+      selectScenario(k);
     });
   }
 
@@ -1077,9 +1057,9 @@
 
   // The frame's labels outside the result blocks (PR 4f): the toggle, the
   // frame line under it (the shared binder writes it: which view is
-  // showing, and what Real means next to Nominal), the chart's title, and
-  // the note under the scenario chips (their growth rates are nominal in
-  // both views; their differences follow the frame).
+  // showing, and what Real means next to Nominal) and the chart's title.
+  // (The note under the old scenario chips went with them on 2026-10-11;
+  // the two-scenario block states its own frame, renderPriceCases.)
   var baselineCtl = null;
   function renderFrameUI(){
     var real = isReal();
@@ -1092,8 +1072,6 @@
     var cf = document.getElementById('calc-chart-frame');
     var basisTxt = chartBasis === 'held' ? 'held, before tax' : 'if sold that year, after tax';
     if (cf) cf.textContent = '(' + basisTxt + '; ' + (real ? 'real, today\u2019s $' : 'nominal, future $') + ')';
-    var chipsNote = document.getElementById('calc-chips-frame');
-    if (chipsNote) chipsNote.hidden = !real;
   }
 
   function bindDisplayMode(){
@@ -1137,6 +1115,7 @@
   var holdRender = false;
   function rerender(){
     if (holdRender) return;
+    applyScenarioDefault();
     var results = computeAll(state);
     renderFrameUI();
     renderPathDescription();
@@ -1146,7 +1125,7 @@
     renderLedger(results, state);
     renderGrid(state);
     renderPath3Derived(state);
-    renderCAGRChips(state);
+    renderPriceCases(state);
     renderChart(state);
     renderChartLegend();  // re-render so Stay tooltip stays accurate as multiple/inputs shift
     renderSpecificCallout(state);
@@ -1258,6 +1237,7 @@
     function click(sel){ var b = document.querySelector(sel); if (b) b.click(); }
     C.register({
       writeUrl: true,
+      scenarioPicked: function(){ return scenarioPicked; },
       read: function(){
         return { horizon: state.holdingYears, happr: state.appreciationPct, sell: state.sellCostPct, btctx: state.btcTxPct,
                  pscenario: state.btcScenario, displaymode: state.displayMode, tax: state.taxRegime,
@@ -1272,7 +1252,8 @@
           if (v.tax !== undefined) select('calc-tax-regime', v.tax);
           if (v.bracket !== undefined) select('calc-bracket', v.bracket);
           if (v.state !== undefined) select('calc-state', v.state);
-          if (v.pscenario !== undefined) click('.calc-cagr-chip[data-scenario="' + v.pscenario + '"]');
+          // A carried scenario is the sender's pick (DEFAULTS_POLICY R7).
+          if (['floor', 'stay', 'trend', 'upper'].indexOf(v.pscenario) !== -1) { scenarioPicked = true; selectScenario(v.pscenario); }
           if (v.displaymode !== undefined) click('.calc-frame-btn[data-mode="' + v.displaymode + '"]');
           if (v.happr !== undefined) {
             var ap = document.getElementById('rpHomeAppreciation');
@@ -1375,7 +1356,7 @@
 
     bindPortfolioSliders();
     bindPathToggle();
-    bindCAGRChips();
+    bindPriceCases();
     bindZoomToggle();
     bindBasisToggle();   // PR 6b
     bindBaseline();
@@ -1390,8 +1371,9 @@
     // Render everything EXCEPT the chart. The chart waits for the
     // calculator tab to activate (STYLE_GUIDE §6.14 — Chart.js charts
     // initialized inside a display:none container suffer stale layout
-    // cache). The headline / table / chips / detail / callout all
+    // cache). The headline / table / block / detail / callout all
     // render fine in the hidden tab.
+    applyScenarioDefault();
     var results = computeAll(state);
     renderFrameUI();
     renderPathDescription();
@@ -1401,7 +1383,7 @@
     renderLedger(results, state);
     renderGrid(state);
     renderPath3Derived(state);
-    renderCAGRChips(state);
+    renderPriceCases(state);
     renderSpecificCallout(state);
     renderChartLegend();  // static legend markup; toggle handlers persist
     updatePerPropertyHint();  // initial visibility (default path is 4, so hidden)
@@ -1426,16 +1408,20 @@
 
     // The shared power-law-data module updates window.TODAY_PRICE in place
     // once fetchTodayPrice resolves (live spot, with PL_DATA fallback).
-    // The ETI module above already calls fetchTodayPrice for its own render,
-    // but the chip-picker's #calc-current-multiple readout is not subscribed
-    // to that callback — so it stays on the first-paint seeded value (the
-    // last PL_DATA sample) while the ETI updates to live. This causes the
-    // page to show two different "current multiple" values for the same
-    // fact (e.g. 0.51× vs 0.44×). Subscribe here so both indicators agree
-    // once the live fetch returns.
+    // Subscribed so the block (its lead, titles and Trend half) agrees with
+    // the ETI card on today's multiple. Until the reader picks, the live
+    // price can also move the default (R2), which moves every figure: then
+    // everything re-renders, the chart only if its tab is showing.
     if (typeof fetchTodayPrice === 'function') {
       fetchTodayPrice(function(){
-        renderCAGRChips(state);
+        var before = state.btcScenario;
+        applyScenarioDefault();
+        if (state.btcScenario === before) { renderPriceCases(state); renderChartLegend(); return; }
+        var r = computeAll(state);
+        renderHeadline(r, state); renderComparison(r, state); renderPathDetail(r, state);
+        renderLedger(r, state); renderGrid(state); renderPriceCases(state); renderChartLegend(); renderSpecificCallout(state);
+        var panel = document.getElementById('panel-calculator');
+        if (panel && panel.classList.contains('active')) renderChart(state);
       });
     }
   }
