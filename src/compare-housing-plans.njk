@@ -24,7 +24,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/compare-housing-plans-head.html' %}"
   page_styles: "{% include '_pageassets/compare-housing-plans.css' %}\n{% include '_pageassets/shared/real-estate-ledger.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/compare-housing-plans.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/real-estate-model.js' %}\n{% include '_pageassets/shared/real-estate-chart.js' %}\n{% include '_pageassets/shared/real-estate-ledger.js' %}\n{% include '_pageassets/shared/real-estate-carry.js' %}\n{% include '_pageassets/compare-housing-plans.js' %}"
 ---
 {#
   Compare Housing Plans — two housing plans side by side, step four of the
@@ -99,14 +99,12 @@ eleventyComputed:
         </div>
     </details>
 
-    <div class="ch-scen" role="group" aria-label="Bitcoin scenario">
-        <span class="ch-scen-k">Bitcoin scenario<span class="help-tip" tabindex="0">?<span class="tip-content">The series&rsquo; four paths from the <a href="/the-power-law">Power Law</a>, each moving bitcoin from where it sits today against the trend to a target at the end: <strong>Drifts to the floor</strong>, the model&rsquo;s lower line (0.42&times; trend); <strong>Today&rsquo;s gap persists</strong> (the default); <strong>Reverts to trend</strong>; <strong>Peaks at 2.5&times; trend</strong>, a stress test. The table under the cards adds two plain what-ifs.</span></span></span>
-        <button type="button" class="ch-chip" data-scenario="floor">Drifts to the floor</button>
-        <button type="button" class="ch-chip on" data-scenario="stay">Today&rsquo;s gap persists</button>
-        <button type="button" class="ch-chip" data-scenario="trend">Reverts to trend</button>
-        <button type="button" class="ch-chip" data-scenario="upper">Peaks at 2.5&times; trend</button>
-        <p class="ch-scen-note" id="chScenNote">These four paths come from the <a href="/the-power-law">Power Law</a>, the long-run trend bitcoin&rsquo;s price has followed since 2010. <a href="/the-power-law">What is the Power Law? &rarr;</a></p>
-    </div>
+    <!-- Bitcoin's price: two scenarios to consider (DEFAULTS_POLICY_2026-10-11,
+         version B). Replaces the four chips: Stay and Trend are the two scenarios
+         (each half shows which plan ends ahead, and by how much), Floor and
+         Upper the stress tests. -->
+    {% set pc_id = 'pcChp' %}
+    {% include 'components/price-cases.njk' %}
 
     <div class="ch-hurdle" id="chHead" aria-live="polite">
         <div class="ch-hurdle-k">The difference</div>

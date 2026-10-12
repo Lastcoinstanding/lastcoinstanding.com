@@ -75,13 +75,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .mp-hurdle-s { margin: 0; font-size: 0.86rem; color: var(--text-dim); line-height: 1.6; }
 .mp-hurdle-s strong { color: var(--text); }
 
-/* Scenario chips */
-.mp-scen { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin: 0 0 1rem; }
-.mp-scen-k { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-right: 0.3rem; display: inline-flex; align-items: center; }
-.mp-chip { font-family: var(--font-b); font-size: 0.78rem; font-weight: 600; color: var(--text-dim); background: transparent; border: 1px solid var(--border-lt); border-radius: 999px; padding: 0.4rem 0.85rem; cursor: pointer; }
-.mp-chip:hover { color: var(--text); border-color: var(--amber-dim); }
-.mp-chip.on { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); }
-
 /* The two households */
 .mp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .mp-card { border: 1px solid var(--border-lt); border-radius: 10px; padding: 1.1rem 1.2rem; background: var(--bg); }
@@ -174,6 +167,3 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
     #mpGrid .re-grid th:first-child, #mpGrid .re-grid td:first-child { font-size: 0.66rem; }
 }
 
-/* The Power Law line under the scenario buttons (JM, CHP review, 2026-10-02). */
-.mp-scen-note { flex-basis: 100%; margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--text-dim); line-height: 1.55; }
-.mp-scen-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }

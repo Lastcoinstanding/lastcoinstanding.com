@@ -96,6 +96,49 @@
     };
   }
 
+  /* THE EPISODE BASIS, as figures (JM rulings 2026-09-04 and -07). HOISTED
+     2026-10-11 from discount-or-premium.js's renderDuration (DEFAULTS_POLICY
+     R4): the forward calculators' two-scenario block prints the same record,
+     so the explainer and the calculators read one copy. Same arithmetic,
+     byte for byte: closed episodes only, sorted ascending; `thin` is the N<3
+     rule (below three independent episodes, name them, don't take a median). */
+  function episodeStats(rec) {
+    var closed = ((rec && rec.episodes) || []).filter(function (e) { return !e.ongoing; })
+                                               .map(function (e) { return e.months; })
+                                               .sort(function (a, b) { return a - b; });
+    var n = closed.length;
+    return {
+      closed: closed, n: n,
+      min: n ? closed[0] : null,
+      max: n ? closed[n - 1] : null,
+      median: !n ? null : n % 2 ? closed[(n - 1) / 2] : (closed[n / 2 - 1] + closed[n / 2]) / 2,
+      thin: n > 0 && n < 3
+    };
+  }
+
+  /* THE LONGEST STRETCH on one side of trend (DEFAULTS_POLICY R4, 2026-10-11).
+     A stretch runs from the first sample past 1.0x to the first sample back,
+     over the same samples as scan(), so "since 2010" is the record's start.
+     side 'below' (multiple < 1) or 'above' (>= 1). `current` is the stretch
+     still open at the latest sample, measured to TODAY_DAYS like scan()'s
+     ongoing episodes; a consumer says so when it outruns `longest`.
+     On 2026-10-11: below 28 months (Jan 2015 to May 2017), above 22 months
+     (Mar 2013 to Jan 2015); the current one below began Oct 2025. */
+  function longestStretch(side) {
+    var below = side !== 'above', best = null, start = -1, i, m, on, months;
+    for (i = 0; i < PL_DATA.length; i++) {
+      m = sampleMult(i); on = below ? m < 1 : m >= 1;
+      if (on && start < 0) start = i;
+      else if (!on && start >= 0) {
+        months = (PL_DATA[i][0] - PL_DATA[start][0]) / YEARS_MO;
+        if (!best || months > best.months) best = { months: months, fromD: PL_DATA[start][0], toD: PL_DATA[i][0] };
+        start = -1;
+      }
+    }
+    return { longest: best,
+             current: start < 0 ? null : { months: (TODAY_DAYS - PL_DATA[start][0]) / YEARS_MO, fromD: PL_DATA[start][0] } };
+  }
+
   /* THE DISPLAY PRECISION (JM ruling, 2026-09-05) — whole months, everywhere.
 
      This is a property of the DATA, not a per-page style choice, which is why
@@ -128,6 +171,8 @@
     NEAR_LO: NEAR_LO, NEAR_HI: NEAR_HI, YEARS_MO: YEARS_MO, EPISODE_D: EPISODE_D,
     sampleMult: sampleMult,
     scan: scan,
+    episodeStats: episodeStats,
+    longestStretch: longestStretch,
     fmtMonths: fmtMonths,
     fmtMonthsShort: fmtMonthsShort
   };

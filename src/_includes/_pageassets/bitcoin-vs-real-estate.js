@@ -622,7 +622,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // Belt-and-suspenders DOM-sync at end of init() force-syncs these
   // regardless, so a future drift in any of the three defaults gets
   // corrected before the first calc render.
-  var scenario = 'stay';   // M3 (PR 4c): the default is Stay at today's multiple
+  // Bitcoin's price: the two scenarios (DEFAULTS_POLICY_2026-10-11; was M3's
+  // four buttons). 'stay' and 'trend' are the scenarios, 'floor' and 'upper'
+  // the stress tests (shared/price-cases.js). Until the reader picks one, or
+  // a link carries a pick, the default is the lower of the two for the price
+  // in the field: stay below trend, trend at or above it (R2, runFwdCalc).
+  var scenario = 'stay';
+  var scenarioPicked = false;
   var method = 'mortgage';
 
   // ── Populate time horizon based on current year ──
@@ -667,19 +673,15 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     });
   }
 
-  // ── Power Law scenario buttons ──
+  // ── Bitcoin's price: two scenarios (components/price-cases.njk) ──
   // Upper's caveat is the cycle-peak record, computed from the price data
-  // (RealEstateModel.upperRecordText) so it can't go stale; the markup
-  // carries the same sentence as its no-script fallback.
+  // (RealEstateModel.upperRecordText) so it can't go stale; it rides on the
+  // "Showing" line when the Upper stress test is picked.
   var _upperRecord = RealEstateModel.upperRecordText();
-  if(_upperRecord) document.querySelectorAll('[data-upper-record]').forEach(function(el){ el.textContent = _upperRecord; });
-  document.querySelectorAll('.scenario-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('.scenario-btn').forEach(function(b){b.classList.remove('active')});
-      btn.classList.add('active');
-      scenario = btn.dataset.scenario;
-      runFwdCalc();
-    });
+  var pcEl = document.getElementById('pcBvre');
+  PriceCases.bind(pcEl, function(k){
+    scenario = k; scenarioPicked = true;
+    runFwdCalc();
   });
 
   // ── Display mode toggle (Real vs Nominal) ──────────────────────────
@@ -790,6 +792,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     var sellPct = parseRange('fwdSellPct', 0, 10, D.sellPct);
     var btcTxPct = parseRange('fwdBtcTxPct', 0, 2, D.btcTxPct);
     var closingPct = parseRange('fwdClosingPct', 0, 10, D.closingPct);
+    // R2: until the reader picks, the default follows the price in the field.
+    if (!scenarioPicked) scenario = PriceCases.defaultFor(PriceCases.multipleOf(btcNow));
     var _pIn = Object.assign({
       method: method, scenario: scenario, horizonYrs: horizonYrs, btcNow: btcNow,
       homePrice: homePrice, homeApprNominal: homeApprNominal, inflRate: inflRate,
@@ -815,18 +819,29 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     setPlaceholder('fwdRentGrowth', pctTxt(homeApprNominal) + ' default');
     setPlaceholder('fwdInsurance', fmt(P.insuranceDefault) + ' default');
 
-    var SCEN_NAMES = { floor: 'Drifts to the floor', stay: 'Today\u2019s gap persists', trend: 'Reverts to trend', upper: 'Peaks at 2.5\u00d7 trend' };
-    var scenarioLabel = SCEN_NAMES[scenario] || 'Today\u2019s gap persists';
-    // M3: today's multiple on the Stay button, and the selected scenario's
-    // implied growth beside the selector (nominal, today → horizon end).
-    var stayMultEl = document.getElementById('fwdStayMult');
-    if(stayMultEl) stayMultEl.textContent = P.mult0.toFixed(2) + '\u00d7';
-    var growthEl = document.getElementById('fwdScenarioGrowth');
-    if(growthEl){
-      var g = P.impliedGrowthPct;
-      growthEl.innerHTML = scenarioLabel + ': bitcoin ' + (g < 0 ? 'falls' : 'grows') + ' <strong>' + Math.abs(g).toFixed(1) + '% a year</strong>, from ' +
-        fmt(btcNow) + ' (' + P.mult0.toFixed(2) + '\u00d7 trend) to ' + fmt(P.priceEnd) + ' (' + P.targetMult.toFixed(2) + '\u00d7) by ' + asOf + ', in nominal dollars.';
+    var SCEN_NAMES = PriceCases.names(P.mult0), SCEN_TITLES = PriceCases.titles(P.mult0);
+    var scenarioLabel = SCEN_NAMES[scenario] || SCEN_NAMES.stay;
+    // The two-scenario block (DEFAULTS_POLICY R5): each half shows the bitcoin
+    // path if sold, after tax, in the display frame, as the card below does;
+    // the "Showing" line restates the selected path (the line under M3's
+    // buttons until 2026-10-11; rePairQA reads it by id, fwdScenarioGrowth).
+    var PS = scenario === 'stay' ? P : RealEstateModel.bvreProjection(Object.assign({}, _pIn, { scenario: 'stay' }));
+    var PT = scenario === 'trend' ? P : RealEstateModel.bvreProjection(Object.assign({}, _pIn, { scenario: 'trend' }));
+    var houseHead = fmt(modeVal(P.real.houseAfterTax, P.houseAfterTax));
+    function pcValue(X){
+      return { num: fmt(modeVal(X.real.btcAfterTax, X.btcAfterTax)),
+               sub: 'the bitcoin path in ' + asOf + ', if sold, after tax, ' + (_mode === 'real' ? 'in today\u2019s dollars' : 'in future dollars') + ' \u00b7 the house: ' + houseHead };
     }
+    var g = P.impliedGrowthPct;
+    var stressNote = scenario === 'upper' ? (_upperRecord ? ' A stress test, not a forecast: ' + _upperRecord + '.' : ' A stress test, not a forecast.')
+      : scenario === 'floor' ? ' A stress test: 0.42\u00d7 is the channel\u2019s floor, which price has gone below by 5.1% at most since the genesis era (2015).' : '';
+    PriceCases.render(pcEl, {
+      mult: P.mult0, selected: scenario, drives: 'the cards, chart and tables below',
+      plan: { months: horizonYrs * 12, phrase: 'all ' + horizonYrs + ' years', words: horizonYrs + ' years' },
+      values: { stay: pcValue(PS), trend: pcValue(PT) },
+      showing: '<span id="fwdScenarioGrowth">' + SCEN_TITLES[scenario] + ': bitcoin ' + (g < 0 ? 'falls' : 'grows') + ' <strong>' + Math.abs(g).toFixed(1) + '% a year</strong>, from ' +
+        fmt(btcNow) + ' (' + P.mult0.toFixed(2) + '\u00d7 trend) to ' + fmt(P.priceEnd) + ' (' + P.targetMult.toFixed(2) + '\u00d7) by ' + asOf + ', in nominal dollars.' + stressNote + '</span>'
+    });
     var houseRateLabel = _mode === 'real'
       ? (P.homeApprRealPct.toFixed(1).replace('-', '\u2212') + '%/yr real')
       : (pctTxt(homeApprNominal) + '/yr nominal');
@@ -934,7 +949,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // The sensitivity grid (PR 7; R9, P1): the after-tax difference if sold,
     // bitcoin minus the house, as two assumptions move; yours outlined.
     if (window.RealEstateGrid) {
-      var SC = [['floor', 'Drifts to the floor'], ['stay', 'Today\u2019s gap persists'], ['trend', 'Reverts to trend']];
+      var SC = [['floor', SCEN_NAMES.floor], ['stay', SCEN_NAMES.stay], ['trend', SCEN_NAMES.trend]];
       var LR = window.ModelingAssumptions ? window.ModelingAssumptions._dimensions.homeApprNominal.presetValues['long-run'] : 3.41;
       function pc(v){ return parseFloat(Number(v).toFixed(2)) + '%'; }
       var hs = [Math.max(1, horizonYrs - 5), horizonYrs, Math.min(30, horizonYrs + 5)];
@@ -954,7 +969,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
           return _mode === 'real' ? d / Q.deflator : d;
         },
         mine: function(pair){ if (pair === 'hr') return [1, 1]; var k = ['floor', 'stay', 'trend'].indexOf(scenario); return k < 0 ? null : [k, 1]; },
-        note: 'Each cell: the bitcoin minus the house, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. <em>Peaks at 2.5&times; trend</em> isn&rsquo;t in the grid: it is a stress test, not a case to plan on.'
+        note: 'Each cell: the bitcoin minus the house, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. <em>Peaks at 2.5&times; trend</em> isn&rsquo;t in the grid: it is a stress test, not a scenario to plan on.'
       });
     }
     if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
@@ -1069,6 +1084,13 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
   // Expose for the calc-mode toggle handler (allows safety re-trigger
   // if initial run happened while #calc-mode-projection was hidden).
   window.runFwdCalc = runFwdCalc;
+  // The scenario for the URL and carry code below (a separate IIFE): read it,
+  // apply a carried pick, and say whether the reader has picked (R7).
+  window._bvreScenario = {
+    get: function(){ return scenario; },
+    set: function(k){ scenario = k; scenarioPicked = true; runFwdCalc(); },
+    picked: function(){ return scenarioPicked; }
+  };
 })();
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1253,7 +1275,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     btctx:     { elId: 'fwdBtcTxPct',          type: 'float',     def: 0.5,     evt: 'input', dp: 2 },
     inv:       { elId: 'fwdInvestDiff',        type: 'bool-on',                 evt: 'change' },
     method:    { type: 'btn-method',    sel: '.purchase-btn',   attr: 'method',   def: 'mortgage' },
-    pscenario: { type: 'btn-pscenario', sel: '.scenario-btn',   attr: 'scenario', def: 'stay',     persist: false },
+    // pscenario: the scenario lives in the projection's JS (window._bvreScenario),
+    // not in a button's class: readValue/applyValue/syncUrl special-case it,
+    // and a link carries it only once the reader has picked (DEFAULTS_POLICY R7).
+    pscenario: { type: 'btn-pscenario', sel: '#pcBvre .pc-opt', attr: 'scenario', def: 'stay',     persist: false },
     displaymode: { type: 'btn-displaymode', sel: '.display-mode-btn', attr: 'mode', def: 'real',  persist: false },
     // PR 8 (rulings P3): Tax on a sale, linked but not stored, like the
     // display frame. `tax`, `bracket` and `state` are pair names, which
@@ -1299,6 +1324,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
   function readValue(key) {
     var spec = SCHEMA[key];
+    if (key === 'pscenario') return window._bvreScenario ? window._bvreScenario.get() : spec.def;
     if (isBtn(spec)) {
       var active = document.querySelector(spec.sel + '.active');
       return active ? active.getAttribute('data-' + spec.attr) : spec.def;
@@ -1315,6 +1341,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
 
   function applyValue(key, raw) {
     var spec = SCHEMA[key];
+    // A carried scenario is the sender's pick (R7): honour it whatever the
+    // price, and stop the default from following the price.
+    if (key === 'pscenario') {
+      if (['floor', 'stay', 'trend', 'upper'].indexOf(raw) !== -1 && window._bvreScenario) window._bvreScenario.set(raw);
+      return;
+    }
     if (isBtn(spec)) {
       var btn = document.querySelector(spec.sel + '[data-' + spec.attr + '="' + raw + '"]');
       if (btn && !btn.classList.contains('active')) btn.click();
@@ -1496,6 +1528,12 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         else params.set(key, String(val));
         return;
       }
+      // The scenario: only a pick is carried, never the default (R7).
+      if (key === 'pscenario') {
+        if (window._bvreScenario && window._bvreScenario.picked()) params.set(key, val);
+        else params.delete(key);
+        return;
+      }
       // Enums (button groups): omit when equal to default
       if (val === spec.def) params.delete(key);
       else params.set(key, val);
@@ -1607,8 +1645,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // called for that key — but the module-init JS variable could be
     // stale. Force-syncing from the DOM here guarantees the calc uses
     // whatever the user actually sees highlighted.
-    var _activeScenarioBtn = document.querySelector('.scenario-btn.active');
-    if (_activeScenarioBtn) scenario = _activeScenarioBtn.dataset.scenario;
+    // (The scenario needs no sync since 2026-10-11: it lives in JS, and the
+    // block is drawn from it on every render.)
     var _activeMethodBtn = document.querySelector('.purchase-btn.active');
     if (_activeMethodBtn) method = _activeMethodBtn.dataset.method;
 
@@ -1622,7 +1660,8 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         var out = {};
         window.RealEstateCarry.KEYS.forEach(function(k){ if (SCHEMA[k]) out[k] = readValue(k); });
         return out;
-      }
+      },
+      scenarioPicked: function(){ return !!(window._bvreScenario && window._bvreScenario.picked()); }
     });
     // No syncUrl() here by design. A load — fresh or storage-restored — leaves the
     // address bar exactly as the reader arrived with it; the first interaction is

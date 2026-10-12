@@ -75,9 +75,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ch-hurdle-s { margin: 0; font-size: 0.86rem; color: var(--text-dim); line-height: 1.6; }
 .ch-hurdle-s strong { color: var(--text); }
 
-/* Scenario chips */
-.ch-scen { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin: 0 0 1rem; }
-.ch-scen-k { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-right: 0.3rem; display: inline-flex; align-items: center; }
 .ch-chip { font-family: var(--font-b); font-size: 0.78rem; font-weight: 600; color: var(--text-dim); background: transparent; border: 1px solid var(--border-lt); border-radius: 999px; padding: 0.4rem 0.85rem; cursor: pointer; }
 .ch-chip:hover { color: var(--text); border-color: var(--amber-dim); }
 .ch-chip.on { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); }
@@ -168,9 +165,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 @media (max-width: 760px) { .ch-plans { grid-template-columns: 1fr; } }
 
 /* JM review round 1 (2026-10-02) ─────────────────────────────── */
-/* The Power Law line under the scenario buttons (the reader may not know it). */
-.ch-scen-note { flex-basis: 100%; margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--text-dim); line-height: 1.55; }
-.ch-scen-note a, .ch-table caption a, .ch-table-sub a, .ch-hurdle-s a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+
+.ch-table caption a, .ch-table-sub a, .ch-hurdle-s a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
 /* Cards: the rows sum to a bold total; the loan is neutral (both plans that buy
    owe one), costs and taxes red; the plan ahead carries a green badge. */
 .ch-card dt.net, .ch-card dd.net { font-weight: 600; color: var(--text-bright); border-top: 1px solid var(--border-lt); padding-top: 0.3rem; margin-top: 0.15rem; }

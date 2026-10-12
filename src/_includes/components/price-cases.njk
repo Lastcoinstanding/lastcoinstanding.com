@@ -1,0 +1,102 @@
+{#-
+  ════════ BITCOIN'S PRICE: TWO SCENARIOS TO CONSIDER ════════
+
+  The block every forward calculator puts at the top of its results
+  (DEFAULTS_POLICY_2026-10-11, version B, JM 2026-10-11): one frame holding
+  the two scenarios side by side with "or" on the seam, the stress tests in a
+  row under it, and a "Showing" line that restates the selected path.
+
+  The halves and chips are `.pc-opt` buttons with `data-scenario` (stay,
+  trend, floor, upper: M3's names, so links and QA vectors keep their
+  meaning). shared/price-cases.js fills every word and number
+  (PriceCases.render) and reports clicks (PriceCases.bind); the page owns the
+  state, so the markup here is first paint only.
+
+  Usage, with an id unique on the page:
+      {% set pc_id = 'pcBvre' %}
+      {% include 'components/price-cases.njk' %}
+  Optional: pc_class (extra classes on the section, e.g. to span a grid) and
+  pc_stress_label (the stress row's label, "Stress tests" by default; The
+  Income Question says "Other paths to test", since "stress" already names
+  its drawdown overlay; PriceCases.render's `stressWord` matches it).
+
+  Built on the series strips' pattern: its own scoped <style>, every
+  selector prefixed `pc-`, colours as vars with literal fallbacks (host
+  palettes differ).
+-#}
+{%- set pcId = pc_id | default('pcBlock') -%}
+{%- set pcStress = pc_stress_label | default('Stress tests') -%}
+<style>
+.pc { margin: 1.4rem 0 1.6rem; padding: 1.15rem 1.25rem 1rem; border: 1px solid rgba(212,168,67,0.38); border-radius: 12px; background: rgba(212,168,67,0.045); text-align: left; box-sizing: border-box; }
+.pc .pc-eyebrow { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold, #d4a843); margin: 0 0 0.2rem; }
+.pc h3.pc-head { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.65rem; font-weight: 600; line-height: 1.2; color: var(--text, #e8e0d0); margin: 0 0 0.4rem; letter-spacing: 0; text-transform: none; }
+.pc .pc-lead { font-size: 0.95rem; line-height: 1.6; color: var(--text, #e8e0d0); margin: 0 0 0.95rem; }
+.pc .pc-lead strong { color: var(--text, #e8e0d0); }
+.pc .pc-pair { display: grid; grid-template-columns: 1fr 2.6rem 1fr; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.28); }
+.pc .pc-half { display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; width: 100%; margin: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0.95rem 1.05rem 1rem; border: 0; border-radius: 0; background: transparent; transition: background 0.15s; }
+.pc .pc-half:hover { background: rgba(224,148,34,0.04); }
+.pc .pc-half.active { background: rgba(224,148,34,0.09); box-shadow: inset 0 0 0 2px var(--amber, #e09422); }
+.pc .pc-half:focus-visible { outline: 2px solid var(--amber, #e09422); outline-offset: -4px; }
+.pc .pc-half span { display: block; }
+.pc .pc-or { position: relative; display: flex; align-items: center; justify-content: center; }
+.pc .pc-or::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: rgba(255,255,255,0.16); }
+.pc .pc-or span { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 1px solid rgba(212,168,67,0.6); background: #17140f; color: var(--gold, #d4a843); font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: 1.1rem; line-height: 1; }
+.pc .pc-half .pc-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.35rem 0.6rem; }
+.pc .pc-half .pc-tag { display: inline-block; font-family: 'Inter', -apple-system, sans-serif; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+.pc .pc-tag--cons { color: #b9c7d2; background: rgba(185,199,210,0.12); border: 1px solid rgba(185,199,210,0.3); }
+.pc .pc-tag--hist { color: var(--gold, #d4a843); background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.35); }
+.pc .pc-tag--never { color: #cf9a8a; background: rgba(207,154,138,0.1); border: 1px solid rgba(207,154,138,0.3); }
+.pc .pc-half .pc-state { display: inline-block; font-size: 0.74rem; color: var(--amber, #e09422); white-space: nowrap; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.pc .pc-half.active .pc-state { font-weight: 600; text-decoration: none; }
+.pc .pc-title { font-size: 1rem; font-weight: 600; line-height: 1.35; color: var(--text, #e8e0d0); margin: 0.6rem 0 0.15rem; }
+.pc .pc-num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2.05rem; font-weight: 600; line-height: 1.15; color: var(--amber, #e09422); }
+.pc .pc-half.is-muted .pc-num { opacity: 0.72; }
+.pc .pc-sub { font-size: 0.78rem; line-height: 1.5; color: var(--text-muted, #8a8070); margin-top: 0.1rem; }
+.pc .pc-note { font-size: 0.84rem; line-height: 1.55; color: var(--text-dim, #a89f8f); margin-top: 0.6rem; padding-top: 0.55rem; border-top: 1px dashed rgba(255,255,255,0.1); }
+.pc .pc-foot { font-size: 0.86rem; line-height: 1.6; color: var(--text-dim, #a89f8f); margin: 0.95rem 0 0.55rem; }
+.pc .pc-foot a { color: var(--amber, #e09422); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; white-space: nowrap; }
+.pc .pc-stress { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.5rem; font-size: 0.78rem; }
+.pc .pc-stress-lbl { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted, #8a8070); margin-right: 0.2rem; }
+.pc .pc-chip { font: inherit; font-size: 0.78rem; color: var(--text-dim, #a89f8f); background: transparent; border: 1px dashed rgba(255,255,255,0.22); border-radius: 999px; padding: 0.25rem 0.7rem; margin: 0; cursor: pointer; }
+.pc .pc-chip:hover { border-color: rgba(224,148,34,0.55); }
+.pc .pc-chip.active { color: var(--amber, #e09422); border-style: solid; border-color: var(--amber, #e09422); background: rgba(224,148,34,0.08); }
+.pc .pc-showing { font-size: 0.8rem; line-height: 1.55; color: var(--text-muted, #8a8070); margin: 0.8rem 0 0; padding-top: 0.6rem; border-top: 1px dashed rgba(255,255,255,0.08); }
+.pc .pc-showing-lbl { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted, #8a8070); margin-right: 0.45rem; }
+.pc .pc-showing strong { color: var(--text, #e8e0d0); }
+@media (max-width: 640px) {
+  .pc { padding: 1rem 0.95rem 0.9rem; }
+  .pc h3.pc-head { font-size: 1.45rem; }
+  .pc .pc-num { font-size: 1.8rem; }
+  .pc .pc-pair { grid-template-columns: 1fr; grid-template-rows: auto 2.6rem auto; }
+  .pc .pc-or::before { top: 50%; bottom: auto; left: 0; right: 0; width: auto; height: 1px; }
+}
+</style>
+<section class="pc{% if pc_class %} {{ pc_class }}{% endif %}" id="{{ pcId }}" aria-labelledby="{{ pcId }}Head">
+  <div class="pc-eyebrow">Bitcoin&rsquo;s price</div>
+  <h3 class="pc-head" id="{{ pcId }}Head">Two scenarios to consider</h3>
+  <p class="pc-lead" data-pc="lead">Your result depends on what bitcoin&rsquo;s price does against its Power Law trend. Neither scenario is a forecast.</p>
+  <div class="pc-pair" role="group" aria-labelledby="{{ pcId }}Head">
+    <button type="button" class="pc-opt pc-half active" data-scenario="stay" aria-pressed="true">
+      <span class="pc-top"><span class="pc-tag pc-tag--cons" data-pc="tag">Conservative</span><span class="pc-state" data-pc="state">&check; Showing</span></span>
+      <span class="pc-title" data-pc="title">If bitcoin stays where it is against trend</span>
+      <span class="pc-num" data-pc="num">&mdash;</span>
+      <span class="pc-sub" data-pc="sub"></span>
+      <span class="pc-note" data-pc="note"></span>
+    </button>
+    <div class="pc-or" aria-hidden="true"><span>or</span></div>
+    <button type="button" class="pc-opt pc-half" data-scenario="trend" aria-pressed="false">
+      <span class="pc-top"><span class="pc-tag pc-tag--hist" data-pc="tag">Historical pattern</span><span class="pc-state" data-pc="state">Show this scenario</span></span>
+      <span class="pc-title" data-pc="title">If bitcoin returns to trend over 3 years</span>
+      <span class="pc-num" data-pc="num">&mdash;</span>
+      <span class="pc-sub" data-pc="sub"></span>
+      <span class="pc-note" data-pc="note"></span>
+    </button>
+  </div>
+  <p class="pc-foot"><span data-pc="foot"></span> <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a></p>
+  <div class="pc-stress">
+    <span class="pc-stress-lbl">{{ pcStress }}</span>
+    <button type="button" class="pc-opt pc-chip" data-scenario="floor" aria-pressed="false">Drifts to the floor (0.42&times;)</button>
+    <button type="button" class="pc-opt pc-chip" data-scenario="upper" aria-pressed="false">Peaks at 2.5&times; trend</button>
+  </div>
+  <p class="pc-showing"><span class="pc-showing-lbl" data-pc="showingLbl">Showing</span><span data-pc="showing"></span></p>
+</section>

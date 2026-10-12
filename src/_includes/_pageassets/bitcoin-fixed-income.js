@@ -59,7 +59,7 @@
     incomeNeed: 60000,
     position: 1000000,
     horizon: 15,
-    btcScenario: 'stay',       // 'floor' | 'stay' | 'trend' | 'upper' (rulings M3); default Stay
+    btcScenario: 'stay',       // 'stay' | 'trend' (the two scenarios) or 'floor' | 'upper' (paths to test); the default follows today's multiple (DEFAULTS_POLICY R2, recalc)
     btcCagr: 0.27,             // the scenario's implied annual growth over the horizon; recomputed in resolveScenarioCagr()
     incomePath: 'strc',
     taxBracket: 42,
@@ -97,45 +97,39 @@
   // currentMultiple   = TODAY_PRICE / currentTrendPrice  — where bitcoin sits relative to trend
   //
   // The scenario set is the real-estate pair's (REAL_ESTATE_PAIR_RULINGS M3,
-  // adopted here 2026-10-10), so the three pages share one vocabulary. Each
-  // scenario moves bitcoin's multiple of the trend in a straight line from
-  // today's to a target at the horizon end, and the price is that multiple
-  // times the trend then:
-  //   floor → PL_FLOOR (0.42×)   the channel's lower bound, drawn faintly always
-  //   stay  → today's multiple  no reversion either way (the default)
-  //   trend → 1.0×              the gap to trend closes by the horizon end
-  //   upper → 2.5×              an upside case, not a forecast
+  // adopted here 2026-10-10; the two scenarios since 2026-10-11,
+  // DEFAULTS_POLICY), so the pages share one vocabulary and one path math
+  // (PriceCases.multipleAt). The price is the multiple times the trend then:
+  //   stay  → today's multiple for the whole horizon (the default below trend)
+  //   trend → a straight line to 1.0× over 3 years, then the trend (the
+  //           default at or above trend)
+  //   floor → a straight line to PL_FLOOR (0.42×) by the horizon end; a path
+  //           to test, drawn faintly always
+  //   upper → a straight line to 2.5× by the horizon end; an upside path to
+  //           test, not a forecast
   // Was (to 2026-10-10): stay / trend (the default, "central case") / upper,
   // each a constant-CAGR path to its end point, with Upper's tooltip calling
   // 2.5× "the historical above-cycle peak". The record says otherwise (cycle
   // peaks of 12×, 5.4×, 3.2× and, so far this cycle, 1.2×; upperRecordText()
   // below), and the default assumed the gap to trend closes (TECH_DEBT,
   // "Bitcoin scenario vocabulary", closed 2026-10-10).
+  // Since 2026-10-11 (DEFAULTS_POLICY): the path math is the shared one
+  // (PriceCases.multipleAt, which the real-estate engine reads too), so the
+  // pages can't drift. Trend now closes the gap in a straight line over 3
+  // years and then follows the trend; Floor and Upper still run to the
+  // horizon end; the default is Stay below trend, Trend at or above it.
   function currentTrendPrice(){ return window.plPrice(window.TODAY_DAYS); }
   function currentMultiple(){ return window.TODAY_PRICE / currentTrendPrice(); }
-  var UPPER_TARGET = 2.5;
-  var SCENARIO_NAMES = {   // for the chart caption: "…if <name> (about X% a year…)"
-    floor: 'bitcoin drifts to the floor',
-    stay:  'today’s gap to trend persists',
-    trend: 'bitcoin reverts to trend',
-    upper: 'bitcoin peaks at 2.5× trend'
-  };
-  function scenarioTarget(scenario, m0){
-    if (scenario === 'stay') return m0;
-    if (scenario === 'floor') return (typeof window.PL_FLOOR === 'number') ? window.PL_FLOOR : 0.42;
-    if (scenario === 'upper') return UPPER_TARGET;
-    return 1.0;
-  }
-  // Price t years from now: the multiple moves in a straight line from
-  // today's to the scenario's target over the horizon, times the trend at
-  // t. 365.25-day years, as on the real-estate pair (rulings M10).
+  var UPPER_TARGET = window.PriceCases.UPPER;
+  function scenarioTarget(scenario, m0){ return window.PriceCases.target(scenario, m0); }
+  // Price t years from now: the multiple at t on the scenario's path, times
+  // the trend at t. 365.25-day years, as on the real-estate pair (rulings M10).
   function scenarioPrice(scenario, t, horizon){
     var m0 = currentMultiple();
-    var p = Math.min(t / Math.max(1, horizon), 1);
-    var mult = m0 + (scenarioTarget(scenario, m0) - m0) * p;
+    var mult = window.PriceCases.multipleAt(scenario, m0, Math.min(t / Math.max(1, horizon), 1), t);
     return mult * window.plPrice(window.TODAY_DAYS + t * 365.25);
   }
-  // The implied annual growth the chips and caption show: today's price to
+  // The implied annual growth the block and caption show: today's price to
   // the horizon-end price as one constant rate. The path between is not
   // constant: the trend's own growth slows over time.
   function resolveScenarioCagr(scenario, horizon){
@@ -174,51 +168,37 @@
            (cur ? '; the peak so far in this cycle is ' + x(cur.spikeM) + when : '');
   }
 
-  // Per-scenario tooltips, worded as on Bitcoin vs. Rental Property (rulings
-  // M3): Trend carries the ruled sentence verbatim; Stay is worded for
-  // bitcoin's position without judging it; Floor's record matches The Floor.
-  // One change for this page: Upper says "an upside case to test the income
-  // path against" where the rental page says "a stress test", because here
-  // "stress" already names the drawdown presets below.
-  function scenarioTipHTML(scenario){
-    if (scenario === 'stay') {
-      var mult = currentMultiple();
-      var base = 'Bitcoin keeps today’s multiple of the Power Law trend (' + mult.toFixed(2) + '×), so it grows at the trend’s own rate from today’s price. No reversion is assumed in either direction. This is the default.';
-      if (mult < 0.95) return base + ' Bitcoin is below trend today, so this assumes the gap stays open; Reverts to trend assumes it closes.';
-      if (mult > 1.05) return base + ' Bitcoin is above trend today, so this assumes the premium persists; Reverts to trend assumes it closes.';
-      return base + ' Bitcoin is close to trend today, so this and Reverts to trend give similar results.';
-    }
-    if (scenario === 'trend') {
-      return 'Assumes the gap to trend closes in a straight line by the horizon end. In the record, reversion has been irregular in timing.';
-    }
-    if (scenario === 'floor') {
-      return 'Bitcoin’s multiple moves in a straight line from today’s to 0.42× the Power Law trend, the channel’s lower bound, by the end of the horizon. Price has approached the floor three times since the genesis era and gone below it by 5.1% at most (2015), and each time it moved back above; the one deep breach, 42.6% below, was in 2010, in the genesis era (<a href="/the-bitcoin-floor">see The Floor</a>). Drawn faintly on the chart whichever scenario you pick.';
-    }
-    if (scenario === 'upper') {
-      var rec = upperRecordText();
-      return 'Bitcoin’s multiple moves in a straight line from today’s to 2.5× the Power Law trend by the end of the horizon: an upside case to test the income path against, not a forecast.' +
-             (rec ? ' For scale, ' + rec + '.' : '') +
-             ' Worth modeling as a possible window for disciplined rebalancing or partial divestment: see <a href="/disciplined-rebalancing">Disciplined Rebalancing</a>.';
-    }
-    return '';
+  // Bitcoin's price: the two scenarios (components/price-cases.njk;
+  // DEFAULTS_POLICY_2026-10-11, version B; replaced M3's four chips and their
+  // tooltips). Each half shows the bitcoin path's end wealth under that
+  // scenario, as the fourth output does; Floor and Upper are the other paths
+  // to test. Until the reader picks, or a link carries a pick, the default is
+  // the lower of the two for today's price (R2).
+  var scenarioPicked = false;
+  function applyScenarioDefault(){
+    if (!scenarioPicked) state.btcScenario = window.PriceCases.defaultFor(currentMultiple());
+    state.btcCagr = resolveScenarioCagr(state.btcScenario, state.horizon);
   }
-
-  // Chip rates and tooltips. Re-runs on load, on horizon changes and when
-  // the live price arrives, so Stay's wording and every rate follow today's
-  // multiple.
-  function refreshScenarioCagrs(){
-    var chips = document.querySelectorAll('.calc-cagr-chip');
-    chips.forEach(function(chip){
-      var scenario = chip.getAttribute('data-scenario');
-      var cagr = resolveScenarioCagr(scenario, state.horizon);
-      var rateEl = chip.querySelector('[data-chip-rate]');
-      if (rateEl) rateEl.textContent = '~' + Math.round(cagr * 100) + '% CAGR';
-      var tipEl = chip.querySelector('.calc-chip-help .tip-content');
-      if (tipEl) {
-        var html = scenarioTipHTML(scenario);
-        if (html) tipEl.innerHTML = html;
-      }
-      if (scenario === state.btcScenario) state.btcCagr = cagr;
+  function scenarioPhrase(sc){
+    var n = window.PriceCases.names(currentMultiple())[sc];
+    return 'bitcoin ' + n.charAt(0).toLowerCase() + n.slice(1);
+  }
+  function renderPriceCases(result, btcEnd){
+    var el = document.getElementById('pcBfi');
+    if (!el) return;
+    var m = currentMultiple(), H = state.horizon, yrs = H + (H === 1 ? ' year' : ' years');
+    var incomeTxt = fmtUSD(result.finalRealIncomeWealth);
+    function val(sc){
+      return { num: fmtUSD(btcEnd[sc]), sub: 'the bitcoin path after ' + yrs + ', holding and selling as needed for the same income, in today\u2019s dollars \u00b7 the income path: ' + incomeTxt };
+    }
+    var sc = state.btcScenario, rate = resolveScenarioCagr(sc, H);
+    var note = sc === 'upper' ? ' An upside path to test the income path against, not a forecast' + (upperRecordText() ? ': ' + upperRecordText() : '') + '.'
+             : sc === 'floor' ? ' A path to test: 0.42\u00d7 is the channel\u2019s floor, which price has gone below by 5.1% at most since the genesis era (2015).' : '';
+    window.PriceCases.render(el, {
+      mult: m, selected: sc, drives: 'the outputs, the chart and the table below', stressWord: 'path to test',
+      plan: { months: H * 12, phrase: 'all ' + yrs, words: yrs },
+      values: { stay: val('stay'), trend: val('trend') },
+      showing: window.PriceCases.titles(m)[sc] + ': bitcoin grows about <strong>' + (rate * 100).toFixed(1) + '% a year</strong> over ' + yrs + ', today\u2019s price to its price then, in nominal dollars.' + note
     });
   }
 
@@ -305,11 +285,6 @@
   bindSlider('positionSlider',   'val-position',   'position',   Number, fmtCurrency);
   bindSlider('horizonSlider',    'val-horizon',    'horizon',    Number, fmtYears);
 
-  // Horizon change must also re-derive the chips' implied rates (they depend
-  // on the horizon: the trend's growth slows over time, and a target reached
-  // over a longer horizon shifts every scenario but Stay less per year).
-  var horizonSliderEl = document.getElementById('horizonSlider');
-  if (horizonSliderEl) horizonSliderEl.addEventListener('input', refreshScenarioCagrs);
 
   // Advanced inputs (legacy slider + number-input pattern for percent values)
   bindSlider('taxBracketSlider', null, 'taxBracket', Number,     null);
@@ -330,28 +305,12 @@
     });
   }
 
-  // Bitcoin growth scenario chips — set scenario string, then derive CAGR
-  // via the Power Law-multiple math (resolveScenarioCagr). The chip's CAGR
-  // is dynamic, so we can't just store data-cagr — we store data-scenario.
-  document.querySelectorAll('.calc-cagr-chip').forEach(function(chip){
-    chip.addEventListener('click', function(){
-      document.querySelectorAll('.calc-cagr-chip').forEach(function(b){ b.classList.remove('active'); });
-      chip.classList.add('active');
-      state.btcScenario = chip.getAttribute('data-scenario');
-      state.btcCagr = resolveScenarioCagr(state.btcScenario, state.horizon);
-      recalc();
-    });
+  // The block's halves and paths to test (PriceCases.bind).
+  window.PriceCases.bind(document.getElementById('pcBfi'), function(k){
+    scenarioPicked = true;
+    state.btcScenario = k;
+    recalc();
   });
-  // A chip's ? opens its tooltip (which can hold a link) without selecting
-  // the chip, as on Bitcoin vs. Rental Property.
-  document.querySelectorAll('.calc-cagr-chip .calc-chip-help').forEach(function(help){
-    help.addEventListener('click', function(e){ e.stopPropagation(); });
-    help.addEventListener('keydown', function(e){
-      if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
-    });
-  });
-  // Initial render of the chips' rates and tooltips
-  refreshScenarioCagrs();
 
   wireButtonGroup('.path-btn', 'incomePath', 'data-path');
   wireButtonGroup('.tax-btn', 'preferredTaxTreatment', 'data-tax');
@@ -474,7 +433,8 @@
       var realBtcPath = [state.position];
       var btcSoldPerYear = [];   // nominal USD value of BTC sold to fund need + tax each year
 
-      // Apply stress: drawdown happens in months 1..duration, recovery linear after that to trend
+      // Apply stress: drawdown happens in months 1..duration, then a linear
+      // recovery back to the selected path (not to trend; DEFAULTS_POLICY §3, item 10)
       var stressDuration = state.stressDurationMonths / 12;
       var stressMax = state.stressDrawdown;
 
@@ -521,6 +481,10 @@
                btcSoldPerYear: btcSoldPerYear, btcPriceTrajectory: btcPriceTrajectory };
     }
     var btcRun = btcSellAsNeeded(state.btcScenario);
+    // Both scenarios' end wealth, for the two-scenario block (one of them is btcRun).
+    function endOf(run){ return run.realBtcPath[run.realBtcPath.length - 1]; }
+    var btcEnd = { stay:  state.btcScenario === 'stay'  ? endOf(btcRun) : endOf(btcSellAsNeeded('stay')),
+                   trend: state.btcScenario === 'trend' ? endOf(btcRun) : endOf(btcSellAsNeeded('trend')) };
     var nominalBtcPath = btcRun.nominalBtcPath;
     var realBtcPath = btcRun.realBtcPath;
     var btcSoldPerYear = btcRun.btcSoldPerYear;
@@ -566,6 +530,7 @@
       crossoverYear: crossoverYear,
       finalRealIncomeWealth: finalRealIncomeWealth,
       finalRealBtcWealth: realBtcPath[realBtcPath.length - 1],
+      btcEnd: btcEnd,
       displayIRR: displayIRR,
       pathLabel: path.label
     };
@@ -598,7 +563,7 @@
       // The rate is computed here rather than read from state.btcCagr, which
       // the horizon slider refreshes only after this render has run.
       var rate = resolveScenarioCagr(state.btcScenario, state.horizon);
-      msg += 'Bitcoin path: hold and sell as needed, if ' + (SCENARIO_NAMES[state.btcScenario] || SCENARIO_NAMES.stay) +
+      msg += 'Bitcoin path: hold and sell as needed, if ' + scenarioPhrase(state.btcScenario) +
              ' (about ' + Math.round(rate * 100) + '% a year over ' + state.horizon + ' year' + (state.horizon === 1 ? '' : 's') + ')';
       if (state.stressDrawdown > 0){
         msg += ', with a ' + (state.stressDrawdown * 100).toFixed(0) + '% drawdown over ' + state.stressDurationMonths + ' months';
@@ -751,7 +716,9 @@
   }
 
   function recalc(){
+    applyScenarioDefault();
     var result = computePaths();
+    renderPriceCases(result, result.btcEnd);
     updateOutputs(result);
     updateChart(result);
     updateCashflowTable(result);
@@ -771,7 +738,8 @@
   //   - Defaults are omitted — a clean URL represents the default scenario.
   //   - Debounced (~250ms) history.replaceState on state changes.
   //   - Decoder runs once on page load, BEFORE the first recalc, via the
-  //     existing slider/chip click handlers so all side effects fire.
+  //     existing slider handlers and button clicks so all side effects fire
+  //     (the scenario is set directly, as the sender's pick).
   //
   // Other state fields (tax bracket, ltcg rate, inflation, preferredTaxTreatment)
   // are intentionally left out — they're "advanced" knobs that don't belong
@@ -780,7 +748,7 @@
     incomeNeed:   60000,
     position:     1000000,
     horizon:      15,
-    btcScenario:  'stay',     // was 'trend' to 2026-10-10 (rulings M3 default)
+    btcScenario:  'stay',     // unused since 2026-10-11: `sc` is written only once the reader picks (DEFAULTS_POLICY R7)
     incomePath:   'strc',
     stressPreset: 'base'
   };
@@ -834,11 +802,13 @@
         el.dispatchEvent(new Event('input', { bubbles: true }));
       }
     }
-    // Chip / button groups: click the matching control so existing handlers
-    // run all the side effects (active class, stress preset table, etc.).
+    // Button groups: click the matching control so existing handlers run all
+    // the side effects (active class, stress preset table, etc.). A carried
+    // scenario is the sender's pick (DEFAULTS_POLICY R7), set directly.
     if (overrides.btcScenario){
-      var sc = document.querySelector('.calc-cagr-chip[data-scenario="' + overrides.btcScenario + '"]');
-      if (sc) sc.click();
+      scenarioPicked = true;
+      state.btcScenario = overrides.btcScenario;
+      recalc();
     }
     if (overrides.incomePath){
       var pa = document.querySelector('.path-btn[data-path="' + overrides.incomePath + '"]');
@@ -862,6 +832,11 @@
         var longKey = SHARE_KEYS[shortKey];
         var v = state[longKey];
         var def = SHARE_DEFAULTS[longKey];
+        // The scenario: only a pick is carried, never the default (R7).
+        if (shortKey === 'sc'){
+          if (scenarioPicked) params.set(shortKey, String(v)); else params.delete(shortKey);
+          continue;
+        }
         if (v === undefined || v === null || v === def){
           params.delete(shortKey);  // clean URL for defaults — Retirement convention
         } else {
@@ -935,7 +910,6 @@
       if (price && isFinite(price) && price > 0){
         window.TODAY_PRICE = price;
       }
-      refreshScenarioCagrs();
       recalc();
     });
   }

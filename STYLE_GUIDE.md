@@ -2601,7 +2601,7 @@ The failure is not that the figure is wrong when written. It is right when writt
 
 Never *"How long will a return to trend take?"* — that is a forecast, and the record cannot issue one. The tense is not decoration: it is the difference between a page reporting what happened and a page predicting what happens, and it is the single cheapest guard against the second reading. A register line saying "historical, not a prediction" under a title written in the future tense loses the argument, because the title is read first and remembered longer.
 
-**Corollary.** A conditional projection titles itself as conditional — *"If price ends at the floor…"*, *"If today's gap persists…"* — and the condition leads. `§10.3` governs the figures inside it.
+**Corollary.** A conditional projection titles itself as conditional — *"If price ends at the floor…"*, *"If today's gap persists…"* — and the condition leads. `§10.3` governs the figures inside it. `§10.14` (2026-10-11) applies this to the forward calculators' scenario switch, where the title also carries today's gap (*"If bitcoin stays 47% below trend"*).
 
 
 ### 10.11 The money a retiree sells is a *withdrawal*, not *income*
@@ -2639,6 +2639,20 @@ Essay tabs may use fuller prose than chat (fewer bullets, more connective senten
 - **Upper band, not ceiling (2026-10-11).** The 3× trend line is the *upper band*. It is not a cap: price has crossed it at the peaks of past cycles (14× trend in 2011, 12× in 2013) and spent about 8% of the time since 2011 above it. Don't call it a ceiling, a boundary or "the historical upper boundary". *Ceiling* is kept for the falling ceiling fitted through the spikes (Bitcoin's Spikes, The Doubling Ladder). Code names (`PL_CEIL`, `projCeiling`) are exempt. Labels still to rename are in TECH_DEBT.
 - **First person singular for authored analysis.** The site is one person's work and the About page is written in the first person. Use "I" ("So I priced bitcoin in gold…", "What would change my view"), not "we". Prefer a neutral construction where no actor is needed ("Priced in gold, the trend still holds"). "The research behind this page" stays as written. Applied on `/bitcoin-spikes`; the site-wide sweep is a separate task in TECH_DEBT.
 - **"Bitcoin", not "coins"** (JM ruling, 2026-10-05, Disciplined Rebalancing review round 1). Bitcoiners say "bitcoin" or "your stack", not "coins": "1.10× HODL", "less bitcoin", "lost bitcoin", "the bitcoin sold". Applies to visible copy, tooltips and aria labels. Code identifiers are exempt, as is the site name. Applied on `/disciplined-rebalancing` and `/bitcoin-spikes`; other pages when next edited.
+
+### 10.14 Scenario labels: conditional titles, tags that describe
+
+**JM rulings, 2026-10-11 (DEFAULTS_POLICY R3 and R5, version B; `claude/DEFAULTS_POLICY_2026-10-11.md` in the project).** Wherever a calculator projects bitcoin's price for the reader's own plan, its scenarios are labelled this way. It is §10.10's corollary applied to a switch.
+
+- **Titles are conditional and carry today's number.** *If bitcoin stays 47% below trend* · *If bitcoin returns to trend over 3 years*. JM's reason: *Today's gap persists* "reads as a statement of fact", and two bare titles read as two results rather than a choice. Plain *If*, not *were to*: the subjunctive tilts the reader through grammar before the record lines make the case with facts, and it is longer on a phone. The gap is computed live from the price the page uses; a hardcoded one goes stale (BvSM's "~35% below" said 35 when the gap was 47).
+- **Tags describe; they never grade.** *Conservative* (stays, below trend) · *Historical pattern* (returns to trend) · *Never sustained* (stays, above trend), or *Optimistic* for a plan shorter than the longest stretch above trend on record, where "never sustained" would be false. Never *realistic*, *expected*, *likely*, *central case*, *base case* or *the bullish reading*: each grades a path the record can't grade. The notes under the titles say what those words would claim, in figures (the longest stretch on record; how long every earlier return took).
+- **A choice, framed as one.** A header that says so (*Two scenarios to consider*), one frame, and **or** on the seam between the two. Not *vs.*: on these pages *vs.* already names the comparison itself (bitcoin vs. the house).
+- **Neither is a forecast**, said once, in the lead.
+- **Stress tests are called stress tests.** The floor (0.42×) and 2.5× trend, and the retirement family's bear market, are not scenarios: they sit in their own row under the frame, and table and grid rows mark them *(stress test)*. The Income Question labels its row *Other paths to test*, because *stress* already names its drawdown overlay.
+- **Short names** for legends, table rows, ledgers and CSVs: *Stays 47% below trend* · *Returns to trend over 3 years* · *Drifts to the floor* · *Peaks at 2.5× trend*.
+- **One source.** Every title, tag, note and record figure comes from `shared/price-cases.js` (SITE_GUIDE §55.5), which reads `ReversionDurations`. A page does not write its own copy of the words.
+
+**Retired names:** *Today's gap persists*, *Reverts to trend*, *Current trajectory*, *Revert to Power Law trend (the central case)*, *Trend (central case)*, *Floor band (conservative anchor)*. The pages still showing them are listed in TECH_DEBT (DEFAULTS_POLICY PR B and PR C).
 
 ## 11. Words we don't use
 
