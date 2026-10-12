@@ -20,7 +20,7 @@
      lcs.homeApprNominal.preset     long-run | since-1990 | since-2000 | custom
      lcs.homeApprNominal.customValue number (nominal %/yr)
      lcs.homeApprNominal.migratedFrom  JSON note, see migrateRealEstate()
-     lcs.btcGrowthModel.preset      powerlaw-floor | powerlaw-trend | linear-cagr-decay
+     lcs.btcGrowthModel.preset      RETIRED 2026-10-11 (see btcGrowthModel below)
 
    The "custom value" is preserved when a user switches to a non-custom preset,
    so re-selecting Custom restores the last value they entered.
@@ -70,14 +70,18 @@
       },
       hasCustom: true
     },
+    // RETIRED 2026-10-11 (DEFAULTS_POLICY decision 2, JM). This sitewide
+    // setting chose the retirement family's growth model: Power Law trend,
+    // Floor, or "Linear CAGR with decay" (which ran as trend). Its Floor
+    // quietly turned a "reverts to trend" basis into 0.42x. Every page now
+    // shows bitcoin's price as two scenarios with the floor as a per-page
+    // stress test (shared/retirement-engine.js), and nothing reads this
+    // dimension. It is kept, with one preset, so an old call still gets an
+    // answer, and a stored retired preset is removed once (below).
     btcGrowthModel: {
-      // Used by /the-bitcoin-retirement.html. Value is a model identifier
-      // (string), not a rate — calculator code maps it to projection logic.
       defaultPreset: 'powerlaw-trend',
       presetValues: {
-        'powerlaw-floor': 'powerlaw-floor',
-        'powerlaw-trend': 'powerlaw-trend',
-        'linear-cagr-decay': 'linear-cagr-decay'
+        'powerlaw-trend': 'powerlaw-trend'
       },
       hasCustom: false
     }
@@ -236,6 +240,13 @@
     removeStorage('lcs.realEstate.customValue');
   }
   migrateRealEstate();
+
+  // The retired growth-model setting (2026-10-11): drop a stored Floor or
+  // Linear CAGR choice, which no page reads any more.
+  (function retireGrowthModel() {
+    var v = readStorage(presetKey('btcGrowthModel'));
+    if (v !== null && v !== 'powerlaw-trend') removeStorage(presetKey('btcGrowthModel'));
+  })();
 
   // The migration note, or null. Pages show it in one line and clear it
   // when the reader next changes home appreciation.

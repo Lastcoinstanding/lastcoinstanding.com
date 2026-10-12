@@ -41,8 +41,10 @@
 /* ════════════════════════════════════════════════════════════════
    Phase 3 / commit 2 — Baseline assumptions cluster
    Wires the picker UI to the shared ModelingAssumptions API.
-   Three pickers: Inflation (4 cards), Bitcoin growth model (3 cards),
-   Traditional portfolio benchmark (3 cards). Plus Hide affordance,
+   Two pickers: Inflation (4 cards) and Traditional portfolio benchmark
+   (3 cards); the Bitcoin growth model picker was retired on 2026-10-11
+   (bitcoin's price is the two scenarios in the Sustainability readout,
+   DEFAULTS_POLICY decision 2). Plus Hide affordance,
    Custom inflation inline input, Reset link.
    See RETIREMENT_CALCULATOR_DESIGN §9.2.9.
 ═══════════════════════════════════════════════════════════════════ */
@@ -84,9 +86,11 @@
       }
     }
   }
+  // The Bitcoin growth model picker was retired on 2026-10-11 (DEFAULTS_POLICY
+  // decision 2): bitcoin's price is the two scenarios in the Sustainability
+  // readout, with the floor as a stress test there.
   function renderAll() {
     renderPicker('inflation');
-    renderPicker('btcGrowthModel');
     renderPicker('realReturns');
   }
 
@@ -204,7 +208,7 @@
         ['Monthly DCA',                     txtById('val-monthlyDcaUSD')],
         ['Years in retirement',             txtById('val-yearsInRetirement')],
         ['Inflation rate',                  pickerSelectedLabel('inflation')],
-        ['Bitcoin growth model',            pickerSelectedLabel('btcGrowthModel')],
+        ['Bitcoin’s price',                 (function(){ var t = document.querySelector('#pcRt .pc-half.active [data-pc="title"]') || document.querySelector('#pcRt .pc-chip.active'); return t ? t.textContent.trim() : '—'; })()],
         ['Traditional benchmark',           pickerSelectedLabel('realReturns')]
       ];
       var tbody = document.getElementById('printInputsBody');
@@ -224,26 +228,10 @@
         });
       }
 
-      // Sustainability values — copy text + escape-velocity class state
-      var screenYears = document.getElementById('sustYearsLast');
-      var printYears = document.getElementById('printYearsLast');
-      if (screenYears && printYears) {
-        printYears.textContent = screenYears.textContent.trim();
-        printYears.classList.toggle('escape-velocity',
-          screenYears.classList.contains('escape-velocity'));
-      }
-      var screenStack = document.getElementById('sustStackValue');
-      var printStack = document.getElementById('printStackValue');
-      if (screenStack && printStack) {
-        printStack.textContent = screenStack.textContent.trim();
-      }
-
-      // Sustainability detail line — already prose-formatted on screen
-      var screenDetail = document.getElementById('spectrumDetail');
-      var printDetail = document.getElementById('printSustDetail');
-      if (screenDetail && printDetail) {
-        printDetail.textContent = screenDetail.textContent.trim();
-      }
+      // The Sustainability summary (verdict, stack at retirement, detail) is
+      // written to the print block by the chart's updateSustainability() on
+      // every render, for the path showing (2026-10-11: the screen readout is
+      // now the two-scenario block, which has no single value to copy).
     }
     // Run on any print intent — covers Cmd/Ctrl-P, browser menu, system print
     window.addEventListener('beforeprint', populate);
@@ -258,7 +246,6 @@
   if (MA.subscribe) {
     MA.subscribe(function(dim){
       if (dim === 'inflation' || dim === '*') renderPicker('inflation');
-      if (dim === 'btcGrowthModel' || dim === '*') renderPicker('btcGrowthModel');
       if (dim === 'realReturns' || dim === '*') renderPicker('realReturns');
     });
   }
@@ -266,7 +253,6 @@
   // ─── Initial wire-up
   renderAll();
   bindPicker('inflation');
-  bindPicker('btcGrowthModel');
   bindPicker('realReturns');
   bindCustomInflationInput();
   bindHideToggle();
@@ -299,15 +285,18 @@
   // constant that drifts on its own. See shared/power-law-data.js.
   var LIVE_BTC_FALLBACK = PL_DATA[PL_DATA.length - 1][1];
 
-  // Live BTC price — updated once fetchTodayPrice() resolves. Used by
-  // renderChart() to anchor the "current trajectory" line (5th dataset).
-  // Seeded to the shared TODAY_PRICE (latest sample) so the line renders
-  // sensibly before the fetch completes.
+  // Live BTC price — updated once fetchTodayPrice() resolves. Today's
+  // multiple (rtCurrentRatio), the 60/40 line's starting capital, the
+  // block's Showing line and the stack-value lines read it; every price path
+  // starts from it (shared/retirement-engine.js reads TODAY_PRICE, the same
+  // value). Seeded to the shared TODAY_PRICE (latest sample) so the page
+  // renders sensibly before the fetch completes.
   var liveBtcPrice = TODAY_PRICE;
 
   // Interactive-legend state — which datasets are user-visible. Indices
   // match the chart.data.datasets order: 0=floor, 1=trend, 2=upper,
-  // 3=drawdown, 4=current-trajectory, 5=benchmark. Persisted across
+  // 3=your stack on the path showing, 4=your stack on the other scenario,
+  // 5=benchmark. Persisted across
   // renderChart() re-runs (every slider change rebuilds datasets, but
   // visibility is a user-intent layer that outlives the redraw).
   var legendVisibility = { 0: true, 1: true, 2: true, 3: true, 4: true, 5: true };
@@ -316,6 +305,7 @@
      repointed 2026-08-26). Local aliases, so this page's call sites are
      untouched and the diff stays a deletion rather than a rewrite. */
   var RE = window.RetirementEngine;
+  var PC = window.PriceCases;
   var daysSince = RE.daysSince;
   var plPriceAtDate = RE.plPriceAtDate;
   var dateForYear = RE.dateForYear;
@@ -335,59 +325,67 @@
   // ─── Growth-model price helper — from the shared module (see the alias block above)
   var projPriceForGrowth = RE.projPriceForGrowth;
 
-  // ─── Stack value at retirement (after pre-retirement DCA accumulation)
-  // Returns nominal value in retirement-year dollars.
-  function computeStackAtRetirement(scenario, growthModelKey) {
-    var startYear = (new Date()).getFullYear();
-    var stack = scenario.btcStack;
-    for (var y = startYear; y < scenario.retirementYear; y++) {
-      var d = dateForYear(y);
-      var price = projPriceForGrowth(d, growthModelKey);
-      if (scenario.monthlyDcaUSD > 0 && price > 0) {
-        stack += (12 * scenario.monthlyDcaUSD) / price;
-      }
-    }
-    var retDate = dateForYear(scenario.retirementYear);
-    var retPrice = projPriceForGrowth(retDate, growthModelKey);
-    return { stackBtc: stack, retPrice: retPrice, nominal: stack * retPrice };
+  /* ─── Bitcoin's price: the two scenarios (DEFAULTS_POLICY_2026-10-11, PR B;
+         JM 2026-10-11). Every projection on this page runs one of the
+         engine's price paths, each starting at today's price:
+           'stay'   bitcoin keeps today's multiple of trend ("If bitcoin stays
+                    47% below trend"), the default below trend;
+           'trend'  the gap closes in a straight line over 3 years, then the
+                    trend; the default at or above trend;
+           'floor'  a stress test: falls to 0.42x over 3 years and stays.
+         The default is the lower of the two for today's price
+         (PriceCases.defaultFor) until the reader picks, or a link carries a
+         pick (?basis=current|trend|floor). Until 2026-10-11 the page opened
+         on "Reverts to trend", which re-set the price to trend at year 0, and
+         the sitewide growth-model setting could turn that path into the floor.
+         The block in the Sustainability readout is the switch; the tables'
+         two buttons mirror it. ─── */
+  var RT_BASIS = 'stay';     // the path every figure below the block follows
+  var RT_PICKED = false;     // a reader's (or a link's) pick holds; otherwise the default tracks today's price
+  function rtSyncDefault() { if (!RT_PICKED) RT_BASIS = PC.defaultFor(rtCurrentRatio()); }
+  function rtLinkBasis(b) { return b === 'stay' ? 'current' : b; }   // the family's URL values
+  // The projection for one path, memoised in the engine. plotAccumulation:
+  // every path starts at today's price, so the pre-retirement years carry a
+  // value and every line on the chart starts at the stack's market value.
+  function pathProj(scenario, basis) { return RE.projectPathMemo(scenario, basis, null, true); }
+  function retireRow(proj) {
+    var r = null;
+    ((proj && proj.btcPoints) || []).forEach(function (b) { if (b.phase === 'retire') r = b; });
+    return r;
+  }
+  // Stack value at retirement on a path, read off the projection itself, so
+  // monthly buying at that path's prices is counted (DEFAULTS_POLICY §3 bug 1:
+  // until 2026-10-11 the "gap persists" figure was the trend path's value
+  // times today's ratio, which missed the extra bitcoin those buys get).
+  function computeStackAtRetirement(scenario, basis) {
+    var r = retireRow(pathProj(scenario, basis || RT_BASIS));
+    return r ? { stackBtc: r.btc, retPrice: r.price, nominal: r.usd } : { stackBtc: scenario.btcStack, retPrice: 0, nominal: 0 };
+  }
+  function realStackAtRetirement(scenario, basis, inflationPct) {
+    var info = computeStackAtRetirement(scenario, basis);
+    var yearsToRet = scenario.retirementYear - (new Date()).getFullYear();
+    return info.nominal / Math.pow(1 + inflationPct / 100, Math.max(0, yearsToRet));
+  }
+  // The words, from PriceCases (one source; STYLE_GUIDE §10.14), plus the
+  // retirement family's floor stress test.
+  function rtWords() {
+    var m = rtCurrentRatio(), T = PC.titles(m), N = PC.names(m);
+    return { title: { stay: T.stay, trend: T.trend, floor: PC.FLOOR_FALL.title },
+             name: { stay: N.stay, trend: N.trend, floor: PC.FLOOR_FALL.name } };
+  }
+  function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+  // The plan, for the block's notes and tags: today to the end of the horizon.
+  function rtPlan() {
+    var y0 = (new Date()).getFullYear(), end = SCENARIO.retirementYear + SCENARIO.yearsInRetirement, n = Math.max(1, end - y0);
+    return { months: n * 12, phrase: 'the whole plan, to ' + end, words: 'the ' + n + ' years to ' + end };
   }
 
-  // ─── Real (today's $) stack value at retirement
-  function realStackAtRetirement(scenario, growthModelKey, inflationPct) {
-    var info = computeStackAtRetirement(scenario, growthModelKey);
-    var startYear = (new Date()).getFullYear();
-    var yearsToRet = scenario.retirementYear - startYear;
-    var deflator = Math.pow(1 + inflationPct / 100, yearsToRet);
-    return info.nominal / deflator;
-  }
-
-  // ─── Project user's stack value year-by-year under sell-as-needed
-  // Pre-retirement: BTC count grows via DCA accumulation (12 × monthly / yearly trend price).
-  // Post-retirement: each year, sell BTC to cover nominal target income.
-  // Returns {points, btcPoints, depletionYear} where points is [{x:year, y:usdValue}]
-  // and btcPoints is [{x:year, btc:count, usd:value}] used by the BTC-count
-  // annotation plugin to label the drawdown line at anchor years.
-  //
-  // Optional priceMultiplier: scales the price returned by the growth model
-  // (default 1.0). Used by the "current trajectory" line, which projects under
-  // the assumption that BTC stays at its current ratio to trend. Multiplying
-  // price scales both the dollar value of remaining stack AND how much BTC
-  // gets sold each year to cover the (unchanged) nominal income — so a stack
-  // priced below trend depletes faster, as it should.
-  /* REPOINTED 2026-08-26 to shared/retirement-engine.js (TECH_DEBT §1).
-     The loop that used to live here is now the module's `projectCore`, which
-     absorbed this page's two distinguishing legs verbatim — the pre-retirement
-     DCA accumulation and the `plotAccumulation` flag (the current-trajectory
-     line opts in so it starts at today's mark-to-market value, matching the
-     60/40 benchmark's anchor; every other caller pushes null pre-retirement so
-     dataset lengths stay aligned for index-mode interaction).
-
-     This wrapper exists only so the page's ~dozen call sites keep their
-     signature. It is not a second implementation. */
-  function projectStackOverTime(scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation) {
-    return window.RetirementEngine.projectStackOverTime(
-      scenario, growthModelKey, inflationPct, priceMultiplier, plotAccumulation);
-  }
+  // ─── The projection: shared/retirement-engine.js (repointed 2026-08-26,
+  // TECH_DEBT §1). Its `projectCore` carries this page's two legs, the
+  // pre-retirement DCA accumulation and the `plotAccumulation` flag. Since
+  // 2026-10-11 the page calls it through pathProj() above, one price path at
+  // a time; the old projectStackOverTime wrapper (growth model × a scalar
+  // multiplier) had no callers left and went.
 
   // ─── Build trend / floor / upper-band point arrays for the chart's bands
   function buildBands(startYear, endYear) {
@@ -690,15 +688,14 @@
   // ─── Chart instance + render/update
   var chart = null;
   // ─── Year-by-year tabular views (below the chart) ──────────────────
-  // Two collapsible tables fed by the SAME projectStackOverTime result the
+  // Two collapsible tables fed by the SAME projection (pathProj) the
   // chart consumes, so they reconcile to the chart by construction. View B
   // ("watch it grow": value + YoY change + growth bar) and View A ("verify
   // the math": full per-year audit + CSV export). The engine only captures
   // intermediates it already computed — no formula is touched. See
   // retirement-tabular-views-design-doc.md.
   var LAST_STACK = null;
-  var LAST_STACK_PAIR = null;                 // { trend: <stack>, current: <stack> } — both bases from the last chart render
-  var RT_BASIS = 'trend';                     // 'trend' (mean-reversion, central case) | 'current' (today's gap to trend persists)
+  var LAST_STACK_PAIR = null;                 // { stay, trend, floor? }: the paths from the last chart render (RT_BASIS above)
   var RT_DOLLARS = 'nominal';                 // 'nominal' (default, future $) | 'real' (today's $, uses chosen inflation)
 
   // Real-dollar deflator for a calendar year, using the user's chosen inflation.
@@ -726,8 +723,6 @@
     var t = projPriceForGrowth(dateForYear((new Date()).getFullYear()), 'powerlaw-trend');
     return (t > 0) ? (liveBtcPrice / t) : 1;
   }
-  // Shared gap/premium wording so button, summary, and CSV always agree.
-  function todaysBasisPhrase(ratio) { return ratio < 1 ? 'gap' : 'premium'; }
 
   // One-line reminder of the scenario the tables reflect, plus the active
   // price basis — so a reader who's been dragging sliders stays oriented.
@@ -738,7 +733,7 @@
       ', drawing <strong>' + formatCurrencyShort(s.targetIncomeUSD) + '/yr</strong>' +
       (s.monthlyDcaUSD > 0 ? ' · adding ' + formatCurrencyShort(s.monthlyDcaUSD) + '/mo until then' : '') +
       ' · ' + s.yearsInRetirement + ' yrs in retirement.' +
-      ' Price basis: ' + (RT_BASIS === 'current' ? 'today’s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend') + '.' +
+      ' Price path: ' + lowerFirst(rtWords().title[RT_BASIS]) + '.' +
       ' Dollars: ' + (RT_DOLLARS === 'real' ? "real (today's, " + window.ModelingAssumptions.get('inflation').value + '% infl)' : 'nominal (future)') + '.' +
       ' Withdrawal: ' + (SCENARIO.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation') + '.';
   }
@@ -757,13 +752,12 @@
   // the active price basis) — no second accumulation loop. The Stress Test has
   // the same model as this page and receives the raw inputs, dca included.
   //
-  // EACH RECEIVER GETS THE COUNT FROM THE PRICE PATH IT RUNS. Under "today's
-  // gap persists", monthly buying happens at discounted prices and buys more
-  // coins; EV honours that basis (it is passed along), Compare runs the trend
-  // path only. Sending Compare the discounted-buying count would value those
-  // extra coins on trend prices — a plan that exists on neither path. So EV
-  // reads the active projection and Compare reads the trend one
-  // (LAST_STACK_PAIR holds both).
+  // EACH RECEIVER GETS THE COUNT FROM THE PRICE PATH IT RUNS. On a path below
+  // trend, monthly buying happens at lower prices and buys more bitcoin, so
+  // the count depends on the path. Since 2026-10-11 all three receivers run
+  // the same paths (DEFAULTS_POLICY PR B): they get the count from the path
+  // shown here, and `basis` rides along only when the reader picked one; a
+  // receiver left to its default opens on the same default for the same price.
   function btcAtRetirement(proj) {
     var atRet = null;
     (proj && proj.btcPoints || []).forEach(function (b) { if (b.phase === 'retire') atRet = b.btc; });
@@ -773,16 +767,16 @@
     var ev = document.getElementById('rtCarryEv');
     if (!ev) return;
     var atRet = btcAtRetirement(stack);
-    var atRetTrend = btcAtRetirement(LAST_STACK_PAIR && LAST_STACK_PAIR.trend ? LAST_STACK_PAIR.trend : stack);
+    var pick = RT_PICKED ? '&basis=' + rtLinkBasis(RT_BASIS) : '';
     var common = '&retire=' + SCENARIO.retirementYear + '&income=' + Math.round(SCENARIO.targetIncomeUSD)
       + '&years=' + SCENARIO.yearsInRetirement + '&incbasis=' + SCENARIO.incomeBasis;
     function stackParam(v) { return 'stack=' + (Math.round(v * 10000) / 10000); }
-    ev.setAttribute('href', '/bitcoin-escape-velocity?' + stackParam(atRet) + common + (RT_BASIS === 'current' ? '&basis=current' : ''));
+    ev.setAttribute('href', '/bitcoin-escape-velocity?' + stackParam(atRet) + common + pick);
     var cmp = document.getElementById('rtCarryCompare');
-    if (cmp) cmp.setAttribute('href', '/compare-retirement-plans?' + stackParam(atRetTrend) + common);
+    if (cmp) cmp.setAttribute('href', '/compare-retirement-plans?' + stackParam(atRet) + common + pick);
     var st = document.getElementById('rtCarryStress');
     if (st) st.setAttribute('href', '/the-bitcoin-retirement-stress-test?stack=' + SCENARIO.btcStack + common
-      + (SCENARIO.monthlyDcaUSD > 0 ? '&dca=' + Math.round(SCENARIO.monthlyDcaUSD) : ''));
+      + (SCENARIO.monthlyDcaUSD > 0 ? '&dca=' + Math.round(SCENARIO.monthlyDcaUSD) : '') + pick);
 
     // Say what the receiving pages will do with the plan, only when it differs
     // from what the reader sees here.
@@ -792,10 +786,7 @@
       if (SCENARIO.monthlyDcaUSD > 0) {
         notes.push('Escape Velocity and Compare start at retirement, so they receive the stack you retire with: <strong>'
           + atRet.toFixed(2) + ' BTC</strong>, after ' + formatCurrencyShort(SCENARIO.monthlyDcaUSD) + ' a month until ' + SCENARIO.retirementYear
-          + (RT_BASIS === 'current' && Math.abs(atRetTrend - atRet) >= 0.005 ? ' (' + atRetTrend.toFixed(2) + ' BTC on the trend path, which Compare uses)' : '') + '.');
-      }
-      if (RT_BASIS === 'current') {
-        notes.push('Compare and the Stress Test run on the trend price path; Escape Velocity keeps your \u201ctoday\u2019s gap persists\u201d setting.');
+          + ', bought at prices on the path shown here.');
       }
       foot.innerHTML = notes.join(' ');
       foot.hidden = !notes.length;
@@ -825,15 +816,19 @@
     updateRtBasisLabels();
   }
 
-  // Live labels on the price-basis buttons: "Reverts to trend (1.0×)" and
-  // "Today's <gap|premium> to trend persists (N.NN×)". Only the .rt-basis-text node
-  // is rewritten so each button's help-tip stays intact.
+  // Live labels on the tables' two price buttons, which mirror the block
+  // (PriceCases.names: "Stays 47% below trend", "Returns to trend over 3
+  // years"). Only the .rt-basis-text node is rewritten so each button's
+  // help-tip stays intact. Under the floor stress test neither is lit.
   function updateRtBasisLabels() {
-    var ratio = rtCurrentRatio();
-    var trendTxt = 'Reverts to trend (1.0×)';
-    var curTxt = 'Today’s ' + todaysBasisPhrase(ratio) + ' to trend persists (' + ratio.toFixed(2) + '×)';
-    document.querySelectorAll('.rt-basis-btn[data-basis="trend"] .rt-basis-text').forEach(function (el) { el.textContent = trendTxt; });
-    document.querySelectorAll('.rt-basis-btn[data-basis="current"] .rt-basis-text').forEach(function (el) { el.textContent = curTxt; });
+    var W = rtWords();
+    ['stay', 'trend'].forEach(function (k) {
+      document.querySelectorAll('.rt-basis-btn[data-basis="' + k + '"]').forEach(function (b) {
+        var t = b.querySelector('.rt-basis-text'); if (t) t.textContent = W.name[k];
+        b.classList.toggle('is-active', RT_BASIS === k);
+        b.setAttribute('aria-pressed', RT_BASIS === k ? 'true' : 'false');
+      });
+    });
     // Real dollar button shows the live Baseline inflation rate (Part C) — only
     // the .seg-btn-sub number is rewritten so the button's help-tip stays intact.
     var infl = window.ModelingAssumptions.get('inflation').value;
@@ -969,7 +964,6 @@
   // render path reads, so the export matches exactly what's on screen.
   function buildRtCsv(stack) {
     var s = SCENARIO;
-    var growth = window.ModelingAssumptions.get('btcGrowthModel');
     var inflation = window.ModelingAssumptions.get('inflation');
     var lines = [];
     lines.push('# Last Coin Standing — Retirement projection');
@@ -978,9 +972,8 @@
     lines.push('# Annual withdrawal,' + s.targetIncomeUSD);
     lines.push('# Years in retirement,' + s.yearsInRetirement);
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
-    lines.push('# Growth model,' + growth.preset);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price assumption,' + (RT_BASIS === 'current' ? "today's " + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists' : 'reverts to trend'));
+    lines.push('# Price path,' + rtWords().title[RT_BASIS] + (RT_BASIS === 'floor' ? ' (a stress test)' : ''));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
@@ -1038,22 +1031,25 @@
     });
   }
 
-  // Price-assumption toggle — selects which already-computed projection the
-  // tables render (trend vs. today's-gap-to-trend-persists). No new math; just
-  // re-renders from LAST_STACK_PAIR. Buttons in both panels stay in sync.
+  // A pick, from the block or the tables' mirror buttons: the whole page
+  // follows it (chart, tables, verdict, compare columns, the derived
+  // withdrawal rate and the carry links), and the URL carries it.
+  function rtPick(basis) {
+    if (['stay', 'trend', 'floor'].indexOf(basis) === -1) return;
+    RT_BASIS = basis; RT_PICKED = true;
+    recomputeCoupledFromIncomeOrMeans();
+    scheduleRender();
+    scheduleUrlSync();
+  }
   function wireRtBasis() {
     var btns = document.querySelectorAll('.rt-basis-btn');
     btns.forEach(function (b) {
       b.addEventListener('click', function (e) {
         if (e.target.closest('.help-tip')) return;   // let the tooltip handle its own clicks
-        RT_BASIS = b.getAttribute('data-basis');
-        document.querySelectorAll('.rt-basis-btn').forEach(function (x) {
-          x.classList.toggle('is-active', x.getAttribute('data-basis') === RT_BASIS);
-        });
-        if (LAST_STACK_PAIR) renderRtTables(LAST_STACK_PAIR[RT_BASIS]);
-        updateSustainability();   // basis-aware escape-velocity/depletion + "Under:" note must track the toggle too
+        rtPick(b.getAttribute('data-basis'));
       });
     });
+    PC.bind(document.getElementById('pcRt'), rtPick);
   }
 
   // Nominal/real dollar toggle — global display basis for EVERY dollar figure.
@@ -1131,33 +1127,28 @@
   function renderChart() {
     var canvas = document.getElementById('projectionChart');
     if (!canvas) return;
+    rtSyncDefault();
 
-    var growth = window.ModelingAssumptions.get('btcGrowthModel');
     var inflation = window.ModelingAssumptions.get('inflation');
     var realReturns = window.ModelingAssumptions.get('realReturns');
 
     var startYear = (new Date()).getFullYear();
     var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
     var bands = buildBands(startYear, endYear);
-    var stack = projectStackOverTime(SCENARIO, growth.preset, inflation.value);
 
-    // Current-trajectory line: same projection, but with prices scaled by
-    // today's actual ratio to trend (i.e., assume BTC stays at this discount
-    // or premium). Anchored to the live BTC price, so the line starts at the
-    // user's actual mark-to-market stack value rather than the at-trend value.
-    var trendPriceToday = projPriceForGrowth(dateForYear(startYear), 'powerlaw-trend');
-    var currentRatio = (trendPriceToday > 0) ? (liveBtcPrice / trendPriceToday) : 1;
-    var currentTrajectory = projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, currentRatio, true);
+    // The two scenarios (and the stress test when it is showing). The chart's
+    // primary stack line is the path showing; the dashed one is the other
+    // scenario (under the stress test, the default one), so both stay on screen.
+    var paths = { stay: pathProj(SCENARIO, 'stay'), trend: pathProj(SCENARIO, 'trend') };
+    if (RT_BASIS === 'floor') paths.floor = pathProj(SCENARIO, 'floor');
+    var otherKey = RT_BASIS === 'stay' ? 'trend' : RT_BASIS === 'trend' ? 'stay' : PC.defaultFor(rtCurrentRatio());
+    var stack = paths[RT_BASIS], other = paths[otherKey];
+    var W = rtWords();
 
-    // Starting capital for the benchmark line: match the bitcoin drawdown
-    // line's anchor (btcStack × trend price today). Apples-to-apples comparison
-    // — both lines start at the same dollars.
-    // Benchmark "starting capital" = btcStack at LIVE market price, i.e.
-    // what you'd actually have if you sold today. Matches the
-    // current-trajectory line's starting point — both lines now share an
-    // honest "if you sold today" basis. Previously used trendPriceToday
-    // which inflated the benchmark by 1/currentRatio (~1.7x at 0.59x
-    // trend), making the 60/40 comparison artificially favourable.
+    // Starting capital for the benchmark line: the stack at the LIVE market
+    // price, what you would have if you sold today. Every price path starts
+    // at that price too (2026-10-11), so all three lines share one anchor.
+    // (Until 2026-10-11 the primary stack line started at the trend price.)
     var startingCapital = SCENARIO.btcStack * liveBtcPrice;
     var benchmark = projectTraditionalPortfolio(SCENARIO, realReturns.value, inflation.value, startingCapital);
 
@@ -1166,7 +1157,7 @@
     if (titleEl) titleEl.textContent = 'Projected stack value, ' + startYear + ' \u2013 ' + endYear;
 
     var datasets = [
-      // ─── Floor band — confident dashed (planning-grade anchor per §7.3) ───
+      // ─── Floor band — confident dashed (§7.3) ───
       {
         label: 'Floor (0.42\u00d7 trend)',
         data: bands.floor,
@@ -1180,7 +1171,7 @@
         tension: 0.2,
         order: 4
       },
-      // ─── Trend — solid (central case) ───
+      // ─── Trend — solid ───
       {
         label: 'Trend',
         data: bands.trend,
@@ -1207,9 +1198,9 @@
         tension: 0.2,
         order: 5
       },
-      // ─── User's stack drawdown — solid white-ish, primary visual weight ───
+      // ─── Your stack on the path showing — solid white-ish, primary weight ───
       {
-        label: 'Your stack (drawdown strategy)',
+        label: 'Your stack, ' + lowerFirst(W.title[RT_BASIS]),
         data: stack.points,
         type: 'line',
         borderColor: '#ece4d6',
@@ -1220,16 +1211,12 @@
         tension: 0.2,
         order: 2
       },
-      // ─── Current trajectory — same projection at today's actual ratio to
-      // trend, anchored to live BTC price. Sibling of the drawdown line: same
-      // ink-bright color family but dashed and dimmer to signal "this is the
-      // below-trend (or above-trend) view." Starts at the user's actual
-      // mark-to-market stack value today, addresses the apparent year-1
-      // discrepancy where the chart used to show stack at trend price even
-      // though BTC currently trades below trend.
+      // ─── Your stack on the other scenario — dashed and dimmer, so both
+      // scenarios stay on the chart (DEFAULTS_POLICY R1). Both lines start
+      // at the stack's market value today.
       {
-        label: 'Your stack (current trajectory, ' + currentRatio.toFixed(2) + '\u00d7 trend)',
-        data: currentTrajectory.points,
+        label: 'Your stack, ' + lowerFirst(W.title[otherKey]),
+        data: other.points,
         type: 'line',
         borderColor: '#a89c8a',
         backgroundColor: '#a89c8a',
@@ -1289,14 +1276,19 @@
     var btcAnchors = pickBtcAnchors(SCENARIO.retirementYear, SCENARIO.yearsInRetirement, stack.depletionYear, stack.btcPoints);
 
     // Index map for the tooltip callback: which datasets have associated
-    // BTC counts that vary by year. Drawdown (index 3) and current
-    // trajectory (index 4) — the user-stack lines — both have btcPoints
-    // arrays where each entry is {x: year, btc: count, usd: value}. The
-    // tooltip uses this to append "(N.NN BTC)" to those rows.
+    // BTC counts that vary by year. The two stack lines (index 3, the path
+    // showing; index 4, the other scenario) both have btcPoints arrays where
+    // each entry is {x: year, btc: count, usd: value}. The tooltip uses this
+    // to append "(N.NN BTC)" to those rows.
     var btcDataByDataset = {
       3: stack.btcPoints,
-      4: currentTrajectory.btcPoints
+      4: other.btcPoints
     };
+    // The legend's two stack rows name their paths (the chart rebuilds its
+    // datasets on every render; the legend is HTML).
+    var lgSel = document.getElementById('rtLegendSel'), lgOther = document.getElementById('rtLegendOther');
+    if (lgSel) lgSel.textContent = 'Your stack, ' + lowerFirst(W.title[RT_BASIS]) + (RT_BASIS === 'floor' ? ' (stress test)' : '');
+    if (lgOther) lgOther.textContent = 'Your stack, ' + lowerFirst(W.title[otherKey]);
 
     // Compute explicit y-axis bounds from actual data. Chart.js's log-scale
     // auto-axis was producing inconsistent min values when the benchmark
@@ -1324,11 +1316,9 @@
 
     // Year-by-year tables read the SAME stack object — placed before the
     // chart-update branch so they render on both the update and initial-
-    // create paths (the update path returns early below). Store BOTH
-    // already-computed bases so the price-assumption toggle can switch the
-    // tables without a chart recompute; render whichever is active.
-    LAST_STACK_PAIR = { trend: stack, current: currentTrajectory };
-    renderRtTables(LAST_STACK_PAIR[RT_BASIS]);
+    // create paths (the update path returns early below).
+    LAST_STACK_PAIR = paths;
+    renderRtTables(stack);
 
     if (chart) {
       chart.data.datasets = datasets;
@@ -1425,10 +1415,9 @@
                 if (i === 0 || i === 1 || i === 2) {
                   formatted += ' (per BTC)';
                 } else if (i === 3 || i === 4) {
-                  // Stack lines — look up BTC count for this year.
-                  // Drawdown (3) and current trajectory (4) hold different
-                  // BTC counts at the same year because the price multiplier
-                  // differs, so showing both is informative.
+                  // Stack lines — look up BTC count for this year. The two
+                  // paths hold different BTC counts in the same year (their
+                  // prices differ), so showing both is informative.
                   var btcMap = ctx.chart && ctx.chart._btcDataByDataset;
                   if (btcMap && btcMap[i]) {
                     var year = Math.round(ctx.parsed.x);
@@ -1517,6 +1506,9 @@
     // Shared helper: one live fetch + consistent fallback site-wide.
     fetchTodayPrice(function(price, source){
       updateStatusLine(price, source);
+      // Today's multiple moved: the default path, the stays path and the
+      // derived withdrawal rate all read it.
+      recomputeCoupledFromIncomeOrMeans();
       scheduleRender();
     });
   }
@@ -1578,9 +1570,10 @@
   // are omitted from the URL — a clean `/the-bitcoin-retirement` represents
   // the default scenario, and only the user's deviations show up as params.
   //
-  // Baseline assumptions (inflation, growth model, real returns) live in
-  // localStorage via ModelingAssumptions and are deliberately out of scope
-  // — per §17.5, the URL covers only page-local Retirement state.
+  // Baseline assumptions (inflation, real returns) live in localStorage via
+  // ModelingAssumptions and are deliberately out of scope — per §17.5, the
+  // URL covers only page-local Retirement state. Bitcoin's price path is
+  // page-local and rides in `basis`, only once picked (2026-10-11).
   var SCENARIO_URL_MAP = {
     stack:    { key: 'btcStack',          isInt: false, decimals: 2 },
     retire:   { key: 'retirementYear',    isInt: true },
@@ -1618,6 +1611,13 @@
     if (params.has('incbasis')) {
       var ib = params.get('incbasis');
       if (ib === 'today' || ib === 'fixed') SCENARIO.incomeBasis = ib;
+    }
+    // A carried pick of bitcoin's price path (the family's `basis` values,
+    // 2026-10-11): applied as a pick, so it holds whatever the price does.
+    if (params.has('basis')) {
+      var pb = params.get('basis');
+      var nb = pb === 'current' || pb === 'stay' ? 'stay' : (pb === 'trend' || pb === 'floor') ? pb : null;
+      if (nb) { RT_BASIS = nb; RT_PICKED = true; }
     }
   }
 
@@ -1660,6 +1660,9 @@
     } else {
       params.delete('incbasis');
     }
+    // The price path, only once picked (DEFAULTS_POLICY R7): a link never
+    // carries a default, so a receiver opens on the default for its own price.
+    if (RT_PICKED) params.set('basis', rtLinkBasis(RT_BASIS)); else params.delete('basis');
     var qs = params.toString();
     var newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
     window.history.replaceState(null, '', newUrl);
@@ -1671,10 +1674,11 @@
   }
 
   function recomputeCoupledFromIncomeOrMeans() {
-    // Income held; rate derived from current stack value
-    var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
+    // Income held; rate derived from the stack value at retirement on the
+    // price path showing (it moves when the reader picks another path).
+    rtSyncDefault();
     var inflation = window.ModelingAssumptions.get('inflation');
-    var stackReal = realStackAtRetirement(SCENARIO, growthModel.preset, inflation.value);
+    var stackReal = realStackAtRetirement(SCENARIO, RT_BASIS, inflation.value);
     if (stackReal > 0) {
       var newRate = (SCENARIO.targetIncomeUSD / stackReal) * 100;
       var rateCfg = SLIDER_BY_KEY.withdrawalRatePct;
@@ -1684,10 +1688,10 @@
   }
 
   function recomputeCoupledFromRate() {
-    // Rate held; income derived from current stack value
-    var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
+    // Rate held; income derived from the stack value at retirement on the path showing
+    rtSyncDefault();
     var inflation = window.ModelingAssumptions.get('inflation');
-    var stackReal = realStackAtRetirement(SCENARIO, growthModel.preset, inflation.value);
+    var stackReal = realStackAtRetirement(SCENARIO, RT_BASIS, inflation.value);
     if (stackReal > 0) {
       var newIncome = (SCENARIO.withdrawalRatePct / 100) * stackReal;
       var incomeCfg = SLIDER_BY_KEY.targetIncomeUSD;
@@ -1751,64 +1755,60 @@
   }
 
   function updateSustainability() {
-    var growthModel = window.ModelingAssumptions.get('btcGrowthModel');
-    var inflation = window.ModelingAssumptions.get('inflation');
-    var inflationPct = inflation.value;
-    // Escape-velocity / depletion / spectrum must follow the SAME price basis
-    // the tables use (RT_BASIS), or the visual can contradict them \u2014 e.g. claim
-    // escape velocity while the tables show depletion under "today's gap to trend".
-    // Current basis = trend prices scaled by today's ratio (matches the tables'
-    // currentTrajectory); trend basis is the default.
-    var proj = (RT_BASIS === 'current')
-      ? projectStackOverTime(SCENARIO, 'powerlaw-trend', inflation.value, rtCurrentRatio())
-      : projectStackOverTime(SCENARIO, growthModel.preset, inflation.value);
+    rtSyncDefault();
+    var inflationPct = window.ModelingAssumptions.get('inflation').value;
+    var m = rtCurrentRatio(), W = rtWords();
+    // The verdict on each path, from the same projections the chart draws.
+    var P = { stay: pathProj(SCENARIO, 'stay'), trend: pathProj(SCENARIO, 'trend') };
+    if (RT_BASIS === 'floor') P.floor = pathProj(SCENARIO, 'floor');
+    var V = {};
+    Object.keys(P).forEach(function (k) { V[k] = flagshipVerdict(P[k], SCENARIO, inflationPct); });
+    var verdict = V[RT_BASIS];
+    function atRet(k) { var r = retireRow(P[k]); return rtDollars(r ? r.usd : 0, SCENARIO.retirementYear, inflationPct); }
+    var dollarsWord = (RT_DOLLARS === 'real') ? 'in today’s dollars' : 'in future dollars';
 
-    var verdict = flagshipVerdict(proj, SCENARIO, inflationPct);
-    var yearsEl = document.getElementById('sustYearsLast');
-    if (yearsEl) {
-      var vs = verdictShort(verdict, SCENARIO);
-      yearsEl.textContent = vs.text;
-      yearsEl.classList.toggle('escape-velocity', vs.escape);
+    // The block (components/price-cases.njk): each half's verdict and the
+    // stack it retires with; the selected path drives everything below it.
+    function half(k) {
+      var bv = window.RetirementEngine.blockVerdict(V[k], SCENARIO);
+      return { num: bv.num,
+               sub: bv.tail + ' &middot; stack worth ' + formatCurrencyShort(atRet(k)) + ' at retirement in ' + SCENARIO.retirementYear + ', ' + dollarsWord };
     }
-    // Disclose which price assumption the Sustainability visual is describing.
-    var bw = document.getElementById('sustBasisWord');
-    if (bw) bw.textContent = (RT_BASIS === 'current')
-      ? 'today\u2019s ' + todaysBasisPhrase(rtCurrentRatio()) + ' to trend persists (' + rtCurrentRatio().toFixed(2) + '\u00D7)'
-      : 'reverts to trend';
-    // Projected stack value at retirement — follows BOTH toggles so it can never
-    // disagree with the tables' start row: the price-basis toggle (× currentRatio
-    // under 'current', matching the tables' currentTrajectory) and the nominal/real
-    // toggle (via rtDollars). Under 'trend' it's the plain trend-basis value.
-    var atRetInfo    = computeStackAtRetirement(SCENARIO, growthModel.preset);
-    var ratio        = rtCurrentRatio();
-    var atRetNominal = (RT_BASIS === 'current') ? atRetInfo.nominal * ratio : atRetInfo.nominal;
-    var atRetShown   = rtDollars(atRetNominal, SCENARIO.retirementYear, inflationPct);
-    var stackEl = document.getElementById('sustStackValue');
-    if (stackEl) stackEl.textContent = formatCurrencyShort(atRetShown);
+    var selRow = retireRow(P[RT_BASIS]);
+    var showing = W.title[RT_BASIS] + ': bitcoin goes from ' + formatBtcPrice(liveBtcPrice) + ' today to about ' +
+      formatCurrencyShort(selRow ? selRow.price : 0) + ' in ' + SCENARIO.retirementYear + ' (prices before inflation), and the plan ' +
+      (verdict.state === 'escape' ? 'reaches escape velocity' : verdict.state === 'shrink' ? 'lasts to ' + verdict.horizonYear + ' but shrinks' : 'runs out in ' + verdict.depletionYear) + '.' +
+      (RT_BASIS === 'floor' ? ' A stress test: 0.42× is the channel’s floor, which price has gone below by 5.1% at most since 2011, in 2015.' : '');
+    PC.render(document.getElementById('pcRt'), {
+      mult: m, selected: RT_BASIS, drives: 'the verdict, the chart and the tables',
+      plan: rtPlan(), values: { stay: half('stay'), trend: half('trend') }, showing: showing
+    });
+
+    // Print-only summary (populated here: the screen readout is the block).
+    var vs = verdictShort(verdict, SCENARIO);
+    var py = document.getElementById('printYearsLast');
+    if (py) { py.textContent = vs.text; py.classList.toggle('escape-velocity', vs.escape); }
+    var ps = document.getElementById('printStackValue');
+    if (ps) ps.textContent = formatCurrencyShort(atRet(RT_BASIS)) + ' (' + dollarsWord + ')';
+    var pd = document.getElementById('printSustDetail');
+    if (pd) pd.textContent = window.RetirementEngine.spectrumDetail(verdict, SCENARIO) + ' Price path: ' + lowerFirst(W.title[RT_BASIS]) + '.';
 
     // Line 1: worth $X today, at bitcoin's live spot price. Today's value is
-    // basis-invariant (deflator = 1 at year 0).
+    // the same on every path (each starts at today's price).
     var todayVal = SCENARIO.btcStack * liveBtcPrice;
     var elToday  = document.getElementById('stackValToday');
     var elPrice  = document.getElementById('stackValLivePrice');
     if (elToday) elToday.textContent = formatCurrencyShort(todayVal);
     if (elPrice) elPrice.textContent = formatBtcPrice(liveBtcPrice);
 
-    // Lines 2 & 3: at-retirement value under BOTH price bases — trend
-    // (mean-reversion) and today's-gap-to-trend-persists (nominal × currentRatio) —
-    // each respecting the active dollar basis. Year is the retirement year.
-    var trendAtRet   = rtDollars(atRetInfo.nominal, SCENARIO.retirementYear, inflationPct);
-    var currentAtRet = rtDollars(atRetInfo.nominal * ratio, SCENARIO.retirementYear, inflationPct);
-    var elTrend    = document.getElementById('stackValTrend');
-    var elCur      = document.getElementById('stackValCurrent');
-    var elWord     = document.getElementById('stackValBasisWord');
-    var elYrTrend  = document.getElementById('stackValRetYearTrend');
-    var elYrCur    = document.getElementById('stackValRetYearCurrent');
-    if (elTrend)   elTrend.textContent   = formatCurrencyShort(trendAtRet);
-    if (elCur)     elCur.textContent     = formatCurrencyShort(currentAtRet);
-    if (elWord)    elWord.textContent    = todaysBasisPhrase(ratio);
-    if (elYrTrend) elYrTrend.textContent = SCENARIO.retirementYear;
-    if (elYrCur)   elYrCur.textContent   = SCENARIO.retirementYear;
+    // Lines 2 & 3: at-retirement value on the two scenarios, each read off its
+    // own projection (monthly buys included at that path's prices), in the
+    // active dollar basis.
+    var l2 = document.getElementById('stackValueLine2'), l3 = document.getElementById('stackValueLine3');
+    if (l2) l2.innerHTML = 'Worth <strong>' + formatCurrencyShort(atRet('stay')) + '</strong> at the start of your retirement in <strong>' +
+      SCENARIO.retirementYear + '</strong> ' + lowerFirst(W.title.stay) + ', or';
+    if (l3) l3.innerHTML = '<strong>' + formatCurrencyShort(atRet('trend')) + '</strong> ' + lowerFirst(W.title.trend) +
+      ' (' + dollarsWord + ')';
 
     updateBaselineDollarsNote();
     updateSpectrum(verdict, SCENARIO);
@@ -1897,10 +1897,11 @@
     field.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ commit(true); field.blur(); } });
   }
 
-  // ─── Re-render chart when inflation or growth model changes
+  // ─── Re-render when inflation or the benchmark changes
   if (window.ModelingAssumptions.subscribe) {
     window.ModelingAssumptions.subscribe(function(dim){
-      if (dim === 'inflation' || dim === 'btcGrowthModel' || dim === 'realReturns' || dim === '*') {
+      if (dim === 'inflation' || dim === 'realReturns' || dim === '*') {
+        recomputeCoupledFromIncomeOrMeans();
         scheduleRender();
       }
     });
@@ -1945,15 +1946,14 @@
   /* ════════════════════════════════════════════════════════════════
      Compare — "what if you…" scenario comparison (rt-compare)
      Each variant is a RELATIVE rule on the live base config, recomputed
-     through the SAME engine (projectStackOverTime / realStackAtRetirement)
+     through the SAME engine (pathProj / realStackAtRetirement)
      that draws the chart — zero new math. Up to two variants (+ base = 3
      columns); each active variant overlays its drawdown curve on the
      projection chart. In-memory UI state only — nothing stored, no URL
-     params. Every compare figure tracks the chart's drawdown line
-     (growth-model + inflation basis); the RT_BASIS trend/current display
-     toggle is a table/readout concern the chart drawdown line ignores, so
-     compare ignores it too — overlay, column, and drawdown line stay in
-     lockstep on one basis.
+     params. Every compare figure follows the price path showing (RT_BASIS,
+     2026-10-11: until then this panel ran the chart's trend line while the
+     tables could show the other basis), so the columns, the chart's primary
+     stack line and the readout stay in lockstep on one path.
   ═══════════════════════════════════════════════════════════════════ */
 
   // Slot-based column colors — assigned by ORDER ADDED, never by valence, so no
@@ -2050,21 +2050,20 @@
     return s;
   }
 
-  // Basis helpers — the chart-drawdown basis (growth model + inflation).
-  function cmpGrowthKey() { return window.ModelingAssumptions.get('btcGrowthModel').preset; }
+  // Basis helpers — the price path showing, and inflation.
   function cmpInfl() { return window.ModelingAssumptions.get('inflation').value; }
-  // Real (today's $) stack value at retirement — same call the Sustainability
-  // readout uses at the default basis, so the base column matches it exactly.
-  function cmpStackReal(scenario) { return realStackAtRetirement(scenario, cmpGrowthKey(), cmpInfl()); }
+  // Real (today's $) stack value at retirement on the path showing — the same
+  // call the readout's figures come from, so the base column matches them.
+  function cmpStackReal(scenario) { return realStackAtRetirement(scenario, RT_BASIS, cmpInfl()); }
 
   // Column outputs for one scenario. years === Infinity ⇒ escape velocity.
   // stackNominal is the raw value at the scenario's retirement year; stackReal
   // deflates it to today's $ via the shared rtDeflator (no new deflator). The
   // panel shows both rows; only stackReal is ever compared across columns.
   function cmpOutputs(scenario, isFourPct) {
-    var proj = projectStackOverTime(scenario, cmpGrowthKey(), cmpInfl());
+    var proj = pathProj(scenario, RT_BASIS);
     var years = (proj.depletionYear === null) ? Infinity : (proj.depletionYear - scenario.retirementYear);
-    var nominal = computeStackAtRetirement(scenario, cmpGrowthKey()).nominal;
+    var nominal = computeStackAtRetirement(scenario, RT_BASIS).nominal;
     return {
       proj: proj,
       years: years,
@@ -2081,7 +2080,7 @@
   // Recompute base + all active variants ONCE per tick. Reuses the chart's
   // already-computed base drawdown projection (baseStackObj) so the base row
   // costs no extra engine run; each active variant adds exactly one
-  // projectStackOverTime call (≤ 2 total, within the drag-perf budget).
+  // memoised path projection (≤ 2 total, within the drag-perf budget).
   function cmpComputeAll(baseStackObj) {
     var base = SCENARIO;
 
@@ -2091,8 +2090,8 @@
     // variant's chip un-presses in the same tick.
     CMP_ACTIVE = CMP_ACTIVE.filter(function(id){ var v = cmpVariantById(id); return v && v.available(base).ok; }).slice(0, CMP_MAX);
 
-    var baseProj = baseStackObj || projectStackOverTime(base, cmpGrowthKey(), cmpInfl());
-    var baseNominal = computeStackAtRetirement(base, cmpGrowthKey()).nominal;
+    var baseProj = baseStackObj || pathProj(base, RT_BASIS);
+    var baseNominal = computeStackAtRetirement(base, RT_BASIS).nominal;
     var baseOut = {
       proj: baseProj,
       depletionYear: baseProj.depletionYear,
@@ -2529,9 +2528,9 @@
 //   dca       monthly DCA USD
 //   withdraw  withdrawal rate %
 //
-// Baseline assumptions (inflation preset, growth model, real-returns
-// preset) live in localStorage via ModelingAssumptions and carry
-// across pages automatically — no URL-param help needed.
+// Baseline assumptions (inflation preset, real-returns preset) live in
+// localStorage via ModelingAssumptions and carry across pages
+// automatically — no URL-param help needed.
 //
 // Implementation notes:
 //   - Reads slider values directly from the DOM (not from any closure-

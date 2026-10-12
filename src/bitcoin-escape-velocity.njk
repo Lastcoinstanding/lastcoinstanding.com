@@ -17,7 +17,7 @@ faq:
   - q: "What is bitcoin escape velocity?"
     a: "It is the point where a stack's growth outpaces the money drawn out of it, so the portfolio stops running down and starts running up. This page checks that condition every year from retirement to the end of the modeled horizon: escape velocity is reached only if growth stays ahead for <em>every</em> remaining year, not just the first one."
   - q: "Is this a guarantee that a bitcoin retirement works?"
-    a: "No. Every figure here is a projection under the Power Law growth model, which is a description of bitcoin's historical trend, not a promise about its future (see <a href='/the-power-law'>Bitcoin and the Power Law</a>). The model's trend growth rate declines with time, and real markets do not deliver an average every year. Change the price basis or the inflation assumption and the answer can flip — which is the point of letting you change them."
+    a: "No. Every figure here is a projection under the Power Law growth model, which is a description of bitcoin's historical trend, not a promise about its future (see <a href='/the-power-law'>Bitcoin and the Power Law</a>). The model's trend growth rate declines with time, and real markets do not deliver an average every year. The page shows two scenarios for bitcoin's price, stays as far below its trend as it is today or returns to trend over three years, and starts on the lower of the two; pick the other, or change the inflation assumption, and the answer can flip — which is the point of letting you change them."
   - q: "What happens if a crash lands early in retirement?"
     a: "This page does not model one. A bear market in the first years of withdrawals sells more bitcoin to cover the same bill, and that stack never comes back even if price recovers — sequence-of-returns risk. The companion <a href='/the-bitcoin-retirement-stress-test'>Retirement Stress Test</a> exists to model exactly that, and it is where this page's answer gets tested."
   - q: "Why does the page default to today's dollars?"
@@ -25,7 +25,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-escape-velocity-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-escape-velocity.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/bitcoin-escape-velocity.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/bitcoin-escape-velocity.js' %}"
 companion:
   - url: https://www.youtube.com/watch?v=aQhk4KKqMss&t=1549s
     title: "Every 0.2 Bitcoin Retires You 3 Years Faster — The Robin Seyr Podcast"
@@ -96,7 +96,7 @@ companion:
 
       <div class="ev-stepper" data-key="retirementYear">
         <div class="ev-stepper-label">Retire in
-          <span class="help-tip" tabindex="0">?<span class="tip-content">The year retirement begins &mdash; withdrawals start this year. Before it, the stack is untouched and simply rides the growth model; from it on, bitcoin is sold each year to cover that year&rsquo;s withdrawal.</span></span>
+          <span class="help-tip" tabindex="0">?<span class="tip-content">The year retirement begins &mdash; withdrawals start this year. Before it, the stack is untouched and simply rides the price scenario; from it on, bitcoin is sold each year to cover that year&rsquo;s withdrawal.</span></span>
         </div>
         <div class="ev-stepper-row">
           <button type="button" class="ev-step-btn" data-dir="-1" aria-label="Retire in, one year earlier">&#9664;</button>
@@ -159,23 +159,31 @@ companion:
   <section class="ev-section" id="verdict" aria-label="The verdict">
     <div class="ev-eyebrow">The verdict</div>
 
+    {# Bitcoin's price: the two scenarios (DEFAULTS_POLICY_2026-10-11, PR B).
+       Each half carries that scenario's verdict; the half showing drives the
+       verdict card below, the thresholds and the year-by-year strip. It
+       replaces the robustness line, which reported the other basis in one
+       sentence. #}
+    {% set pc_id = 'pcEv' %}
+    {% set pc_stress_set = 'retirement' %}
+    {% set pc_stress_label = 'Stress test' %}
+    {% include 'components/price-cases.njk' %}
+
     <div class="sustainability" id="evVerdictCard">
       <div class="sustainability-header">
         <span class="sustainability-label">Does your planned retirement reach escape velocity?</span>
       </div>
 
       <p class="ev-verdict-sentence" id="evVerdictSentence" aria-live="polite">&mdash;</p>
-      <p class="ev-robustness" id="evRobustness" hidden></p>
-      <p class="ev-basis-footnote" id="evAboveTrendNote" hidden></p>
       <p class="ev-nominal-note" id="evNominalNote" hidden>Nominal figures include inflation &mdash; part of any nominal &ldquo;escape&rdquo; is the dollar shrinking, not the stack growing. The real-dollar view is the harder, more honest test.</p>
 
       <div class="sustainability-values">
         <div class="value-block">
           <div class="value-label">Stack at retirement
-            <span class="help-tip" tabindex="0">?<span class="tip-content">The projected value of your stack the moment withdrawals begin, before the first one is taken. Follows the price basis and the dollar basis you have selected.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">The projected value of your stack the moment withdrawals begin, before the first one is taken. Follows the price scenario and the dollar basis you have selected.</span></span>
           </div>
           <div class="value-display" id="evStackAtRet">&mdash;</div>
-          <p class="sust-basis-note">Under: <strong id="evBasisWord">reverts to trend</strong>.</p>
+          <p class="sust-basis-note">Under: <strong id="evBasisWord">the scenario showing above</strong>.</p>
         </div>
         <div class="value-block">
           <div class="value-label">Value at horizon (<span id="evHorizonYearLabel">&mdash;</span>)
@@ -195,9 +203,9 @@ companion:
           <div class="spectrum-marker" id="evSpectrumMarker" style="left: 50%"></div>
         </div>
         <div class="spectrum-labels">
-          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower the annual withdrawal, or raise the stack to reach sustainability. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
-          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
-          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. Assumes the projected Power Law trend price of bitcoin over time.</span></span></span>
+          <span class="spectrum-label-left">Depleting<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack runs out before retirement ends. You&rsquo;d need to extend the horizon, lower the annual withdrawal, or raise the stack to reach sustainability. On the price scenario showing above.</span></span></span>
+          <span class="spectrum-label-mid">Threshold<span class="help-tip" tabindex="0">?<span class="tip-content">Break-even &mdash; the stack lasts exactly through retirement, neither growing nor depleting in real terms. On the price scenario showing above.</span></span></span>
+          <span class="spectrum-label-right">Escape velocity<span class="help-tip" tabindex="0">?<span class="tip-content">Your stack grows faster than you draw it down. Purchasing power increases over retirement instead of being consumed; the stack lasts indefinitely. On the price scenario showing above.</span></span></span>
         </div>
         <div class="spectrum-detail-wrap">
           <span class="spectrum-detail" id="evSpectrumDetail">&mdash;</span>
@@ -290,7 +298,7 @@ companion:
          plan sits on. -->
     <div class="ev-line">
       <div class="ev-line-head">Where your thresholds sit
-        <span class="help-tip" tabindex="0">?<span class="tip-content">The crossing value on each variable, holding the other two where your plan has them. Computed against the same projection engine and the same price basis as the verdict above &mdash; the same solver that places the ticks on the sliders, so a tick and its own sentence can never disagree. Where a threshold falls outside this page&rsquo;s range, it says so, and names which other variable would bring one back into range.</span></span>
+        <span class="help-tip" tabindex="0">?<span class="tip-content">The crossing value on each variable, holding the other two where your plan has them. Computed against the same projection engine and the same price scenario as the verdict above &mdash; the same solver that places the ticks on the sliders, so a tick and its own sentence can never disagree. Where a threshold falls outside this page&rsquo;s range, it says so, and names which other variable would bring one back into range.</span></span>
       </div>
       <p class="ev-status" id="evStatus" aria-live="polite">&mdash;</p>
       <div class="ev-line-rows" id="evLineRows"><!-- JS-populated --></div>
@@ -365,13 +373,13 @@ companion:
       <div class="ev-assump-body" id="evAssumpBody" hidden>
         <div class="ev-assump-grid">
 
-          <div class="ev-assump-label">Price assumption
-            <span class="help-tip" tabindex="0">?<span class="tip-content">Whether bitcoin&rsquo;s price is modeled as returning to the Power Law trend, or as carrying today&rsquo;s distance from trend forward unchanged.</span></span>
+          <div class="ev-assump-label">Bitcoin&rsquo;s price
+            <span class="help-tip" tabindex="0">?<span class="tip-content">The same switch as the two scenarios above the verdict: bitcoin stays as far from its Power Law trend as it is today, or returns to the trend over 3 years. The floor stress test is picked there.</span></span>
           </div>
           <div class="ev-assump-control">
-            <div class="seg-control seg-2" role="group" aria-label="Price assumption">
-              <button type="button" class="ev-basis-btn seg-btn is-active" data-basis="trend"><span class="ev-basis-text">Reverts to trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">The primary projection. Values your stack at the Power Law <em>trend</em> price throughout, including today. Withdrawals are taken against this trend-priced stack. This is the central-case expectation if you assume bitcoin mean-reverts to trend over your retirement window.</span></span></button>
-              <button type="button" class="ev-basis-btn seg-btn" data-basis="current"><span class="ev-basis-text">Today&rsquo;s gap to trend persists</span><span class="help-tip" tabindex="0">?<span class="tip-content">Anchors to today&rsquo;s actual market price and projects forward at the same Power Law growth rate. When this basis sits <em>below</em> the trend basis, bitcoin is below trend today &mdash; the gap is the extra gain if the market mean-reverts to trend over your retirement window. When <em>above</em>, the gap is a premium that trend says will fade. Useful as a sanity check: to assume <em>no</em> mean-reversion, plan closer to this basis.</span></span></button>
+            <div class="seg-control seg-2" role="group" aria-label="Bitcoin&rsquo;s price: two scenarios">
+              <button type="button" class="ev-basis-btn seg-btn is-active" data-basis="stay" aria-pressed="true"><span class="ev-basis-text">Stays where it is against trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps today&rsquo;s multiple of its Power Law trend for the whole plan, so it grows at the trend&rsquo;s own rate and no recovery is assumed. Below trend this is the conservative scenario, and where the page starts.</span></span></button>
+              <button type="button" class="ev-basis-btn seg-btn" data-basis="trend" aria-pressed="false"><span class="ev-basis-text">Returns to trend over 3 years</span><span class="help-tip" tabindex="0">?<span class="tip-content">The gap to the Power Law trend closes in a straight line over 3 years, then bitcoin follows its trend. Every earlier stretch below trend has ended; the block above the verdict gives the record. Not a forecast.</span></span></button>
             </div>
           </div>
 
@@ -418,19 +426,8 @@ companion:
             <p class="ev-assump-inherited" data-inherited="inflation" hidden></p>
           </div>
 
-          <div class="ev-assump-label">Bitcoin growth model
-            <span class="help-tip" tabindex="0">?<span class="tip-content">Saved on this device and shared across every calculator on the site. <a href="/the-power-law#summary">What is the Power Law?</a></span></span>
-          </div>
-          <div class="ev-assump-control">
-            <div class="seg-control" role="group" aria-label="Bitcoin growth model" data-dim="btcGrowthModel">
-              <button type="button" class="seg-btn" data-preset="powerlaw-floor">Floor band</button>
-              <button type="button" class="seg-btn" data-preset="powerlaw-trend">Trend line</button>
-            </div>
-            <p class="ev-assump-inherited" data-inherited="btcGrowthModel" hidden></p>
-          </div>
-
         </div>
-        <p class="ev-assump-foot">Inflation and growth model are saved on this device only and shared with every other calculator on the site. Everything else on this card is page-local. Defaults are starting positions, never recommendations.</p>
+        <p class="ev-assump-foot">Inflation is saved on this device only and shared with every other calculator on the site. Everything else on this card is page-local. Defaults are starting positions, never recommendations.</p>
       </div>
     </div>
   </section>

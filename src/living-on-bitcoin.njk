@@ -14,7 +14,7 @@ related:
 companion: []
 eleventyComputed:
   page_styles: "{% include '_pageassets/living-on-bitcoin.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/living-on-bitcoin.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/living-on-bitcoin.js' %}"
   head_extras: "{% include '_pageassets/living-on-bitcoin-head.html' %}"
 ---
 <section class="hero">
@@ -299,23 +299,29 @@ eleventyComputed:
                 <div class="projection-display">
                     <div class="projection-row">
                         <span class="projection-name">Bitcoin growth (Power Law projection)
-                            <span class="help-tip" tabindex="0">?<span class="tip-content">Rather than ask you to guess a growth rate, the Calculator projects forward along the Power Law trend. Two scenarios are offered: <strong>Current trajectory</strong> starts from today&rsquo;s actual bitcoin price (which is below trend), so the implied CAGR includes both mean-reversion to trend and trend growth &mdash; the bullish reading. <strong>Power Law trendline</strong> starts from today&rsquo;s trend value (higher than the actual price), so the implied CAGR is pure trend growth without the mean-reversion bonus &mdash; the conservative reading. You can override the underlying growth model via the sitewide modeling-assumptions picker.</span></span>
+                            <span class="help-tip" tabindex="0">?<span class="tip-content">Rather than ask you to guess a growth rate, the Calculator projects bitcoin&rsquo;s price from today&rsquo;s against the Power Law trend, in two scenarios. <strong>If bitcoin stays</strong> as far from its trend as it is today, it grows at the trend&rsquo;s own rate. <strong>If it returns to trend over 3 years</strong>, the gap closes in a straight line and bitcoin follows the trend after that. Neither is a forecast. The page starts on the lower of the two for today&rsquo;s price, so below trend nothing depends on a recovery.</span></span>
                         </span>
                         <span class="projection-val" id="projection-cagr">&mdash;</span>
                     </div>
                     <div class="projection-detail" id="projection-detail">Loading current bitcoin price&hellip;</div>
-                    <div class="projection-scenarios">
-                        <label class="projection-scenario-option">
-                            <input type="radio" name="growthScenario" value="current" checked>
-                            <span class="projection-scenario-label">Current trajectory</span>
-                            <span class="projection-scenario-help">starts at today&rsquo;s price</span>
+                    <div class="projection-scenarios" role="radiogroup" aria-label="Bitcoin&rsquo;s price: two scenarios to consider">
+                        <label class="projection-scenario-option is-selected" data-scenario="stay">
+                            <input type="radio" name="growthScenario" value="stay" checked>
+                            <span class="projection-scenario-tag lob-tag--cons" data-lob="tag">Conservative</span>
+                            <span class="projection-scenario-label" data-lob="title">If bitcoin stays where it is against trend</span>
+                            <span class="projection-scenario-help" data-lob="help">grows at the trend&rsquo;s own rate</span>
+                            <span class="projection-scenario-note" data-lob="note"></span>
                         </label>
-                        <label class="projection-scenario-option">
-                            <input type="radio" name="growthScenario" value="trendline">
-                            <span class="projection-scenario-label">Power Law trendline</span>
-                            <span class="projection-scenario-help">starts at today&rsquo;s trend value</span>
+                        <span class="projection-scenario-or" aria-hidden="true">or</span>
+                        <label class="projection-scenario-option" data-scenario="trend">
+                            <input type="radio" name="growthScenario" value="trend">
+                            <span class="projection-scenario-tag lob-tag--hist" data-lob="tag">Historical pattern</span>
+                            <span class="projection-scenario-label" data-lob="title">If bitcoin returns to trend over 3 years</span>
+                            <span class="projection-scenario-help" data-lob="help">back on trend by year 3</span>
+                            <span class="projection-scenario-note" data-lob="note"></span>
                         </label>
                     </div>
+                    <p class="projection-scenarios-foot"><span data-lob="foot">Two scenarios to consider; neither is a forecast.</span> <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a></p>
                 </div>
             </div>
 
@@ -342,7 +348,7 @@ eleventyComputed:
                     <div class="slider-control" data-key="drawdownYear">
                         <div class="slider-row">
                             <span class="slider-name">Drawdown stress &mdash; year of &minus;50% BTC shock
-                                <span class="help-tip" tabindex="0">?<span class="tip-content">Models a single 50% drawdown at the end of the chosen year. Under the Power Law modeling assumption, the trajectory recovers to trendline by horizon end &mdash; drawdowns are temporary deviations, not permanent damage. The dashed line on the chart shows the V-shaped recovery. The real cost lives in the near-term: selling bitcoin at the bottom to pay bills during the recovery period.</span></span>
+                                <span class="help-tip" tabindex="0">?<span class="tip-content">Models a single 50% drawdown at the end of the chosen year. Under the Power Law modeling assumption, the float recovers to the scenario&rsquo;s path by horizon end &mdash; drawdowns are temporary deviations, not permanent damage. The dashed line on the chart shows the V-shaped recovery. The real cost lives in the near-term: selling bitcoin at the bottom to pay bills during the recovery period.</span></span>
                             </span>
                             <span class="slider-val" id="val-drawdownYear">Year 3</span>
                         </div>
@@ -416,9 +422,10 @@ eleventyComputed:
             <h4 class="lob-math-subhead">Strategy B &mdash; Living on Bitcoin</h4>
             <p class="prose">At time 0, the user converts <em>B</em> dollars into bitcoin at price <em>P&#8320;</em>, yielding <em>B/P&#8320;</em> coins. Each month thereafter, <em>M</em> dollars of bitcoin is sold to pay bills, and <em>M</em> dollars of paycheck is bought back into bitcoin. Under steady-state refilling, the BTC quantity held stays constant at <em>B/P&#8320;</em>. The dollar value tracks bitcoin&rsquo;s price:</p>
             <div class="lob-math-eq">value<sub>LoB,gross</sub>(t) = (B/P&#8320;) &times; P<sub>t</sub> = B &times; (1 + r)<sup>t</sup></div>
-            <p class="prose">where <em>r</em> is the implied annual growth rate from the Power Law projection. Rather than ask the user to pick a number, the Calculator anchors to two real values: today&rsquo;s spot bitcoin price <em>P&#8320;</em> (fetched live from Coinbase, with Kraken, mempool.space and CoinGecko as backups, and the most recent price in the site&rsquo;s data as the last resort) and the Power Law trend value <em>P<sub>h</sub></em> at the end of the chosen horizon. The implied annual rate is:</p>
+            <p class="prose">where <em>r</em> is the implied annual growth rate from the Power Law projection. Rather than ask the user to pick a number, the Calculator anchors to two real values: today&rsquo;s spot bitcoin price <em>P&#8320;</em> (fetched live from Coinbase, with Kraken, mempool.space and CoinGecko as backups, and the most recent price in the site&rsquo;s data as the last resort) and the scenario&rsquo;s price <em>P<sub>h</sub></em> at the end of the chosen horizon, a multiple <em>m<sub>h</sub></em> of the Power Law trend then. The implied annual rate is:</p>
             <div class="lob-math-eq">r = (P<sub>h</sub> / P&#8320;)<sup>1/h</sup> &minus; 1</div>
-            <p class="prose">This is the &ldquo;current value with Power Law projected out&rdquo; framing &mdash; the same framing used by the Retirement and Borrowing-Against-Your-Stack calculators. Because today&rsquo;s price is below the Power Law trend, <em>r</em> includes both trend growth and mean-reversion to trend over the horizon. The reversion is a one-time tailwind, not a sustained rate, but the Calculator amortizes it evenly across the horizon for tractability.</p>
+            <p class="prose">Two scenarios set <em>m<sub>h</sub></em>, the same two the retirement calculators use. <em>If bitcoin stays</em> as far from its trend as it is today, <em>m<sub>h</sub></em> is today&rsquo;s multiple and <em>r</em> is the trend&rsquo;s own growth rate. <em>If bitcoin returns to trend over 3 years</em>, the multiple closes on 1.0 in a straight line over 3 years, so from year 3 <em>m<sub>h</sub></em> = 1 and <em>r</em> includes the return as well as trend growth. The return is a one-time tailwind, not a sustained rate, but the Calculator spreads it evenly across the horizon for tractability: the end value is exact, and the years in between are smoothed. Neither scenario is a forecast; the Calculator starts on the lower of the two for today&rsquo;s price.</p>
+            <p class="prose"><em>Changed October 11, 2026:</em> until then the default scenario, &ldquo;Current trajectory&rdquo;, was described as starting at today&rsquo;s price but returned to trend by the horizon end, about 51% a year over the default 5 years, and this paragraph said the Retirement and Borrowing calculators used the same framing, which they did not. The default is now the lower scenario, and the return to trend takes 3 years.</p>
         </div>
 
         <div class="section lob-math-section">

@@ -15,10 +15,19 @@
    to Historical (not Fast) with a prominent Weak option, and make no
    probability claims. It is a what-if, never a forecast.
 
-   Baseline parity: the no-crash path uses the same shared
-   ModelingAssumptions (inflation 6.5% m2-growth, Power Law trend by
-   default) and the same math as /the-bitcoin-retirement, so the
-   baseline projection matches that page for identical inputs.
+   Baseline parity: the no-crash path uses the same shared inflation
+   (6.5% m2-growth by default), the same price path and the same math as
+   /the-bitcoin-retirement, so the baseline projection matches that page for
+   identical inputs.
+
+   Bitcoin's price (DEFAULTS_POLICY_2026-10-11, PR B; JM 2026-10-11): the
+   two scenarios, 'stay' and 'trend' (back to trend over 3 years), plus the
+   floor stress test, picked in the compact switch under the plan. The
+   default is the lower of the two for today's price. The crash multiplies
+   THE PATH PICKED: until 2026-10-11 it always hit the trend price (a price
+   re-set to trend at year 0, or the old sitewide Floor setting). On the
+   stays path the same −60% falls from 0.53x trend, so its low sits under the
+   floor; the assumption line says so whenever that happens.
 
    Reads PL_FLOOR/PL_CEIL/plPrice/GENESIS_TS from power-law-data.js,
    window.ModelingAssumptions, window.CalcHelpers.
@@ -58,6 +67,9 @@
   // The lesson is not "a big stack is safe" (this one depletes if you retire early and the
   // recovery fails) and not "early retirement is dangerous" (the base case is comfortable).
   // The decisive levers are retirement year and withdrawal rate relative to stack.
+  // (Tuned on the old trend-from-today path. Since 2026-10-11 the page opens on the
+  // lower of the two scenarios: below trend, on the stays path the no-crash plan runs
+  // out in 2056 and the crash pulls that forward; the return path keeps the tuning.)
   // Baseline PARITY is preserved for identical inputs (same math + shared assumptions);
   // only the cold-start defaults differ, which is the point of a stress test.
   var SCENARIO = {
@@ -105,8 +117,14 @@
   function inflationLabel() {
     try { var a = window.ModelingAssumptions.get('inflation'); return a.value + '% (' + a.preset + ')'; } catch (e) { return '6.5%'; }
   }
-  function growthKey() {
-    try { return window.ModelingAssumptions.get('btcGrowthModel').preset; } catch (e) { return 'powerlaw-trend'; }
+  // The price path every projection on the page runs (see the header).
+  var BASIS = 'stay';
+  var PICKED = false;
+  function syncDefault() { if (!PICKED) BASIS = window.PriceCases.defaultFor(window.RetirementEngine.currentRatio()); }
+  function pathKey() { return BASIS; }
+  function pathWords(b) {
+    var PC = window.PriceCases, m = window.RetirementEngine.currentRatio();
+    return b === 'floor' ? { title: PC.FLOOR_FALL.title, name: PC.FLOOR_FALL.name } : { title: PC.titles(m)[b], name: PC.names(m)[b] };
   }
 
   // ════════ CRASH MODEL — timed price-path multiplier (shared module) ════════
@@ -126,7 +144,7 @@
   }
   function makeCrash(timingYear) { return makeCrashFor(SCENARIO, timingYear); }
 
-  // ════════ PROJECTION ENGINE (parity with retirement projectStackOverTime) ════════
+  // ════════ PROJECTION ENGINE (the flagship's loop and price paths) ════════
   /* REPOINTED 2026-08-26 to shared/retirement-engine.js (TECH_DEBT §1).
 
      This page's loop was the widest of the three: it carried the DCA leg, the
@@ -139,9 +157,12 @@
      `rows`; the module returns `btcPoints` carrying exactly the same fields
      (x, phase, price, btc, usd, income, btcSold, dcaAdded, plus fullIncome and
      cut on drawdown years), so the mapping is a rename. */
-  function projectStack(scn, growth, infl, multFn, flexPct) {
-    var out = window.RetirementEngine.projectCore(scn, growth, infl,
-      { multFn: multFn, flexPct: flexPct });
+  // `path` is the price path (pathKey(): 'stay' | 'trend' | 'floor'); the
+  // crash rides on top of it, and the spending cut binds to the crash alone
+  // (the engine keeps the two apart: pathFn vs multFn).
+  function projectStack(scn, path, infl, multFn, flexPct) {
+    var out = window.RetirementEngine.projectPath(scn, path,
+      { inflationPct: infl, multFn: multFn, flexPct: flexPct });
     return { rows: out.btcPoints, depletionYear: out.depletionYear,
              startYear: out.startYear, endYear: out.endYear };
   }
@@ -335,7 +356,7 @@
   var _sweepRows = [];                    // current rows, read by the plugin + tooltip (survives chart re-use)
 
   function sweepRows() {
-    var infl = inflationPct(), g = growthKey();
+    var infl = inflationPct(), g = pathKey();
     if (COMPARE_MODE === 'timing') {
       var baseProj = projectStack(SCENARIO, g, infl, null);
       var baseReal = finalRealStack(baseProj, infl);
@@ -468,7 +489,7 @@
   // the STACK does not — the coins sold cheap are gone, and that residual gap IS the
   // sequence cost. Never phrase this as "the stack reverts". Anchored on the faint
   // no-crash bar, the closest visual to the undisturbed Power Law path.
-  var NOCRASH_TIP = ' <span class="help-tip" tabindex="0">?<span class="tip-content">The faint bar is the plan on the undisturbed Power Law path. Under a Historical recovery the price finds its way back to that trend &mdash; what does not come back is the coins sold while it was down. The remaining gap is not price damage; it is the sequence cost, priced.</span></span>';
+  var NOCRASH_TIP = ' <span class="help-tip" tabindex="0">?<span class="tip-content">The faint bar is the plan on the undisturbed price path you picked. Under a Historical recovery the price finds its way back to that path &mdash; what does not come back is the coins sold while it was down. The remaining gap is not price damage; it is the sequence cost, priced.</span></span>';
 
   // Swap the section title, lead, and caption to match the active sweep.
   function updateCompareCopy() {
@@ -595,7 +616,7 @@
     }
   }
   if (typeof window !== 'undefined') window.stFlexQA = function () {
-    var infl = inflationPct(), g = growthKey(), crash = makeCrash(CRASH.timingYear);
+    var infl = inflationPct(), g = pathKey(), crash = makeCrash(CRASH.timingYear);
     var endYear = SCENARIO.retirementYear + SCENARIO.yearsInRetirement;
     var mult = function (y) { return crashMultiplier(y, crash); };
     var reduced = projectStack(SCENARIO, g, infl, mult, FLEX > 0 ? FLEX : 20);
@@ -676,7 +697,45 @@
   function renderAssumptions() {
     var el = document.getElementById('stAssumptions'); if (!el) return;
     var rec = RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical;
-    el.innerHTML = 'Recovery assumed: <strong>' + rec.label + '</strong> (' + rec.note + '). Baseline growth is Power Law trend, inflation <strong>' + inflationLabel() + '</strong> (shared with the Retirement page). Past recoveries were reliable; the future is not guaranteed.';
+    // Where the crash's low sits against trend, on the path picked: the path's
+    // multiple in the trough year times the crash's trough. Said only when it
+    // is under the floor, which the record has never sustained. The record's
+    // deepest low since 2011 was 5.1% under the floor (September 2015; The
+    // Bitcoin Floor page), so a -60% crash from trend (0.40x) is about that
+    // deep, and the same crash from 0.53x (0.21x) is far deeper.
+    var RE = window.RetirementEngine, crash = makeCrash(CRASH.timingYear);
+    var troughYear = crash.crashYear + crash.troughLagYears, y0 = (new Date()).getFullYear();
+    var lowMult = RE.pathMultiple(BASIS, RE.currentRatio(), troughYear - y0) * crashMultiplier(troughYear, crash);
+    var RECORD_LOW = PL_FLOOR * (1 - 0.051);
+    var floorNote = lowMult < PL_FLOOR
+      ? ' On this path the crash&rsquo;s low is <strong>' + lowMult.toFixed(2) + '&times; trend</strong>, under the Power Law floor (0.42&times;): ' +
+        (lowMult < RECORD_LOW - 0.005
+          ? 'deeper than any low in the record, whose deepest was 5.1% under the floor (2015).'
+          : 'about as deep as the deepest low in the record, 5.1% under the floor (2015).')
+      : '';
+    el.innerHTML = 'Recovery assumed: <strong>' + rec.label + '</strong> (' + rec.note + '). Bitcoin&rsquo;s price: <strong>' + pathWords(BASIS).name.toLowerCase() + '</strong>' + (BASIS === 'floor' ? ' (a stress test)' : '') +
+      ', inflation <strong>' + inflationLabel() + '</strong> (shared with the Retirement page). Past recoveries were reliable; the future is not guaranteed.' + floorNote;
+  }
+
+  // Bitcoin's price: the compact switch, with the other scenario's answer to
+  // the same crash on the line under it, so both scenarios stay on screen.
+  function renderSwitch(infl) {
+    var el = document.getElementById('pcsSt'); if (!el) return;
+    var PC = window.PriceCases, RE = window.RetirementEngine;
+    var otherKey = BASIS === 'stay' ? 'trend' : BASIS === 'trend' ? 'stay' : PC.defaultFor(RE.currentRatio());
+    var crash = makeCrash(CRASH.timingYear), mult = function (y) { return crashMultiplier(y, crash); };
+    var o = projectStack(SCENARIO, otherKey, infl, mult, FLEX > 0 ? FLEX : 0);
+    var end = SCENARIO.retirementYear + SCENARIO.yearsInRetirement, n = Math.max(1, end - (new Date()).getFullYear());
+    PC.renderSwitch(el, {
+      mult: RE.currentRatio(), selected: BASIS,
+      plan: { months: n * 12, phrase: 'the whole plan, to ' + end, words: 'the ' + n + ' years to ' + end },
+      other: (BASIS === 'floor' ? 'Showing the stress test. ' : '') + '<strong>' + pathWords(otherKey).title + '</strong>, with the same crash' + (FLEX > 0 ? ' and cut' : '') + ': the plan ' +
+        (o.depletionYear ? 'runs out in <strong>' + o.depletionYear + '</strong>.' : 'lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + '.')
+    });
+  }
+  function pickBasis(b) {
+    BASIS = window.RetirementEngine.normBasis(b); PICKED = true;
+    renderAll();
   }
 
   // Compact BTC formatter for readouts (trims trailing zeros).
@@ -743,7 +802,7 @@
     return isFinite(m) ? m : 0;
   }
   function findWorstTiming() {
-    var infl = inflationPct(), g = growthKey();
+    var infl = inflationPct(), g = pathKey();
     var maxT = Math.max(1, SCENARIO.yearsInRetirement);
     var best = null;
     for (var t = 1; t <= maxT; t++) {
@@ -790,7 +849,8 @@
   // ════════ RENDER ALL ════════
   function renderAll() {
     clearFinderLine(); // the finder line describes a scan of a now-stale config; any recompute clears it
-    var infl = inflationPct(), g = growthKey();
+    syncDefault();
+    var infl = inflationPct(), g = pathKey();
     var crash = makeCrash(CRASH.timingYear);
     var mult = function (y) { return crashMultiplier(y, crash); };
     var base = projectStack(SCENARIO, g, infl, null);
@@ -808,6 +868,7 @@
     renderSweepTable(rows);
     renderAudit(base, shown);
     renderAssumptions();
+    renderSwitch(infl);
     renderComparSummary();
     updateReadouts();
     syncUrl();
@@ -825,7 +886,8 @@
          The crash settings stay here: neither receiver models them. ─── */
   function renderCarry(base) {
     var common = '&retire=' + SCENARIO.retirementYear + '&income=' + Math.round(SCENARIO.targetIncomeUSD)
-      + '&years=' + SCENARIO.yearsInRetirement + '&incbasis=' + SCENARIO.incomeBasis;
+      + '&years=' + SCENARIO.yearsInRetirement + '&incbasis=' + SCENARIO.incomeBasis
+      + (PICKED ? '&basis=' + (BASIS === 'stay' ? 'current' : BASIS) : '');   // a pick rides along (R7)
     var raw = '/the-bitcoin-retirement?stack=' + SCENARIO.btcStack + common
       + (SCENARIO.monthlyDcaUSD > 0 ? '&dca=' + Math.round(SCENARIO.monthlyDcaUSD) : '');
     ['stCarryFlagship', 'stCarryFlagshipCard'].forEach(function (id) {
@@ -1004,6 +1066,11 @@
     if (p.has('flex')) { var fx = parseInt(p.get('flex'), 10); if (isFinite(fx)) FLEX = clamp(fx, 0, 50); }
     if (p.has('cmp') && (p.get('cmp') === 'retire' || p.get('cmp') === 'timing')) COMPARE_MODE = p.get('cmp');
     if (p.has('focus') && (p.get('focus') === 'full' || p.get('focus') === 'crash')) CHART_FOCUS = p.get('focus');
+    // A carried pick of bitcoin's price path (the family's `basis` values).
+    if (p.has('basis')) {
+      var pb = p.get('basis');
+      if (pb === 'current' || pb === 'stay' || pb === 'trend' || pb === 'floor') { BASIS = window.RetirementEngine.normBasis(pb); PICKED = true; }
+    }
   }
   // Shipped defaults, captured at init BEFORE readUrl() mutates anything, so the
   // writer below can omit any param still sitting at its default. Snapshotting
@@ -1035,6 +1102,7 @@
       put('flex', FLEX, D.flex);
       put('cmp', COMPARE_MODE, D.cmp);
       put('focus', CHART_FOCUS, D.focus);
+      if (PICKED) p.set('basis', BASIS === 'stay' ? 'current' : BASIS); else p.delete('basis');
       var qs = p.toString();
       window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
     }, 250);
@@ -1049,9 +1117,13 @@
     };
     readUrl();
     wire();
+    try { window.PriceCases.bind(document.getElementById('pcsSt'), pickBasis); } catch (e) {}
     renderAll();
     // Initial render is done; from here a user change may write the URL.
     _suppressUrlWrite = false;
+    // Every price path starts at today's price, and the default path is chosen
+    // from it (2026-10-11), so the live quote re-renders the page.
+    if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function () { renderAll(); });
     // Recompute when shared assumptions change on another page/tab (parity).
     try { window.ModelingAssumptions.subscribe && window.ModelingAssumptions.subscribe(renderAll); } catch (e) {}
   }

@@ -25,6 +25,10 @@
        above trend on record, where "never sustained" would be false).
    R4  Every record figure comes from ReversionDurations (episode basis).
    R7  URL keys don't change; a link carries a pick, never a default.
+   Consumers: the real-estate pages and The Income Question (PR A, the block),
+   and the retirement family (PR B): the block on the flagship and Escape
+   Velocity, the compact switch (renderSwitch) on Compare and the Stress Test.
+   The retirement engine reads multipleAt and REVERT_YEARS for its paths.
 
    The internal names stay M3's (`stay`, `trend`, `floor`, `upper`) so every
    link and QA vector keeps its meaning; only the words and `trend`'s period
@@ -73,6 +77,17 @@
   function titles(m) {
     return { stay: titleStay(m), trend: TITLE_TREND, floor: 'Drifts to the floor (0.42×)', upper: 'Peaks at 2.5× trend' };
   }
+  // The retirement family's floor stress test (PR B, 2026-10-11) is a
+  // different shape from the real-estate pages' (a straight line to 0.42x by
+  // the plan's end): it falls to the floor over the same 3 years the return
+  // takes and stays there, because a retirement plan runs for decades and a
+  // 50-year drift would barely differ from "stays". Its own words, so the two
+  // shapes are never called by one name.
+  var FLOOR_FALL = {
+    chip: 'Falls to the floor (0.42×) and stays',
+    title: 'If bitcoin falls to its floor (0.42×) over ' + REVERT_YEARS + ' years and stays there',
+    name: 'Falls to the floor and stays'
+  };
   function names(m) {
     var g = gapPct(m);
     return { stay: g === 0 ? 'Stays on trend' : 'Stays ' + g + '% ' + (m < 1 ? 'below' : 'above') + ' trend',
@@ -157,6 +172,38 @@
     q(el, '[data-pc="showingLbl"]').textContent = stress ? 'Showing a ' + (o.stressWord || 'stress test') : 'Showing';
     q(el, '[data-pc="showing"]').innerHTML = o.showing || '';
   }
+  // ── The compact switch (components/price-cases-switch.njk; PR B) ──
+  // For Compare and the Stress Test, where one figure per scenario would have
+  // to speak for two plans or for a crash, so the halves carry no number.
+  // o: { mult, selected, plan, other (HTML: the other scenario's answer, so
+  //      both stay on screen), stressWord }
+  function renderSwitch(el, o) {
+    if (!el) return;
+    var m = o.mult, T = titles(m), G = tags(m, o.plan.months), N = notes(m, o.plan), s = side(m);
+    ['stay', 'trend'].forEach(function (k) {
+      var b = q(el, '.pcs-opt[data-scenario="' + k + '"]'); if (!b) return;
+      var on = o.selected === k;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.classList.toggle('is-muted', k === 'stay' && m >= 1);
+      var tag = q(b, '[data-pcs="tag"]');
+      tag.className = 'pcs-tag pcs-tag--' + G[k].cls; tag.textContent = G[k].text;
+      q(b, '[data-pcs="title"]').textContent = T[k];
+      var nt = q(b, '[data-pcs="note"]'); if (nt) nt.textContent = N[k];
+    });
+    el.querySelectorAll('.pcs-chip').forEach(function (c) {
+      var on = o.selected === c.getAttribute('data-scenario');
+      c.classList.toggle('active', on);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var ld = q(el, '[data-pcs="lead"]');
+    if (ld) ld.innerHTML = s === 'near'
+      ? 'Bitcoin is within 5% of its Power Law trend today (' + m.toFixed(2) + '×), so the two scenarios land close together. Neither is a forecast.'
+      : 'Bitcoin trades <strong>' + gapPct(m) + '% ' + s + '</strong> its Power Law trend today (' + m.toFixed(2) + '×). Neither scenario is a forecast.';
+    var ot = q(el, '[data-pcs="other"]'); if (ot) { ot.innerHTML = o.other || ''; ot.hidden = !o.other; }
+    var ft = q(el, '[data-pcs="foot"]'); if (ft) ft.textContent = foot(m, o.plan);
+  }
+
   // Clicks on any option in the block (the two halves and the stress chips).
   // `onPick(scenario)` is the page's: it sets its state and re-renders.
   function bind(el, onPick) {
@@ -171,10 +218,10 @@
   }
 
   window.PriceCases = {
-    REVERT_YEARS: REVERT_YEARS, UPPER: UPPER,
+    REVERT_YEARS: REVERT_YEARS, UPPER: UPPER, FLOOR_FALL: FLOOR_FALL,
     target: target, multipleAt: multipleAt,
     multipleOf: multipleOf, side: side, defaultFor: defaultFor,
     titles: titles, names: names, tags: tags, lead: lead, notes: notes, foot: foot,
-    render: render, bind: bind
+    render: render, renderSwitch: renderSwitch, bind: bind
   };
 })();

@@ -15,10 +15,14 @@
   Usage, with an id unique on the page:
       {% set pc_id = 'pcBvre' %}
       {% include 'components/price-cases.njk' %}
-  Optional: pc_class (extra classes on the section, e.g. to span a grid) and
+  Optional: pc_class (extra classes on the section, e.g. to span a grid),
   pc_stress_label (the stress row's label, "Stress tests" by default; The
   Income Question says "Other paths to test", since "stress" already names
-  its drawdown overlay; PriceCases.render's `stressWord` matches it).
+  its drawdown overlay; PriceCases.render's `stressWord` matches it) and
+  pc_stress_set ('retirement': the retirement family's one stress test,
+  PriceCases.FLOOR_FALL, which falls to the floor over 3 years and stays;
+  otherwise the real-estate pair's two, M3's straight lines to the plan's
+  end). The retirement pages set pc_stress_label to "Stress test".
 
   Built on the series strips' pattern: its own scoped <style>, every
   selector prefixed `pc-`, colours as vars with literal fallbacks (host
@@ -95,8 +99,12 @@
   <p class="pc-foot"><span data-pc="foot"></span> <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a></p>
   <div class="pc-stress">
     <span class="pc-stress-lbl">{{ pcStress }}</span>
+    {%- if pc_stress_set == 'retirement' %}
+    <button type="button" class="pc-opt pc-chip" data-scenario="floor" aria-pressed="false">Falls to the floor (0.42&times;) and stays</button>
+    {%- else %}
     <button type="button" class="pc-opt pc-chip" data-scenario="floor" aria-pressed="false">Drifts to the floor (0.42&times;)</button>
     <button type="button" class="pc-opt pc-chip" data-scenario="upper" aria-pressed="false">Peaks at 2.5&times; trend</button>
+    {%- endif %}
   </div>
   <p class="pc-showing"><span class="pc-showing-lbl" data-pc="showingLbl">Showing</span><span data-pc="showing"></span></p>
 </section>

@@ -29,7 +29,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-stress-test-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-retirement-stress-test.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement-stress-test.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement-stress-test.js' %}"
 ---
 
 <section class="hero">
@@ -96,7 +96,7 @@ eleventyComputed:
       </div>
       <div class="st-field">
         <span class="st-field-label">Monthly DCA until retirement (USD)
-          <span class="help-tip" tabindex="0">?<span class="tip-content">Dollars added per month between now and retirement, buying bitcoin at the trend price.</span></span>
+          <span class="help-tip" tabindex="0">?<span class="tip-content">Dollars added per month between now and retirement, buying bitcoin at each year&rsquo;s price on the path picked below.</span></span>
         </span>
         <input type="number" id="stDca" step="100" min="0" aria-label="Monthly DCA">
       </div>
@@ -110,6 +110,12 @@ eleventyComputed:
         </div>
       </div>
     </div>
+
+    {# Bitcoin's price: the two scenarios as one compact switch; the crash
+       below lands on the path picked (DEFAULTS_POLICY_2026-10-11, PR B). #}
+    {% set pcs_id = 'pcsSt' %}
+    {% set pcs_class = 'st-pcs' %}
+    {% include 'components/price-cases-switch.njk' %}
   </section>
 
   <!-- ════════ TIER 2 — THE STRESS TEST (playground + full-width chart) ════════ -->
@@ -164,7 +170,7 @@ eleventyComputed:
 
         <div class="st-control">
           <div class="st-control-label">Recovery
-            <span class="help-tip" tabindex="0">?<span class="tip-content">How price returns to trend after the low. Weak never fully recovers, the failed-recovery case.</span></span>
+            <span class="help-tip" tabindex="0">?<span class="tip-content">How price returns to the path it fell from (the price path picked above) after the low. Weak never fully recovers, the failed-recovery case.</span></span>
           </div>
           <div class="st-seg" id="stRecovery">
             <button type="button" data-val="fast">Fast</button>
@@ -172,7 +178,7 @@ eleventyComputed:
             <button type="button" data-val="slow">Slow</button>
             <button type="button" data-val="weak">Weak</button>
           </div>
-          <p class="st-control-note"><strong>Weak</strong> settles toward the Power Law floor and never fully returns to trend, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
+          <p class="st-control-note"><strong>Weak</strong> settles 40% below the path it fell from and never fully recovers, the failed-recovery case. Historical is the default because past recoveries were reliable, but non-stationarity means the future is not guaranteed.</p>
         </div>
 
         <div class="st-control">
