@@ -2,6 +2,20 @@
   {
     "display": "10/14/26",
     "date": "2026-10-14",
+    "page": "/bitcoin-as-collateral",
+    "badge": false,
+    "summary": "Bitcoin as Collateral: the $100-of-collateral table is updated to October 2026. The 30-year mortgage rate is now about 7.4% (it was about 6.6% in August), and India's cap on gold loans is 75–85% of the gold's value depending on loan size (it was 75% for all loans until April 2026). The bitcoin loan terms ($40–60 per $100, about 9–14% a year) and the margin rates are unchanged. The Basel watch now notes that the Basel Committee expects to update its crypto rules by the end of 2026."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/disciplined-rebalancing",
+    "badge": false,
+    "summary": "Disciplined Rebalancing: the results now say plainly that they are hypothetical: what the rules would have done on past prices, which nobody actually traded, before exchange fees and spreads. No figure changed."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
     "page": "/how-much-bitcoin",
     "summary": "How Much Bitcoin?: the two Power Law presets are now the site's two scenarios for bitcoin's price, side by side, each with its full-Kelly answer: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. The page starts on the lower of the two, so the default reads about 105% of wealth where it read about 124%, and that answer stays on screen beside it. The old Conservative preset is now a stress test, the hostile case (−8% a year at 60% volatility)."
   },

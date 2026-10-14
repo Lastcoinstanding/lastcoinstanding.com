@@ -423,15 +423,23 @@ the present.
 (±50bp); the month string updates whenever the rate does. The Power Law
 preset inputs need no refresh — they compute live from the shared globals.
 
-**Bitcoin as Collateral — the "as of August 2026" strings and the $100 table.**
+**Bitcoin as Collateral — the "as of [Month] 2026" string and the $100 table** (last refreshed 2026-10-14, "as of October 2026").
 `src/bitcoin-as-collateral.njk` carries two coupled things that stale together
 and must move together:
 
-1. The Gap tab's `Figures as of August 2026.` line, and the same tab's
-   `at the Senate floor as of August 2026` CLARITY Act status.
+1. The Gap tab's `Figures as of October 2026.` line, and the same tab's
+   CLARITY Act status (since the 2026-10-14 refresh it records the 15 Sep 2026
+   cloture vote, failed 49–50, and the motion to reconsider; nothing new as of
+   2 Oct 2026, per Orrick) and the Basel line (the Committee's targeted review
+   expects an update by end-2026, BIS release of 1 Oct 2026).
 2. The **$100-of-collateral table** it labels — the bitcoin loan row
-   (`$40–60` / `≈9–14% APR`), the mortgage `≈6.6%`, the Reg T margin
-   `≈5–8% (tiered)`, the repo `≈0.5%` haircut, and India's 75% LTV cap.
+   (`$40–60` / `≈9–14% APR`; checked against `/bitcoin-lenders`' data, read
+   30 Sep–1 Oct 2026), the mortgage `≈7.4%` (PMMS 7.40%, 8 Oct 2026; was
+   `≈6.6%` in August), the Reg T margin `≈5–8% (tiered)` (IBKR Pro 4.38–5.38%,
+   Lite 6.38% on 2026-10-14, after the Fed's 16 Sep move to 3.75–4.00%), the
+   repo `≈0.5%` haircut, and India's gold-loan LTV caps, `75–85%` by loan size
+   (RBI Lending Against Gold and Silver Collateral Directions, 2025, in force
+   from 1 April 2026; was "75%").
    The margin band is **best-commonly-available, matching the repo row's basis** — the
    "(tiered)" parenthetical is load-bearing, because small retail balances pay 10–11%
    base under $25K and the band would otherwise read as universal.
@@ -443,7 +451,7 @@ Practice tab quotes the same LTV and rate ranges — if the table moves and the
 series row does not, the page contradicts itself in two tabs. Check both, always.
 
 ```bash
-grep -n "as of August 2026\|as of \[Month\]" src/bitcoin-as-collateral.njk
+grep -n "as of [A-Z][a-z]* 2026\|as of \[Month\]" src/bitcoin-as-collateral.njk
 ```
 
 ## 4. Conditional disclosures and percentile markers
@@ -858,10 +866,11 @@ Each quarter, in The Practice tab:
 And in The Gap tab:
 
 - **Tripwire status lines** — Basel haircut schedule, UCC Art. 12 adoption map,
-  and especially the **CLARITY Act** status (as shipped: passed the House 2025,
-  at the Senate floor as of August 2026; cloture filed 8 Aug 2026, next
-  procedural step 15 Sep 2026). A moved tripwire is the page's headline event,
-  so this line earns a real check rather than a glance.
+  and especially the **CLARITY Act** status (passed the House 2025; cloture
+  filed 8 Aug 2026; on 15 Sep 2026 cloture on the motion to proceed failed
+  49–50 and a motion to reconsider was entered; no new vote as of 2 Oct 2026).
+  A moved tripwire is the page's headline event, so this line earns a real
+  check rather than a glance.
 
 ## 9. Bitcoin & Metcalfe's Law — ETF-era time-sensitive figures (`/bitcoin-and-metcalfes-law.html`)
 
