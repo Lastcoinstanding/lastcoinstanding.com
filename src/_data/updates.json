@@ -1,5 +1,59 @@
 [
   {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/how-much-bitcoin",
+    "summary": "How Much Bitcoin?: the two Power Law presets are now the site's two scenarios for bitcoin's price, side by side, each with its full-Kelly answer: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. The page starts on the lower of the two, so the default reads about 105% of wealth where it read about 124%, and that answer stays on screen beside it. The old Conservative preset is now a stress test, the hostile case (−8% a year at 60% volatility)."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/the-bitcoin-hurdle-rate",
+    "summary": "The Bitcoin Hurdle Rate: the two views are now the site's two scenarios for bitcoin's price: if it stays as far below its trend as it is today (the trend's own growth, the same bar at any price), or if it returns to trend over 3 years (the bar from today's price, read from 3 years). The page starts on the lower of the two and no longer remembers the view you last picked; a link still carries it."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/bitcoin-allocation-sizing",
+    "summary": "Bitcoin Portfolio Allocation: the return to trend now takes 3 years rather than the whole horizon, so a hold shorter than 3 years ends part-way back (2 years: 2.97x rather than 3.52x). The buttons carry the site's scenario names, the line under the verdict gives the other scenario's figure, and the default switches at 1.0× trend (it was 0.98×)."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/borrowing-against-your-stack",
+    "summary": "Borrowing Against Your Stack: Borrow vs. Sell vs. HODL now prices bitcoin on two scenarios, side by side, each with how much cheaper borrowing is than selling: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It used to price every path at the trend, a full return over any horizon. It now starts on the lower of the two, so the 5-year default reads $24,990 cheaper where it read $62,500, with that answer beside it."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/bitcoin-backed-mortgages",
+    "summary": "Bitcoin-Backed Mortgages: the sell path now values the bitcoin sold at what it sells for today, then on one of two scenarios: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. It had priced that bitcoin at the trend from the day it was sold, about 1.9 times its sale price. The page starts on the lower of the two (a $3.41M sell-path cost at 15 years, where it showed $6.47M), with both answers on screen. Also fixed: a line said the price came from the trend; it comes from the latest monthly sample."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/bitcoin-vs-the-stock-market",
+    "summary": "Bitcoin vs. the Stock Market: the two forward bitcoin lines are now the site's two scenarios, both starting at the amount invested: if bitcoin stays as far below its trend as it is today, or if it returns to trend over 3 years. The second line had started at the trend price, about 1.9 times the amount invested before any time passed; its values from year 3 on are unchanged. The note above the chart now updates itself, and the convergence dates in the text are corrected."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/the-rundown",
+    "summary": "The Rundown: the retirement module now gives the stack your target needs on both scenarios for bitcoin's price, if it stays as far below its trend as it is today or returns to trend over 3 years, with the floor as a stress test, and measures your surplus or shortfall against the lower one. It had shown only the first, beside the floor."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/your-deployment-plan",
+    "summary": "Your Bitcoin Deployment Plan: the Projection's range now spans the site's two scenarios for bitcoin's price: it stays as far below its trend as it is today, or it returns to trend over 3 years. The return used to take the whole hold, so the 2-year column now ends part-way back (lump sum up to 3.0× rather than 3.5×); the 8-year figures are unchanged."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/bitcoin-vs-rental-property",
+    "summary": "Bitcoin vs. Rental Property: the entry-timing indicator's bar now runs from the floor (0.42×) through trend at its centre to 3×, so the marker sits under the right label; it had put 1.5× trend under the \"1× Trend\" label."
+  },
+  {
     "display": "10/11/26",
     "date": "2026-10-11",
     "page": "/the-bitcoin-retirement",

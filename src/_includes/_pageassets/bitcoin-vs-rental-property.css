@@ -368,12 +368,14 @@ html, body {
 .eti-bar {
   position: relative;
   height: 12px;
+  /* Zones change at the indicator's thresholds on the bar's scale (see the
+     page script): 1.0x trend sits at 50%, 1.5x at 68.5%. */
   background: linear-gradient(90deg,
     rgba(90,138,58,0.20) 0%,
-    rgba(90,138,58,0.20) 33%,
-    rgba(224,148,34,0.20) 33%,
-    rgba(224,148,34,0.20) 66%,
-    rgba(192,57,43,0.20) 66%,
+    rgba(90,138,58,0.20) 50%,
+    rgba(224,148,34,0.20) 50%,
+    rgba(224,148,34,0.20) 68.5%,
+    rgba(192,57,43,0.20) 68.5%,
     rgba(192,57,43,0.20) 100%);
   border-radius: 6px;
   border: 1px solid var(--border-faint);

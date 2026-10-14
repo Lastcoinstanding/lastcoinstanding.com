@@ -394,8 +394,9 @@ function dlYearTicks(axis){
 
 // ════════════ SCENARIO SLIDER — future rungs, early/late ════════════════
 // The five trend levels still above today's price, with their trend-projected
-// arrival dates. The slider shifts every arrival by the same offset (−730 to
-// +730 days) so the reader can re-date the whole upper ladder on their own
+// arrival dates. The slider shifts every arrival by the same offset (−1,200 to
+// +1,200 days, about 3.3 years either way; this said ±730 until 2026-10-14) so
+// the reader can re-date the whole upper ladder on their own
 // assumption — a scenario to reason from, not a schedule.
 (function(){
   var slider  = document.getElementById('dl-scenario-slider');

@@ -22,7 +22,10 @@
   pc_stress_set ('retirement': the retirement family's one stress test,
   PriceCases.FLOOR_FALL, which falls to the floor over 3 years and stays;
   otherwise the real-estate pair's two, M3's straight lines to the plan's
-  end). The retirement pages set pc_stress_label to "Stress test".
+  end; 'none': no stress row, for Borrowing Against Your Stack and
+  Bitcoin-Backed Mortgages). The retirement pages set pc_stress_label to
+  "Stress test". pc_stress_chips (an array of { key, label }) replaces the
+  row's chips with a page's own (How Much Bitcoin?'s hostile case).
 
   Built on the series strips' pattern: its own scoped <style>, every
   selector prefixed `pc-`, colours as vars with literal fallbacks (host
@@ -97,14 +100,20 @@
     </button>
   </div>
   <p class="pc-foot"><span data-pc="foot"></span> <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a></p>
+  {%- if pc_stress_set != 'none' %}
   <div class="pc-stress">
     <span class="pc-stress-lbl">{{ pcStress }}</span>
-    {%- if pc_stress_set == 'retirement' %}
+    {%- if pc_stress_chips %}
+    {%- for c in pc_stress_chips %}
+    <button type="button" class="pc-opt pc-chip" data-scenario="{{ c.key }}" aria-pressed="false">{{ c.label | safe }}</button>
+    {%- endfor %}
+    {%- elif pc_stress_set == 'retirement' %}
     <button type="button" class="pc-opt pc-chip" data-scenario="floor" aria-pressed="false">Falls to the floor (0.42&times;) and stays</button>
     {%- else %}
     <button type="button" class="pc-opt pc-chip" data-scenario="floor" aria-pressed="false">Drifts to the floor (0.42&times;)</button>
     <button type="button" class="pc-opt pc-chip" data-scenario="upper" aria-pressed="false">Peaks at 2.5&times; trend</button>
     {%- endif %}
   </div>
+  {%- endif %}
   <p class="pc-showing"><span class="pc-showing-lbl" data-pc="showingLbl">Showing</span><span data-pc="showing"></span></p>
 </section>

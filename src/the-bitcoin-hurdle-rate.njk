@@ -25,7 +25,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-hurdle-rate-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-hurdle-rate.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/the-bitcoin-hurdle-rate.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/the-bitcoin-hurdle-rate.js' %}"
 ---
 
 <section class="hero">
@@ -144,11 +144,13 @@ eleventyComputed:
 
     <!-- VIEW TOGGLE (v2) — governs the WHOLE reading (verdict + cards + chart), so it sits ABOVE the answer: the reader meets the control that determines which answer before the answer itself (JM 2026-08-08, correcting the v2 first pass where it was a chart-only control). §6.22 segmented control, not a 2nd §6.17 yin-yang. -->
     <div class="hr-view-wrap">
-      <div class="hr-view-toggle" role="tablist" aria-label="How to read the bar">
-        <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true">From trend <span class="hr-view-knum">(1.0&times;)</span></button>
-        <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false">From today <span class="hr-view-knum">(<span class="hr-view-k">0.43&times;</span>)</span></button>
+      <div class="hr-view-eyebrow">Bitcoin&rsquo;s price &middot; two scenarios to consider</div>
+      <div class="hr-view-toggle hr-view-toggle-main" role="tablist" aria-label="Bitcoin&rsquo;s price: two scenarios to consider">
+        <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true"><span class="hr-view-tag hr-view-tag--cons" data-hr="tag">Conservative</span><span class="hr-view-title" data-hr="title">If bitcoin stays where it is against trend</span></button>
+        <span class="hr-view-or" aria-hidden="true">or</span>
+        <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false"><span class="hr-view-tag hr-view-tag--hist" data-hr="tag">Historical pattern</span><span class="hr-view-title" data-hr="title">If bitcoin returns to trend over 3 years</span></button>
       </div>
-      <p class="hr-view-note">Two readings of the same question, and the verdict, the cards and the chart all switch with your choice &mdash; one calculation at two channel positions, not two calculations. <strong>From trend</strong> is the structural bar at <strong>1.0&times;</strong> trend &mdash; bitcoin&rsquo;s trend growth, matched to your horizon, independent of price today. <strong>From today</strong> reads the bar from where bitcoin actually sits in its Power&nbsp;Law channel now. <span class="help-tip" tabindex="0">?<span class="tip-content">The channel is bitcoin&rsquo;s position relative to its long-run <a href="/the-power-law">Power&nbsp;Law</a> trend. &ldquo;From today&rdquo; reads the bar from that position to trend at your horizon, rather than from the trend line itself &mdash; so it starts at three years, where reversion is a plan rather than a bet on timing. The trend view is the same calculation with the position set to 1.0&times;.</span></span></p>
+      <p class="hr-view-note" id="hrViewNote">Two scenarios for bitcoin&rsquo;s price; the verdict, the cards and the chart follow your pick. Neither is a forecast. <span class="help-tip" tabindex="0">?<span class="tip-content">Both read the bar off bitcoin&rsquo;s long-run <a href="/the-power-law">Power&nbsp;Law</a> trend. If bitcoin keeps today&rsquo;s distance from the trend, it grows at the trend&rsquo;s own rate, so the bar is the trend&rsquo;s growth over your horizon, whatever the price. If it returns to trend, the bar is what bitcoin returns from today&rsquo;s price to trend at your horizon &mdash; read from three years on, where the return is a plan rather than a bet on timing. One calculation at two channel positions: the first is the second with the position set to today&rsquo;s trend.</span></span></p>
     </div>
 
     <div id="hrAnswer" class="hr-answer">
@@ -166,9 +168,9 @@ eleventyComputed:
            second URL param. Top instance is the fork in the road; this is the control you use while
            looking at the curve. -->
       <div class="hr-view-wrap hr-view-wrap-chart">
-        <div class="hr-view-toggle" role="tablist" aria-label="How to read the bar (same control as above the answer)">
-          <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true">From trend <span class="hr-view-knum">(1.0&times;)</span></button>
-          <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false">From today <span class="hr-view-knum">(<span class="hr-view-k">0.43&times;</span>)</span></button>
+        <div class="hr-view-toggle" role="tablist" aria-label="Bitcoin&rsquo;s price (same control as above the answer)">
+          <button type="button" class="hr-view-btn active" data-view="trend" role="tab" aria-selected="true"><span data-hr="name">Stays where it is against trend</span></button>
+          <button type="button" class="hr-view-btn" data-view="position" role="tab" aria-selected="false"><span data-hr="name">Returns to trend over 3 years</span></button>
         </div>
       </div>
 
@@ -210,7 +212,7 @@ eleventyComputed:
 
     <h2 class="hr-h2">Why bitcoin is a candidate benchmark</h2>
     <p class="hr-prose">Under the <a href="/the-power-law">Power Law</a>, bitcoin&rsquo;s trend price scales with time, and its annualised trend growth is high but declining. That trend is a model, not a law: it holds until it doesn&rsquo;t, and every figure on this page inherits its uncertainty in full. What makes it a hurdle rather than a headline is that <strong>the growth rate depends on the horizon</strong>. On a one-year-forward window the trend grows faster; on a thirty-year-forward window it grows much more slowly, because the power law&rsquo;s rate decays with age. Comparing a thirty-year infrastructure decision to a one-year trend rate is the mistake this tool exists to prevent. Every rate the tool shows names the window it was measured over.</p>
-    <p class="hr-prose">The bar also depends on where bitcoin sits relative to trend when the capital is committed. Entering from below trend raises the realised return available; entering from above it lowers it. Switch the chart to <strong>&ldquo;From today&rdquo;</strong> to read the bar from where bitcoin actually is rather than from the trend &mdash; whether that position is a discount or a premium is the subject of <a href="/discount-or-premium">Discount, or Premium?</a>; this view is that reading applied to a capital decision. The floor case on the chart is the conservative version of it &mdash; what the capital returns if bitcoin reaches only its historical floor at the horizon rather than its trend.</p>
+    <p class="hr-prose">The bar also depends on where bitcoin sits relative to trend when the capital is committed. Entering from below trend raises the realised return available; entering from above it lowers it. Pick the scenario where bitcoin <strong>returns to trend over 3 years</strong> to read the bar from where bitcoin actually is rather than from the trend &mdash; whether that position is a discount or a premium is the subject of <a href="/discount-or-premium">Discount, or Premium?</a>; this view is that reading applied to a capital decision. The floor case on the chart is the conservative version of it &mdash; what the capital returns if bitcoin reaches only its historical floor at the horizon rather than its trend.</p>
 
     <h2 class="hr-h2">What this explains</h2>
     <p class="hr-prose">A high hurdle predicts treasury-company behaviour mechanically, with no appeal to anyone&rsquo;s conviction. If bitcoin&rsquo;s trend has grown faster than the return on cash, holding cash rather than bitcoin carries an opportunity cost &mdash; so a treasury holds bitcoin. If the trend has grown faster than the cost of debt, issuing debt to buy more can be accretive &mdash; so treasuries issue debt against the stack. Buybacks against a bitcoin-per-share metric follow from the same gap. An explanation that predicts behaviour is worth more than an argument that praises it.</p>

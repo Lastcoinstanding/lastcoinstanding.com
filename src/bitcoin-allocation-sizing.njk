@@ -23,7 +23,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-allocation-sizing-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-allocation-sizing.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/bitcoin-allocation-sizing.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/bitcoin-allocation-sizing.js' %}"
 ---
 
 <section class="hero">
@@ -67,15 +67,15 @@ eleventyComputed:
           <span class="as-control-val" id="asBtcModeVal">—</span>
         </div>
         <div class="as-seg as-seg-mini as-seg-even" id="asBtcMode">
-          <button type="button" data-val="hold">Today&rsquo;s gap to trend persists<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps its current position relative to the Power Law trend (its multiple of trend on the day you run this) and grows along with the trend from there. Conservative from a discount: it does not assume the gap to trend closes.</span></span></button>
-          <button type="button" data-val="revert">Return to trend<span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin converges back to its full Power Law trend by the end of the hold. The more optimistic reading, since today&rsquo;s price sits below trend.</span></span></button>
+          <button type="button" data-val="hold"><span data-as="name">Stays where it is against trend</span><span class="help-tip" tabindex="0">?<span class="tip-content">Bitcoin keeps today&rsquo;s multiple of its Power Law trend for the whole hold, so it grows at the trend&rsquo;s own rate. Below trend this is the conservative scenario: it does not assume the gap closes. Above trend it assumes the premium lasts, which no stretch above trend on record has done for more than 22 months.</span></span></button>
+          <button type="button" data-val="revert"><span data-as="name">Returns to trend over 3 years</span><span class="help-tip" tabindex="0">?<span class="tip-content">The gap to the Power Law trend closes in a straight line over 3 years, then bitcoin follows its trend. From below trend that adds the catch-up; from above trend it gives the premium back. Every earlier stretch away from trend has ended, which is the pattern this scenario follows; it is not a forecast.</span></span></button>
           <button type="button" data-val="flat">Flat rate<span class="help-tip" tabindex="0">?<span class="tip-content">A simple constant annual growth rate you set yourself, ignoring the Power Law curve. A manual override for a reader with their own expectation.</span></span></button>
         </div>
         <div class="as-flat-wrap" id="asFlatWrap" hidden>
           <input type="range" id="asFlatRate" class="as-range as-range-red" min="0" max="30" step="1" aria-label="Flat bitcoin rate">
           <span class="as-flat-val" id="asFlatRateVal">15%/yr</span>
         </div>
-        <p class="as-control-note">Projected from the Power Law, regime-aware. See <a href="/bull-and-bear-cycles">Bull &amp; Bear Cycles</a>.</p>
+        <p class="as-control-note">Two scenarios from the Power Law; the page starts on the lower of the two for today&rsquo;s price. Neither is a forecast. <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a></p>
       </div>
 
       <div class="as-control">
@@ -302,7 +302,7 @@ eleventyComputed:
           <tbody id="asPathBody"></tbody>
         </table>
       </div>
-      <p class="as-chart-caption">The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from its neighbour: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve. The <strong>return-to-trend</strong> curve is trend-shaped and amortized to close today&rsquo;s gap to trend by the final year &mdash; so you can see how the gap closes, not just that it does. With a crash active, <strong>underwater</strong> means the portfolio total below its level the year the crash lands (before the drop) &mdash; measured on the total, not the bitcoin sleeve. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
+      <p class="as-chart-caption">The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from its neighbour: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve. On the <strong>return-to-trend</strong> scenario the gap to trend closes in a straight line over 3 years and the path follows the trend after that &mdash; so you can see how the gap closes, not just that it does. With a crash active, <strong>underwater</strong> means the portfolio total below its level the year the crash lands (before the drop) &mdash; measured on the total, not the bitcoin sleeve. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
     </div>
   </section>
 

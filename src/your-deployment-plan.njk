@@ -20,7 +20,7 @@ related:
 eleventyComputed:
   head_extras: "{% include '_pageassets/your-deployment-plan-head.html' %}"
   page_styles: "{% include '_pageassets/your-deployment-plan.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/deployment-projection.js' %}\n{% include '_pageassets/your-deployment-plan.js' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/your-deployment-plan.js' %}"
 ---
 
 <section class="hero">
@@ -119,7 +119,7 @@ eleventyComputed:
 
     <!-- PROJECTION: deploy today, range forward under two Power Law paths -->
     <div class="dp-tablewrap dp-proj-only">
-      <p class="dp-table-caption">Deploying <strong>today</strong> and holding N years &mdash; the range each strategy reaches under two Power Law paths (reversion to trend &harr; stay on the current trajectory). Extrapolations of an empirical regularity, <em>never forecasts</em>.</p>
+      <p class="dp-table-caption">Deploying <strong>today</strong> and holding N years &mdash; the range each strategy reaches across bitcoin&rsquo;s two price scenarios: it stays as far from its Power Law trend as it is today, or it returns to trend over 3 years. Extrapolations of an empirical regularity, <em>never forecasts</em>.</p>
       <div class="dp-table-wrap">
         <table class="dp-table dp-grid">
           <thead><tr><th>Strategy</th><th>2&nbsp;yr</th><th>4&nbsp;yr</th><th>6&nbsp;yr</th><th>8&nbsp;yr</th></tr></thead>
@@ -132,7 +132,7 @@ eleventyComputed:
     <!-- Chart: channel orientation + qualifying-entry dots (retro) / forward range (projection) -->
     <div class="dp-chart-block">
       <p class="dp-chart-caption dp-cap-retro">The Power Law channel across history &mdash; floor at the bottom. The <strong>amber dots</strong> are the <span id="dpDotCountTotal">&mdash;</span> historical entries near today&rsquo;s position the tables are built from &mdash; <span id="dpDotCountMature">&mdash;</span> have a full eight-year history; hover a strategy row to light them up.</p>
-      <p class="dp-chart-caption dp-cap-proj">Bitcoin&rsquo;s price forward from today under two Power Law paths &mdash; <strong>reversion to trend</strong> and <strong>staying on the current trajectory</strong> &mdash; as a range. Both are extrapolations of the Power Law, never forecasts.</p>
+      <p class="dp-chart-caption dp-cap-proj">Bitcoin&rsquo;s price forward from today on its two scenarios &mdash; <strong>it returns to trend over 3 years</strong>, or <strong>it stays as far from trend as it is today</strong> &mdash; as a range. Both are extrapolations of the Power Law, never forecasts.</p>
       <div class="dp-chart-wrapper" data-chart-copy data-chart-heading="#dpCalcTitle" data-chart-sub=".dp-chart-block .dp-chart-caption" data-chart-assump="#dpLivePos" data-chart-title="Your deployment plan — the Power Law channel">
         <canvas id="dpChart" aria-label="Bitcoin price over time against the Power Law floor, trend, and upper band, with dots at the historical entries near today's position"></canvas>
       </div>
@@ -217,7 +217,7 @@ eleventyComputed:
       <li><strong>Retrospective table &mdash; &ldquo;held N years&rdquo;:</strong> takes the historical entries whose channel position is within &plusmn;0.07 of today&rsquo;s (a position at/below the floor folds into the floor), <strong>post-2014</strong>, and reports the <em>median</em> multiple of each strategy, each entry valued <em>N years after its own entry date</em>. Each column draws on the entries old enough for that hold, so the long-hold columns rest on fewer, older entries &mdash; the climb left-to-right is the patience lesson. The expandable <em>&ldquo;show all entries&rdquo;</em> view lists every entry behind the medians, with blank cells where an entry is too recent for that hold.</li>
       <li><strong>Two conventions, stated on each table.</strong> The calculator table measures against each entry&rsquo;s <em>own price N years later</em> (captures the cycle peak inside the window); the commitment-backstop table measures against <em>today&rsquo;s</em> price (&ldquo;held to today&rdquo;). They answer different questions and so show different eight-year numbers &mdash; both valid.</li>
       <li><strong>Early-era cut &amp; the 2014 gap:</strong> there <em>were</em> real near-floor entries in 2010&ndash;2013, but the retrospective table sets them aside &mdash; the sub-$15 prices of that era produced returns no buyer today could replicate (the cut removes real entries, it does not claim none existed) &mdash; marked, never silently dropped. <strong>2014 contributes no near-floor matches for a different reason:</strong> price spent that year high in the channel, working down from the 2013 peak (~5.3&times; trend early, still ~1.26&times; by year-end), so it never sat near the floor &mdash; its absence is position, not a cut. That is why the qualifying entries begin in 2015. The today-anchored backstop needs no cut: anchoring exits to today already excludes those ancient cycle-peak exits.</li>
-      <li><strong>Projection</strong> deploys today and extends two Power Law paths &mdash; reversion-to-trend and stay-on-trajectory &mdash; as a range per strategy and hold. Both are extrapolations of an empirical regularity, <em>not forecasts</em>.</li>
+      <li><strong>Projection</strong> deploys today and prices bitcoin on the site&rsquo;s two scenarios, as a range per strategy and hold: it stays at today&rsquo;s multiple of its trend and grows at the trend&rsquo;s rate, or the multiple moves in a straight line to 1.0 over 3 years and then follows the trend, so the 2-year column ends part-way back. Both are extrapolations of an empirical regularity, <em>not forecasts</em>. <em>Changed October 14, 2026:</em> the return used to run over the whole hold, in channel position rather than in the multiple: back at trend in 2 years for the 2-year column, and over all 8 years on the chart.</li>
       <li>Lump deploys the full sum at once; ladder spreads it equally over the chosen duration; hybrid deploys a chosen share now and ladders the rest. Value is BTC accumulated &times; price along the path; multiples are amount-invariant, the dollar figures just scale with the sum.</li>
       <li>Commitment backstop: <strong>today-anchored</strong>. For each hold length N, entries deployed ~N years ago (a ~1.8-year window centred N years before today) are bucketed by channel position and valued at <strong>today&rsquo;s live price &divide; entry price</strong>. Recomputes live as the price moves.</li>
       <li id="dpMethodWindow">Computed live from the current <code>PL_DATA</code> window.</li>

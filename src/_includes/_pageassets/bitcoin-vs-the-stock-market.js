@@ -5,7 +5,8 @@
      §1 Power Law cautionary-tale viz (NEW — Path A step 2)
      §2 Lump-sum calculator at cyclical-top presets
      §3 Weekly DCA calculator
-     §4 Forward projection (Power Law vs comparator CAGRs)
+     §4 Forward projection (bitcoin's two price scenarios vs comparator
+        CAGRs; the scenarios from shared/price-cases.js since 2026-10-14)
 
    §2-4 will be restructured in Path A step 3 — §2 and §3 merge into
    a unified Lump-sum/DCA calculator with a mode toggle. §4 keeps its
@@ -820,6 +821,37 @@
 
   var projChart = null;
 
+  // The dated callout above the projection chart (bug 6, 2026-10-14): it was
+  // hand-typed each month ("As of September 2026 … roughly 47% below … $157K")
+  // and is now written from the same sample and trend the chart uses.
+  // Enumerated by state (STYLE_GUIDE §12), not one sentence with a number in it.
+  function renderGapCallout(m0, trendToday, dateISO) {
+    var lbl = document.getElementById('bvsmGapAsOf'), body = document.getElementById('bvsmGapCallout');
+    if (!lbl || !body) return;
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var d = new Date(dateISO + 'T00:00:00Z');
+    lbl.textContent = 'As of ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+    var gap = Math.round(Math.abs(1 - m0) * 100);
+    var tv = trendToday >= 1e6 ? fmtUsd(trendToday) : '$' + Math.round(trendToday / 1000) + 'K';
+    var r = (1 / m0).toFixed(2) + '×';
+    var floorNow = (typeof PL_FLOOR === 'number' && m0 < PL_FLOOR);
+    var html;
+    if (m0 < 0.95) {
+      html = 'Bitcoin&rsquo;s price sits about ' + gap + '% below its Power Law trend value of about ' + tv +
+        (floorNow ? ', under the Power Law floor (' + PL_FLOOR.toFixed(2) + '&times;)' : '') +
+        '. In the chart below, the dashed line, where bitcoin returns to trend over 3 years, pulls away above the solid line as that gap closes, and from year 3 on it runs at about ' + r +
+        ' the solid line. <em>When bitcoin trades above trend, this relationship inverts</em>: the dashed line falls below the solid one as the premium fades.';
+    } else if (m0 > 1.05) {
+      html = 'Bitcoin&rsquo;s price sits about ' + gap + '% above its Power Law trend value of about ' + tv +
+        '. In the chart below, the dashed line, where bitcoin returns to trend over 3 years, falls away below the solid line as that premium fades, and from year 3 on it runs at about ' + r +
+        ' the solid line. <em>When bitcoin trades below trend, this relationship inverts</em>: the dashed line pulls away above the solid one as the gap closes.';
+    } else {
+      html = 'Bitcoin&rsquo;s price sits within 5% of its Power Law trend value of about ' + tv +
+        ', so the two bitcoin lines in the chart below run close together: from year 3 on, the dashed line, where bitcoin returns to trend, runs at about ' + r + ' the solid one.';
+    }
+    body.innerHTML = html;
+  }
+
   function recomputeProjection() {
     var horizonEl = document.getElementById('bvsmProjHorizon');
     var investEl = document.getElementById('bvsmProjInvest');
@@ -834,24 +866,37 @@
 
     var SP_CAGR = 0.1086, NDQ_CAGR = 0.1626;
 
-    // The §4 chart plots TWO bitcoin lines to capture both the conservative
-    // forward-trend projection AND the current discount/premium to trend:
+    // Bitcoin's two lines are the site's two scenarios for its price
+    // (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14; shared/price-cases.js),
+    // both always drawn, both starting at the amount invested:
     //
-    //   Line 1 — Trend basis: assumes today is fair value, projects Power Law
-    //     forward. Starts at investAmt.
-    //   Line 2 — Current-price basis: anchors to today's market price and
-    //     projects forward at trend. Captures whether today is a discount or
-    //     premium to trend; vertical gap at y=0 is the entry-quality signal.
-    var btcTrendToday = plBtcPrice(daysSinceGenesisFromDate(todayDate));
+    //   stays  (solid; ids ...BtcTrend...) — today's multiple of trend for
+    //     the whole horizon, so the investment grows at the trend's own rate.
+    //     The same line as the old "trend basis".
+    //   trend  (dashed; ids ...BtcMarket...) — the multiple moves in a
+    //     straight line from today's to 1.0 over 3 years, then follows the
+    //     trend. The old "current price" line jumped to trend at year 0 and
+    //     so started at investAmt / m0 (about 1.9x the amount invested at
+    //     0.53x); from year 3 on the two are the same, and the horizon slider
+    //     starts at 5, so every end value shown is unchanged.
+    //
+    // "Today" is the comparators' last date and the PL_DATA sample nearest
+    // it, so the multiple and the dated callout above the chart agree.
+    var PC = window.PriceCases || null;
+    var days0 = daysSinceGenesisFromDate(todayDate);
+    var btcTrendToday = plBtcPrice(days0);
+    var m0 = btcToday / btcTrendToday;
+    function multAt(y) {
+      return PC ? PC.multipleAt('trend', m0, 0, y) : m0 + (1 - m0) * Math.max(0, Math.min(1, y / 3));
+    }
 
     var labels = [];
     var btcTrendData = [], btcMarketData = [], spData = [], ndqData = [];
     for (var y = 0; y <= horizonYears; y++) {
       labels.push('+' + y + 'y');
-      var d = daysSinceGenesisFromDate(todayDate) + y * 365.25;
-      var btcTrendPrice = plBtcPrice(d);
+      var btcTrendPrice = plBtcPrice(days0 + y * 365.25);
       btcTrendData.push(investAmt * (btcTrendPrice / btcTrendToday));
-      btcMarketData.push(investAmt * (btcTrendPrice / btcToday));
+      btcMarketData.push(investAmt * (btcTrendPrice * multAt(y) / btcToday));
       spData.push(investAmt * Math.pow(1 + SP_CAGR, y));
       ndqData.push(investAmt * Math.pow(1 + NDQ_CAGR, y));
     }
@@ -861,12 +906,32 @@
     document.getElementById('bvsmProjSpValue').textContent  = fmtUsd(spData[spData.length - 1]);
     document.getElementById('bvsmProjNdqValue').textContent = fmtUsd(ndqData[ndqData.length - 1]);
 
+    // The words: one source (price-cases.js), with a fallback if it failed to load.
+    var N = PC ? PC.names(m0) : { stay: 'Stays at today’s distance from trend', trend: 'Returns to trend over 3 years' };
+    // Short names (STYLE_GUIDE §10.14) for the legend and the result rows: the
+    // legend sits under the chart-copy button's corner, and "Bitcoin, if it …"
+    // pushed its row's right end under the button at most desktop widths.
+    var lineName = function (k) { return 'Bitcoin: ' + N[k].charAt(0).toLowerCase() + N[k].slice(1); };
+    var plan = { months: horizonYears * 12, phrase: 'all ' + horizonYears + ' years', words: horizonYears + ' years' };
+    var G = PC ? PC.tags(m0, plan.months) : null, NT = PC ? PC.notes(m0, plan) : null;
+    var setTxt = function (sel, txt) { var e = document.querySelector(sel); if (e) e.textContent = txt; };
+    setTxt('[data-bvsm="stayName"]', lineName('stay'));
+    setTxt('[data-bvsm="trendName"]', lineName('trend'));
+    setTxt('[data-bvsm="stayNote"]', (G ? G.stay.text + ' · ' : '') + 'grows at the trend’s own rate');
+    setTxt('[data-bvsm="trendNote"]', (G ? G.trend.text + ' · ' : '') +
+      (m0 < 0.95 ? 'the gap closes over 3 years' : m0 > 1.05 ? 'the premium fades over 3 years' : 'back to trend over 3 years'));
+    if (NT) {
+      setTxt('[data-bvsm="stayTip"]', NT.stay + ' At year zero this line equals the amount invested; at the horizon it equals that amount times the trend’s growth over the period.');
+      setTxt('[data-bvsm="trendTip"]', NT.trend + ' It starts at the amount invested; from year 3 on it equals that amount times the trend’s price at the horizon divided by today’s price.');
+    }
+    renderGapCallout(m0, btcTrendToday, todayISO());
+
     var canvas = document.getElementById('bvsmProjectionChart');
     if (!canvas || typeof Chart === 'undefined') return;
 
     var datasets = [
-      { label: 'Bitcoin (trend basis)',   data: btcTrendData,  borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'Bitcoin (current price)', data: btcMarketData, borderColor: '#e09422', borderWidth: 2.2, borderDash: [6, 4], fill: false, tension: 0.05, pointRadius: 0 },
+      { label: lineName('stay'),  data: btcTrendData,  borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: lineName('trend'), data: btcMarketData, borderColor: '#e09422', borderWidth: 2.2, borderDash: [6, 4], fill: false, tension: 0.05, pointRadius: 0 },
       { label: 'S&P 500 (10.9% CAGR)',    data: spData,        borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
       { label: 'NASDAQ-100 (16.3% CAGR)', data: ndqData,       borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
     ];
@@ -880,7 +945,10 @@
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { position: 'top', labels: { color: '#9a9080', font: { family: 'Inter', size: 11 } } },
+          // Narrower boxes than Chart.js's 40px default (not usePointStyle, which
+          // drops the dashed line's dash: TECH_DEBT §1), so the row, longer
+          // since 2026-10-14, stays clear of the chart-copy button.
+          legend: { position: 'top', labels: { color: '#9a9080', font: { family: 'Inter', size: 11 }, boxWidth: 26, padding: 9 } },
           tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y); } } }
         },
         scales: {
@@ -952,6 +1020,14 @@
     // HTML's default amount value (10000) rather than overwriting it.
     setMode('lump', { skipSliderReset: true });
     recomputeProjection();
+    // Chart.js measures legend text when a chart is built. Built before Inter
+    // lands, the projection legend was laid out with the fallback font and
+    // drawn with Inter, wider; with the two bitcoin lines' longer names
+    // (2026-10-14) the last item no longer fit its row and vanished. Rebuild
+    // once the font is in (STYLE_GUIDE §6.45's re-measure, for a chart).
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('11px "Inter"').then(function () { recomputeProjection(); }, function () {});
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════
