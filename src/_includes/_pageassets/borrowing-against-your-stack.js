@@ -315,7 +315,7 @@
       return { label: 'In upper channel', cls: 'bas-zone-bad',
                hint:  'Routine mean-reversion to trend would liquidate this position.' };
     }
-    return { label: 'Above channel ceiling', cls: 'bas-zone-bad',
+    return { label: 'Above the upper band', cls: 'bas-zone-bad',
              hint:  'Liquidation requires bitcoin to be above 3× trend — very exposed.' };
   }
   // Current-price-relative-to-trend classifier — used by the interpretation
@@ -554,7 +554,7 @@
     } else if (s.oz === 'extreme') {
       checks.push({
         status: 'bad',
-        title: 'Originating near or above the channel ceiling',
+        title: 'Originating near or above the upper band',
         detail: 'High-percentile zone &mdash; both liquidation risk and downside on retained coins are elevated.'
       });
     } // 'mid' produces no check — it's neither notable nor problematic

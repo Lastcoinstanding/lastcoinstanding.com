@@ -236,7 +236,7 @@ eleventyComputed:
   <div class="lsl-method">
     <div class="lsl-method-label">Methodology</div>
     <ul>
-      <li>Channel position is the log-space location between floor and ceiling: <code>(ln(price/trend) &minus; ln 0.42) / (ln 3.0 &minus; ln 0.42)</code> &mdash; 0 at the floor, 1 at the upper band.</li>
+      <li>Channel position is the log-space location between the floor and the upper band: <code>(ln(price/trend) &minus; ln 0.42) / (ln 3.0 &minus; ln 0.42)</code> &mdash; 0 at the floor, 1 at the upper band.</li>
       <li>Backtest: a fixed sum deployed all-at-once vs. laddered equally across the chosen window, comparing BTC accumulated, bucketed by entry channel position. The advantage is amount-invariant.</li>
       <li>Commitment backstop: <strong>today-anchored</strong>. For each hold length N, entries deployed ~N years ago (a ~1.8-year window centred N years before today) are bucketed by channel position and valued at <strong>today&rsquo;s live price &divide; entry price</strong> &mdash; what each entry would be worth now, not its value at some historical cycle peak. Recomputes live as the price moves.</li>
       <li id="lslMethodWindow"></li>

@@ -806,7 +806,7 @@
     var R = S.R, sells = a11.ev.filter(function(e){ return e.t === 'sell'; }), buys = a11.ev.filter(function(e){ return e.t === 'buy'; });
     var cov = a11.cyc.filter(function(c){ return c.covered; }), nc = cov.filter(function(c){ return c.sell; }).length, last = a11.cyc[a11.cyc.length - 1];
     var early = PEAKS.slice(0, PEAKS.length - 1).map(function(p){ return p.m; });
-    $('dr2PanelCaveat').textContent = 'History, not a forecast. These include spikes of ' + Math.floor(Math.min.apply(null, early)) + '–' + Math.round(Math.max.apply(null, early)) + '×, far larger than the latest (' + fxs(LAST_PEAK.m) + '). For smaller future spikes, see Looking ahead below.';
+    $('dr2PanelCaveat').textContent = 'Hypothetical results, not a forecast: what these rules would have done on past prices. Nobody traded them, and trading costs are left out. These include spikes of ' + Math.floor(Math.min.apply(null, early)) + '–' + Math.round(Math.max.apply(null, early)) + '×, far larger than the latest (' + fxs(LAST_PEAK.m) + '). For smaller future spikes, see Looking ahead below.';
     $('dr2RkFire').innerHTML = 'In <b>' + nc + ' of ' + cov.length + '</b> cycles since 2011' + (sells.length > nc ? ' (' + sells.length + ' sales)' : '') + (last.sell ? '' : '; <span class="down">not in ' + last.name + '</span>');
     var lvl = buys.filter(function(b){ return b.why === 'level'; }).length, dl = buys.length - lvl;
     $('dr2RkBuy').innerHTML = sells.length ? '<b>' + lvl + ' of ' + sells.length + '</b> at your level' + (dl ? ', ' + dl + ' by the deadline' : '') + (a11.inCash ? ', <span class="down">1 still in cash</span>' : '') : '—';
