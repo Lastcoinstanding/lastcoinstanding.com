@@ -46,6 +46,21 @@
    AND the H≥3 fence below (clears a). The fence is load-bearing for
    §4.2 compatibility, not editorial — dropping it reopens the §4.2
    rejection (JM, 2026-08-08).
+
+   THE TWO SCENARIOS (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14). The
+   two views ARE the site's two scenarios for bitcoin's price
+   (shared/price-cases.js), relabelled to say so:
+     • view 'trend'    = "If bitcoin stays 47% below trend": today's
+       multiple held, so bitcoin grows at the trend's own rate and the bar
+       is trendCAGR(H), whatever the price.
+     • view 'position' = "If bitcoin returns to trend over 3 years": for
+       H >= 3 (this view's fence) the price is on trend at the horizon,
+       so the bar is posCAGR(H) exactly as before.
+   The default is the lower of the two for today's price (PriceCases.
+   defaultFor): the trend view below trend, the position view above it.
+   A link carries `view` only once the reader picks one, and the view is
+   no longer saved in the browser (R7). Until 2026-10-14 the page always
+   opened on the trend view and remembered the last one picked.
 ============================================================ */
 (function hurdleRate(){
   'use strict';
@@ -68,8 +83,15 @@
     cashflow: 'yes',  // company: 'yes' | 'no'  — gates the verdict (§3.5)
     capsrc: 'savings',// personal: 'savings' | 'sale'
     canWait: 'yes',   // personal: 'yes' | 'limited' | 'no' — gates the verdict
-    view: 'trend'     // 'trend' (default, structural) | 'position' (opt-in, from today's price) — design §4.1
+    view: 'trend'     // 'trend' (stays: the structural bar) | 'position' (returns to trend, from today's price) — design §4.1; the default follows today's price (syncDefault)
   };
+  var PC = window.PriceCases || null;
+  var VIEW_PICKED = false;   // a pick (click or link) holds; until then the default follows the price
+  // The default view is the lower of the two scenarios for today's position.
+  function syncDefault(){
+    if (VIEW_PICKED || !PC) return;
+    S.view = (PC.defaultFor(chanK()) === 'stay') ? 'trend' : 'position';
+  }
 
   var spot = (typeof TODAY_PRICE === 'number' && TODAY_PRICE > 0)
     ? TODAY_PRICE : PL_DATA[PL_DATA.length - 1][1];
@@ -233,8 +255,10 @@
     };
   }
 
-  // View-specific legend labels (the band travels with the view).
-  function upperLabel(){ return isPos() ? 'From the channel (to trend)' : 'Bitcoin’s trend hurdle'; }
+  // View-specific legend labels (the band travels with the view). Since
+  // 2026-10-14 the upper curve names its scenario (PriceCases.names).
+  function scenarioNames(){ return PC ? PC.names(chanK()) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' }; }
+  function upperLabel(){ var N = scenarioNames(); return 'Hurdle if bitcoin ' + (isPos() ? N.trend : N.stay).replace(/^./, function (c){ return c.toLowerCase(); }); }
   function floorLabel(){ return 'Floor case (0.42× trend)'; } // both views (design §13); caption carries the explanation
   function candStart(){ return isPos() ? MIN_POS_H : 1; }
 
@@ -539,11 +563,30 @@
   // rounds to 1.00× the two would read the same, so the position button reads "at trend"
   // instead — factual (spot sits at trend), and it makes the coincidence the point rather
   // than a glitch. Not "median" — the site makes no distributional claim about 1.0×.
+  // Since 2026-10-14 the buttons are the two scenarios: the top toggle shows
+  // each scenario's tag and full title, the chart's duplicate the short
+  // names (PriceCases.titles / names / tags, live from k), and the note under
+  // the top toggle gives the record behind each (PriceCases.notes / foot).
   function updateViewLabels(){
     var k = chanK();
-    var txt = (Math.abs(k - 1) < 0.005) ? 'at trend' : (k.toFixed(2) + '&times;');
     var nodes = document.querySelectorAll('.hr-view-k');
+    var txt = (Math.abs(k - 1) < 0.005) ? 'at trend' : (k.toFixed(2) + '&times;');
     for (var i = 0; i < nodes.length; i++) nodes[i].innerHTML = txt;
+    if (!PC) return;
+    var plan = { months: S.h * 12, phrase: S.h === 1 ? 'the whole year' : 'all ' + S.h + ' years', words: S.h + (S.h === 1 ? ' year' : ' years') };
+    var T = PC.titles(k), N = PC.names(k), G = PC.tags(k, plan.months), NT = PC.notes(k, plan);
+    var map = { trend: 'stay', position: 'trend' };
+    document.querySelectorAll('.hr-view-btn').forEach(function(b){
+      var key = map[b.getAttribute('data-view')]; if (!key) return;
+      var t = b.querySelector('[data-hr="title"]'); if (t) t.textContent = T[key];
+      var n = b.querySelector('[data-hr="name"]'); if (n) n.textContent = N[key];
+      var g = b.querySelector('[data-hr="tag"]');
+      if (g){ g.textContent = G[key].text; g.className = 'hr-view-tag hr-view-tag--' + G[key].cls; }
+    });
+    var note = document.getElementById('hrViewNote');
+    if (note) note.innerHTML = 'The verdict, the cards and the chart follow your pick. <strong>' + T.stay + '</strong>: bitcoin grows at the trend&rsquo;s own rate, so the bar is its trend growth matched to your horizon, the same at any price. ' + NT.stay +
+      ' <strong>' + T.trend + '</strong>: the bar is what bitcoin returns from today&rsquo;s price to trend at your horizon, read from three years on. ' + NT.trend +
+      ' Neither is a forecast. ' + PC.foot(k, plan) + ' <a href="/discount-or-premium#dpDuration">How long returns to trend have taken&nbsp;&rarr;</a>';
   }
 
   // ─────────── VERDICT HEIGHT EQUALISER (chart stays put on view switch) ───────────
@@ -671,6 +714,7 @@
   }
   function setView(v, initial){
     S.view = (v === 'position') ? 'position' : 'trend';
+    if (!initial) VIEW_PICKED = true;
     applyViewUI();
     if (!initial){ render(); scheduleSync(); }
   }
@@ -695,7 +739,9 @@
     if (S.r === 12) p.delete('r'); else p.set('r', String(S.r));
     if (S.h === 10) p.delete('h'); else p.set('h', String(S.h));
     if (S.lens === 'company') p.delete('lens'); else p.set('lens', S.lens);
-    if (S.view === 'trend') p.delete('view'); else p.set('view', S.view);
+    // R7: the view rides in a link only once the reader picked it; otherwise
+    // a viewer gets the default for their own price.
+    if (VIEW_PICKED) p.set('view', S.view); else p.delete('view');
     // ?k= is a review-only debug override; strip it on any sync so it can't leak into a
     // shared URL. The forced position stays active in memory for the reviewer's session.
     p.delete('k');
@@ -704,9 +750,11 @@
   }
   function syncStorage(){
     if (typeof localStorage === 'undefined') return;
+    // The view is not stored (DEFAULTS_POLICY R7, 2026-10-14): each visit
+    // opens on the default for today's price unless a link carries a pick.
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
       r: S.r, h: S.h, lens: S.lens, tax: S.tax, funding: S.funding,
-      cashflow: S.cashflow, capsrc: S.capsrc, canWait: S.canWait, view: S.view
+      cashflow: S.cashflow, capsrc: S.capsrc, canWait: S.canWait
     })); } catch(e){}
   }
   function readStorage(){
@@ -722,14 +770,14 @@
     if (d.cashflow === 'yes' || d.cashflow === 'no') S.cashflow = d.cashflow;
     if (d.capsrc === 'savings' || d.capsrc === 'sale') S.capsrc = d.capsrc;
     if (['yes','limited','no'].indexOf(d.canWait) >= 0) S.canWait = d.canWait;
-    if (d.view === 'position' || d.view === 'trend') S.view = d.view;
+    // d.view, saved before 2026-10-14, is ignored: the view is no longer stored.
   }
   function readUrl(){
     var p = new URLSearchParams(window.location.search);
     if (p.has('r')) S.r = clampR(p.get('r'));
     if (p.has('h')) S.h = clampH(p.get('h'));
     var l = p.get('lens'); if (l === 'personal' || l === 'company') S.lens = l;
-    var v = p.get('view'); if (v === 'position' || v === 'trend') S.view = v;
+    var v = p.get('view'); if (v === 'position' || v === 'trend'){ S.view = v; VIEW_PICKED = true; }
     // Debug override (build §4 / design §5): ?k= forces channel position for the
     // pre-ship neutrality review only. Clamped to a sane band; not persisted, not linked.
     if (p.has('k')){ var kv = parseFloat(p.get('k')); if (isFinite(kv) && kv > 0) kOverride = Math.max(0.05, Math.min(5, kv)); }
@@ -779,6 +827,7 @@
     // reviewer sees the normal rendering at the forced position. The live fetch is
     // skipped below while the override is active, so it can't clobber the forced spot.
     if (kOverride != null){ spot = kOverride * plPrice(tDays()); spotSource = 'live'; }
+    syncDefault();
 
     // input listeners
     if (el.hrReturn) el.hrReturn.addEventListener('input', function(){ setR(el.hrReturn.value, 'slider'); });
@@ -803,7 +852,7 @@
     // ?k= debug override so it can't clobber the forced position.
     if (typeof fetchTodayPrice === 'function' && kOverride == null){
       fetchTodayPrice(function(price, source){
-        if (typeof price === 'number' && price > 0){ spot = price; spotSource = source; render(); }
+        if (typeof price === 'number' && price > 0){ spot = price; spotSource = source; syncDefault(); applyViewUI(); render(); }
       });
     }
 

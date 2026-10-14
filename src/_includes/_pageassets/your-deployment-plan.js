@@ -8,9 +8,19 @@
    future timing page (page 3), reached via the position-aware cross-link.
 
    Reads PL_DATA + PL_* + GENESIS_TS + plPrice + positionLabel + TODAY_DAYS/
-   TODAY_PRICE + fetchTodayPrice from shared/power-law-data.js, and the forward
-   path model from shared/deployment-projection.js (DeploymentProjection).
+   TODAY_PRICE + fetchTodayPrice from shared/power-law-data.js, and bitcoin's
+   price forward from shared/price-cases.js (the site's two scenarios; it needs
+   shared/reversion-durations.js before it).
    Everything is computed live; no live position/price is baked into static copy.
+
+   THE PROJECTION'S TWO PATHS (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14).
+   stays: today's multiple of trend throughout, so bitcoin grows at the trend's
+   own rate. trend: the multiple moves in a straight line from today's to 1.0
+   over 3 years, then follows the trend. Until 2026-10-14 the return was
+   DeploymentProjection.pathPos('revert'): a straight line in log-channel
+   position over the whole hold, so the 2-year column was back at trend in 2
+   years and the chart took all 8. That module has no other consumer, so the
+   page no longer loads it (TECH_DEBT).
 
    Stage 3A changes: removed the "A point in time" anchor toggle + hold-horizon
    slider + the dense prose verdict. Retrospective output is now a 3×4 median
@@ -31,8 +41,6 @@
   var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;
   function posOf(price, days) { return (Math.log(price / plPrice(days)) - LF) / SPAN; }
   function ratioOf(pos) { return Math.exp(pos * SPAN + LF); }
-  var TREND_POS = (DeploymentProjection && DeploymentProjection.TREND_POS != null)
-    ? DeploymentProjection.TREND_POS : (0 - LF) / SPAN;
 
   var N = PL_DATA.length;
   var FIRST_D = PL_DATA[0][0], LAST_D = PL_DATA[N - 1][0];
@@ -45,9 +53,17 @@
   // no cut (the today-anchor already excludes ancient cycle-peak exits).
   var TABLE_CUT = (Date.UTC(2014, 0, 1) / 1000 - GENESIS_TS) / 86400;
 
-  function revertPos(startPos, u) {
-    if (DeploymentProjection && typeof DeploymentProjection.pathPos === 'function') return DeploymentProjection.pathPos('revert', startPos, u);
-    return startPos + (TREND_POS - startPos) * u;
+  // Bitcoin's price d days from today on each scenario (see the header).
+  var PC = window.PriceCases || null;
+  function stayPriceFn(m0) { return function (d) { return plPrice(todayD + d) * m0; }; }
+  function returnPriceFn(m0) {
+    return function (d) {
+      var t = d / YEAR_D;
+      return plPrice(todayD + d) * (PC ? PC.multipleAt('trend', m0, 0, t) : m0 + (1 - m0) * Math.max(0, Math.min(1, t / 3)));
+    };
+  }
+  function scenarioNames(m0) {
+    return PC ? PC.names(m0) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' };
   }
   function realPriceAt(absDay) {
     if (absDay <= PL_DATA[0][0]) return PL_DATA[0][1];
@@ -137,15 +153,14 @@
     });
     return grid;
   }
-  // 3×4 projection grid: deploy TODAY, value N years forward under the two Power Law paths
-  // (reversion-to-trend, stay-on-trajectory) → a low–high range per cell. Extrapolation.
+  // 3×4 projection grid: deploy TODAY, value N years forward on bitcoin's two price
+  // scenarios (stays where it is against trend; returns to trend over 3 years) → a
+  // low–high range per cell. Extrapolation.
   function projGrid() {
-    var pos = livePos(), grid = {};
+    var m0 = ratioOf(livePos()), tj = stayPriceFn(m0), rv = returnPriceFn(m0), grid = {};
     STYLES.forEach(function (s) {
       grid[s] = HOLDS.map(function (h) {
         var span = h * YEAR_D, ev = buyEvents(s);
-        var tj = function (d) { return plPrice(todayD + d) * ratioOf(pos); };
-        var rv = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / span))); };
         var a = btcHeldAt(ev, tj, span) * tj(span) / state.sum, b = btcHeldAt(ev, rv, span) * rv(span) / state.sum;
         return { lo: Math.min(a, b), hi: Math.max(a, b) };
       });
@@ -156,7 +171,7 @@
   // ════════ CHART — channel orientation + qualifying-entry dots ════════
   // Retrospective: floor/trend/upper bands across history + the actual price line, with
   // the qualifying entries pinpointed as dots (brighten on table row-hover). Projection:
-  // forward bands + the reversion/trajectory range from today.
+  // forward bands + the range between the two scenarios from today.
   var chart = null, entryDots = [];
   var dotPlugin = {
     id: 'dpDots',
@@ -185,12 +200,12 @@
   function chartDatasets() {
     entryDots = [];
     if (state.view === 'projective') {
-      var pos = livePos(), span = HOLDS[HOLDS.length - 1] * YEAR_D, ds = bandTriple(todayD, span);
-      var trajPrice = function (d) { return plPrice(todayD + d) * ratioOf(pos); };
-      var revertPrice = function (d) { return plPrice(todayD + d) * ratioOf(revertPos(pos, Math.min(1, d / span))); };
-      var path = function (fn) { var p = [], step = span / 90, d; for (d = 0; d <= span + 1e-6; d += step) p.push({ x: todayD + d, y: fn(d) }); return p; };
-      ds.push({ label: 'Reversion to trend', data: path(revertPrice), borderColor: REVERT_C, backgroundColor: 'rgba(224,148,34,0.10)', borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: '+1', order: 1 });
-      ds.push({ label: 'Stay on current trajectory', data: path(trajPrice), borderColor: TRAJ_C, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 3], pointRadius: 0, tension: 0.2, fill: false, order: 1 });
+      var m0 = ratioOf(livePos()), span = HOLDS[HOLDS.length - 1] * YEAR_D, ds = bandTriple(todayD, span), NM = scenarioNames(m0);
+      var trajPrice = stayPriceFn(m0), revertPrice = returnPriceFn(m0);
+      // 96 steps over the 8-year span: year 3 is step 36, so the return's kink lands on a sample.
+      var path = function (fn) { var p = [], step = span / 96, d; for (d = 0; d <= span + 1e-6; d += step) p.push({ x: todayD + d, y: fn(d) }); return p; };
+      ds.push({ label: NM.trend, data: path(revertPrice), borderColor: REVERT_C, backgroundColor: 'rgba(224,148,34,0.10)', borderWidth: 2.4, pointRadius: 0, tension: 0.2, fill: '+1', order: 1 });
+      ds.push({ label: NM.stay, data: path(trajPrice), borderColor: TRAJ_C, backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 3], pointRadius: 0, tension: 0.2, fill: false, order: 1 });
       return ds;
     }
     // retrospective: bands + price over a window from a bit before the earliest entry to today
@@ -314,7 +329,11 @@
     STYLES.forEach(function (s) { cells[s] = grid[s].map(function (r) { return fmtMult(r.lo) + '–' + fmtMult(r.hi); }); });
     strategyRows('dpProjBody', cells);
     var d = document.getElementById('dpProjDollars');
-    if (d) { var r = projGrid()[state.style][HOLDS.length - 1]; d.innerHTML = fmtUSD(state.sum) + ' deployed today as <strong>' + STYLE_NAME[state.style].toLowerCase() + '</strong> → <strong>' + fmtUSD(r.lo * state.sum) + '–' + fmtUSD(r.hi * state.sum) + '</strong> in ' + HOLDS[HOLDS.length - 1] + ' years. The range spans reversion-to-trend and stay-on-trajectory — extrapolations of the Power Law, never forecasts.'; }
+    if (d) {
+      var r = grid[state.style][HOLDS.length - 1], NM = scenarioNames(ratioOf(livePos()));
+      var lc = function (x) { return x.charAt(0).toLowerCase() + x.slice(1); };
+      d.innerHTML = fmtUSD(state.sum) + ' deployed today as <strong>' + STYLE_NAME[state.style].toLowerCase() + '</strong> → <strong>' + fmtUSD(r.lo * state.sum) + '–' + fmtUSD(r.hi * state.sum) + '</strong> in ' + HOLDS[HOLDS.length - 1] + ' years. The range spans bitcoin’s two price scenarios: it ' + lc(NM.stay) + ', or it ' + lc(NM.trend) + '. Neither is a forecast.';
+    }
   }
   function renderActiveRows() {
     document.querySelectorAll('.dp-strat-row').forEach(function (tr) { tr.classList.toggle('dp-row-sel', tr.getAttribute('data-style') === state.style); });

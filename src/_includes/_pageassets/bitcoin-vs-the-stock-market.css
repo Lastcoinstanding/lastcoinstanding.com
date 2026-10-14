@@ -557,6 +557,11 @@ body {
 }
 @media (max-width: 540px) {
     .bvsm-results-grid.bvsm-results-grid-3 { grid-template-columns: 1fr; }
+    /* Projection rows (2026-10-14): the bitcoin rows' scenario names are
+       longer than "Bitcoin (trend basis)", and in three columns at 375px they
+       wrapped a word to a line. The note drops under the name and value. */
+    .bvsm-proj-row { grid-template-columns: 1fr auto; row-gap: 0.2rem; }
+    .bvsm-proj-note { grid-column: 1 / -1; }
 }
 
 

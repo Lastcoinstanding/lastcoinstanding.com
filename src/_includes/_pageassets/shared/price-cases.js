@@ -141,9 +141,11 @@
   }
 
   // ── The block (components/price-cases.njk) ─────────────────────
-  // o: { mult, selected ('stay'|'trend'|'floor'|'upper'), plan, drives,
+  // o: { mult, selected ('stay'|'trend'|'floor'|'upper'|a page's own stress
+  //      chip|null for custom inputs), plan, drives,
   //      values: { stay: { num, sub }, trend: { num, sub } }, showing (HTML),
-  //      stressWord (optional; "stress test" by default) }
+  //      stressWord (optional; "stress test" by default),
+  //      showingLabel (optional; overrides the Showing label) }
   function q(el, sel) { return el.querySelector(sel); }
   function render(el, o) {
     if (!el) return;
@@ -168,8 +170,12 @@
       c.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     q(el, '[data-pc="foot"]').textContent = foot(m, o.plan);
-    var stress = o.selected === 'floor' || o.selected === 'upper';
-    q(el, '[data-pc="showingLbl"]').textContent = stress ? 'Showing a ' + (o.stressWord || 'stress test') : 'Showing';
+    // Anything picked that is not one of the two scenarios is a stress test
+    // (floor, upper, or a page's own chip, such as How Much Bitcoin?'s
+    // hostile case). Nothing picked (a page's custom inputs) shows neither
+    // half selected; `showingLabel` lets the page name that state.
+    var stress = !!o.selected && o.selected !== 'stay' && o.selected !== 'trend';
+    q(el, '[data-pc="showingLbl"]').textContent = o.showingLabel || (stress ? 'Showing a ' + (o.stressWord || 'stress test') : 'Showing');
     q(el, '[data-pc="showing"]').innerHTML = o.showing || '';
   }
   // ── The compact switch (components/price-cases-switch.njk; PR B) ──

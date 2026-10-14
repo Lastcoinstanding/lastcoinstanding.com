@@ -13,12 +13,18 @@
         the outsized work; it is not a hazard (see The Bitcoin Horizon:
         volatility is not risk).
 
-   Bitcoin growth is projected from the shared Power Law, with a
-   REGIME-AWARE default: below trend, hold today's ratio (grow with the
-   trend from a discount); at/above trend, grow back to trend, not a
-   persistent premium. A flat-rate override is available. The math (risk
-   share, drawdown, upside) is unchanged; only the bitcoin projection and
-   the framing change. Makes no optimal-% recommendation.
+   Bitcoin growth is projected from the shared Power Law as the site's two
+   scenarios (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14; shared/
+   price-cases.js): 'hold' = "If bitcoin stays 47% below trend" (today's
+   multiple, trend-rate growth) and 'revert' = "If bitcoin returns to trend
+   over 3 years" (the multiple moves in a straight line to 1.0x over 36
+   months, then the trend). The default is the lower of the two for
+   today's price (PriceCases.defaultFor: hold below 1.0x, revert at or
+   above; the threshold was 0.98x until 2026-10-14, and the return closed
+   geometrically over the whole hold, which gives the same end point for
+   holds of 3 years or more). A flat-rate override is available. The math
+   (risk share, drawdown, upside) is unchanged. Makes no optimal-%
+   recommendation.
 
    Reads plPrice / TODAY_DAYS / TODAY_PRICE / fetchTodayPrice from
    power-law-data.js. Reference points reproduced: influence/risk share
@@ -44,7 +50,19 @@
   var _priceSource = 'fallback';
   function trendToday() { return plPrice(TODAY_DAYS); }
   function currentRatio() { var t = trendToday(); return t > 0 ? spot / t : 1; }
-  function belowTrend() { return currentRatio() < 0.98; }
+  var PC = window.PriceCases || null;
+  function belowTrend() { return PC ? PC.defaultFor(currentRatio()) === 'stay' : currentRatio() < 1; }
+  // The return-to-trend multiple at t years: a straight line in the multiple
+  // to 1.0x over 3 years, then 1.0x (PriceCases.multipleAt, the site's one path).
+  function revertMultipleAt(t) {
+    var r = currentRatio();
+    return PC ? PC.multipleAt('trend', r, 0, t) : r + (1 - r) * Math.max(0, Math.min(1, t / 3));
+  }
+  // Bitcoin's growth multiple over `years` on the return-to-trend scenario.
+  function revertGrowth(years) {
+    var r = currentRatio();
+    return r > 0 ? trendGrowth(years) * revertMultipleAt(years) / r : trendGrowth(years);
+  }
   function trendGrowth(years) {
     var dEnd = TODAY_DAYS + years * 365.25;
     var t0 = plPrice(TODAY_DAYS);
@@ -76,7 +94,10 @@
   var RECOVERY = window.CrashModel.RECOVERY;
   var crashMultiplier = window.CrashModel.crashMultiplier;
   // Human label for a projection-mode key (CSV + anywhere a readable mode is wanted).
-  function modeLabel(k) { return k === 'hold' ? "Today's gap to trend persists" : (k === 'revert' ? 'Return to trend' : 'Flat rate'); }
+  function modeLabel(k) {
+    var N = PC ? PC.names(currentRatio()) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' };
+    return k === 'hold' ? N.stay : (k === 'revert' ? N.trend : 'Flat rate');
+  }
 
   function regimeMode() { return belowTrend() ? 'hold' : 'revert'; } // the regime-aware default
   function activeMode() { return S.btcMode || regimeMode(); }
@@ -85,9 +106,8 @@
   function btcMult() {
     var H = S.horizonYears, m = activeMode();
     if (m === 'flat') return Math.pow(1 + S.btcFlatPct / 100, H);
-    var g = trendGrowth(H), r = currentRatio();
-    if (m === 'revert') return r > 0 ? g / r : g;  // price returns to trend by horizon end
-    return g;                                        // 'hold': keeps today's ratio, grows with trend
+    if (m === 'revert') return revertGrowth(H);      // back to trend over 3 years, then the trend
+    return trendGrowth(H);                           // 'hold': keeps today's ratio, grows with trend
   }
   function tradMult() { return Math.pow(1 + S.tradRatePct / 100, S.horizonYears); }
 
@@ -120,13 +140,13 @@
   // walked one year at a time. Parity is exact — ride.total[H]/P0 reproduces
   // effects(w).withBtc for every mode (see assertParity / paritySweep).
   //
-  // Return-to-trend path shape: the Retirement engine's revert convention values
-  // its stack at TREND price throughout (terminal factor g), which cannot start
-  // from today's below-trend spot and so would break parity here (this page's
-  // revert multiple is g/r). We use the design-doc fallback — geometric
-  // amortization of the ratio: gBtc(t) = [plPrice(t)/plPrice(t-1)] × (1/r)^(1/H).
-  // That is trend-shaped and closes the gap to trend smoothly by year H, and its
-  // product over the horizon equals g/r exactly.
+  // Return-to-trend path shape (2026-10-14): the site's one return path, the
+  // multiple in a straight line to 1.0x over 3 years, then the trend:
+  //   gBtc(t) = [plPrice(t)/plPrice(t-1)] × m(t)/m(t-1),  m = revertMultipleAt
+  // Its product over the horizon telescopes to trendGrowth(H) × m(H)/r, which is
+  // revertGrowth(H), so the loop and the closed form stay in parity. (Until
+  // 2026-10-14 the ratio was amortized geometrically over the whole hold,
+  // (1/r)^(1/H) a year: the same end point for holds of 3 years or more.)
   function pathModeFor(state) { return state.btcMode || regimeMode(); }
   function computePaths(state) {
     var st = state || S;
@@ -142,7 +162,7 @@
       var pPrev = plPrice(TODAY_DAYS + (t - 1) * 365.25);
       var pCur = plPrice(TODAY_DAYS + t * 365.25);
       var g = pPrev > 0 ? pCur / pPrev : 1;
-      if (mode === 'revert' && r > 0) return g * Math.pow(1 / r, 1 / H);
+      if (mode === 'revert' && r > 0) { var mA = revertMultipleAt(t - 1); return mA > 0 ? g * revertMultipleAt(t) / mA : g; }
       return g; // 'hold'
     }
 
@@ -219,7 +239,7 @@
         btcMode: m, btcFlatPct: S.btcFlatPct, portfolioUSD: null };
       var w = a / 100, mT = Math.pow(1 + tr / 100, H), mB;
       if (m === 'flat') mB = Math.pow(1 + st.btcFlatPct / 100, H);
-      else { var g = trendGrowth(H), rr = currentRatio(); mB = (m === 'revert' && rr > 0) ? g / rr : g; }
+      else mB = (m === 'revert') ? revertGrowth(H) : trendGrowth(H);
       var cf = w * mB + (1 - w) * mT;
       var loop = computePaths(st).ride.total[H] / 100;
       if (cf > 0 && Math.abs(loop - cf) / cf <= 0.005) pass++;
@@ -248,16 +268,25 @@
   function hasUSD() { return S.portfolioUSD != null && isFinite(S.portfolioUSD) && S.portfolioUSD > 0; }
 
   // ════════ REGIME TRANSPARENCY LINE (why the number is what it is) ════════
+  // Since 2026-10-14 it names the scenario showing and gives the other one's
+  // answer for the same position, so both scenarios stay on screen (R1).
   function renderRegime() {
     var el = document.getElementById('asRegime'); if (!el) return;
-    var r = currentRatio(), g = trendGrowth(S.horizonYears), m = activeMode();
-    var line;
+    var r = currentRatio(), H = S.horizonYears, m = activeMode(), w = S.allocPct / 100;
+    var T = PC ? PC.titles(r) : { stay: 'If bitcoin stays where it is against trend', trend: 'If bitcoin returns to trend over 3 years' };
+    function low(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+    function portWith(mB) { return w * mB + (1 - w) * tradMult(); }
+    var line = 'Bitcoin is about <strong>' + ratioX(r) + '</strong> its Power Law trend today. ';
     if (m === 'flat') {
-      line = 'You are overriding the Power Law projection with a flat <strong>' + S.btcFlatPct + '%/yr</strong> (about ' + mult(btcMult()) + ' over ' + S.horizonYears + ' years). For context, bitcoin sits at about <strong>' + ratioX(r) + '</strong> its Power Law trend today.';
-    } else if (belowTrend()) {
-      line = 'Bitcoin is about <strong>' + ratioX(r) + '</strong> its Power Law trend right now, a historical discount, and that is why the expected uplift is this large. The default holds that discount and grows with the trend, about <strong>' + mult(g) + '</strong> over ' + S.horizonYears + ' years; it does not bank on the discount closing (returning to trend would be more). If bitcoin were at or above trend, the default would instead assume growth back to trend, not a lasting premium, and read more modestly.';
+      line = 'You are overriding the Power Law projection with a flat <strong>' + S.btcFlatPct + '%/yr</strong> (about ' + mult(btcMult()) + ' over ' + H + ' years). For context, bitcoin sits at about <strong>' + ratioX(r) + '</strong> its Power Law trend today.';
     } else {
-      line = 'Bitcoin is about <strong>' + ratioX(r) + '</strong> its Power Law trend right now. The default assumes it grows back toward trend from here, about <strong>' + mult(btcMult()) + '</strong> over ' + S.horizonYears + ' years, rather than holding a premium the Power Law says mean-reverts.';
+      var showK = m === 'hold' ? 'stay' : 'trend', otherK = showK === 'stay' ? 'trend' : 'stay';
+      var mShow = btcMult(), mOther = otherK === 'stay' ? trendGrowth(H) : revertGrowth(H);
+      var upOther = tradMult() > 0 ? portWith(mOther) / tradMult() - 1 : 0;
+      line += 'Showing <strong>' + low(T[showK]) + '</strong>: about <strong>' + mult(mShow) + '</strong> over ' + H + (H === 1 ? ' year' : ' years') +
+        (showK === 'stay' ? ', growing with the trend and not counting on the gap closing.' : (H < 3 ? ', part of the way back to trend by the end of the hold.' : ', back on trend after 3 years.')) +
+        ' ' + low(T[otherK]).charAt(0).toUpperCase() + low(T[otherK]).slice(1) + ', it is about <strong>' + mult(mOther) + '</strong>, and the same ' + S.allocPct + '% position adds <strong>' + signedPct(upOther, 1) + '</strong> against none.' +
+        (S.btcMode == null ? ' The page starts on the lower of the two for today&rsquo;s price. Neither is a forecast.' : ' Neither is a forecast.');
     }
     el.innerHTML = line;
   }
@@ -266,7 +295,7 @@
   function upliftAt(w, years) {
     var m = activeMode(), mB, mT = Math.pow(1 + S.tradRatePct / 100, years);
     if (m === 'flat') mB = Math.pow(1 + S.btcFlatPct / 100, years);
-    else { var g = trendGrowth(years), r = currentRatio(); mB = (m === 'revert' && r > 0) ? g / r : g; }
+    else mB = (m === 'revert') ? revertGrowth(years) : trendGrowth(years);
     var wb = w * mB + (1 - w) * mT;
     return mT > 0 ? wb / mT - 1 : 0;
   }
@@ -951,6 +980,9 @@
     var hzV = document.getElementById('asHorizonVal'); if (hzV) hzV.textContent = S.horizonYears + (S.horizonYears === 1 ? ' year' : ' years');
     var trV = document.getElementById('asTradRateVal'); if (trV) trV.textContent = S.tradRatePct + '%/yr → ' + mult(tradMult());
     var bmV = document.getElementById('asBtcModeVal'); if (bmV) bmV.textContent = mult(btcMult()) + ' over ' + S.horizonYears + ' yrs';
+    // The two scenario buttons carry the live names (PriceCases.names).
+    var bmG = document.getElementById('asBtcMode');
+    if (bmG) bmG.querySelectorAll('[data-as="name"]').forEach(function (n) { var b = n.closest('[data-val]'); if (b) n.textContent = modeLabel(b.getAttribute('data-val')); });
     var frWrap = document.getElementById('asFlatWrap'); if (frWrap) frWrap.hidden = (activeMode() !== 'flat');
     var frV = document.getElementById('asFlatRateVal'); if (frV) frV.textContent = S.btcFlatPct + '%/yr';
     var dv = document.getElementById('asDepthVal'); if (dv) dv.innerHTML = '−' + S.crashDepthPct + '%';
@@ -1102,9 +1134,9 @@
       put('tradr', S.tradRatePct, D.tradRatePct);
       put('depth', S.crashDepthPct, D.crashDepthPct);
       if (S.btcMode) p.set('btc', S.btcMode); else p.delete('btc');
-      // `flat` only when the flat sleeve is actually in play AND the reader retuned
-      // its rate. activeMode() can land on 'flat' from the regime alone, and writing
-      // the untouched default there would pin a rate nobody chose.
+      // `flat` only when the reader picked the flat sleeve AND retuned its rate
+      // (the regime default is never 'flat'; an untouched rate is not written,
+      // so a link never pins a rate nobody chose).
       if (activeMode() === 'flat' && S.btcFlatPct !== D.btcFlatPct) p.set('flat', String(S.btcFlatPct)); else p.delete('flat');
       if (hasUSD()) p.set('port', String(Math.round(S.portfolioUSD))); else p.delete('port');
       if (S.strat === 'rebal') p.set('strat', 'rebal'); else p.delete('strat');

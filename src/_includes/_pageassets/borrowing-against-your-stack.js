@@ -112,6 +112,29 @@
   var bvsHodlRows       = document.getElementById('basBvsHodlRows');
   var bvsVerdict        = document.getElementById('basBvsVerdict');
 
+  // ─── Bitcoin's price on the Borrow vs. Sell vs. HODL tab: the two scenarios
+  // (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14; shared/price-cases.js).
+  //   stay   "If bitcoin stays 47% below trend": today's multiple of trend
+  //          at the horizon, so bitcoin grows at the trend's own rate.
+  //   trend  "If bitcoin returns to trend over 3 years": on trend from year 3
+  //          (part-way back for a 1- or 2-year horizon).
+  // Until 2026-10-14 the tab priced every path at the trend at the horizon,
+  // the return over the whole horizon, and called it the central-tendency
+  // expectation. The default is the lower of the two for the price in the
+  // current-price input (an editable price counts, R2), until the reader
+  // picks; `sc` carries a pick in the address bar (R7).
+  var PC = window.PriceCases || null;
+  var pcBas = document.getElementById('pcBas');
+  var BVS_SC = 'stay', BVS_PICKED = false;
+  try {
+    var _sc = new URLSearchParams(window.location.search).get('sc');
+    if (_sc === 'stay' || _sc === 'trend') { BVS_SC = _sc; BVS_PICKED = true; }
+  } catch (e) {}
+  function bvsScenarioMultiple(scenario, m0, years) {
+    if (scenario !== 'trend') return m0;
+    return PC ? PC.multipleAt('trend', m0, 0, years) : m0 + (1 - m0) * Math.max(0, Math.min(1, years / 3));
+  }
+
   // ─── Scenario carry-over from sibling pages ──────────────────────────
   // /the-bitcoin-retirement (the primary calculator) builds links to
   // BAS with the user's scenario serialized as URL query parameters.
@@ -241,6 +264,7 @@
 
   // ─── Formatters ───
   function fmtUsd(n) {
+    if (n === 0) return '$0';   // a zero tax read "$0.0000" until 2026-10-14
     if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
     if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
     if (n >= 1e3) return '$' + Math.round(n).toLocaleString();
@@ -434,11 +458,19 @@
     var taxRate      = parseFloat(capGainsSlider.value) || 0;
     horizonDisplay.textContent  = horizonYears;
     capGainsDisplay.textContent = taxRate;
-    var bvs = computeBorrowVsSell({
-      stack: stack, currentPrice: price, loan: loan, rate: rate,
-      horizonYears: horizonYears, costBasis: costBasis, taxRate: taxRate
+    // Both scenarios are computed every pass: the block shows each one's
+    // answer, and the cards and verdict show the one picked.
+    if (!BVS_PICKED && PC) BVS_SC = PC.defaultFor(currentRatio);
+    var bvsBoth = {};
+    ['stay', 'trend'].forEach(function (sc) {
+      bvsBoth[sc] = computeBorrowVsSell({
+        stack: stack, currentPrice: price, loan: loan, rate: rate,
+        horizonYears: horizonYears, costBasis: costBasis, taxRate: taxRate, scenario: sc
+      });
     });
+    var bvs = bvsBoth[BVS_SC];
     renderBorrowVsSell(bvs, {stack: stack, loan: loan, rate: rate});
+    renderBvsBlock(bvsBoth, currentRatio, horizonYears, price);
 
     renderChart(price, liqPrice);
   }
@@ -666,8 +698,8 @@
   }
 
   // ═══════ BORROW vs. SELL COMPARISON ═══════
-  // Two paths over the chosen horizon, evaluated at the Power Law trend
-  // price at end-of-horizon:
+  // Two paths over the chosen horizon, evaluated at bitcoin's price at the
+  // end of the horizon on the scenario picked (args.scenario, see above):
   //
   // SELL PATH: sell BTC now to net `loan` after capital gains tax. The
   //   remaining BTC compounds with bitcoin's appreciation.
@@ -679,9 +711,9 @@
   //   cost taken from external income, so it reduces terminal USD wealth
   //   but doesn't touch the BTC stack during the horizon.
   //
-  // Future BTC price is the Power Law trend at end-of-horizon — the
-  // central-tendency expectation. NOT a forecast. The page is explicit
-  // about this in the section subtitle.
+  // Future BTC price = the Power Law trend at the horizon × the scenario's
+  // multiple there (today's for 'stay', 1.0 from year 3 for 'trend'). NOT a
+  // forecast; the block above the cards says so and shows both.
   function computeBorrowVsSell(args) {
     var stack         = args.stack;
     var currentPrice  = args.currentPrice;
@@ -691,10 +723,12 @@
     var costBasis     = args.costBasis;
     var taxRate       = args.taxRate / 100;     // % as decimal
 
-    // Future price at end of horizon = Power Law trend
+    // Future price at end of horizon = trend there × the scenario's multiple
     var todayDays  = (Date.now()/1000 - GENESIS_TS) / 86400;
     var futureDays = todayDays + horizonYears * 365.25;
-    var futurePrice = plPrice(futureDays);
+    var trendNow   = plPrice(todayDays);
+    var m0         = trendNow > 0 ? currentPrice / trendNow : 1;
+    var futurePrice = plPrice(futureDays) * bvsScenarioMultiple(args.scenario, m0, horizonYears);
 
     // ─── Sell path ───
     // Net per BTC after tax (when selling now at currentPrice)
@@ -741,6 +775,7 @@
     var sellCostVsHodl   = hodlTerminalWealth - sellTerminalWealth;
 
     return {
+      scenario:              args.scenario === 'trend' ? 'trend' : 'stay',
       futurePrice:           futurePrice,
       horizonYears:          horizonYears,
       loan:                  loan,
@@ -806,7 +841,7 @@
       row('BTC sold'                                + tip('No bitcoin is sold in the HODL path. The stack is preserved intact through the horizon.'),                                                                                                                                            'None') +
       row('Cap gains tax'                           + tip('No taxable event in the HODL path. The cost basis carries forward unchanged.'),                                                                                                                                                       '$0') +
       row('Cumulative interest paid'                + tip('Zero &mdash; no loan is taken in the HODL path.'),                                                                                                                                                                                    '$0') +
-      row('Net wealth at year ' + horizonYears      + tip('Stack at horizon &times; the Power Law trend price at year ' + horizonYears + '. Mathematically the highest of the three paths &mdash; HODL sells nothing and pays nothing, so its terminal wealth is the wealth-maximising baseline.'), fmtUsd(r.hodl.terminalWealth), true);
+      row('Net wealth at year ' + horizonYears      + tip('Stack at horizon &times; bitcoin&rsquo;s price at year ' + horizonYears + ' on the scenario showing (' + fmtUsd(r.futurePrice) + '). Mathematically the highest of the three paths &mdash; HODL sells nothing and pays nothing, so its terminal wealth is the wealth-maximising baseline.'), fmtUsd(r.hodl.terminalWealth), true);
 
     // ─── Borrow path card ───
     // Labels match HODL and Sell row-for-row for visual alignment; the
@@ -815,10 +850,10 @@
     bvsBorrowHeadline.textContent = fmtBtc(r.borrow.btcRetained);
     bvsBorrowRows.innerHTML =
       row('Need funded today'                       + tip('The loan amount, available in cash today. Same dollar figure as the sell path; HODL funds nothing.'),                                                                                                                                  fmtUsd(r.loan)) +
-      row('BTC sold'                                + tip('Sold <strong>at horizon</strong> to repay the loan principal. At year ' + horizonYears + ', the trend price is higher than today, so fewer BTC are needed to repay the same loan amount &mdash; the structural advantage of borrowing.'), fmtBtc(r.borrow.btcSoldAtHorizon)) +
-      row('Cap gains tax'                           + tip('Owed <strong>at horizon</strong> when those BTC are sold. Cost basis is your original purchase price; the gain is the difference between that and the future trend price.'),                                                            fmtUsd(r.borrow.taxPaid)) +
+      row('BTC sold'                                + tip('Sold <strong>at horizon</strong> to repay the loan principal. At year ' + horizonYears + ', bitcoin&rsquo;s price on the scenario showing is higher than today, so fewer BTC are needed to repay the same loan amount &mdash; the structural advantage of borrowing.'), fmtBtc(r.borrow.btcSoldAtHorizon)) +
+      row('Cap gains tax'                           + tip('Owed <strong>at horizon</strong> when those BTC are sold. Cost basis is your original purchase price; the gain is the difference between that and bitcoin&rsquo;s price at year ' + horizonYears + ' on the scenario showing.'),                                                            fmtUsd(r.borrow.taxPaid)) +
       row('Cumulative interest paid'                + tip('Total interest paid over the full horizon &mdash; paid from external income, not from the bitcoin stack. Simple-interest model: loan &times; rate &times; horizon years.'),                                                              fmtUsd(r.borrow.cumulativeInterest)) +
-      row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at the future trend price), minus the cumulative interest paid along the way. Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                        fmtUsd(r.borrow.terminalWealth), true);
+      row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at bitcoin&rsquo;s price at year ' + horizonYears + ' on the scenario showing), minus the cumulative interest paid along the way. Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                        fmtUsd(r.borrow.terminalWealth), true);
 
     // ─── Sell path card ───
     bvsSellHeadline.textContent = fmtBtc(r.sell.btcRetained);
@@ -827,7 +862,7 @@
       row('BTC sold'                                + tip('Sold <strong>now</strong> at today\'s price to net the loan amount after capital gains tax. Higher cost basis or lower tax rate means fewer BTC sold.'),                                                                                  fmtBtc(r.sell.btcSold)) +
       row('Cap gains tax'                           + tip('Owed <strong>now</strong> when the BTC is sold. Will be $0 if your cost basis equals today\'s price (no embedded gain) &mdash; use the cost-basis presets to model typical cycle entry points.'),                                          fmtUsd(r.sell.taxPaid)) +
       row('Cumulative interest paid'                + tip('Zero &mdash; the sell path has no interest cost, because there\'s no loan.'),                                                                                                                                                            '$0') +
-      row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at the future trend price). Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                                                                          fmtUsd(r.sell.terminalWealth), true);
+      row('Net wealth at year ' + horizonYears      + tip('Value of BTC retained at horizon (at bitcoin&rsquo;s price at year ' + horizonYears + ' on the scenario showing). Always less than HODL &mdash; the difference is the wealth cost of funding the need this way.'),                                                                          fmtUsd(r.sell.terminalWealth), true);
 
     // ─── Three-path verdict ───
     // Lead with HODL as the wealth-maximising reference, then compare
@@ -839,7 +874,7 @@
       verdictHtml = '<p><strong>The sell path isn\'t feasible at these inputs.</strong> To net the loan amount after tax, you\'d need to sell more BTC than you have. HODL still preserves the full stack worth ' + fmtUsd(r.hodl.terminalWealth) + ' at year ' + horizonYears + '; borrowing remains an option if the need is real.</p>';
     } else if (!r.borrowPathFeasible) {
       verdictCls = 'bas-calc-bvs-verdict-error';
-      verdictHtml = '<p><strong>The borrow path isn\'t feasible to fully unwind at horizon.</strong> The trend price at year ' + horizonYears + ' isn\'t high enough to repay the loan from a fraction of your stack at the configured tax rate.</p>';
+      verdictHtml = '<p><strong>The borrow path isn\'t feasible to fully unwind at horizon.</strong> Bitcoin\'s price at year ' + horizonYears + ' on this scenario isn\'t high enough to repay the loan from a fraction of your stack at the configured tax rate.</p>';
     } else if (!r.loan || r.loan === 0) {
       verdictCls = '';
       verdictHtml = '<p>Enter a loan amount above to model the cost of funding it three different ways.</p>';
@@ -877,6 +912,41 @@
     bvsVerdict.className = 'bas-calc-bvs-verdict ' + verdictCls;
     bvsVerdict.innerHTML = verdictHtml;
   }
+
+  // ─── The two-scenario block above the cards (components/price-cases.njk) ───
+  // Each half carries that scenario's answer to the page's question: which
+  // active path is cheaper, by how much, at the horizon.
+  function renderBvsBlock(both, m0, horizonYears, price) {
+    if (!pcBas || !PC) return;
+    function half(r) {
+      if (!r.loan) return { num: '&mdash;', sub: 'enter a loan amount to compare' };
+      if (!r.sellPathFeasible) return { num: '&mdash;', sub: 'the sell path isn&rsquo;t feasible at these inputs' };
+      if (!r.borrowPathFeasible) return { num: '&mdash;', sub: 'the borrow path can&rsquo;t be unwound at year ' + horizonYears + ' on this path' };
+      var d = r.borrow.terminalWealth - r.sell.terminalWealth;
+      return { num: fmtUsd(Math.abs(d)),
+               sub: (d >= 0 ? 'cheaper to borrow than to sell' : 'cheaper to sell than to borrow') + ' at year ' + horizonYears +
+                    ' &middot; bitcoin at about ' + fmtUsd(r.futurePrice) };
+    }
+    var plan = { months: horizonYears * 12, phrase: horizonYears === 1 ? 'the whole year' : 'all ' + horizonYears + ' years', words: horizonYears + (horizonYears === 1 ? ' year' : ' years') };
+    var sel = both[BVS_SC], T = PC.titles(m0);
+    PC.render(pcBas, {
+      mult: m0, selected: BVS_SC, plan: plan, drives: 'the three paths and the verdict below',
+      values: { stay: half(both.stay), trend: half(both.trend) },
+      showing: T[BVS_SC] + ': bitcoin goes from ' + fmtUsd(price) + ' today to about <strong>' + fmtUsd(sel.futurePrice) + '</strong> in year ' + horizonYears + ' (prices before inflation).'
+    });
+  }
+  if (pcBas && PC) PC.bind(pcBas, function (k) {
+    if (k !== 'stay' && k !== 'trend') return;
+    BVS_PICKED = true; BVS_SC = k;
+    recompute();
+    // R7: a pick rides in the address bar; the URL-sync IIFE below keeps
+    // unknown keys, so `sc` survives its writes.
+    try {
+      var params = new URLSearchParams(window.location.search);
+      params.set('sc', k);
+      window.history.replaceState(null, '', window.location.pathname + '?' + params.toString() + window.location.hash);
+    } catch (e) {}
+  });
 
   // Helper for building rows in the comparison cards
   function row(label, value, terminal) {

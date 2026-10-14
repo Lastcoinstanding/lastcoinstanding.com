@@ -3,12 +3,21 @@
    All formula outputs computed here; nothing quoted from
    research-corpus arithmetic (SITE_GUIDE verification rule).
 
-   Growth scenarios mirror the canonical BvRP/BFI chips:
-     revert — price closes its gap to the Power Law trend over 10y
-     stay   — price holds today's trend multiple (trend-rate growth)
-   Both embed the trend's DECLINING growth rate, averaged over the
-   next ten years; Kelly needs a single (mu, sigma) and the 10-year
-   trend-implied CAGR is the honest mapping.
+   Bitcoin's price: the site's two scenarios (DEFAULTS_POLICY_2026-10-11,
+   PR C; shared/price-cases.js), plus one stress test:
+     stay    — "If bitcoin stays 47% below trend": today's trend multiple
+               for the whole ten years (trend-rate growth)
+     trend   — "If bitcoin returns to trend over 3 years": the gap closes
+               in a straight line over 3 years, then the trend (at ten
+               years it is on trend, so the ten-year rate is the one the
+               old ten-year reversion gave)
+     hostile — a stress test: mu 10%, sigma 60% (g = -8%)
+   The two scenarios embed the trend's DECLINING growth rate, averaged over
+   the next ten years; Kelly needs a single (mu, sigma) and the 10-year
+   trend-implied CAGR is the honest mapping. The page opens on the lower of
+   the two for today's price (PriceCases.defaultFor) until the reader picks.
+   Until 2026-10-14 it opened on "Revert to Power Law trend (the central
+   case)", a reversion over the full ten years.
 
    Model (continuous-time, two assets):
      mu  = arithmetic drift; g = compound growth; g ≈ mu − ½σ²
@@ -22,6 +31,7 @@
 
     var svg = document.getElementById('curveChart');
     if (!svg || typeof PL_DATA === 'undefined' || typeof plPrice === 'undefined') return;
+    var PC = window.PriceCases || null;
 
     /* ── Realized volatility over the most recent ten years of the canonical series ── */
     function trailingVol() {
@@ -41,27 +51,32 @@
     }
     var VOL = trailingVol();
 
-    /* ── Power Law scenario growth rates (10y forward CAGR) ── */
+    /* ── The two scenarios' growth rates (10y forward CAGR from today's price) ── */
     var SC;
     function scenarioRates() {
         var trendNow = plPrice(TODAY_DAYS), trendThen = plPrice(TODAY_DAYS + H_DAYS);
+        var m = TODAY_PRICE / trendNow;
+        // The return's multiple at ten years: on trend (it got there in three).
+        var mThen = PC ? PC.multipleAt('trend', m, 0, H_YEARS) : 1;
         return {
-            multiple: TODAY_PRICE / trendNow,
+            multiple: m,
             gStay: Math.pow(trendThen / trendNow, 1 / H_YEARS) - 1,
-            gRevert: Math.pow(trendThen / TODAY_PRICE, 1 / H_YEARS) - 1
+            gTrend: Math.pow(trendThen * mThen / TODAY_PRICE, 1 / H_YEARS) - 1
         };
     }
     SC = scenarioRates();
     function PRESETS() {
         return {
-            revert: { g: SC.gRevert, sigma: VOL },
             stay: { g: SC.gStay, sigma: VOL },
-            conservative: { g: 0.10 - 0.5 * 0.36, sigma: 0.60 } // mu = 10% → g = −8%
+            trend: { g: SC.gTrend, sigma: VOL },
+            hostile: { g: 0.10 - 0.5 * 0.36, sigma: 0.60 } // mu = 10% → g = −8%; a stress test
         };
     }
+    function defaultPreset() { return PC ? PC.defaultFor(SC.multiple) : 'stay'; }
+    var PICKED = false;   // a pick holds for the visit; nothing is stored
 
     /* ── State + helpers ── */
-    var state = { g: 0, sigma: VOL, preset: 'revert' };
+    var state = { g: 0, sigma: VOL, preset: 'stay' };
     var sliderG = document.getElementById('sliderG');
     var sliderS = document.getElementById('sliderS');
     var valG = document.getElementById('valG');
@@ -264,30 +279,64 @@
         document.getElementById('roFlags').innerHTML = flags.map(function (f) { return '<div class="ro-flag">' + f + '</div>'; }).join('');
     }
 
-    /* ── Prose (§B), ladder (§F), and chip sub-labels — same engine ── */
+    /* ── Prose (§B), ladder (§F) and the block — same engine ── */
+    function fOf(p) { var m = p.g + 0.5 * p.sigma * p.sigma; return (m - R) / (p.sigma * p.sigma); }
+    function words() {
+        var m = SC.multiple;
+        return { T: PC ? PC.titles(m) : { stay: 'If bitcoin stays where it is against trend', trend: 'If bitcoin returns to trend over 3 years' },
+                 G: PC ? PC.tags(m, H_YEARS * 12) : { stay: { text: 'Conservative' }, trend: { text: 'Historical pattern' } } };
+    }
     function fillStatics() {
-        var P = PRESETS();
-        var fOf = function (p) { var m = p.g + 0.5 * p.sigma * p.sigma; return (m - R) / (p.sigma * p.sigma); };
-        var fRevert = fOf(P.revert), fStay = fOf(P.stay), fCons = fOf(P.conservative);
-
+        var P = PRESETS(), W = words();
+        var fStay = fOf(P.stay), fTrend = fOf(P.trend), fHostile = fOf(P.hostile);
         var set = function (id, txt) { var e = document.getElementById(id); if (e) e.textContent = txt; };
-        set('gRevertTxt', fmtP0(P.revert.g));
         set('gStayTxt', fmtP0(P.stay.g));
+        set('gTrendTxt', fmtP0(P.trend.g));
         set('volTxt', fmtP0(VOL));
         set('multTxt', SC.multiple.toFixed(2));
-        set('sFRevert', fmtP0(fRevert));
         set('sFStay', fmtP0(fStay));
-        set('sFCons', fmtP0(fCons));
-        set('ladderRevert', '~' + fmtP0(fRevert));
-        set('ladderStay', '~' + fmtP0(fStay));
-        set('ladderHalf', '~' + fmtP0(fStay / 2));
-        set('ladderQuart', '~' + fmtP0(fStay / 4));
-        set('subRevert', '\u2248' + fmtP0(P.revert.g) + '/yr \u00B7 vol ' + fmtP0(VOL));
-        set('subStay', '\u2248' + fmtP0(P.stay.g) + '/yr \u00B7 vol ' + fmtP0(VOL));
-        set('subCons', '\u22128%/yr \u00B7 vol 60%');
-        set('ctxMult', SC.multiple.toFixed(2) + '\u00D7');
-        var pe = document.getElementById('ctxPrice');
-        if (pe) pe.textContent = '$' + Math.round(TODAY_PRICE).toLocaleString('en-US');
+        set('sFTrend', fmtP0(fTrend));
+        set('sFHostile', fmtP0(fHostile));
+        set('ttlStay', W.T.stay);
+        set('ttlTrend', W.T.trend);
+        set('tagStay', W.G.stay.text);
+        set('tagTrend', W.G.trend.text);
+        // The ladder descends: the higher scenario's full Kelly first; half and
+        // quarter Kelly on the lower one, the page's default.
+        var hiK = fTrend >= fStay ? 'trend' : 'stay', loK = hiK === 'trend' ? 'stay' : 'trend';
+        var fHi = hiK === 'trend' ? fTrend : fStay, fLo = hiK === 'trend' ? fStay : fTrend;
+        var low = W.T[loK].charAt(0).toLowerCase() + W.T[loK].slice(1);
+        set('ladderHiLbl', 'Full Kelly, ' + W.T[hiK].charAt(0).toLowerCase() + W.T[hiK].slice(1) + ' (live)');
+        set('ladderLoLbl', 'Full Kelly, ' + low + ' (live)');
+        set('ladderHalfLbl', 'Half-Kelly, ' + low + ' (live)');
+        set('ladderQuartLbl', 'Quarter-Kelly, ' + low + ' (live)');
+        set('ladderHi', '~' + fmtP0(fHi));
+        set('ladderLo', '~' + fmtP0(fLo));
+        set('ladderHalf', '~' + fmtP0(fLo / 2));
+        set('ladderQuart', '~' + fmtP0(fLo / 4));
+    }
+
+    /* ── Bitcoin's price: the two-scenario block (components/price-cases.njk) ── */
+    var BLOCK = document.getElementById('pcHmb');
+    function renderBlock() {
+        if (!BLOCK || !PC) return;
+        var P = PRESETS(), m = SC.multiple, W = words();
+        var plan = { months: H_YEARS * 12, phrase: 'all ' + H_YEARS + ' years', words: H_YEARS + ' years' };
+        function half(k) {
+            return { num: fmtP0(fOf(P[k])), sub: 'of wealth at full Kelly &middot; about ' + fmtP0(P[k].g) + ' a year averaged over ' + H_YEARS + ' years, at ' + fmtP0(VOL) + ' volatility' };
+        }
+        var sel = state.preset, showing;
+        if (sel === 'stay' || sel === 'trend') {
+            showing = W.T[sel] + ': bitcoin grows about <strong>' + fmtP0(P[sel].g) + ' a year</strong> averaged over the next ten years' +
+                (sel === 'stay' ? ', the trend&rsquo;s own rate' : ', the return included') + ', against realized trailing volatility of ' + fmtP0(VOL) + '.';
+        } else if (sel === 'hostile') {
+            showing = 'The hostile case: a 10% expected return against 60% volatility, so bitcoin held alone would lose about 8% a year in compound terms. Not a Power Law path.';
+        } else {
+            showing = 'Your own assumptions: ' + Math.round(state.g * 100) + '% a year compound growth at ' + Math.round(state.sigma * 100) + '% volatility. Pick a scenario above to return to it.';
+        }
+        PC.render(BLOCK, { mult: m, selected: sel, plan: plan, drives: 'the curve and the readout',
+            values: { stay: half('stay'), trend: half('trend') }, showing: showing,
+            showingLabel: sel ? null : 'Showing' });
     }
 
     /* ── Controls ── */
@@ -299,38 +348,40 @@
     }
     function setPreset(name) {
         var P = PRESETS();
+        if (!P[name]) return;
         state.preset = name;
         state.g = P[name].g;
         state.sigma = P[name].sigma;
-        document.querySelectorAll('.kpreset-btn').forEach(function (b) {
-            b.classList.toggle('active', b.dataset.preset === name);
-        });
         syncSliders();
+        renderBlock();
         render();
     }
-    document.querySelectorAll('.kpreset-btn').forEach(function (b) {
-        b.addEventListener('click', function () { setPreset(b.dataset.preset); });
-    });
+    if (BLOCK && PC) PC.bind(BLOCK, function (k) { PICKED = true; setPreset(k); });
     function onSlide() {
         state.g = parseInt(sliderG.value, 10) / 100;
         state.sigma = parseInt(sliderS.value, 10) / 100;
         state.preset = null;
-        document.querySelectorAll('.kpreset-btn').forEach(function (b) { b.classList.remove('active'); });
+        PICKED = true;
         valG.textContent = sliderG.value + '% / yr';
         valS.textContent = sliderS.value + '%';
+        renderBlock();
         render();
     }
     sliderG.addEventListener('input', onSlide);
     sliderS.addEventListener('input', onSlide);
 
-    /* ── Boot: series price first, then refine via the shared live fetch ── */
+    /* ── Boot: series price first, then refine via the shared live fetch.
+          Until the reader picks, the page follows the default for the
+          price it has (the lower scenario). ── */
     fillStatics();
-    setPreset('revert');
+    setPreset(defaultPreset());
     if (typeof fetchTodayPrice === 'function') {
         fetchTodayPrice(function () {
             SC = scenarioRates();
             fillStatics();
-            if (state.preset) { setPreset(state.preset); } else { render(); }
+            if (!PICKED) { setPreset(defaultPreset()); }
+            else if (state.preset) { setPreset(state.preset); }
+            else { renderBlock(); render(); }
         });
     }
 })();

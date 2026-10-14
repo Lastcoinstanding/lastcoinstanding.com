@@ -11,7 +11,7 @@
        (standard 30-yr rate + premium); the premium applies to the
        full borrowed amount per the published product structure,
        not only to the second-lien. The borrower keeps the full BTC
-       stack — it appreciates per Power Law.
+       stack — it appreciates at P(t), below.
      - Cost-of-pledge delta vs the sell baseline:
          (down_payment × rate + home_price × premium) × horizon
        — simple-interest approximation, matching the parent BvS
@@ -27,7 +27,7 @@
        collateral funds the rest of the home (or refinances the
        primary at the standard rate); calc treats the cost as
        'paused' from year R onward.
-     - At horizon: wealth = stack × P_powerLaw(t) − cost(min(t, R))
+     - At horizon: wealth = stack × P(t) − cost(min(t, R))
 
    SELL:
      - Sell enough BTC at today's price to net the down payment
@@ -35,17 +35,27 @@
        the rest at the standard rate (no premium).
      - BTC stack reduced by btcSold; no premium interest cost; cap
        gains paid upfront.
-     - At horizon: wealth = (stack − btcSold) × P_powerLaw(t)
+     - At horizon: wealth = (stack − btcSold) × P(t)
 
    HOLD (0% borrowing baseline):
      - Don't buy the house at all. Keep the full stack untouched.
-     - At horizon: wealth = stack × P_powerLaw(t)
+     - At horizon: wealth = stack × P(t)
+
      - This is the 'genuinely conservative baseline' per
        RETIREMENT_CALCULATOR_DESIGN §4.2 — the reference against
        which both Pledge and Sell represent decisions to commit
        BTC to a home purchase. Both Pledge and Sell carry a cost
        relative to this baseline; the calc surfaces that cost as
        the gap between the lines on the chart.
+
+   P(t), bitcoin's price t years out, is one of the site's two scenarios
+   (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14; shared/price-cases.js):
+   the trend at t times today's multiple ('stay', the default below trend)
+   or times a multiple that returns to 1.0 in a straight line over 3 years
+   ('trend'). Both start at the current-price input, so year 0 is the price
+   the bitcoin is sold at. Until 2026-10-14 P(t) was the trend itself from
+   year 0, which at October 2026's multiple (about 0.52×) valued the
+   bitcoin sold at about 1.9× its sale price the moment it was sold.
 
    Tactical / strategic preset toggle scopes the horizon to either
    5y (tactical — short-term cash-flow framing) or 30y (strategic —
@@ -75,6 +85,17 @@
   function plPriceAtYear(year){
     // Power Law price at (today + year × 365.25 days)
     return plPrice(daysSinceGenesisNow() + year * 365.25);
+  }
+
+  // ─── Bitcoin's price on the two scenarios (see the header) ───
+  var PC = window.PriceCases || null;
+  var pcBbm = document.getElementById('pcBbm');
+  var BBM_SC = 'stay', BBM_PICKED = false;   // a pick holds for the visit
+  function scenarioPriceAtYear(sc, m0, year){
+    var m = (sc === 'trend')
+      ? (PC ? PC.multipleAt('trend', m0, 0, year) : m0 + (1 - m0) * Math.max(0, Math.min(1, year / 3)))
+      : m0;
+    return plPriceAtYear(year) * m;
   }
 
   // ─── Formatting helpers ───
@@ -240,8 +261,10 @@
     var btcSold       = netPerBtc > 0 ? (downPayment / netPerBtc) : 0;
     var sellTaxPaid   = btcSold * taxPerBtc;
 
-    // ─── Future price (at horizon) per Power Law trend ───
-    var futurePrice   = plPriceAtYear(horizon);
+    // ─── Bitcoin's price path: the scenario picked, or the default for the
+    //     current-price input (the lower of the two) ───
+    var m0 = price / plPriceAtYear(0);
+    if (!BBM_PICKED && PC) BBM_SC = PC.defaultFor(m0);
 
     // ─── Pledge-path extra interest cost over t years ───
     // Same model as v9. The differential between pledge and sell paths in
@@ -256,42 +279,46 @@
       return downPayment * mortRate * capped + homePrice * premium * capped;
     }
 
-    // ─── Sell-path opportunity cost over t years ───
+    // ─── Sell-path opportunity cost over t years, on a scenario ───
     // The future value of the BTC consumed by the sell path. btcSold
     // INCLUDES the BTC needed to net the down-payment after cap-gains tax,
     // so btcSold × P(t) captures both the down-payment-equivalent value
     // and the tax-leakage value at future prices.
-    function sellCostAtYear(t){
-      return btcSold * plPriceAtYear(t);
-    }
-
-    // ─── Year-by-year cost trajectories (for chart + crossover detection) ───
-    var years = [];
-    var pledgeSeries = [];
-    var sellSeries = [];
-    var crossoverYear = null;
-    var prevDelta = pledgeCostAtYear(0) - sellCostAtYear(0);
-    for(var t = 0; t <= horizon; t++){
-      var pCost = pledgeCostAtYear(t);
-      var sCost = sellCostAtYear(t);
-      years.push(t);
-      pledgeSeries.push(pCost);
-      sellSeries.push(sCost);
-      var delta = pCost - sCost;
-      if(t > 0 && Math.sign(delta) !== Math.sign(prevDelta) && Math.sign(prevDelta) !== 0){
-        var prevP = pledgeSeries[t-1];
-        var prevS = sellSeries[t-1];
-        var prevDeltaR = prevP - prevS;
-        var dDelta = delta - prevDeltaR;
-        if(dDelta !== 0){
-          crossoverYear = (t - 1) + Math.abs(prevDeltaR / dDelta);
+    // Year-by-year cost trajectories (for chart + crossover detection) for
+    // one scenario; both are computed so the block can show each answer.
+    function pathFor(sc){
+      var sellCostAtYear = function(t){ return btcSold * scenarioPriceAtYear(sc, m0, t); };
+      var years = [], pledgeSeries = [], sellSeries = [], crossoverYear = null;
+      var prevDelta = pledgeCostAtYear(0) - sellCostAtYear(0);
+      for(var t = 0; t <= horizon; t++){
+        var pCost = pledgeCostAtYear(t);
+        var sCost = sellCostAtYear(t);
+        years.push(t);
+        pledgeSeries.push(pCost);
+        sellSeries.push(sCost);
+        var delta = pCost - sCost;
+        if(t > 0 && Math.sign(delta) !== Math.sign(prevDelta) && Math.sign(prevDelta) !== 0){
+          var prevP = pledgeSeries[t-1];
+          var prevS = sellSeries[t-1];
+          var prevDeltaR = prevP - prevS;
+          var dDelta = delta - prevDeltaR;
+          if(dDelta !== 0){
+            crossoverYear = (t - 1) + Math.abs(prevDeltaR / dDelta);
+          }
         }
+        prevDelta = delta;
       }
-      prevDelta = delta;
+      return { years: years, pledgeSeries: pledgeSeries, sellSeries: sellSeries, crossoverYear: crossoverYear,
+               pledgeTerminalCost: pledgeCostAtYear(horizon), sellTerminalCost: sellCostAtYear(horizon),
+               futurePrice: scenarioPriceAtYear(sc, m0, horizon) };
     }
-
-    var pledgeTerminalCost = pledgeCostAtYear(horizon);
-    var sellTerminalCost   = sellCostAtYear(horizon);
+    var paths = { stay: pathFor('stay'), trend: pathFor('trend') };
+    var P_ = paths[BBM_SC];
+    var years = P_.years, pledgeSeries = P_.pledgeSeries, sellSeries = P_.sellSeries, crossoverYear = P_.crossoverYear;
+    var pledgeTerminalCost = P_.pledgeTerminalCost;
+    var sellTerminalCost   = P_.sellTerminalCost;
+    var futurePrice        = P_.futurePrice;
+    renderBlock(paths, m0, horizon, price);
 
     // ─── Render Pledge card (cost-of-path framing) ───
     pledgeHeadline.textContent = fmtUsd(pledgeTerminalCost);
@@ -319,7 +346,7 @@
       row('BTC sold to fund (incl. tax leakage)',                                fmtBtc(btcSold)) +
       row('Cap-gains tax paid now',                                              fmtUsd(sellTaxPaid)) +
       row('Cumulative interest premium',                                          '$0') +
-      row('BTC trend price @ year ' + horizon,                                    fmtUsd(futurePrice) + '/BTC') +
+      row('BTC price @ year ' + horizon,                                          fmtUsd(futurePrice) + '/BTC') +
       row('Forgone BTC value @ year ' + horizon,                                  fmtUsd(sellTerminalCost), true);
 
     // ─── Verdict (which path is cheaper at horizon) ───
@@ -342,10 +369,36 @@
     verdict.innerHTML =
       '<p>At year <strong>' + horizon + '</strong>, the <strong class="' + winnerCls + '">' + winnerLabel + '</strong> path is cheaper by ' +
       '<strong class="' + winnerCls + '">' + fmtUsd(costDelta) + '</strong> than the ' + loserLabel + ' path. ' +
-      'BTC trend price at year ' + horizon + ': <strong>' + fmtUsd(futurePrice) + '/BTC</strong>.' + crossoverStr + '</p>';
+      'Bitcoin&rsquo;s price at year ' + horizon + ' on this scenario: <strong>' + fmtUsd(futurePrice) + '/BTC</strong>.' + crossoverStr + '</p>';
 
     // ─── Render the chart (two cost lines + crossover marker) ───
     renderChart(years, pledgeSeries, sellSeries, crossoverYear);
+  }
+
+  // ─── The two-scenario block above the result cards ───
+  // Each half carries that scenario's answer: which path is cheaper at the
+  // horizon, and by how much.
+  function renderBlock(paths, m0, horizon, price){
+    if(!pcBbm || !PC) return;
+    function half(p){
+      var d = p.sellTerminalCost - p.pledgeTerminalCost;
+      return { num: fmtUsd(Math.abs(d)),
+               sub: (d >= 0 ? 'cheaper to pledge than to sell' : 'cheaper to sell than to pledge') + ' at year ' + horizon +
+                    ' &middot; bitcoin at about ' + fmtUsd(p.futurePrice) };
+    }
+    var plan = { months: horizon * 12, phrase: horizon === 1 ? 'the whole year' : 'all ' + horizon + ' years', words: horizon + (horizon === 1 ? ' year' : ' years') };
+    var T = PC.titles(m0);
+    PC.render(pcBbm, {
+      mult: m0, selected: BBM_SC, plan: plan, drives: 'the two paths, the verdict and the chart',
+      values: { stay: half(paths.stay), trend: half(paths.trend) },
+      showing: T[BBM_SC] + ': bitcoin goes from ' + fmtUsd(price) + ' today to about <strong>' + fmtUsd(paths[BBM_SC].futurePrice) + '</strong> in year ' + horizon + ' (prices before inflation).'
+    });
+  }
+  if(pcBbm && PC){
+    PC.bind(pcBbm, function(k){
+      if(k !== 'stay' && k !== 'trend') return;
+      BBM_PICKED = true; BBM_SC = k; compute();
+    });
   }
 
   function row(label, value, terminal){
@@ -360,7 +413,7 @@
     // Commit 2 simplification: chart now shows two cost lines instead of
     // wealth trajectories. Pledge cost is cumulative extra interest
     // (linear, plateaus at repayYear); Sell cost is forgone BTC value
-    // priced at the Power Law trend (exponential). The Hold baseline
+    // priced on the scenario showing (exponential). The Hold baseline
     // (previously a dashed reference) no longer applies — there's no
     // "no purchase" alternative being modelled in cost terms.
     var datasets = [
@@ -376,7 +429,7 @@
         fill: false,
       },
       {
-        label: 'Sell: forgone BTC value (PL trend)',
+        label: 'Sell: forgone BTC value',
         data: sellSeries,
         borderColor: '#8aa3b5',
         backgroundColor: 'rgba(122,149,168,0.10)',

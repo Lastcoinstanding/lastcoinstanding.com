@@ -10,8 +10,13 @@
 //     shared/power-law-data.js (PL_DATA, TODAY_PRICE, fetchTodayPrice).
 //
 //     The indicator is conservative on thresholds: Favorable ≤ 1.0× trend,
-//     Neutral 1.0×–1.5×, Elevated > 1.5×. Bar scale runs 0×–3× (the upper
-//     band) so the marker has visual room across the full channel.
+//     Neutral 1.0×–1.5×, Elevated > 1.5×. The bar runs from the floor (0.42×)
+//     at the left edge through trend (1×) at the centre to the 3× upper band
+//     at the right, log-spaced within each half, so its three labels sit where
+//     the marker means them and its colour zones change at the thresholds.
+//     Until 2026-10-14 it ran linearly from 0× to 3× under evenly spaced
+//     labels, which put the marker for 1.5× under "1× Trend" and labelled the
+//     left edge "0× Floor" (DEFAULTS_POLICY bug 10, "check above trend").
 //
 //     First-paint uses the seeded TODAY_PRICE (current as of the monthly
 //     data refresh); fetchTodayPrice replaces it with the live spot when a
@@ -51,9 +56,14 @@
     var multiple = livePrice / trendPrice;
     var cat = categorize(multiple);
 
-    // Bar scale: 0× to 3× trend (the upper band). Clamp marker to [2, 98]
-    // so it never sits flush against the edges of the gradient bar.
-    var pct = Math.min(98, Math.max(2, (multiple / 3.0) * 100));
+    // Bar scale (see the header): floor → trend is the left half, trend → 3×
+    // the right, each log-spaced. Clamp the marker to [2, 98] so it never sits
+    // flush against the edges of the gradient bar.
+    var FL = (typeof PL_FLOOR === 'number') ? PL_FLOOR : 0.42, CE = (typeof PL_CEIL === 'number') ? PL_CEIL : 3.0;
+    var scaled = multiple <= 1
+      ? Math.log(Math.max(multiple, FL) / FL) / Math.log(1 / FL) * 50
+      : 50 + Math.log(Math.min(multiple, CE)) / Math.log(CE) * 50;
+    var pct = Math.min(98, Math.max(2, scaled));
 
     // Multiple value
     var mEl = card.querySelector('.eti-multiple-value');

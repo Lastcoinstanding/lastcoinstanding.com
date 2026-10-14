@@ -20,7 +20,8 @@
                                      (what Wait-or-Deploy and How Much Cash publish)
      shared/ladder-advantage.js      bucketAt — D2   (what Lump Sum or Ladder In publishes)
      shared/reversion-durations.js   scan — R2       (what Discount, or Premium? publishes)
-     shared/retirement-engine.js     lineFor — P1    (what Escape Velocity publishes)
+     shared/retirement-engine.js     lineFor — P1    (what Escape Velocity publishes;
+                                     the two scenarios and the floor stress test)
      shared/modeling-assumptions.js  the site-wide inflation / growth-model store
 
    ── THE ONE RULE THAT IS EASIEST TO BREAK ──
@@ -1243,39 +1244,69 @@
     if (!ln || ln.value == null) return null;
     return ln.value;
   }
+  // The two scenarios and the stress test (DEFAULTS_POLICY_2026-10-11, PR C,
+  // 2026-10-14). Until then P1 printed "if today's gap persists" beside "if
+  // price tracks the floor", with no return to trend at all. Now it prints
+  // each scenario's stack with the floor as a stress test, leads with the
+  // lower of the two (PriceCases.defaultFor: stays below trend, returns at or
+  // above it), and measures the reader's surplus against that one. The words
+  // come from shared/price-cases.js; the solver is Escape Velocity's.
   function renderP1() {
     var scn = scenario();
-    var here = fmtLine(RE.lineFor('stack', scn, 'current'));
+    var PC = window.PriceCases || null;
+    var m = RE.currentRatio();
+    var need = {
+      stay: fmtLine(RE.lineFor('stack', scn, 'current')),
+      trend: fmtLine(RE.lineFor('stack', scn, 'trend'))
+    };
     var floor = fmtLine(RE.lineFor('stack', scn, 'trend', null, 'powerlaw-floor'));
 
-    if (here == null) {
+    if (need.stay == null && need.trend == null) {
       setHTML('rdP1Verdict', 'No stack inside the engine’s range covers that plan from here. Bitcoin Escape Velocity shows where the limit sits.');
       setHTML('rdP1Cards', ''); setHTML('rdP1Viz', ''); return;
     }
+    var planYears = Math.max(0, st.retirementYear - (new Date()).getFullYear()) + YEARS_IN_RETIREMENT;
+    var plan = { months: planYears * 12, phrase: 'all ' + planYears + ' years of the plan', words: planYears + ' years' };
+    var T = PC ? PC.titles(m) : { stay: 'If bitcoin stays where it is against trend', trend: 'If bitcoin returns to trend over 3 years' };
+    var N = PC ? PC.names(m) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' };
+    var G = PC ? PC.tags(m, plan.months) : { stay: { text: '' }, trend: { text: '' } };
+    var NT = PC ? PC.notes(m, plan) : { stay: '', trend: '' };
+    var FF = PC ? PC.FLOOR_FALL : { chip: 'Falls to the floor (0.42×) and stays', name: 'Falls to the floor and stays' };
+    var lead = PC ? PC.defaultFor(m) : 'stay', other = lead === 'stay' ? 'trend' : 'stay';
+    function cond(k, it) { var t = T[k].charAt(0).toLowerCase() + T[k].slice(1); return it ? t.replace(/^if bitcoin /, 'if it ') : t; }
+    function needs(v) { return v == null ? 'more than the engine’s range holds' : 'about <strong>' + btc(v) + ' BTC</strong>'; }
+
     setHTML('rdP1Verdict',
       'Retiring in <strong>' + st.retirementYear + '</strong> on <strong>' + fmtUSDshort(st.targetIncomeUSD) +
-      '</strong> a year needs about <strong>' + btc(here) + ' BTC</strong> if today’s gap to trend persists. That is the model’s arithmetic, not a forecast.');
+      '</strong> a year needs ' + needs(need[lead]) + ' ' + cond(lead) + ', or ' + needs(need[other]) + ' ' + cond(other, true) +
+      '. That is the model’s arithmetic, not a forecast.');
 
+    function val(v) { return v == null ? '—' : btc(v) + ' BTC'; }
     var cs = [
-      { k: 'If today’s gap persists' + tip('Prices projected forward at the trend&rsquo;s own growth rate, but starting from today&rsquo;s actual price rather than today&rsquo;s trend price &mdash; so the gap between the two never closes.'), v: btc(here) + ' BTC', sub: 'read from today’s price' },
-      { k: 'If price tracks the floor' + tip('The floor stress test: price falls to 0.42&times; the trend over 3 years and stays there for the whole plan. The more conservative of the two, and on Escape Velocity as its stress test.'), v: floor == null ? '—' : btc(floor) + ' BTC', sub: 'the 0.42× floor case' }
+      { k: T[lead] + tip(NT[lead]), v: val(need[lead]), sub: G[lead].text },
+      { k: T[other] + tip(NT[other]), v: val(need[other]), sub: G[other].text },
+      { k: FF.chip + tip('A stress test, not a scenario: price falls in a straight line to 0.42&times; the trend over 3 years and stays there for the whole plan. Bitcoin has never held its floor for long; Escape Velocity runs the same test.'), v: val(floor), sub: 'stress test' }
     ];
-    if (stackBTC) {
-      var gap = stackBTC - here;
+    if (stackBTC && need[lead] != null) {
+      var gap = stackBTC - need[lead];
       cs.push({ k: gap >= 0 ? 'Your surplus' : 'Your shortfall', v: (gap >= 0 ? '+' : '−') + btc(Math.abs(gap)) + ' BTC',
-                sub: 'against ' + btc(here) + ' BTC, from ' + btc(stackBTC) + ' held' });
+                sub: 'against ' + btc(need[lead]) + ' BTC (' + N[lead].charAt(0).toLowerCase() + N[lead].slice(1) + '), from ' + btc(stackBTC) + ' held' });
     }
     setHTML('rdP1Cards', cards(cs));
 
-    var W = 700, H = stackBTC ? 176 : 140, PADL = 168, PADR = 76, TOP = 22, BH = 28, GAP = 24;
-    var rows = [['If today’s gap persists', here, 'rd-bar-trend'], ['If price tracks the floor', floor, 'rd-bar-floor']];
+    var rows = [[N[lead], need[lead], 'rd-bar-trend'], [N[other], need[other], 'rd-bar-open'], [FF.name + ' (stress test)', floor, 'rd-bar-floor']];
     if (stackBTC) rows.push(['Your stack today', stackBTC, 'rd-bar-you']);
+    var W = 700, PADL = 236, PADR = 76, TOP = 22, BH = 28, GAP = 24, H = TOP + rows.length * (BH + GAP) + 6;
     var maxv = Math.max.apply(null, rows.map(function (r) { return r[1] || 0; })) * 1.2 || 1;
-    var s = svgOpen(W, H, 'The stack this plan needs under each case, against the stack held');
+    var s = svgOpen(W, H, 'The stack this plan needs in each scenario and the stress test, against the stack held');
     rows.forEach(function (r, i) {
-      if (r[1] == null) return;
-      var y = TOP + i * (BH + GAP), w = Math.max(2, r[1] / maxv * (W - PADL - PADR));
+      var y = TOP + i * (BH + GAP);
       s += '<text class="rd-barlbl" x="' + (PADL - 10) + '" y="' + (y + BH / 2 + 4) + '" text-anchor="end">' + r[0] + '</text>';
+      if (r[1] == null) {
+        s += '<text class="rd-barval" x="' + PADL + '" y="' + (y + BH / 2 + 4) + '">beyond the engine’s range</text>';
+        return;
+      }
+      var w = Math.max(2, r[1] / maxv * (W - PADL - PADR));
       s += '<rect class="' + r[2] + '" x="' + PADL + '" y="' + y + '" width="' + w + '" height="' + BH + '" rx="3"/>';
       s += '<text class="rd-barval" x="' + (PADL + w + 8) + '" y="' + (y + BH / 2 + 4) + '">' + btc(r[1]) + ' BTC</text>';
     });
