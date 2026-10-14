@@ -45,7 +45,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | Bitcoin month-end closes `BTC_MONTHLY` | `shared/btc-monthly-data.js` | Yahoo BTC-USD | §1 |
 | The Power Law's three falsifiability tests (live on `/the-power-law#when-reliable`; read the statuses) | `the-power-law.js` | computed from `PL_DATA` | §9.8a |
 | Values computed once from `PL_DATA` and stored: `TREND_RATIO_PERCENTILES`; ~~Disciplined Rebalancing's percentile table~~ (live since 2026-10-04); What Daily Conviction Bought's FAQ and meta figures; the hurdle-rate meta line; Allocation Sizing's "about 0.44× today" tooltip | several | recompute from `PL_DATA` | §9.8 |
-| As-of callouts, captions and hand-typed callout values (Bitcoin vs. the Stock Market §1/§3 and its "Through August 2026" returns; the Horizon's "through August 2026") | several `.njk` | recompute | §3, §4 |
+| As-of callouts, captions and hand-typed callout values (Bitcoin vs. the Stock Market §1 and its "Through August 2026" returns; the Horizon's "through August 2026"; BvSM's §3 callout is live since 2026-10-14) | several `.njk` | recompute | §3, §4 |
 | Case-Shiller, Zillow rents and values | `shared/housing-monthly-data.js` | FRED, Zillow | §9.4 |
 | Is Bitcoin a Bubble? weekly line `BTC_DATA_2014` | `not-a-bubble.js` | Yahoo, Sunday closes | §9.7 |
 | Strategy at a glance (Fixed Income Tab II) | `bitcoin-fixed-income.njk` / `.js` | 8-K | §7 |
@@ -394,9 +394,11 @@ grep -rni "as of\|through mid-\|through late-\|through early-\|through [a-z]* 20
 Case-insensitive on purpose: the case-sensitive version of this grep missed
 "Through August 2026" on Bitcoin vs. the Stock Market (found 2026-09-29).
 `scripts/data-freshness.py` lists every dated string with its age, which is the
-quicker way to see which ones are due. Bitcoin vs. the Stock Market's §1 and §3
-callouts also carry **hand-typed values** (the multiple, the floor and trend
-prices): recompute those, don't just re-date them.
+quicker way to see which ones are due. Bitcoin vs. the Stock Market's §1
+callout also carries **hand-typed values** (the multiple, the floor and trend
+prices): recompute those, don't just re-date them. Its §3 callout (the gap to
+trend above the forward projection) is written by the page from the latest
+sample since 2026-10-14 (PR C), so it needs no edit; check that it reads right.
 
 Known patterns to expect:
 
@@ -455,7 +457,7 @@ After updating constants, spot-check the live page to verify the derived
 values read correctly:
 
 - BvSM §1 — *"As of [Month]"* callout with multiple-of-trend value
-- BvSM §3 — *"As of [Month]"* callout with forward-projection anchor
+- BvSM §3 — *"As of [Month]"* callout with forward-projection anchor (live since 2026-10-14: the month, the gap and the trend price come from the latest sample)
 - BvSM page header — any in-prose current-state references
 - BAYB §1 — *"As of [Month]"* callout below the CAGR-vs-rates chart with
   trend CAGR (~46% currently), realized CAGR (~13% currently), and
