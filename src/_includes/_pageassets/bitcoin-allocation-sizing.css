@@ -83,6 +83,10 @@ body { background: var(--bg); color: var(--text); }
 .as-seg-mini button { font-size: 0.74rem; padding: 0.35rem 0.75rem; }
 /* Even, full-width segmented (the bitcoin-growth projection control) */
 .as-control-growth { grid-column: span 2; }
+/* One column below about 560px (two 250px tracks no longer fit): span 2 there
+   made an implicit second track and pushed the card ~5px past a 375px screen
+   (seen 2026-10-14). */
+@media (max-width: 560px) { .as-control-growth { grid-column: auto; } }
 .as-seg-even { display: flex; width: 100%; }
 .as-seg-even button { flex: 1; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
 

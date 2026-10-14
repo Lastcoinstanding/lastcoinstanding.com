@@ -96,7 +96,7 @@ eleventyComputed:
             <p class="prose">Second, the historical distribution of <strong>price relative to trend</strong> is well-defined. Bitcoin has spent roughly half its history at or below trend, half above it. The 80th percentile of historical position corresponds to a specific multiple of trend; the 20th percentile to another. These are facts about the data, not predictions about the future. The Calculator sets its levels as multiples of trend and prints these historical-frequency anchors beside each one, so the user can see, in real time, how often a given trigger condition has actually existed.</p>
             <p class="prose">Third, inside a <strong>retirement-account wrapper</strong>, the rebalancing protocol generates no tax events. Sells trigger no capital gains; rebuys reset no holding-period clocks; the only friction is the bitcoin you fail to capture if a sell-and-rebuy bet doesn't complete. Outside that wrapper, every speculative sale is a taxable event, and the framework collapses into something far less defensible &mdash; the Calculator's account-type toggle makes that cost explicit.</p>
             <p class="prose">These three observations combine into the discipline: <em>Sell a defined fraction of the stack when price reaches a high-percentile zone. Re-buy when it returns to a lower-percentile zone. Accept that some cycles won't trigger; accept that the discipline only works inside a wrapper that absorbs the friction.</em></p>
-            <p class="prose"><strong>How much you sell matters as much as when.</strong> At the same triggers (sell on the way up through 1.75&times; trend, buy back at 0.85&times;), an IRA that sold the whole stack each time ended at <span id="drQ100">0.61&times;</span> HODL since 2011; one that sold half ended at <span id="drQ50">0.95&times;</span>. Partial sales cut both the damage and the upside. That is the honest trade, and it is why the calculator starts at selling a quarter, not the whole stack.</p>
+            <p class="prose"><strong>How much you sell matters as much as when.</strong> At the same triggers (sell on the way up through 1.75&times; trend, buy back at 0.85&times;), an IRA that sold the whole stack each time would have ended at <span id="drQ100">0.61&times;</span> HODL since 2011, and one that sold half at <span id="drQ50">0.95&times;</span> (hypothetical backtests on the recorded prices). Partial sales cut both the damage and the upside. That is the honest trade, and it is why the calculator starts at selling a quarter, not the whole stack.</p>
         </div>
 
         <div class="section">
@@ -235,7 +235,7 @@ eleventyComputed:
                 <div class="dr2-hn"><div class="lab">Since 2011</div><div class="big dr2-num" id="dr2R11"></div><div class="sub" id="dr2R11b"></div></div>
                 <div class="dr2-hn"><div class="lab">Since 2014</div><div class="big dr2-num" id="dr2R14"></div><div class="sub" id="dr2R14b"></div></div>
               </div>
-              <p class="dr2-caveat" id="dr2PanelCaveat">History, not a forecast. These include spikes of 3&ndash;14&times;, far larger than the latest (1.19&times;). For smaller future spikes, see Looking ahead below.</p>
+              <p class="dr2-caveat" id="dr2PanelCaveat">Hypothetical results, not a forecast: what these rules would have done on past prices. Nobody traded them, and trading costs are left out. These include spikes of 3&ndash;14&times;, far larger than the latest (1.19&times;). For smaller future spikes, see Looking ahead below.</p>
               <div class="dr2-why" id="dr2Why" hidden></div>
               <div class="dr2-risk">
                 <h3>What it took, and what could go wrong</h3>
@@ -278,7 +278,7 @@ eleventyComputed:
             <div><div class="dr2-eyebrow">Cycle by cycle</div><h2 id="dr2HCyc">What your rules did each time</h2></div>
             <div class="dr2-seg" id="dr2SegStart" role="group" aria-label="Start of record"><button type="button" data-v="2011-01">From 2011</button><button type="button" data-v="2014-01">From 2014</button><button type="button" data-v="2017-01">From 2017</button></div>
           </div>
-          <p class="dr2-caveat">This is the record, not a forecast. The early cycles had spikes of 5&ndash;14&times; and a trend growing several times faster than today&rsquo;s, which made both rules easier to profit from and, in 2013, easier to lose with. Future cycles can play out very differently.</p>
+          <p class="dr2-caveat">Hypothetical results, not a forecast: the rules applied to the recorded prices, before trading costs. The early cycles had spikes of 5&ndash;14&times; and a trend growing several times faster than today&rsquo;s, which made both rules easier to profit from and, in 2013, easier to lose with. Future cycles can play out very differently.</p>
           <p class="dr2-showing" id="dr2Showing"></p>
           <div class="dr2-tablewrap" tabindex="0" role="region" aria-label="What your rules did each cycle (scrolls sideways)"><table class="dr2-table">
             <thead><tr>
@@ -542,7 +542,7 @@ eleventyComputed:
         <div class="dr-math-section">
             <h3>11. The historical record is not a forecast</h3>
 
-            <p>The Calculator tab shows what the discipline would have done across actual bitcoin price history at the user's chosen settings. That is a fact about the past. It is not a prediction about the future. Three concrete ways the future will differ from the historical record:</p>
+            <p>The Calculator tab shows what the discipline would have done across actual bitcoin price history at the user's chosen settings. Every result there is hypothetical: the rules applied to recorded prices, not trades anyone made, and before exchange fees and spreads. It is arithmetic about the past, not a prediction about the future. Three concrete ways the future will differ from the historical record:</p>
 
             <ul class="dr-math-list">
                 <li><strong>Volatility compression.</strong> Bitcoin&rsquo;s cycle amplitudes have decreased over time. Cycle 1 peaked near 8&times; trend in 2011; recent cycles peak closer to 2&times; trend. The triggers that fired in 2011 or 2017 against extreme price excursions will likely fire less often in future cycles, even at the same levels. <a href="/the-power-law#theory">The Power Law Theory tab</a> documents this compression in detail.</li>
@@ -590,6 +590,7 @@ eleventyComputed:
                 <li>Percentiles: share of samples since January 2011 (also shown for the full record and since 2017)</li>
                 <li>Backtest: one pass through <code>PL_DATA</code> from the first sample of the start month (2011, 2014 or 2017), 1 BTC at that sample&rsquo;s price; crossing triggers, one open sale at a time</li>
                 <li>Cash returns: 0% or 4% a year, compounded between samples</li>
+                <li>Trading costs: not modelled. Exchange fees and spreads would lower every round trip&rsquo;s result</li>
                 <li>Tax: in a taxable account, net gain on the lots sold (FIFO or highest cost first); 32% plus NIIT and state on lots held under a year, the chosen long-term rate plus NIIT and state otherwise</li>
             </ul>
         </div>

@@ -210,7 +210,7 @@
       data: {
         datasets: [
           {
-            label: 'Ceiling (3× trend)',
+            label: 'Upper band (3× trend)',
             data: ceilingLine,
             borderColor: 'rgba(212,83,58,0.55)',
             borderWidth: 1.1,
@@ -402,6 +402,14 @@
       updateBvsmTodayCaption(price, source);
       plChart.update();
     });
+
+    // Re-lay out the legend once Inter is in. Chart.js measured it in the
+    // fallback font; at phone widths the wider Inter text then wrapped the last
+    // item, "Upper band (3× trend)" since 2026-10-14, out of the legend box.
+    // The same fix as the projection chart's below.
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('11px "Inter"').then(function () { plChart.update(); }, function () {});
+    }
   }
 
   if (document.readyState === 'loading') {
