@@ -38,10 +38,10 @@
     usd: {
       nodes: { sov: 'decaying', moe: 'decaying', uoa: 'decaying' },
       props: {
-        'monetary-inflation':    { value: 'high',           decoration: 'decaying', desc: 'Real inflation is typically >7%. Money printing is required for credit-based economy to function.' },
+        'monetary-inflation':    { value: 'high',           decoration: 'decaying', desc: '~6.5% a year M2 money-supply growth over the past 50 years, well above official CPI. Money printing is required for credit-based economy to function.' },
         'terminal-scarcity':     { value: 'elastic',        decoration: 'decaying', desc: 'No cap. Supply expands at central-bank discretion, in unspoken partnership with Treasury.' },
         'confiscation-risk':     { value: 'confiscatable',  decoration: 'decaying', desc: 'Accounts are tracked and can be frozen or seized at state discretion. Sanctions enforceable.' },
-        'durability':            { value: 'slow-decay',     decoration: 'decaying', desc: 'Structural half-life is <10 years.' },
+        'durability':            { value: 'slow-decay',     decoration: 'decaying', desc: 'Structural half-life is ~11 years at 50-year money-supply growth (~6.5% a year).' },
         'settlement-finality':   { value: 'reversible',     decoration: 'decaying', desc: 'Chargebacks, reversals, freezes remain possible.' },
         'permissionless-access': { value: 'gatekept',       decoration: 'decaying', desc: 'Bank account required. KYC at every layer. Large transfers scrutinized. Capital flight permissioned.' },
         'cross-border-friction': { value: 'fragmented',     decoration: 'decaying', desc: 'SWIFT delays. FX fees. Sanctions carve-outs. Capital controls possible.' },

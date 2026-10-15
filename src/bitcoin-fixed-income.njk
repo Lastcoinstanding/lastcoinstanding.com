@@ -250,13 +250,13 @@ related:
 
     <p class="prose"><em>(One small detail worth knowing: SATA's reserve includes STRC preferred, 505,000 shares worth about $50M as of September 18, 2026 — meaning a stress event affecting STRC will also mark down a portion of SATA's backstop. The correlation is structural and worth knowing if you're considering both.)</em></p>
 
-    <!-- Strategy at a glance: snapshot ground-truth framing the capital-structure analysis below. BTC count verified against the 8-K of 7 September 2026 (September 2026 snapshot). Treasury USD value is computed live from TODAY_PRICE x BTC_HELD via the JS subscribed to fetchTodayPrice. mNAV, shares outstanding, and ATM status are snapshots refreshed monthly per MONTHLY_REFRESH_CHECKLIST. -->
+    <!-- Strategy at a glance: snapshot ground-truth framing the capital-structure analysis below. BTC count verified against the 8-K filed 13 October 2026 (holdings at 11 October; October 2026 snapshot). mNAV at the 14 October 2026 close: about 384M shares × $143 ≈ $55B, against 848,250 BTC × about $81.7K ≈ $69B (cross-checked with mnav.com's gross figure, 0.79×). Treasury USD value is computed live from TODAY_PRICE x BTC_HELD via the JS subscribed to fetchTodayPrice. mNAV, shares outstanding, and ATM status are snapshots refreshed monthly per MONTHLY_REFRESH_CHECKLIST. -->
     <aside class="strategy-glance" aria-labelledby="sg-title">
       <div class="sg-eyebrow" id="sg-title">STRATEGY <span class="sg-ticker">(MSTR)</span> AT A GLANCE</div>
       <div class="sg-grid">
         <div class="sg-cell">
           <div class="sg-label">Bitcoin treasury</div>
-          <div class="sg-value">845,050<span class="sg-unit"> BTC</span></div>
+          <div class="sg-value">848,250<span class="sg-unit"> BTC</span></div>
           <div class="sg-sub"><span class="sg-live-tag" id="sgLiveTag">latest data</span><span class="sg-treasury-usd-value">$&hellip;</span></div>
         </div>
         <div class="sg-cell">
@@ -272,14 +272,14 @@ related:
         <div class="sg-cell sg-cell-wide">
           <div class="sg-label">ATM issuance <span class="help-tip" tabindex="0">?<span class="tip-content">At-The-Market offering — pre-registered share issuance sold directly into the open market on demand. When mNAV > 1×, ATM issuance is accretive to BTC-per-share; when mNAV < 1×, it's dilutive. Strategy uses multiple ATM programs in parallel: common equity plus dedicated preferred-share ATMs for STRF, STRK, STRD, and STRC.</span></span></div>
           <div class="sg-value sg-value-prose">Active</div>
-          <div class="sg-sub">Common equity ATM plus dedicated preferred-share programs (STRF, STRK, STRD, STRC). Used in the week to 30 Aug; no ATM sales in the week to 7 Sep.</div>
+          <div class="sg-sub">Common equity ATM plus dedicated preferred-share programs (STRF, STRK, STRD, STRC). Small common sales in the weeks to 4 and 11 Oct ($15.7M and $21.0M); no preferred sold in either week.</div>
         </div>
       </div>
       <div class="sg-insight">
         <div class="sg-insight-label">Reading right now</div>
-        <p class="sg-insight-text">mNAV has now slipped <em>through</em> 1.0&times; — roughly 0.8&times; on the common — the boundary this card previously named as the number to watch. Below it, newly-issued common dilutes bitcoin-per-share rather than adding to it. Behaviour at the turn has been mixed rather than clean: the ATMs were still working in the week to 30 August, raising roughly $603M of net proceeds with about $370M of it spent on bitcoin, but in the week to 7 September there were no ATM sales and no bitcoin bought or sold, while $176.3M went to repurchasing STRC below par. The digital-credit repurchase authorization has been doubled to $2B, funded from a USD reserve that has grown to $5.1B. Read together, the posture has tilted from accumulation toward liability management and defence of the preferred — which is what the framework predicts below 1.0&times;. The open question is no longer whether issuance is accretive; it is how long the reserve funds both the dividend and the bid.</p>
+        <p class="sg-insight-text">mNAV is still about 0.8&times; on the common: roughly $55B of market value against $69B of bitcoin at the 14 October close. Below 1.0&times;, newly issued common dilutes bitcoin per share rather than adding to it. Strategy has kept selling small amounts anyway: about $37M of common in the two weeks to 11 October, which with $13.5M of USD Cash bought 584 BTC. Far more went to defending the preferred: $368.7M bought back STRC below par in the same two weeks, at prices rising to about $99.6, near par. The buybacks are paid mostly from USD Cash, the flexible pool set up in August, which fell from $1.00B on 27 September to $640.5M on 11 October; $354.8M of the $2B repurchase authorization is left. The USD Reserve, held for dividends and interest, stood at $4.88B, about 34 months of them. The posture is still liability management before accumulation, as the framework predicts below 1.0&times;. The open question has narrowed: once USD Cash and the authorization run down, does the bid continue, paid for by more common sold below NAV or by bitcoin sales, or does it stop?</p>
       </div>
-            <div class="sg-footer">Snapshot as of September 2026 (8-K of 7 September). Bitcoin treasury USD value updates live from the bitcoin spot price; other values refresh monthly.</div>
+            <div class="sg-footer">Snapshot as of October 2026 (8-K filed 13 October, holdings at 11 October; mNAV at the 14 October close). Bitcoin treasury USD value updates live from the bitcoin spot price; other values refresh monthly.</div>
     </aside>
 
     <h2 class="section-title">The capital structure picture</h2>
@@ -452,7 +452,7 @@ related:
         <div class="mechanism-num">5</div>
         <div class="mechanism-body">
           <h3>The cash reserve</h3>
-          <p>The temporal buffer that funds dividends through short stress events without triggering forced action on any of the above mechanisms. Strategy&rsquo;s USD reserve was $5.04 billion on September 20, 2026, about three years of preferred dividends and convertible interest at $1.70 billion a year; the board&rsquo;s policy since June 29, 2026 is to hold at least twelve months. In a scenario where the ATM channel is fully closed, the reserve alone funds dividends for about that long. (In early June 2026 it was about $900 million, some 6.75 months.)</p>
+          <p>The temporal buffer that funds dividends through short stress events without triggering forced action on any of the above mechanisms. Strategy&rsquo;s USD reserve was $4.88 billion on October 11, 2026, nearly three years of preferred dividends and convertible interest at $1.70 billion a year; the board&rsquo;s policy since June 29, 2026 is to hold at least twelve months. In a scenario where the ATM channel is fully closed, the reserve alone funds dividends for about that long. (In early June 2026 it was about $900 million, some 6.75 months.)</p>
         </div>
       </div>
     </div>
@@ -767,7 +767,7 @@ related:
 
     <p class="prose">The full coupled-system view is documented in <a href="#mechanism">The Mechanism</a>. Here, the page surfaces the cash-runway question that most concerns income-dependent readers, and presents the dual numbers rather than the single comforting one.</p>
 
-    <p class="prose">Strategy's USD reserve, $5.04 billion on September 20, 2026, against about $1.70 billion a year of preferred dividends and convertible interest, is roughly <strong>three years</strong> of pure-cash coverage (the board's floor is twelve months). That is the worst-case runway — what holds if every capital-market channel is fully blocked. In early June 2026 the same measure was about $900 million, or 6.75 months; the reserve has grown since. The runway lengthens if some capital-market access continues (reduced-but-still-functional ATM issuance, opportunistic STRD dividend skips — STRD is the non-cumulative junior tranche; skipped payments don't accrue — and operating cash flow), and it shortens if the reserve is also spent buying back preferred below par, as it was in September 2026 ($176.3 million of STRC in the week to September 7).</p>
+    <p class="prose">Strategy's USD reserve, $4.88 billion on October 11, 2026, against about $1.70 billion a year of preferred dividends and convertible interest, is nearly <strong>three years</strong> of pure-cash coverage (the board's floor is twelve months). That is the worst-case runway — what holds if every capital-market channel is fully blocked. In early June 2026 the same measure was about $900 million, or 6.75 months; the reserve has grown since. The runway lengthens if some capital-market access continues (reduced-but-still-functional ATM issuance, opportunistic STRD dividend skips — STRD is the non-cumulative junior tranche; skipped payments don't accrue — and operating cash flow), and it shortens if the reserve is also drawn to buy back preferred below par. In the two weeks to October 11 those buybacks ($368.7 million of STRC) were paid mostly from USD Cash, a second pool that fell from $1.00 billion to $640.5 million, while the reserve paid dividends and interest.</p>
 
     <p class="prose">Both numbers can be true; they answer different questions. <em>Under conditions where Strategy retains capital-market access at compressed terms, the structure has multi-year runway through stress. Under conditions of full capital-market closure, the runway is the reserve's: about three years at its September 2026 size, less whatever it spends on buybacks.</em> Which scenario actually unfolds depends on the duration of the bitcoin downturn and the institutional appetite for risk during it.</p>
 

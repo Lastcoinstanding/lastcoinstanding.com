@@ -36,6 +36,14 @@
     gtag('config', 'G-WNGLLPPR5M', cfg);
   })();
 </script>
+{# Chart.js re-layout once the web fonts load (2026-10-14). A chart built before
+   Inter arrives is measured in the fallback font and drawn in Inter; a legend
+   item can drop out. Emitted BEFORE head_extras (which loads the fonts and
+   Chart.js) so the 'loadingdone' listener is in place before any font starts
+   loading. No-op on pages without Chart.js. See shared/chart-fonts.js. #}
+<script>
+{% include '_pageassets/shared/chart-fonts.js' %}
+</script>
 {{ head_extras | safe }}
 {# FAQPage JSON-LD — layout-level, single-sourced from the `faq` front matter
    (same array the visible page-faq.njk block renders in the body). Emitted here
