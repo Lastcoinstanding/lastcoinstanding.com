@@ -2,6 +2,47 @@
   {
     "display": "10/14/26",
     "date": "2026-10-14",
+    "page": "/bitcoin-fixed-income",
+    "badge": false,
+    "summary": "Bitcoin and Fixed Income: Strategy at a glance is updated to October: 848,250 BTC (11 October) and mNAV still about 0.8×. The reading now follows the money: $368.7M of STRC bought back in two weeks, paid mostly from USD Cash (down to $640.5M), while the $4.88B reserve pays dividends and interest."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/the-strc-mechanism",
+    "badge": false,
+    "summary": "The STRC Mechanism: filing figures brought up to October 11: three more buyback windows (3.7 million shares for $368.7M, at averages of $99.31 to $99.58), a $4.88B USD Reserve (about 34 months of dividends and interest), $640.5M of USD Cash and a float of about 87.9 million shares."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/bitcoin-vs-rental-property",
+    "badge": false,
+    "summary": "Bitcoin vs. Rental Property: Strategy's treasury (848,250 BTC) and USD Reserve ($4.88B) updated to October 11. The coverage tiles are unchanged."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/the-fixed-pie",
+    "summary": "The Bitcoin Fixed Share: the dollar's supply now grows at about 6.5% a year, the money supply's 50-year average and the figure the rest of the site uses; it was 7%. After 10 years a dollar holder keeps 53.3% of their share, not 50.8%."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/the-bitcoin-migration",
+    "badge": false,
+    "summary": "The dollar's half-life now reads the same across the site: about 11 years, at the money supply's 50-year growth of about 6.5% a year. The Bitcoin Migration said about six years, Money Trees 7 to 10 and What Money Has to Be under 10."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
+    "page": "/bitcoin-vs-the-stock-market",
+    "badge": false,
+    "summary": "Charts across the site now lay out their legends and axes again once the page's font has loaded. On a slow connection a legend could lose an item, such as 'Upper band (3× trend)' here at phone width, and lines on The Bitcoin Horizon, The Doubling Ladder and The Power Law."
+  },
+  {
+    "display": "10/14/26",
+    "date": "2026-10-14",
     "page": "/bitcoin-as-collateral",
     "badge": false,
     "summary": "Bitcoin as Collateral: the $100-of-collateral table is updated to October 2026. The 30-year mortgage rate is now about 7.4% (it was about 6.6% in August), and India's cap on gold loans is 75–85% of the gold's value depending on loan size (it was 75% for all loans until April 2026). The bitcoin loan terms ($40–60 per $100, about 9–14% a year) and the margin rates are unchanged. The Basel watch now notes that the Basel Committee expects to update its crypto rules by the end of 2026."

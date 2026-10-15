@@ -402,14 +402,9 @@
       updateBvsmTodayCaption(price, source);
       plChart.update();
     });
-
-    // Re-lay out the legend once Inter is in. Chart.js measured it in the
-    // fallback font; at phone widths the wider Inter text then wrapped the last
-    // item, "Upper band (3× trend)" since 2026-10-14, out of the legend box.
-    // The same fix as the projection chart's below.
-    if (document.fonts && document.fonts.load) {
-      document.fonts.load('11px "Inter"').then(function () { plChart.update(); }, function () {});
-    }
+    // The legend is laid out again once Inter loads by the site-wide
+    // shared/chart-fonts.js (base.njk <head>); measured in the fallback font,
+    // "Upper band (3× trend)" had dropped out of it at 375px.
   }
 
   if (document.readyState === 'loading') {
@@ -1030,12 +1025,9 @@
     recomputeProjection();
     // Chart.js measures legend text when a chart is built. Built before Inter
     // lands, the projection legend was laid out with the fallback font and
-    // drawn with Inter, wider; with the two bitcoin lines' longer names
-    // (2026-10-14) the last item no longer fit its row and vanished. Rebuild
-    // once the font is in (STYLE_GUIDE §6.45's re-measure, for a chart).
-    if (document.fonts && document.fonts.load) {
-      document.fonts.load('11px "Inter"').then(function () { recomputeProjection(); }, function () {});
-    }
+    // drawn with Inter, wider, and its last item (NASDAQ-100) vanished. The
+    // site-wide shared/chart-fonts.js (base.njk <head>) lays every chart out
+    // again once the fonts load (STYLE_GUIDE §6.45's re-measure, for charts).
   }
 
   /* ═══════════════════════════════════════════════════════════════

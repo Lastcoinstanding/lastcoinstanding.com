@@ -108,10 +108,10 @@ The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy N
 
 The same fact appears on several pages; after each refresh they must agree:
 
-- **Strategy's bitcoin count:** `BTC_HELD` (`bitcoin-fixed-income.js`) and the Tab II card, `STRC_DATA.btcHoldings`, and the rental page's treasury line and sources list. (On 2026-09-29 they read 845,050, 843,775 and 846,000.)
+- **Strategy's bitcoin count:** `BTC_HELD` (`bitcoin-fixed-income.js`) and the Tab II card, `STRC_DATA.btcHoldings`, and the rental page's treasury line and sources list. (On 2026-09-29 they read 845,050, 843,775 and 846,000; on 2026-10-14 all three read 848,250, as of 11 October.)
 - **The STRC dividend rate:** one place since 2026-09-30, **`src/_data/preferredRates.json`** (`strc.ratePct`, `schedule`, `source`, and the file's `asOf` / `asOfLabel`; SATA beside it). Bitcoin Fixed Income's prose, tables, tax example (computed at build time by `src/_data/preferredTax.js`) and calculator, the rental page's `YIELD_RATES.strc`, and The STRC Mechanism's `STRC_DATA.rateAnnualPct` all read it (`components/preferred-rates.njk` injects it as `window.PREFERRED_RATES`). A change also needs: a new `rateHistory` row on The STRC Mechanism (§7.5), the rental page's STRC tooltip (by hand), and DATA_AUDIT BvRP-5.
-- **Strategy's USD reserve and dividend bill:** `STRC_DATA.usdReserveB`, Fixed Income Tab III, the rental page's sources.
-- **Standing modelling figures quoted in prose:** the dollar's purchasing-power half-life and M2 growth (The Half-Life, The Fixed Pie, The Bitcoin Migration, What Money Has to Be, Money Trees' `data.json`) should use one set of numbers (TECH_DEBT "Refresh audit 2026-09-29" lists the current disagreement).
+- **Strategy's USD reserve and dividend bill:** `STRC_DATA.usdReserveB`, Fixed Income's Tab II card (*Reading right now*), its Mechanism cash-reserve card and The Risks §3 (Tab III is the dated June record), the rental page's bear-case paragraph and sources. All read $4.88B (11 October) on 2026-10-14.
+- **Standing modelling figures quoted in prose:** the dollar's purchasing-power half-life and M2 growth (The Half-Life, The Bitcoin Fixed Share, The Bitcoin Migration, What Money Has to Be, Money Trees' `data.json`, The Gallery, the Melting Ice Cube's placeholder) use one set since 2026-10-14: **M2 about 6.5% a year over 50 years, half-life about 11 years** (DATA_AUDIT I-2, from FRED M2SL; CPI 3.5% gives about 20). Gold's supply growth and half-life are not yet one set (TECH_DEBT, "Gold's supply growth and half-life").
 
 ---
 
@@ -713,12 +713,12 @@ For each value, verify against the source listed and update in the BFI files as 
 
 | Field | Where it lives | Source to verify against |
 |---|---|---|
-| **BTC held** | `src/bitcoin-fixed-income.njk` (the `845,050` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 845050`) | The latest Strategy 8-K (primary). Cross-check CoinGecko's `/api/v3/companies/public_treasury/bitcoin` (keyless; the Strategy entry has `symbol: "MSTR.US"`; out for most of 2026-09-29 by a CoinGecko fault, working again 2026-09-30), bitcointreasuries.net or Strategy IR. |
+| **BTC held** | `src/bitcoin-fixed-income.njk` (the `848,250` figure) AND `src/_includes/_pageassets/bitcoin-fixed-income.js` (`var BTC_HELD = 848250`) | The latest Strategy 8-K (primary). Cross-check CoinGecko's `/api/v3/companies/public_treasury/bitcoin` (keyless; the Strategy entry has `symbol: "MSTR.US"`; out for most of 2026-09-29 by a CoinGecko fault, working again 2026-09-30), bitcointreasuries.net or Strategy IR. |
 | **mNAV** | `.njk` (`~0.8&amp;times;`) | SaylorTracker.com headline mNAV figure. Or compute: (MSTR price &times; shares outstanding) &divide; (BTC count &times; BTC price). |
 | **Shares outstanding** | `.njk` (`~384M`) | Latest 10-Q "Diluted shares outstanding" or Yahoo Finance MSTR Statistics page. Basic, all classes. |
 | **ATM issuance** | `.njk` (`Active` value cell + sub-text) | Latest 10-Q ATM disclosures + 8-K announcements for new facilities. Phrase as `Active` or `Paused` with a brief structural note. |
 | **Reading right now insight prose** | `.njk` `.sg-insight-text` paragraph | Rewrite when mNAV crosses ~1.0&times; (issuance accretive vs dilutive boundary) or ATM status changes (Active &harr; Paused). Stable otherwise. |
-| **As-of date** | `.njk` footer (`Snapshot as of September 2026`) | Update to the current month/year whenever any other field is refreshed. |
+| **As-of date** | `.njk` footer (`Snapshot as of October 2026`) | Update to the current month/year whenever any other field is refreshed. |
 
 **Critical**: the two BTC count locations on this page (the visible cell text in `.njk` AND the `BTC_HELD` constant in `.js`) MUST stay in sync. Otherwise the displayed BTC count and the live USD value will drift apart.
 
@@ -745,14 +745,14 @@ If the values haven't materially changed (BTC count moved &lt;1%, mNAV moved &lt
 - **Every STRC rate on the page** now comes from `src/_data/preferredRates.json` (§0.7, 2026-09-30); nothing to edit here by hand except the payment-frequency row in the Tab II table (njk ~219) when the schedule changes. Was: the card "11.5–13%" (njk ~87), the table's "Current dividend rate" (~218), the prose at ~160, 172, 245, 373, 388–389 and 773, and `PATHS` in `bitcoin-fixed-income.js` (~76–80; the path buttons are at njk ~604–607). They must equal `YIELD_RATES.strc` and `STRC_DATA.rateAnnualPct` (§0.7). Check the payment frequency wording (monthly or semi-monthly) at ~160, 219 and 235 at the same time.
 - **The Tab II capital-stack table** (njk ~218–227, 243): $7.98B, ~$35.6B, 2.93×, ~44 years, $44–62B, ~$1.08B, 843,738 BTC, and Strive's count.
 - **"As of Q1 2026" capital structure** (njk ~285–361): move to the latest 10-Q when it lands.
-- **Reserve, runway and dividend-bill prose** (The Mechanism's "The cash reserve" card; The Risks §3 and §4): updated 2026-09-30 to the $5.04B reserve (2026-09-20), the $1.70B annual bill and September's mNAV below 1.0×. Refresh with the rental page's Strategy block (DATA_AUDIT BvRP-2, BvRP-3) and the Tab II card.
+- **Reserve, runway and dividend-bill prose** (The Mechanism's "The cash reserve" card; The Risks §3 and §4): updated 2026-09-30 to the $5.04B reserve (2026-09-20), the $1.70B annual bill and September's mNAV below 1.0×; on 2026-10-14 to the $4.88B reserve (2026-10-11). The buybacks are paid mostly from USD Cash, not the reserve (the 8-Ks of 5 and 13 October): say so wherever the prose names what funds them. Refresh with the rental page's Strategy block (DATA_AUDIT BvRP-2, BvRP-3) and the Tab II card.
 - **Present-tense state statements** (njk ~476, 785 "ATM channel has frozen", 795 "has not" crossed 1.0×): rewrite whenever the state they describe changes.
 
 The page's path reference rates (Treasury 4.3%, investment grade 5.5%, M2 6.5%, trend CAGR ~28%; njk ~72–116, 146, 383–390, 773) move slowly; check them quarterly under §9.10.
 
 ## 7.5. The STRC Mechanism — the `STRC_DATA` block (`/the-strc-mechanism.html`)
 
-_Last refreshed 2026-09-30, through the 8-K filed 2026-09-28 (DATA_AUDIT STRC-2). `sharesOutstanding` and `claimStack.strcNotionalB` are derived (the 10-Q's July count less the weekly 8-K repurchases) until a filing gives a newer count; `priorMonthVWAP` is estimated from Yahoo daily bars, Σ(typical price × volume) ÷ Σ volume, and labelled so on the page. The weekly 8-Ks list each week's repurchases, bitcoin bought or sold, and the USD Reserve and USD Cash: append a `buybackLog` row per week (avg = dollars ÷ shares), and rows to `fuelLog` / `supplyLog` for anything new._
+_Last refreshed 2026-10-14, through the 8-K filed 2026-10-13 (DATA_AUDIT STRC-2); the October VWAP and the episode test wait for the 1 November refresh. Before that, 2026-09-30, through the 8-K filed 2026-09-28. `sharesOutstanding` and `claimStack.strcNotionalB` are derived (the 10-Q's July count less the weekly 8-K repurchases) until a filing gives a newer count; `priorMonthVWAP` is estimated from Yahoo daily bars, Σ(typical price × volume) ÷ Σ volume, and labelled so on the page. The weekly 8-Ks list each week's repurchases, bitcoin bought or sold, and the USD Reserve and USD Cash: append a `buybackLog` row per week (avg = dollars ÷ shares), and rows to `fuelLog` / `supplyLog` for anything new._
 
 This page is **deliberately episodic** (design doc `STRC_BELOW_PAR_DESIGN.md` §7; aging-policy comment at the top of `src/the-strc-mechanism.njk`). It examines a live episode — STRC trading below its $100 par — and the monthly refresh does more than update constants: it **decides whether the episode is still live**.
 

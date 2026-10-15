@@ -1728,8 +1728,8 @@ var chartInstance = null;
 
 // ─── Chart 9: The Half-Life of a Dollar ───────────────────────────
 //
-// Exponential decay of $100 in purchasing power at 6.5%/yr (M2 monetary-
-// base growth — the default inflation preset on /the-half-life). Custom
+// Exponential decay of $100 in purchasing power at 6.5%/yr (M2 money-
+// supply growth — the default inflation preset on /the-half-life). Custom
 // fill area + curve via Chart.js with a 'fill: origin' style so the
 // loss area below the curve shades to make the magnitude of decay
 // visually heavy. Half-life year is dashed-line annotated.
