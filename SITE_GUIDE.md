@@ -3711,6 +3711,8 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 
 **What it found (for the record).** In gold, this bear market's low (0.25×, February 2026) is below every cycle low since 2015 (0.48–0.76×) and the lowest month of the 2011+ fit; in dollars its low (0.50×, July 2026) sits inside the earlier range (0.36–0.58×). The gap is mostly gold's run ($2,034 in January 2024 to $5,020 in February 2026, monthly averages). The gold fit is less stable than the dollar fit (exponent 5.18 / 4.59 / 4.39 from 2011 / 2013 / 2016, R² falling to 0.78).
 
+**JM's review (2026-10-18).** Today's point on the ounces chart is the glowing `lcs-pulse-halo` (STYLE_GUIDE §6.23), in bitcoin orange; it pulses only when both of today's prices are live and is a still dot otherwise. Hovering a month shows its ounces, the dollar prices of bitcoin and gold behind it, its multiple of the gold trend (with the trend's ounces) and of the dollar trend; the multiples chart's tooltip adds the ounces and both prices.
+
 **Console.** `gbQA()` returns the fits, the range and today's reading.
 
 **OG.** Product-forward (`build-og-images.py`, card `bitcoin-in-gold`, hero `#gbOzChart`); `--base` captures from a local build or preview before the page is on production. Regenerate with the monthly refresh (MONTHLY_REFRESH_CHECKLIST §6).

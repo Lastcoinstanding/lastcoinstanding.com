@@ -182,9 +182,39 @@
     };
   }
 
+  // Tooltip lines for a month (or today) on either chart.
+  function tipLines(p) {
+    if (p.today && TODAY) {
+      return ['Bitcoin: ' + fmtOz(TODAY.oz) + ' oz of gold',
+              fmtUsd(TODAY.btcUsd) + ' a bitcoin \u00b7 ' + fmtUsd(TODAY.goldUsd) + ' an ounce',
+              fmtX(TODAY.mg) + ' the gold trend (' + fmtOz(TODAY.trendOz) + ' oz)',
+              fmtX(TODAY.mu) + ' the dollar trend'];
+    }
+    var r = p.row; if (!r) return '';
+    return ['Bitcoin: ' + fmtOz(r.oz) + ' oz of gold',
+            fmtUsd(r.usd) + ' a bitcoin \u00b7 ' + fmtUsd(r.gold) + ' an ounce (month avg.)',
+            fmtX(r.mg) + ' the gold trend (' + fmtOz(MAIN.gold.at(r.day)) + ' oz)',
+            fmtX(r.mu) + ' the dollar trend'];
+  }
+
+  // The glowing "you are here" marker (STYLE_GUIDE §6.23, lcs-pulse-halo).
+  // Honesty binding: it pulses only when both today's prices are live; on
+  // either fallback it is a still dot.
+  var pulsePlugin = {
+    id: 'gbPulse',
+    afterRender: function (chart) {
+      var el = document.getElementById('gbPulse'); if (!el || !TODAY) return;
+      var x = chart.scales.x.getPixelForValue(yearFrac(TODAY.day)), y = chart.scales.y.getPixelForValue(TODAY.oz);
+      if (!isFinite(x) || !isFinite(y)) return;
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+      el.classList.add('is-visible');
+      el.classList.toggle('is-static', !(TODAY.btcSrc === 'live' && TODAY.goldSrc === 'live'));
+    }
+  };
+
   function renderOzChart() {
     var cv = document.getElementById('gbOzChart'); if (!cv || typeof Chart === 'undefined') return;
-    var pts = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.oz, day: r.day }; });
+    var pts = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.oz, day: r.day, row: r }; });
     var endDay = Math.max(LAST.day, TODAY ? TODAY.day : 0);
     var trend = [], lo = [], hi = [];
     for (var d = FROM_DAY; d <= endDay + 1; d += 15) {
@@ -198,22 +228,25 @@
       { label: 'Usual range (90% of months)', data: hi, borderColor: band, borderWidth: 1, borderDash: [2, 3], pointRadius: 0 },
       { label: 'Usual range low', data: lo, borderColor: band, borderWidth: 1, borderDash: [2, 3], pointRadius: 0, hideInLegend: true }
     ];
-    if (TODAY) ds.push({ label: 'Today', data: [{ x: yearFrac(TODAY.day), y: TODAY.oz }], type: 'scatter', pointRadius: 5, pointHoverRadius: 6, backgroundColor: now, borderColor: btc, borderWidth: 2, hideInLegend: true });
+    // Today: an invisible hover target (the glowing marker is the pulse below).
+    if (TODAY) ds.push({ label: 'Today', data: [{ x: yearFrac(TODAY.day), y: TODAY.oz, today: true }], type: 'scatter', pointRadius: 0, pointHoverRadius: 6, pointHitRadius: 10, backgroundColor: now, borderColor: btc, borderWidth: 2, hideInLegend: true });
     var opt = baseOptions('Ounces of gold per bitcoin (log scale)', ozTick);
     opt.scales.x.max = yearFrac(endDay) + 0.3;
     opt.plugins.tooltip.callbacks = {
-      title: function (it) { var p = it[0].raw; return p.day != null ? monthLabel(p.day) : (it[0].dataset.label === 'Today' ? 'Today' : ''); },
-      label: function (it) { return it.dataset.label.replace(' low', '') + ': ' + fmtOz(it.parsed.y) + ' oz'; }
+      title: function (it) { var p = it[0].raw; return p.today ? 'Today' : (p.day != null ? monthLabel(p.day) : ''); },
+      // The month's reading in full: ounces, the two prices behind it, and its
+      // place against the gold trend (JM, 2026-10-18).
+      label: function (it) { return tipLines(it.raw); }
     };
     opt.plugins.tooltip.filter = function (it) { return it.datasetIndex === 0 || it.dataset.label === 'Today'; };
     if (charts.oz) charts.oz.destroy();
-    charts.oz = new Chart(cv, { type: 'line', data: { datasets: ds }, options: opt });
+    charts.oz = new Chart(cv, { type: 'line', data: { datasets: ds }, options: opt, plugins: [pulsePlugin] });
   }
 
   function renderMultChart() {
     var cv = document.getElementById('gbMultChart'); if (!cv || typeof Chart === 'undefined') return;
-    var g = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.mg, day: r.day }; });
-    var u = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.mu, day: r.day }; });
+    var g = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.mg, day: r.day, row: r }; });
+    var u = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.mu, day: r.day, row: r }; });
     var endDay = Math.max(LAST.day, TODAY ? TODAY.day : 0);
     var one = [{ x: 2011, y: 1 }, { x: yearFrac(endDay) + 0.3, y: 1 }];
     var ds = [
@@ -229,7 +262,13 @@
     opt.scales.x.max = yearFrac(endDay) + 0.3;
     opt.plugins.tooltip.callbacks = {
       title: function (it) { var p = it[0].raw; return p.day != null ? monthLabel(p.day) : 'Today'; },
-      label: function (it) { return it.dataset.label + ': ' + fmtX(it.parsed.y); }
+      label: function (it) { return it.dataset.label + ': ' + fmtX(it.parsed.y); },
+      afterBody: function (it) {
+        var p = it[0] && it[0].raw;
+        if (p && p.row) return [fmtOz(p.row.oz) + ' oz \u00b7 ' + fmtUsd(p.row.usd) + ' a bitcoin \u00b7 ' + fmtUsd(p.row.gold) + ' an ounce'];
+        if (TODAY && p && p.day == null) return [fmtOz(TODAY.oz) + ' oz \u00b7 ' + fmtUsd(TODAY.btcUsd) + ' a bitcoin \u00b7 ' + fmtUsd(TODAY.goldUsd) + ' an ounce'];
+        return [];
+      }
     };
     opt.plugins.tooltip.filter = function (it) { return it.dataset.label.indexOf('On trend') < 0; };
     if (charts.mult) charts.mult.destroy();
