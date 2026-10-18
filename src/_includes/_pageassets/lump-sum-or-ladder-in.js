@@ -14,9 +14,10 @@
 
    This page is the retrospective teaching demonstration. The projective
    lens, manual-blend, and recurring-windfall planner were removed in
-   Stage 2C-①; the forward path model was LIFTED to
-   shared/deployment-projection.js for reuse by Page 2
-   (/your-deployment-plan), not deleted. The channel-orientation chart
+   Stage 2C-①; the forward path model went to
+   shared/deployment-projection.js for Page 2 (/your-deployment-plan),
+   which since 2026-10-14 prices from shared/price-cases.js instead; the
+   file was deleted on 2026-10-18 (git history has it). The channel-orientation chart
    was promoted ABOVE the slider into the "Where are we right now?"
    context section, gaining the canonical glowing "you are here" pulse
    (STYLE_GUIDE §6.23) and a live factual position callout.

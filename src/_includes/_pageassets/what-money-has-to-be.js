@@ -21,7 +21,7 @@
     gold: {
       nodes: { sov: 'resonant', moe: 'depleted', uoa: 'depleted' },
       props: {
-        'monetary-inflation':    { value: 'low',            decoration: 'resonant', desc: '~1.5–2% supply growth from mining; higher prices drive higher supply response.' },
+        'monetary-inflation':    { value: 'low',            decoration: 'resonant', desc: '~1.7% a year supply growth from mining (World Gold Council, 2025); higher prices drive higher supply response.' },
         'terminal-scarcity':     { value: 'elastic',        decoration: 'depleted', desc: 'Finite on Earth but elastic. New discoveries continue.' },
         'confiscation-risk':     { value: 'bearer',         decoration: 'resonant', desc: 'Bearer asset in principle. Historically can be seized by decree (1933). Capital flight is difficult.' },
         'durability':            { value: 'persistent',     decoration: 'resonant', desc: 'Chemically inert. Persists across millennia. Structural half-life is ~35 years.' },

@@ -102,7 +102,7 @@ function drawShareChart(highlightYear) {
   // Draw lines
   const lines = [
     { growth: 0,    color: '#F7931A', label: 'Bitcoin', lineWidth: 3 },
-    { growth: 0.02, color: '#c9a84c', label: 'Gold',    lineWidth: 2 },
+    { growth: 0.017, color: '#c9a84c', label: 'Gold',    lineWidth: 2 },
     { growth: 0.065, color: '#c0392b', label: 'USD',    lineWidth: 2 },  // M2, ~6.5%/yr over 50 years (the site-wide m2-growth preset; DATA_AUDIT I-2)
   ];
 
@@ -188,7 +188,7 @@ function drawShareChart(highlightYear) {
   // Dots at cursor
   [
     { growth: 0,    color: '#F7931A' },
-    { growth: 0.02, color: '#c9a84c' },
+    { growth: 0.017, color: '#c9a84c' },
     { growth: 0.065, color: '#c0392b' },
   ].forEach(({ growth, color }) => {
     const pct = shareRetained(growth, highlightYear);
@@ -205,7 +205,7 @@ function drawShareChart(highlightYear) {
 
 function updateStatCards(year) {
   const fiatPct  = shareRetained(0.065, year);
-  const goldPct  = shareRetained(0.02, year);
+  const goldPct  = shareRetained(0.017, year);
   const btcPct   = 100;
 
   const fmt = v => v >= 99.9 ? '100%' : v.toFixed(1) + '%';

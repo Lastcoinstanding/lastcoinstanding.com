@@ -58,8 +58,14 @@
   // ── Baseline scenario (mirror of the retirement SCENARIO shape) ──
   // v1.1 default: an EARLY-retirement scenario, because retirement year is the dominant
   // variable (the same plan passes or fails on when you retire) and the early retiree is
-  // the audience. 5 BTC retiring 2030 on 175k/yr (today's $) is the tuned sweet spot,
-  // verified against the live Power Law trend prices:
+  // the audience. 5 BTC retiring 2030 on 100k/yr (today's $) since 2026-10-18 (JM: a
+  // default that survives on the stays path without a crash, so the first view shows
+  // what the crash alone does; it was 175k/yr, tuned on the old trend-from-today path):
+  //   - at $83,554 (0.53x trend), stays: no crash lasts to 2060; the default -60% crash
+  //     survives (a ~58% fall, ~3 years underwater); -77% survives; Weak recovery depletes
+  //     in 2047. The no-crash plan still lasts at $55,000 (about 0.34x); $125k/yr would
+  //     have run out without a crash below about $65,000, which is why it is 100k.
+  // The original tuning notes, from the trend-from-today path:
   //   - baseline (no crash) survives with a wide margin;
   //   - the default crash (-60% in year 1, HISTORICAL recovery) survives; deepening it toward
   //     the -77% historical characteristic, or flipping recovery to Weak, is where the bite shows;
@@ -67,14 +73,14 @@
   // The lesson is not "a big stack is safe" (this one depletes if you retire early and the
   // recovery fails) and not "early retirement is dangerous" (the base case is comfortable).
   // The decisive levers are retirement year and withdrawal rate relative to stack.
-  // (Tuned on the old trend-from-today path. Since 2026-10-11 the page opens on the
-  // lower of the two scenarios: below trend, on the stays path the no-crash plan runs
-  // out in 2056 and the crash pulls that forward; the return path keeps the tuning.)
+  // (Since 2026-10-11 the page opens on the lower of the two scenarios. With 175k/yr
+  // the no-crash plan ran out in 2056 on stays, so the first view said "the stack was
+  // already tight" before it reached the crash; hence the 2026-10-18 retune above.)
   // Baseline PARITY is preserved for identical inputs (same math + shared assumptions);
   // only the cold-start defaults differ, which is the point of a stress test.
   var SCENARIO = {
     btcStack: 5,
-    targetIncomeUSD: 175000,
+    targetIncomeUSD: 100000,
     retirementYear: 2030,
     yearsInRetirement: 30,
     monthlyDcaUSD: 0,
@@ -524,6 +530,9 @@
     return sp;
   }
 
+  // "a 60% fall" but "an 80% fall" / "an 18% fall" / "an 8% fall" / "an 11% fall".
+  function aPct(n) { var s = String(Math.round(n)); return (s.charAt(0) === '8' || s === '11' || s === '18') ? 'an' : 'a'; }
+
   // ════════ HEADLINE (lead with the lived stress period, not the terminal value) ════════
   function renderHeadline(base, crashed, crash) {
     var el = document.getElementById('stHeadline'); if (!el) return;
@@ -556,11 +565,11 @@
         // anchored beside the percentage. $preCrash/$trough/dropPct reconcile by
         // construction: dropPct = round(100·(1 − troughV/onset)), onset = the band's level.
         if (sp.recovered) {
-          detail = 'But living it is a long hold. The crash takes the stack from about <strong>' + usd(sp.onset) + '</strong> to <strong>' + usd(sp.troughUsd) + '</strong> — a <strong>' + sp.dropPct + '% fall</strong> — and it stays below that pre-crash level for about <strong>' + uw + '</strong> before regaining it. The plan holds, but only because the recovery came. For those ' + sp.underwater + ' years you could not have known it would.';
+          detail = 'But living it is a long hold. The crash takes the stack from about <strong>' + usd(sp.onset) + '</strong> to <strong>' + usd(sp.troughUsd) + '</strong> — ' + aPct(sp.dropPct) + ' <strong>' + sp.dropPct + '% fall</strong> — and it stays below that pre-crash level for about <strong>' + uw + '</strong> before regaining it. The plan holds, but only because the recovery came. For those ' + sp.underwater + ' years you could not have known it would.';
         } else {
           // Not-recovered (e.g. Weak): the pre-crash level is never regained, so the
           // sentence must not promise a return — no dangling "before regaining it".
-          detail = 'But living it is a long hold. The crash takes the stack from about <strong>' + usd(sp.onset) + '</strong> to <strong>' + usd(sp.troughUsd) + '</strong> — a <strong>' + sp.dropPct + '% fall</strong> — and it stays below that pre-crash level through the horizon, never regaining it within the projection. The plan holds, but the stack never climbs back to where it stood when the crash hit — <strong>' + uw + '</strong> below the line, and you could not have known it would last.';
+          detail = 'But living it is a long hold. The crash takes the stack from about <strong>' + usd(sp.onset) + '</strong> to <strong>' + usd(sp.troughUsd) + '</strong> — ' + aPct(sp.dropPct) + ' <strong>' + sp.dropPct + '% fall</strong> — and it stays below that pre-crash level through the horizon, never regaining it within the projection. The plan holds, but the stack never climbs back to where it stood when the crash hit — <strong>' + uw + '</strong> below the line, and you could not have known it would last.';
         }
         detailSub = 'By ' + endYear + ' the stack is about ' + pct + '% smaller than with no crash — ' + usd(crashFinalNom) + ' versus ' + usd(baseFinalNom) + ' — but that final gap is not what you would feel. The years underwater are.';
       } else {

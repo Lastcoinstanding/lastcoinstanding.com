@@ -2,6 +2,18 @@
   {
     "display": "10/18/26",
     "date": "2026-10-18",
+    "page": "/the-fixed-pie",
+    "summary": "The Fixed Share, The Half-Life and three essays: gold's supply growth is now about 1.7% a year, doubling in about 41 years (was 2% and 35), from the World Gold Council's 2025 figures, with a note on where the number comes from. The Fixed Share's chart and figures recompute."
+  },
+  {
+    "display": "10/18/26",
+    "date": "2026-10-18",
+    "page": "/the-bitcoin-retirement-stress-test",
+    "summary": "The Bitcoin Retirement Stress Test: the default plan now withdraws $100K a year (was $175K), a plan that lasts without a crash if bitcoin stays where it is, so the first view shows what the crash alone does."
+  },
+  {
+    "display": "10/18/26",
+    "date": "2026-10-18",
     "page": "/paper-bitcoin",
     "summary": "Paper Bitcoin vs. Real Bitcoin: the self-custody side now carries three 2026 incidents. A hardware-wallet maker's shipping partner leaked about 80,700 customers' contact details; a Coldcard firmware flaw let attackers recompute keys and take about 1,800 BTC; and Ledger devices sold through a Southeast Asian reseller carried a hidden implant that sent recovery phrases out over the mobile network (more than $86 million by on-chain estimates). None was a failure of the Bitcoin network."
   },

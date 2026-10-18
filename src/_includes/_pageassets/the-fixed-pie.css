@@ -639,3 +639,7 @@ footer {
 .nav-dropdown-menu a.active { color: var(--orange); background: rgba(247,147,26,0.08); font-weight: 600; }
 
 
+/* Gold's figure: source note under the supply cards (2026-10-18) */
+.gold-src-note { font-size: .8rem; line-height: 1.6; color: var(--text-dim); margin: 4px 0 24px; max-width: 760px; }
+.gold-src-note strong { color: var(--text-body); font-weight: 500; }
+.gold-src-note a { color: var(--text-body); text-decoration: underline; text-decoration-color: rgba(201,168,76,.5); text-underline-offset: 2px; }
