@@ -1404,3 +1404,29 @@ body {
     padding: 0.15rem 0 0.15rem 0.75rem;
     margin: 0 0 1rem 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   MEASURE IN: DOLLARS | BITCOIN — the history calculator (2026-10-18)
+   ═══════════════════════════════════════════════════════════════
+   Same look as the stock-return chips, own class (their click handler
+   drives the projection). 44px minimum (STYLE_GUIDE §6.54). */
+.bvsm-units { margin: 0.75rem 0 0.5rem 0; }
+.bvsm-unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.85rem;
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+.bvsm-unit:hover,
+.bvsm-unit:focus-visible { color: var(--text); border-color: var(--amber-dim); outline: none; }
+.bvsm-unit.is-active { color: var(--amber); border-color: var(--amber); background: var(--amber-glow); }
+.bvsm-unit-note { margin-top: 0.25rem; }
+.bvsm-unit-foot { display: block; margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-dim); font-style: italic; }

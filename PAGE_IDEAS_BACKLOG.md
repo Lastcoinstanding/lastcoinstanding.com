@@ -649,7 +649,7 @@ _Cluster opened 2026-08-21 (JM). Three pages live — **The Bitcoin Retirement**
 
 ### Tools & suite plumbing
 
-- [ ] **"Measure in BTC": a bitcoin-denominated view on the comparison tools.**
+- [ ] **"Measure in BTC": a bitcoin-denominated view on the comparison tools.** *First page shipped 2026-10-18 (JM): Bitcoin vs. the Stock Market's history calculator, history only (SITE_GUIDE §19). The series question is settled there: divide through by the price the dollar view already uses, so the two views agree by construction; log scale kept. Next candidates: the rental page, the Gallery, a standalone page.*
   Surfaced 2026-10-01 alongside the denominator essay: the claim made something a reader can do. A toggle that re-prices the comparison in bitcoin: the median house (the Gallery already carries a BTC-per-house line), the S&P 500, a salary, a rental property's income.
   - **Candidates:** Bitcoin vs. Real Estate, Bitcoin vs. Rental Property, Bitcoin vs. the Stock Market, the Gallery; possibly a standalone "priced in bitcoin" page.
   - **Open design questions:** month-end `BTC_MONTHLY` vs `PL_DATA` as the series; log scale by default (a BTC-priced asset falls by orders of magnitude, which reads as a crash on a linear axis); how to say plainly that the view is historical pricing, not a forecast.
