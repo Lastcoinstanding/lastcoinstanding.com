@@ -2142,11 +2142,11 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 ### The groups (as of June 2026)
 
-**The Numbers** (27 items, four columns — the growth that drove the mega-panel; six columns and 37 items from 2026-10-18; canonical source is `explorations.json`):
+**The Numbers** (27 items, four columns — the growth that drove the mega-panel; six columns and 38 items from 2026-10-18; canonical source is `explorations.json`):
 
 | Group (= panel column) | Pages |
 |---|---|
-| The Power Law (6) — split from *Models & Trends* 2026-10-18 (JM; §63) | Bitcoin & The Power Law · Bitcoin, Priced in Gold · The Bitcoin Floor · Bitcoin’s Spikes · The Bitcoin Doubling Ladder · Discount, or Premium? |
+| The Power Law (7) — split from *Models & Trends* 2026-10-18 (JM; §63, §64) | Bitcoin & The Power Law · Bitcoin, Priced in Gold · Bitcoin's Hash Rate · The Bitcoin Floor · Bitcoin’s Spikes · The Bitcoin Doubling Ladder · Discount, or Premium? |
 | Markets & Cycles (5) — the rest of *Models & Trends*, 2026-10-18 | Bitcoin & Metcalfe’s Law · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · The Bitcoin Rundown · Bitcoin vs. The Stock Market |
 | Real Estate (5) — replaced *Bitcoin vs. Other Assets* 2026-10-02 (§60) | Bitcoin and Real Estate (hub, "start here") · BTC vs. Real Estate · BTC vs. Rental Property · BTC vs. Paying Down the Mortgage · Compare Housing Plans |
 | Positioning & Strategy (14) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · Bitcoin Escape Velocity · Compare Retirement Plans · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
@@ -3716,4 +3716,16 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 **Console.** `gbQA()` returns the fits, the range and today's reading.
 
 **OG.** Product-forward (`build-og-images.py`, card `bitcoin-in-gold`, hero `#gbOzChart`); `--base` captures from a local build or preview before the page is on production. Regenerate with the monthly refresh (MONTHLY_REFRESH_CHECKLIST §6).
+
+## 64. Bitcoin's Hash Rate (`/bitcoin-hash-rate.html`)
+
+**Added 2026-10-18 (JM).** The second new page in *The Power Law* group (§30, §63): JM asked whether the hash rate is also a power law useful for describing adoption, as a standalone page for discoverability. A read, not a calculator; prefix `hr-`, mixed-content tier.
+
+**Data.** `shared/hash-rate-data.js`: `HASH_WEEKLY`, weekly means of Blockchain.com's daily hash-rate estimate from 2010 in EH/s (DATA_AUDIT HR-1), and `fetchHashRate(cb)`, today's figure as the mean of the last seven daily estimates from the same chart (CORS checked 2026-10-18), else the latest week, labelled.
+
+**What it shows (all computed at load).** The readout: hash rate now, doubling time over the last four years against the windows to 2017, the latest four-year exponent, and an enumerated verdict against the 2011 fit. *Three power laws, one record*: the weekly series with fits from 2011, 2016 and 2020 (exponents 10.9 / 7.4 / 5.7 at 2026-10-18, R² about 0.95 each) and the glowing today marker (live only, §6.23 of STYLE_GUIDE). *A law that keeps slowing*: the table (exponent, R², implied doubling time, today against each) and the rolling four-year exponent (peak 18.1 to July 2016, low 4.3 to July 2023, 5.8 now), with the reason in prose (CPU → GPU → ASIC leaps, then smaller steps). *Price and hash rate*: a log-log scatter of monthly price against hash rate with fits from 2011 (price ∝ hash^0.49, R² 0.94) and 2016 (0.75, 0.90), today 1.75× the 2011 fit. *Which moves first*: correlation of year-over-year log changes, monthly from 2014, at leads of ±12 months; the best match is price six months ahead (0.55, against 0.41 in the same month and 0.31 at best with hash first). The reading: the hash rate is the security the price pays for, and follows it; it does not forecast it. *What this page does not show*: pool concentration (Risks to Bitcoin).
+
+**JM's review (2026-10-18).** The unit is spelled out (zettahashes per second, 10²¹ hashes a second) in the readout and the verdict; the second card reads "to double, assuming the last four years' pace"; the early-years doubling card (3 months, the four-year windows to 2017) is replaced by the change over the last twelve months (−11% at 2026-10-18), and the verdict no longer quotes it. *What the hash rate is* now says brute-force guessing, not calculation, and spells out the block reward (3.125 BTC since April 2024, halving about every four years, valued at the price) and mempool fees (driven mostly by congestion and urgency, only loosely by the price). Range chips (*Since 2010 / 2016 / 2020*; *Since 2011 / 2016 / 2020* on the price chart; 44px, nothing stored): a later view shows only the fits that start inside it, and the price chart adds the fit from 2020 (price ∝ hash^0.74). New section **So is it a power law?**: price and hash-rate exponents from the same starts (price 5.50 / 5.64 / 4.50, the last loose at R² 0.63; hash 10.89 / 7.38 / 5.70, all R² ≥ 0.95), and the page's point of view: not one law but downstream of the price (miners spend roughly what mining pays; as efficiency gains shrink, the hash rate grows nearer in step with the price), with the latest hash exponent (5.7) now near the price's (5.5); framed as a reading the next years will test, halvings pulling the other way.
+
+**Console.** `hrQA()`. **OG.** Product-forward (`build-og-images.py`, card `bitcoin-hash-rate`).
 

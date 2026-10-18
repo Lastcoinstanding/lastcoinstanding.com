@@ -88,6 +88,7 @@ module.exports = function (eleventyConfig) {
     'og-the-bitcoin-floor.jpg',
     'og-bitcoin-spikes.jpg',
     'og-bitcoin-in-gold.jpg',
+    'og-bitcoin-hash-rate.jpg',
     'og-compare-retirement-plans.jpg',
     'og-compare-retirement-plans-v2.jpg',
     'og-bitcoin-retirement.jpg',

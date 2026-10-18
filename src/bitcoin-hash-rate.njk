@@ -1,0 +1,139 @@
+---
+layout: base.njk
+permalink: /bitcoin-hash-rate.html
+slug: bitcoin-hash-rate
+related:
+  - slug: the-power-law
+    desc: "The price power law this page sets beside the hash rate: the site&rsquo;s reference trend, its channel and the tests that would show it breaking."
+  - slug: bitcoin-in-gold
+    desc: "The same trend measured in another unit: bitcoin priced in ounces of gold since 2011."
+  - slug: bitcoin-and-metcalfes-law
+    desc: "Another network measure fitted against price: holders and active addresses, and how well the fit has held across eras."
+  - slug: risks-to-bitcoin
+    desc: "What hash rate does not show: how concentrated the mining pools are, and where the miners sit."
+eleventyComputed:
+  head_extras: "{% include '_pageassets/bitcoin-hash-rate-head.html' %}"
+  page_styles: "{% include '_pageassets/bitcoin-hash-rate.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/hash-rate-data.js' %}\n{% include '_pageassets/bitcoin-hash-rate.js' %}"
+---
+<div class="hr-page">
+
+  <header class="hr-header">
+    <div class="hr-eyebrow">The Power Law &middot; the network</div>
+    <h1>The hash rate, as a <em>power law</em></h1>
+    <p class="hr-subtitle">Bitcoin&rsquo;s computing power has grown a hundred-trillion-fold since 2010. Fitted the way the price is, it follows a power law over any stretch you pick, but a different one each time: the growth keeps slowing, and the price moves first.</p>
+  </header>
+
+  <div class="hr-attribution">
+    <div class="hr-attribution-label">Lineage &amp; attribution</div>
+    <p><strong>Dr.&nbsp;Giovanni Santostasi</strong>, who first framed bitcoin&rsquo;s price as a power law of time, has fitted the hash rate and active addresses the same way. <strong>Stephen Perrenod</strong> fitted the mining difficulty, which tracks the hash rate, and found an index of about 11.4 (<a href="https://stephenperrenod.substack.com/p/bitcoins-power-laws" target="_blank" rel="noopener">&ldquo;Bitcoin&rsquo;s power laws&rdquo;</a>). The fits below, the rolling exponent and the price comparisons are this site&rsquo;s own, computed from Blockchain.com&rsquo;s hash-rate estimates and the site&rsquo;s price record.</p>
+  </div>
+
+  <!-- READOUT -->
+  <section class="hr-readout" aria-live="polite">
+    <div class="hr-readout-row">
+      <div class="hr-stat hr-stat-key"><div class="hr-stat-value" id="hrNow">&mdash;</div><div class="hr-stat-label">hash rate now, 7-day mean (<span id="hrNowUnit">EH/s</span>)</div></div>
+      <div class="hr-stat"><div class="hr-stat-value" id="hrDblNow">&mdash;</div><div class="hr-stat-label">to double, assuming the last four years&rsquo; pace</div></div>
+      <div class="hr-stat"><div class="hr-stat-value" id="hrYoY">&mdash;</div><div class="hr-stat-label">change over the last twelve months</div></div>
+      <div class="hr-stat"><div class="hr-stat-value" id="hrBNow">&mdash;</div><div class="hr-stat-label">power-law exponent, last four years</div></div>
+    </div>
+    <p class="hr-verdict" id="hrVerdict"></p>
+    <p class="hr-source" id="hrSource"></p>
+  </section>
+
+  <section class="hr-section">
+    <h2>What the hash rate is</h2>
+    <p>Miners compete to add the next block by brute force. There is no calculation to solve and no shortcut: each miner takes the block it wants to add, adds a number, and runs it through a hash function, which returns what is in effect a random number. If that number is below a target, the block is valid; if not, change the number and try again. It is closer to rolling dice trillions of times a second than to working anything out. The hash rate is how many of those guesses the whole network makes each second, measured in hashes per second. Today that runs to zettahashes: a zettahash is 10<sup>21</sup>, a thousand billion billion. Nobody reports the figure: it is estimated from how hard the target is (the difficulty) and how fast blocks are actually found, so a single day&rsquo;s figure is noisy. This page uses weekly averages.</p>
+    <p>It matters because it is the cost of attacking the network. To rewrite recent blocks, an attacker would need more computing power than everyone else combined, and every rise in the hash rate raises that bar. That work is paid for in two ways. The first is the block reward: a fixed number of new bitcoin per block (3.125 since April 2024), halved about every four years, whose value to the miner is that number times bitcoin&rsquo;s price in dollars or other currency, the way most participants judge it. The second is the fees on the transactions the block picks up from the mempool, the queue of transactions waiting to be confirmed. A higher price can mean higher fees, but not necessarily: fees depend mostly on how crowded the mempool is and how urgently people want their transactions confirmed. Both streams, and so the hash rate miners can afford, rise and fall with the price.</p>
+  </section>
+
+  <div class="hr-chart-container">
+    <div class="hr-chart-kicker">Hash rate since 2010</div>
+    <div class="hr-chart-title">Three power laws, one record</div>
+    <div class="hr-chart-subtitle">The weekly hash rate on a log scale, with a power law fitted from three different starting years. Each line fits its own stretch well; none fits the whole record. Pick a later start to see the recent stretch at a readable scale.</div>
+    <div class="hr-range" role="group" aria-label="Range of the hash-rate chart"><span class="hr-range-label">Show:</span><button type="button" class="hr-chip is-active" data-chart="hash" data-from="2010" aria-pressed="true">Since 2010</button><button type="button" class="hr-chip" data-chart="hash" data-from="2016" aria-pressed="false">Since 2016</button><button type="button" class="hr-chip" data-chart="hash" data-from="2020" aria-pressed="false">Since 2020</button></div>
+    <div class="hr-chart-wrapper" data-chart-copy data-chart-title="Bitcoin hash rate and three power-law fits" data-chart-heading="closest:.hr-chart-container .hr-chart-title" data-chart-sub="closest:.hr-chart-container .hr-chart-subtitle"><canvas id="hrHashChart" role="img" aria-label="Bitcoin's weekly hash rate since 2010 on a log scale, with power-law fits from 2011, 2016 and 2020; each later fit is flatter."></canvas><div class="lcs-pulse-halo" id="hrPulse" aria-hidden="true"></div></div>
+  </div>
+
+  <section class="hr-section">
+    <h2>A law that keeps slowing</h2>
+    <p>A power law grows quickly at first and more slowly later, but at a steady rate in the right units: the exponent should be the same whatever stretch you fit. Fit the hash rate from three starting years and the exponent falls each time.</p>
+    <div class="hr-table-wrap">
+      <table class="hr-table">
+        <thead><tr><th>Fit</th><th>Exponent</th><th>R&sup2;</th><th>Implied doubling time</th><th>Today against it</th></tr></thead>
+        <tbody id="hrFitBody"></tbody>
+      </table>
+    </div>
+    <p class="hr-read" id="hrFitRead"></p>
+  </section>
+
+  <div class="hr-chart-container">
+    <div class="hr-chart-kicker">The exponent over time</div>
+    <div class="hr-chart-title">The power-law exponent, four years at a time</div>
+    <div class="hr-chart-subtitle">Each point is the exponent fitted to the four years before that date. A stable power law would draw a flat line.</div>
+    <div class="hr-chart-wrapper hr-chart-short" data-chart-copy data-chart-title="Rolling four-year hash-rate exponent" data-chart-heading="closest:.hr-chart-container .hr-chart-title" data-chart-sub="closest:.hr-chart-container .hr-chart-subtitle"><canvas id="hrRollChart" role="img" aria-label="The hash-rate power-law exponent fitted to rolling four-year windows: high through 2017, then much lower."></canvas></div>
+  </div>
+
+  <section class="hr-section">
+    <p>Most of the early speed came from the machines. Mining moved from ordinary processors to graphics cards to chips built for nothing else, and each step multiplied the hashes a dollar of electricity could buy. Those leaps have run their course: chips still improve, but by smaller steps, and the hash rate now depends more on how much miners spend than on leaps in efficiency. That is why the exponent fell, and why the hash rate today sits well below a line drawn through its fast early years.</p>
+  </section>
+
+  <section class="hr-section">
+    <h2>So is it a power law?</h2>
+    <p>Not one power law. Bitcoin&rsquo;s price, fitted the same way, keeps roughly the same exponent as the starting year moves; the hash rate&rsquo;s falls steadily. Here are both, from the same starting years:</p>
+    <div class="hr-table-wrap">
+      <table class="hr-table">
+        <thead><tr><th>Fit from</th><th>Price exponent</th><th>Price R&sup2;</th><th>Hash-rate exponent</th><th>Hash-rate R&sup2;</th></tr></thead>
+        <tbody id="hrCompareBody"></tbody>
+      </table>
+    </div>
+    <p class="hr-read" id="hrCompareRead"></p>
+    <p>This page&rsquo;s reading: the hash rate is not a law of its own. It is downstream of the price. A miner&rsquo;s revenue is the reward and fees, valued at the price, and over time miners spend roughly what mining pays on machines and electricity. When chips were getting dramatically better each generation, the same spending bought ever more hashes, and the hash rate raced ahead of the price. As those gains shrink, the hash rate grows more nearly in step with what is spent on it, which follows the price. If that is right, the hash rate&rsquo;s exponent should settle near the price&rsquo;s, plus whatever chips still improve, rather than keep falling, and the next few years of data will test it. It is a reading of the record, not a law; the halvings, which cut the reward in half every four years, pull the other way.</p>
+  </section>
+
+  <!-- PRICE -->
+  <section class="hr-section">
+    <h2>Price and hash rate</h2>
+    <p>Each dot below is a month: bitcoin&rsquo;s price against the hash rate that month, both on log scales. A straight band of dots means one grows as a power of the other.</p>
+  </section>
+
+  <div class="hr-chart-container">
+    <div class="hr-chart-kicker">Price against hash rate, 2011 to today</div>
+    <div class="hr-chart-title">Bitcoin&rsquo;s price, plotted against its hash rate</div>
+    <div class="hr-chart-subtitle">Monthly samples, with the power law fitted from the year you pick (and, from 2016 or 2020, the 2011 fit for comparison).</div>
+    <div class="hr-range" role="group" aria-label="Range of the price chart"><span class="hr-range-label">Show:</span><button type="button" class="hr-chip is-active" data-chart="price" data-from="2011" aria-pressed="true">Since 2011</button><button type="button" class="hr-chip" data-chart="price" data-from="2016" aria-pressed="false">Since 2016</button><button type="button" class="hr-chip" data-chart="price" data-from="2020" aria-pressed="false">Since 2020</button></div>
+    <div class="hr-chart-wrapper" data-chart-copy data-chart-title="Bitcoin price against hash rate" data-chart-heading="closest:.hr-chart-container .hr-chart-title" data-chart-sub="closest:.hr-chart-container .hr-chart-subtitle"><canvas id="hrPriceChart" role="img" aria-label="Bitcoin's monthly price against its hash rate since 2011 on log scales, with power-law fits from 2011 and 2016."></canvas><div class="lcs-pulse-halo" id="hrPricePulse" aria-hidden="true"></div></div>
+  </div>
+
+  <section class="hr-section">
+    <p class="hr-read" id="hrPriceRead"></p>
+    <h3>Which moves first?</h3>
+    <p>Take each month&rsquo;s change over the year before, in price and in hash rate, and line the two up with one shifted against the other. The taller a bar, the more closely the two changes track at that shift.</p>
+  </section>
+
+  <div class="hr-chart-container">
+    <div class="hr-chart-kicker">Lead and lag, 2014 to today</div>
+    <div class="hr-chart-title">Price first, hash rate after</div>
+    <div class="hr-chart-subtitle">Correlation between the year-over-year change in price and in hash rate, with price shifted from twelve months behind to twelve months ahead. The brightest bar is the best match.</div>
+    <div class="hr-chart-wrapper hr-chart-short" data-chart-copy data-chart-title="Price growth against hash-rate growth, by lead" data-chart-heading="closest:.hr-chart-container .hr-chart-title" data-chart-sub="closest:.hr-chart-container .hr-chart-subtitle"><canvas id="hrLagChart" role="img" aria-label="Bar chart of the correlation between price growth and hash-rate growth at leads of minus twelve to plus twelve months; the bars are highest when price leads by several months."></canvas></div>
+  </div>
+
+  <section class="hr-section">
+    <p class="hr-read" id="hrLagRead"></p>
+    <p>That order is what the economics would predict. A higher price raises what each block pays, miners buy and plug in more machines, and the new machines take months to order, ship and power up. The hash rate is the security the price pays for, and it follows the price; it does not forecast it. A rising hash rate says the network is getting harder to attack, and that miners expect mining to pay. It says nothing about where the price goes next.</p>
+  </section>
+
+  <section class="hr-section hr-pointer">
+    <h2>What this page does not show</h2>
+    <p>A high hash rate is not the whole of security. How the mining is spread matters too: across pools, across countries, across power sources. <a href="/risks-to-bitcoin">Risks to Bitcoin</a> covers pool concentration and where the miners are. For bitcoin&rsquo;s price as a power law of time, the trend this page measures the hash rate against, start with <a href="/the-power-law">The Power Law</a>.</p>
+  </section>
+
+  <div class="hr-caveats">
+    <h3>Method and sources</h3>
+    <p><strong>Hash rate:</strong> Blockchain.com&rsquo;s daily estimate (<a href="https://www.blockchain.com/explorer/charts/hash-rate" target="_blank" rel="noopener">chart</a>), averaged by week from 2010; today&rsquo;s figure is the mean of the last seven daily estimates. Other trackers estimate it differently and can differ by a few percent.</p>
+    <p><strong>The fits:</strong> least squares of the logarithm of hash rate on the logarithm of days since the genesis block (3 January 2009), the same form as the price power law, from 2011, 2016 and 2020, and over rolling four-year windows, refitted each time the page loads. Doubling times come from the slope of the hash rate&rsquo;s logarithm against time over each window.</p>
+    <p><strong>Price against hash rate:</strong> the site&rsquo;s price record (the samples behind <a href="/the-power-law">The Power Law</a>) against the hash rate of the same week. <strong>Which moves first:</strong> year-over-year changes in the logarithms of price and hash rate, monthly from 2014, correlated with one shifted by up to twelve months. A correlation shows the two move together at that shift; it does not by itself prove which causes which.</p>
+    <p><strong>Sources:</strong> <a href="https://www.blockchain.com/explorer/charts/hash-rate" target="_blank" rel="noopener">Blockchain.com, hash rate</a>; <a href="https://stephenperrenod.substack.com/p/bitcoins-power-laws" target="_blank" rel="noopener">Stephen Perrenod, &ldquo;Bitcoin&rsquo;s power laws&rdquo;</a>; Giovanni Santostasi&rsquo;s power-law work on hash rate and addresses.</p>
+  </div>
+
+</div>

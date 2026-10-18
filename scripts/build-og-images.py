@@ -657,6 +657,29 @@ CARDS = [
         },
         "output_filename": "og-bitcoin-in-gold.jpg",
     },
+    {
+        # Bitcoin's Hash Rate (2026-10-18): the weekly hash rate with fits from
+        # 2011, 2016 and 2020. Product-forward: reads HASH_WEEKLY and today's
+        # estimate, so it goes stale with the data (MONTHLY_REFRESH_CHECKLIST §6).
+        "name": "bitcoin-hash-rate",
+        "url": "https://lastcoinstanding.com/bitcoin-hash-rate",
+        "hero_selector": "#hrHashChart",
+        "inject_js": "(()=>{const s=document.createElement('style');s.textContent='.chart-copy-btn{display:none!important}';document.head.appendChild(s);})()",
+        "wait_after_navigate_ms": 3000,
+        "wait_after_scroll_ms": 800,
+        "chrome": {
+            "title": "The hash rate, as a ",
+            "titleAccent": "power law",
+            "titleAfter": "",
+            "subtitle": "Bitcoin's computing power fits a power law over any stretch, but a slower one each time, and it follows the price.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Three starts, three exponents</strong>'
+                '  ·  price moves first'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-hash-rate",
+        },
+        "output_filename": "og-bitcoin-hash-rate.jpg",
+    },
 ]
 
 

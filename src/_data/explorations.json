@@ -160,6 +160,15 @@
     "interactive": false
   },
   {
+    "_comment": "Bitcoin's hash rate fitted as a power law of time (2026-10-18, JM): fits from 2011, 2016 and 2020 and a rolling four-year exponent (falling), price against hash rate, and which moves first (price, by about six months). Live from shared/hash-rate-data.js (Blockchain.com weekly means) and PL_DATA; today's figure from fetchHashRate(). A read: no inputs, no calculator_tile.",
+    "slug": "bitcoin-hash-rate",
+    "launched": "2026-10-18",
+    "title": "Bitcoin's Hash Rate",
+    "category": "numbers",
+    "group": "The Power Law",
+    "interactive": false
+  },
+  {
     "_comment": "The lower edge of the Power Law channel, taken on its own. Grouped with Models & Trends beside the-power-law, which owns the model; this page owns the line it has agreed to be judged against. interactive: true — live distance readout, episode explorer, endpoint-toggled parity instrument, live tripwire status — but it takes NO plan inputs and stores nothing, so there is no sticky state and no URL scenario params: it is a read, not a calculator. Everything historical is measured on the MODERN set (2011 onward, MODERN_FROM in the page JS, the same boundary the tripwire uses); the 2010 genesis samples appear once in the record section and are excluded from every measurement and every chart position, because a position is weight. floorParityQA() asserts three things on every load: the published full-set fixture, the modern-set fixture, and a leak check that no pre-2011 sample reaches the displayed set. Tile anchor is '' — the payload is the live readout at the top of the page. SVG tile at components/calc-tile-icons/the-bitcoin-floor.njk.",
     "slug": "the-bitcoin-floor",
     "title": "The Bitcoin Floor",

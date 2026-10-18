@@ -134,6 +134,17 @@ def gold_monthly():
 
 
 @safe
+def hash_weekly():
+    # Blockchain.com weekly hash rate (DATA_AUDIT HR-1): the last full week
+    # should be within about five weeks of today.
+    s = read(PA, 'shared', 'hash-rate-data.js')
+    days = re.findall(r'\[(\d+(?:\.\d+)?),[\d.e+-]+\]', re.search(r'var HASH_WEEKLY = \[(.*?)\];', s, re.S).group(1))
+    last = GENESIS + dt.timedelta(days=int(float(days[-1])))
+    by_age('HASH_WEEKLY (Blockchain.com weekly hash rate)', last, 35, 45, 'monthly', '§1',
+           'shared/hash-rate-data.js', "Bitcoin's Hash Rate; re-pull whole")
+
+
+@safe
 def tr_comparators():
     s = read(PA, 'shared', 'tr-comparator-data.js')
     for name in ('SP500_TR_DATA', 'NDQ_TR_DATA'):
