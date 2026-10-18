@@ -487,9 +487,11 @@
   }
   // Pretty-format date string yyyy-mm-dd → 'Mon dd, yyyy'
   function fmtDate(isoStr) {
+    // UTC getters: an ISO date parses as UTC midnight, so local getters showed
+    // the day before anywhere west of UTC ("Nov 27" for a 28 Nov sample).
     var d = new Date(isoStr);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    return months[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
   }
 
   // Format USD with $ prefix and commas / abbreviations
@@ -524,6 +526,19 @@
 
   var calcChart = null;
   var calcMode = 'lump';
+  var presetStart = null;   // the active top preset's own date, or null (see recomputeCalc)
+
+  // The calculator's time points: the start date itself (bitcoin priced that
+  // day, each index at its nearest monthly sample), then every monthly sample
+  // after it. For a start on a monthly row this is exactly the rows from there.
+  function calcPoints(startDate) {
+    var pts = [{ date: startDate, btc: btcPriceOnDate(startDate), sp: valueOnDate(SP500_TR_DATA, startDate), ndq: valueOnDate(NDQ_TR_DATA, startDate) }];
+    for (var i = 0; i < SP500_TR_DATA.length; i++) {
+      var d = SP500_TR_DATA[i][0];
+      if (d > startDate) pts.push({ date: d, btc: btcPriceOnDate(d), sp: SP500_TR_DATA[i][1], ndq: NDQ_TR_DATA[i][1] });
+    }
+    return pts;
+  }
 
   var SLIDER_RANGES = {
     lump:    { min: 1000, max: 100000, step: 1000, value: 10000 },
@@ -556,6 +571,68 @@
     }
   };
 
+  /* ── Measure in: Dollars | Bitcoin (2026-10-18, JM; PAGE_IDEAS_BACKLOG
+     "Measure in BTC") ──
+     The same history, counted in bitcoin instead of dollars: each position's
+     dollar value on a date divided by bitcoin's price on that date, using the
+     same price lookup (btcPriceOnDate) the dollar view uses, so the bitcoin
+     view is the dollar view divided through, by construction. History only:
+     the §3 projection stays in dollars (JM: a model divided by a model adds
+     nothing and reads like a forecast). Opens on dollars; ?unit=btc opens on
+     bitcoin; nothing is stored. */
+  var calcUnit = 'usd';
+  var UNIT_LABELS = {
+    lump: {
+      btcSub: 'Coins held today', spSub: 'Worth today, in bitcoin', ndqSub: 'Worth today, in bitcoin',
+      chartLabel: 'Each position counted in bitcoin \u2014 lump sum invested at the chosen start date',
+      chartCaption: 'Log-scale Y-axis, in bitcoin. The bitcoin position is the same number of coins throughout, so its line is flat; the other two lines show how many bitcoin each position would have bought on each date.'
+    },
+    dca: {
+      btcSub: 'Coins bought', spSub: 'Worth today, in bitcoin', ndqSub: 'Worth today, in bitcoin',
+      chartLabel: 'Each portfolio counted in bitcoin \u2014 weekly DCA from the chosen start date',
+      chartCaption: 'Log-scale Y-axis, in bitcoin. The bitcoin line is the coins bought so far, which is also every dollar put in, counted in bitcoin; the other two lines show how many bitcoin each portfolio would have bought on each date.'
+    }
+  };
+
+  // Bitcoin amounts: 3 significant figures below 100 BTC, whole coins above.
+  function fmtBtc(v) {
+    if (v === null || v === undefined || isNaN(v)) return '\u2014';
+    var abs = Math.abs(v);
+    if (abs >= 100) return Math.round(v).toLocaleString() + ' BTC';
+    if (abs === 0) return '0 BTC';
+    var dp = Math.max(0, 2 - Math.floor(Math.log10(abs)));
+    return v.toFixed(Math.min(dp, 8)) + ' BTC';
+  }
+  function fmtVal(v) { return calcUnit === 'btc' ? fmtBtc(v) : fmtUsd(v); }
+  // A signed percentage change, "+12%" / "\u221294%".
+  function fmtChange(r) {
+    var p = Math.round(r * 100);
+    return (p > 0 ? '+' : p < 0 ? '\u2212' : '') + Math.abs(p) + '%';
+  }
+
+  function applyCalcLabels() {
+    var L = calcUnit === 'btc' ? Object.assign({}, MODE_LABELS[calcMode], UNIT_LABELS[calcMode]) : MODE_LABELS[calcMode];
+    var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+    setText('bvsmBtcSublabel',  L.btcSub);
+    setText('bvsmSpSublabel',   L.spSub);
+    setText('bvsmNdqSublabel',  L.ndqSub);
+    setText('bvsmChartLabel',   L.chartLabel);
+    setText('bvsmChartCaption', L.chartCaption);
+  }
+
+  function setUnit(u) {
+    calcUnit = u === 'btc' ? 'btc' : 'usd';
+    document.querySelectorAll('.bvsm-unit').forEach(function (b) {
+      var on = b.getAttribute('data-unit') === calcUnit;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var note = document.getElementById('bvsmUnitNote');
+    if (note) note.hidden = calcUnit !== 'btc';
+    applyCalcLabels();
+    recomputeCalc();
+  }
+
   function setMode(newMode, opts) {
     opts = opts || {};
     calcMode = newMode;
@@ -576,11 +653,7 @@
     };
     setText('bvsmCalcHeading',  L.heading);
     setText('bvsmPresetsLabel', L.presetsLabel);
-    setText('bvsmBtcSublabel',  L.btcSub);
-    setText('bvsmSpSublabel',   L.spSub);
-    setText('bvsmNdqSublabel',  L.ndqSub);
-    setText('bvsmChartLabel',   L.chartLabel);
-    setText('bvsmChartCaption', L.chartCaption);
+    applyCalcLabels();
 
     // Amount label — preserve the nested help-tip span, update only the
     // leading text node and the tip-content text
@@ -610,7 +683,11 @@
     var amountEl = document.getElementById('bvsmAmount');
     if (!startEl || !amountEl) return;
 
-    var startDate = sliderIndexToDate(parseInt(startEl.value, 10));
+    // A top preset starts on its own date (bitcoin priced that day; the indices
+    // at their nearest monthly sample), not on the slider's monthly row
+    // (2026-10-18, JM: "2013 top" had bought on 28 Dec 2013 at about $660, not at
+    // the top's ~$1,134). Dragging the slider returns to the monthly rows.
+    var startDate = presetStart || sliderIndexToDate(parseInt(startEl.value, 10));
     var amount = parseFloat(amountEl.value);
 
     document.getElementById('bvsmStartDateVal').textContent = fmtDate(startDate);
@@ -625,20 +702,6 @@
 
   function rowHtml(label, value) {
     return '<div class="row"><span class="row-label">' + label + '</span><span class="row-val">' + value + '</span></div>';
-  }
-
-  function findStartIdx(startDate) {
-    for (var i = 0; i < SP500_TR_DATA.length; i++) {
-      if (SP500_TR_DATA[i][0] === startDate) return i;
-    }
-    // Nearest by absolute date diff
-    var target = new Date(startDate).getTime();
-    var minDiff = Infinity, bestIdx = -1;
-    for (var j = 0; j < SP500_TR_DATA.length; j++) {
-      var diff = Math.abs(new Date(SP500_TR_DATA[j][0]).getTime() - target);
-      if (diff < minDiff) { minDiff = diff; bestIdx = j; }
-    }
-    return bestIdx;
   }
 
   function computeLumpResults(startDate, amount) {
@@ -659,6 +722,12 @@
     var btcCagr = Math.pow(btcValue / amount, 1 / years) - 1;
     var spCagr  = Math.pow(spValue  / amount, 1 / years) - 1;
     var ndqCagr = Math.pow(ndqValue / amount, 1 / years) - 1;
+
+    if (calcUnit === 'btc') {
+      renderLumpBtc(startDate, amount, years, btc0, btc1, spValue, ndqValue);
+      renderLumpChart(startDate, amount, btc0, sp0, ndq0);
+      return;
+    }
 
     document.getElementById('bvsmBtcValue').textContent = fmtUsd(btcValue);
     document.getElementById('bvsmSpValue').textContent  = fmtUsd(spValue);
@@ -707,18 +776,18 @@
     var weeklyAmt = amount;
     var monthlyAmt = weeklyAmt * 52 / 12;
 
-    var startIdx = findStartIdx(startDate);
+    var pts = calcPoints(startDate);
 
     var labels = [];
     var investedSeries = [], btcSeries = [], spSeries = [], ndqSeries = [];
     var btcUnits = 0, spUnits = 0, ndqUnits = 0;
     var totalInvested = 0;
 
-    for (var i = startIdx; i < SP500_TR_DATA.length; i++) {
-      var dateStr = SP500_TR_DATA[i][0];
-      var btcP = btcPriceOnDate(dateStr);
-      var spP  = SP500_TR_DATA[i][1];
-      var ndqP = NDQ_TR_DATA[i][1];
+    for (var i = 0; i < pts.length; i++) {
+      var dateStr = pts[i].date;
+      var btcP = pts[i].btc;
+      var spP  = pts[i].sp;
+      var ndqP = pts[i].ndq;
 
       btcUnits += monthlyAmt / btcP;
       spUnits  += monthlyAmt / spP;
@@ -735,6 +804,17 @@
     var btcFinal = btcSeries[btcSeries.length - 1] || 0;
     var spFinal  = spSeries[spSeries.length - 1]  || 0;
     var ndqFinal = ndqSeries[ndqSeries.length - 1] || 0;
+
+    if (calcUnit === 'btc') {
+      // Counted in bitcoin: each portfolio's dollar value on each date over
+      // bitcoin's price that date. The bitcoin line is the coins bought.
+      var px = pts.map(function (q) { return q.btc; });
+      var inBtc = function (arr) { return arr.map(function (v, j) { return v / px[j]; }); };
+      var bS = inBtc(btcSeries), sS = inBtc(spSeries), nS = inBtc(ndqSeries);
+      renderDcaBtc(startDate, labels, totalInvested, bS[bS.length - 1] || 0, sS[sS.length - 1] || 0, nS[nS.length - 1] || 0);
+      renderDcaChart(labels, null, bS, sS, nS);
+      return;
+    }
 
     document.getElementById('bvsmBtcValue').textContent = fmtUsd(btcFinal);
     document.getElementById('bvsmSpValue').textContent  = fmtUsd(spFinal);
@@ -760,20 +840,71 @@
     renderDcaChart(labels, investedSeries, btcSeries, spSeries, ndqSeries);
   }
 
+  // ── The bitcoin view's cards and verdicts (enumerated, STYLE_GUIDE §12) ──
+  // How an index fared against bitcoin, as a clause: "would now buy 0.42 BTC,
+  // 95% fewer" / "would now buy 1.30 BTC, 12% more" / "would buy about the same".
+  function againstBtcClause(name, nowBtc, thenBtc) {
+    var r = nowBtc / thenBtc - 1;
+    if (Math.abs(r) < 0.005) return 'the ' + name + ' position would buy about the same, ' + fmtBtc(nowBtc);
+    return 'the ' + name + ' position would now buy ' + fmtBtc(nowBtc) + ', ' + Math.abs(Math.round(r * 100)) + '% ' + (r < 0 ? 'fewer' : 'more');
+  }
+  function againstBtcSummary(spR, ndqR) {
+    var spDown = spR < 1, ndqDown = ndqR < 1;
+    if (spDown && ndqDown) return 'Bitcoin rose against both indices. The stock positions grew in dollars, but each dollar of them buys fewer bitcoin than when it went in.';
+    if (!spDown && !ndqDown) return 'Over this stretch both indices rose against bitcoin: the stock positions would buy more bitcoin than the money bought on the start date.';
+    return 'Over this stretch one index rose against bitcoin and the other fell: ' + (spDown ? 'the NASDAQ-100 would buy more bitcoin than at the start, the S&amp;P 500 fewer.' : 'the S&amp;P 500 would buy more bitcoin than at the start, the NASDAQ-100 fewer.');
+  }
+  var UNIT_FOOT = ' <span class="bvsm-unit-foot">Past prices, counted in bitcoin; not a forecast.</span>';
+
+  function renderLumpBtc(startDate, amount, years, btc0, btc1, spValueUsd, ndqValueUsd) {
+    var coins = amount / btc0;                       // what the money bought, in bitcoin
+    var spBtc = spValueUsd / btc1, ndqBtc = ndqValueUsd / btc1;
+    document.getElementById('bvsmBtcValue').textContent = fmtBtc(coins);
+    document.getElementById('bvsmSpValue').textContent  = fmtBtc(spBtc);
+    document.getElementById('bvsmNdqValue').textContent = fmtBtc(ndqBtc);
+    var bought = rowHtml('Bought on the day', fmtBtc(coins));
+    document.getElementById('bvsmBtcRows').innerHTML = bought + rowHtml('Change in bitcoin', '0%');
+    document.getElementById('bvsmSpRows').innerHTML  = bought + rowHtml('Change in bitcoin', fmtChange(spBtc / coins - 1));
+    document.getElementById('bvsmNdqRows').innerHTML = bought + rowHtml('Change in bitcoin', fmtChange(ndqBtc / coins - 1));
+    var v = 'Counted in bitcoin: on ' + fmtDate(startDate) + ', ' + fmtUsd(amount) + ' bought <strong>' + fmtBtc(coins) + '</strong>, and the bitcoin position is still those coins. Today ' +
+      againstBtcClause('S&amp;P 500', spBtc, coins) + ', and ' + againstBtcClause('NASDAQ-100', ndqBtc, coins) + '. ' + againstBtcSummary(spBtc / coins, ndqBtc / coins);
+    if (years < 3) v += ' This is a short horizon by the page&rsquo;s argument.';
+    document.getElementById('bvsmVerdict').innerHTML = v + UNIT_FOOT;
+  }
+
+  function renderDcaBtc(startDate, labels, totalInvested, coins, spBtc, ndqBtc) {
+    document.getElementById('bvsmBtcValue').textContent = fmtBtc(coins);
+    document.getElementById('bvsmSpValue').textContent  = fmtBtc(spBtc);
+    document.getElementById('bvsmNdqValue').textContent = fmtBtc(ndqBtc);
+    var inv = rowHtml('Total invested', fmtUsd(totalInvested));
+    var vs = function (x) { return rowHtml('Against the bitcoin bought', coins > 0 ? fmtMultiple(x / coins) : '\u2014'); };
+    document.getElementById('bvsmBtcRows').innerHTML = inv + vs(coins);
+    document.getElementById('bvsmSpRows').innerHTML  = inv + vs(spBtc);
+    document.getElementById('bvsmNdqRows').innerHTML = inv + vs(ndqBtc);
+    var v;
+    if (totalInvested === 0 || labels.length === 0 || coins <= 0) {
+      v = '<strong>Pick a start date earlier than today</strong> to see the DCA outcome.';
+    } else {
+      v = 'Counted in bitcoin: after <strong>' + (labels.length / 12).toFixed(1) + ' years</strong> of weekly buys from ' + fmtDate(startDate) + ', ' + fmtUsd(totalInvested) + ' bought <strong>' + fmtBtc(coins) + '</strong>. The same buys in the S&amp;P 500 would now be worth <strong>' + fmtBtc(spBtc) + '</strong> (' + fmtMultiple(spBtc / coins) + ' the bitcoin bought), and in the NASDAQ-100 <strong>' + fmtBtc(ndqBtc) + '</strong> (' + fmtMultiple(ndqBtc / coins) + ').' + UNIT_FOOT;
+    }
+    document.getElementById('bvsmVerdict').innerHTML = v;
+  }
+
   function renderLumpChart(startDate, amount, btc0, sp0, ndq0) {
     var canvas = document.getElementById('bvsmCalcChart');
     if (!canvas || typeof Chart === 'undefined') return;
 
     var labels = [];
     var btcData = [], spData = [], ndqData = [];
-    var startIdx = findStartIdx(startDate);
+    var pts = calcPoints(startDate);
 
-    for (var i = startIdx; i < SP500_TR_DATA.length; i++) {
-      var dateStr = SP500_TR_DATA[i][0];
-      labels.push(dateStr.substring(0, 7));
-      btcData.push(amount * (btcPriceOnDate(dateStr) / btc0));
-      spData.push(amount * (SP500_TR_DATA[i][1] / sp0));
-      ndqData.push(amount * (NDQ_TR_DATA[i][1] / ndq0));
+    for (var i = 0; i < pts.length; i++) {
+      labels.push(pts[i].date.substring(0, 7));
+      var pxi = pts[i].btc;
+      var div = calcUnit === 'btc' ? pxi : 1;   // counted in bitcoin: divide by that date's price
+      btcData.push(amount * (pxi / btc0) / div);
+      spData.push(amount * (pts[i].sp / sp0) / div);
+      ndqData.push(amount * (pts[i].ndq / ndq0) / div);
     }
 
     var datasets = [
@@ -792,9 +923,11 @@
     var datasets = [
       { label: 'Bitcoin',             data: btcSeries,      borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.1, pointRadius: 0 },
       { label: 'S&P 500 (TR)',        data: spSeries,       borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'NASDAQ-100 (TR)',     data: ndqSeries,      borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 },
-      { label: 'Cumulative invested', data: investedSeries, borderColor: '#bfae97', borderWidth: 1.4, borderDash: [5, 4], fill: false, tension: 0.1, pointRadius: 0 }
+      { label: 'NASDAQ-100 (TR)',     data: ndqSeries,      borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.1, pointRadius: 0 }
     ];
+    // Counted in bitcoin, the dollars put in are the bitcoin line itself, so
+    // the invested line is left out rather than drawn on top of it.
+    if (investedSeries) datasets.push({ label: 'Cumulative invested', data: investedSeries, borderColor: '#bfae97', borderWidth: 1.4, borderDash: [5, 4], fill: false, tension: 0.1, pointRadius: 0 });
 
     drawCalcChart(canvas, labels, datasets);
   }
@@ -810,11 +943,11 @@
         interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { position: 'top', labels: { color: '#9a9080', font: { family: 'Inter', size: 11 } } },
-          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y); } } }
+          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtVal(ctx.parsed.y); } } }
         },
         scales: {
           x: { ticks: { color: '#6a6256', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { type: 'logarithmic', ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return fmtUsd(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+          y: { type: 'logarithmic', ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return fmtVal(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
         }
       }
     });
@@ -1036,12 +1169,14 @@
         document.querySelectorAll('.bvsm-preset').forEach(function(b){ b.classList.remove('is-active'); });
         btn.classList.add('is-active');
         var dateStr = btn.getAttribute('data-preset-date');
+        presetStart = dateStr;
+        // The slider shows the nearest monthly row; the calculation starts on
+        // the preset's own date (recomputeCalc).
+        var near = 0;
         for (var i = 0; i < SP500_TR_DATA.length; i++) {
-          if (SP500_TR_DATA[i][0] >= dateStr) {
-            document.getElementById('bvsmStartDate').value = i;
-            break;
-          }
+          if (Math.abs(Date.parse(SP500_TR_DATA[i][0]) - Date.parse(dateStr)) < Math.abs(Date.parse(SP500_TR_DATA[near][0]) - Date.parse(dateStr))) near = i;
         }
+        document.getElementById('bvsmStartDate').value = near;
         recomputeCalc();
       });
     });
@@ -1057,6 +1192,7 @@
       startEl.max = SP500_TR_DATA.length - 1;
       startEl.addEventListener('input', function(e) {
         if (e.isTrusted) {
+          presetStart = null;
           document.querySelectorAll('.bvsm-preset.is-active').forEach(function(b){
             b.classList.remove('is-active');
           });
@@ -1071,6 +1207,14 @@
     ['bvsmProjHorizon', 'bvsmProjInvest'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('input', recomputeProjection);
+    });
+
+    // Measure in: Dollars | Bitcoin (2026-10-18).
+    document.querySelectorAll('.bvsm-unit').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var u = btn.getAttribute('data-unit');
+        if (u !== calcUnit) setUnit(u);
+      });
     });
 
     // Stock-return chips (2026-10-18). Not a .bvsm-preset: that class is wired
@@ -1103,7 +1247,10 @@
     wireUp();
     // Initial render — setMode('lump', skipSliderReset:true) preserves the
     // HTML's default amount value (10000) rather than overwriting it.
+    var act = document.querySelector('.bvsm-preset.is-active');
+    if (act) presetStart = act.getAttribute('data-preset-date');
     setMode('lump', { skipSliderReset: true });
+    try { if (new URLSearchParams(window.location.search).get('unit') === 'btc') setUnit('btc'); } catch (e) {}
     recomputeProjection();
     // Chart.js measures legend text when a chart is built. Built before Inter
     // lands, the projection legend was laid out with the fallback font and
@@ -1724,6 +1871,7 @@
     }
 
     // 3. Clear any active preset (user is now on a custom date)
+    presetStart = null;
     document.querySelectorAll('.bvsm-preset.is-active').forEach(function(b) {
       b.classList.remove('is-active');
     });

@@ -155,6 +155,16 @@ eleventyComputed:
                     </div>
                 </div>
 
+                <!-- Measure in: Dollars | Bitcoin (2026-10-18, JM). The same history
+                     counted in bitcoin; history only, the projection stays in dollars. -->
+                <div class="bvsm-presets bvsm-units" role="group" aria-labelledby="bvsmUnitLabel">
+                    <span class="bvsm-presets-label" id="bvsmUnitLabel">Measure in:</span>
+                    <button type="button" class="bvsm-unit is-active" data-unit="usd" aria-pressed="true">Dollars</button>
+                    <button type="button" class="bvsm-unit" data-unit="btc" aria-pressed="false">Bitcoin</button>
+                    <span class="help-tip" tabindex="0">?<span class="tip-content"><strong>Bitcoin</strong> counts each position in bitcoin instead of dollars: its dollar value on each date divided by bitcoin&rsquo;s price that day. A bitcoin holding is then a fixed number of coins, and the question becomes how many bitcoin the stock positions would buy. The same past prices, a different measuring stick.</span></span>
+                </div>
+                <p class="bvsm-rates-note bvsm-unit-note" id="bvsmUnitNote" hidden>Counted in bitcoin. A line that falls means the position buys fewer bitcoin than it did, because bitcoin rose faster; it does not mean the position lost dollars. The page measures in dollars because that is how most savings and bills are still counted today; this is a second lens on the same history, not a forecast.</p>
+
                 <!-- Chart moved up here (was below the result cards). Makes the
                      graph the most-visible feedback as the reader drags sliders. -->
                 <div class="bvsm-chart-wrap">

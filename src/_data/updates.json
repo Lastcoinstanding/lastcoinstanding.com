@@ -2,6 +2,12 @@
   {
     "display": "10/18/26",
     "date": "2026-10-18",
+    "page": "/bitcoin-vs-the-stock-market",
+    "summary": "Bitcoin vs. the Stock Market: the history calculator can now measure in bitcoin, counting each position in coins instead of dollars. Also fixed: the cyclical-top presets were buying a few weeks after each top, at lower prices; they now buy at the top, so bitcoin's results there are lower than before."
+  },
+  {
+    "display": "10/18/26",
+    "date": "2026-10-18",
     "page": "/the-fixed-pie",
     "summary": "The Fixed Share, The Half-Life and three essays: gold's supply growth is now about 1.7% a year, doubling in about 41 years (was 2% and 35), from the World Gold Council's 2025 figures, with a note on where the number comes from. The Fixed Share's chart and figures recompute."
   },
