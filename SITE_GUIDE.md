@@ -2142,11 +2142,12 @@ _Last updated: June 2026. Update this document as editorial decisions crystalliz
 
 ### The groups (as of June 2026)
 
-**The Numbers** (27 items, four columns — the growth that drove the mega-panel; canonical source is `explorations.json`):
+**The Numbers** (27 items, four columns — the growth that drove the mega-panel; six columns and 37 items from 2026-10-18; canonical source is `explorations.json`):
 
 | Group (= panel column) | Pages |
 |---|---|
-| Models & Trends (8 + Bitcoin vs. The Stock Market, moved in 2026-10-02) | Bitcoin & The Power Law · Bitcoin & Metcalfe’s Law · The Bitcoin Doubling Ladder · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · Discount, or Premium? · The Bitcoin Floor · Bitcoin’s Spikes |
+| The Power Law (6) — split from *Models & Trends* 2026-10-18 (JM; §63) | Bitcoin & The Power Law · Bitcoin, Priced in Gold · The Bitcoin Floor · Bitcoin’s Spikes · The Bitcoin Doubling Ladder · Discount, or Premium? |
+| Markets & Cycles (5) — the rest of *Models & Trends*, 2026-10-18 | Bitcoin & Metcalfe’s Law · The Bitcoin Heatmap · Bitcoin Bull & Bear Cycles · The Bitcoin Rundown · Bitcoin vs. The Stock Market |
 | Real Estate (5) — replaced *Bitcoin vs. Other Assets* 2026-10-02 (§60) | Bitcoin and Real Estate (hub, "start here") · BTC vs. Real Estate · BTC vs. Rental Property · BTC vs. Paying Down the Mortgage · Compare Housing Plans |
 | Positioning & Strategy (14) | Lump Sum or Ladder In? · Your Bitcoin Deployment Plan · Wait, or Deploy Now? · The Bitcoin Retirement · Bitcoin Escape Velocity · Compare Retirement Plans · The Bitcoin Retirement Stress Test · Bitcoin Portfolio Allocation · Disciplined Rebalancing · The Bitcoin Hurdle Rate · How Much Bitcoin? · How Much Cash? · What Daily Conviction Bought · The Bitcoin Horizon |
 | Living on Bitcoin (6) | Borrowing Against Your Stack · Bitcoin Lenders Compared · Bitcoin-Backed Mortgages · Living on Bitcoin · Bitcoin and Fixed Income · The STRC Mechanism |
@@ -3695,3 +3696,22 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 - **Bar inputs (2026-10-05, `feat-dr-bar-inputs`).** From 601px up, the bar edits the rule in place while the chart is in view: a preset select, "Sell at", "then below" (fade only), "Sell %" and "Buy back at" number fields with the panel sliders' ranges and steps, and a deadline select, plus IRA / Taxable and "Edit rules". The rule sentence and summary sit below the controls in smaller text. Typing applies after 200ms when in range, blur clamps, and an empty field reverts; any edit makes the preset Custom. At 600px and below the bar is unchanged.
 - **Charts.** Chart 1 ranges: All history (to today + 1 year), 10 / 5 / 2 years (to today + 6 months), Out to 2035 (two years back); y fitted to the window, markers outside it not drawn, sticky as `dr:range`. Both charts label one tick per year, thinned to fit; Chart 2's bitcoin axis runs on round steps. Chart 2 has a caption on why the line moves while in cash.
 - **Washington** is two options on both pages (DATA_AUDIT DR-WA). The DR OG card still says "percentile" (TECH_DEBT).
+
+## 63. Bitcoin, Priced in Gold (`/bitcoin-in-gold.html`)
+
+**Added 2026-10-18 (JM).** The first page of the new **The Power Law** nav group (§30), which split *Models & Trends* the same day: The Power Law, this page, The Bitcoin Floor, Bitcoin's Spikes, The Doubling Ladder and Discount, or Premium? in one column; Metcalfe's Law, the Heatmap, Bull & Bear Cycles, The Rundown and Bitcoin vs. the Stock Market in *Markets & Cycles*. JM asked for the gold and hash-rate relationships as standalone pages in a Power Law group rather than tabs on The Power Law, for discoverability. The hash-rate page is next (PAGE_IDEAS_BACKLOG).
+
+**What it is.** Bitcoin's power law measured in ounces of gold: a read, not a calculator (no inputs, nothing stored, no calculator tile). Mixed-content tier (§4.2 of STYLE_GUIDE), page prefix `gb-`.
+
+**Data.** `shared/gold-monthly-data.js`: `GOLD_MONTHLY`, the World Bank Pink Sheet's monthly gold average from July 2010 (DATA_AUDIT GLD-1; read from the Bank's own CMO-Historical-Data-Monthly.xlsx, which matched datahub's copy row for row), and `fetchGoldPrice(cb)`, today's gold from Coinbase's XAU-USD spot, then PAX Gold on Kraken, else the latest month (labelled). Both sources send CORS headers this origin accepts (checked 2026-10-18).
+
+**Method (all computed at load; nothing typed).** Each `PL_DATA` sample divided by gold's average for its month; an OLS fit of log10(ounces) on log10(days since genesis) from 2011 (`FIT_FROM`); the dollar line fitted the same way over the same months, so the two multiples are like for like (the dollar multiple therefore differs a little from the site's reference model; the method note says so). The usual range is the 5th–95th percentile of the monthly multiples. At 2026-10-18 (Sep 2026 sample): b = 5.18, R² 0.94 in gold; 5.50 / 0.95 in dollars; range 0.30–3.56×; today 0.30× in gold (5% of months lower), 0.62× in dollars (29%).
+
+**Sections.** The readout (ounces today, the trend's ounces, the two multiples, an enumerated verdict and a source line naming live or fallback prices); a framing line in prose (§11.1 of STYLE_GUIDE: a position-dependent page that takes no input gets prose, not the tool-framing strip); the ounces chart (trend, range, today); the two multiples on one chart; the cycle lows (2015, 2018–19, March 2020, 2022–23, and the current bear, open) with an enumerated reading; *Why the lines parted* (gold's run from January 2024, computed from the series; the reading enumerated on depth); *How sturdy* (fits from 2011, 2013 and 2016 in both units: the gold exponent spans 0.79, the dollar 0.37); *Has bitcoin been this low before?* (runs below the range, with two-year outcomes and the caveat that every earlier one came by 2013, when bitcoin cost at most $14); the two readings (shown only while the gold multiple is below 0.75×); a pointer to The Bitcoin Migration's gold section (`/the-bitcoin-migration#gold`, an id added to that heading, JM's ask: the conceptual comparison lives there, not here) and The Half-Life; method and sources (Mezinskis/Porkopolis, Perrenod 2024, b1m.io, the World Bank).
+
+**What it found (for the record).** In gold, this bear market's low (0.25×, February 2026) is below every cycle low since 2015 (0.48–0.76×) and the lowest month of the 2011+ fit; in dollars its low (0.50×, July 2026) sits inside the earlier range (0.36–0.58×). The gap is mostly gold's run ($2,034 in January 2024 to $5,020 in February 2026, monthly averages). The gold fit is less stable than the dollar fit (exponent 5.18 / 4.59 / 4.39 from 2011 / 2013 / 2016, R² falling to 0.78).
+
+**Console.** `gbQA()` returns the fits, the range and today's reading.
+
+**OG.** Product-forward (`build-og-images.py`, card `bitcoin-in-gold`, hero `#gbOzChart`); `--base` captures from a local build or preview before the page is on production. Regenerate with the monthly refresh (MONTHLY_REFRESH_CHECKLIST §6).
+
