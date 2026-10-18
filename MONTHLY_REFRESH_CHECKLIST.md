@@ -43,6 +43,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | Power Law price series `PL_DATA` (also the live-price fallback) | `shared/power-law-data.js` | daily close | §1 |
 | Equity comparators `SP500_TR_DATA`, `NDQ_TR_DATA` (Day-28 rows) | `shared/tr-comparator-data.js` | Yahoo `^SP500TR`, QQQ adjusted close | §1 |
 | Bitcoin month-end closes `BTC_MONTHLY` | `shared/btc-monthly-data.js` | Yahoo BTC-USD | §1 |
+| Gold monthly average `GOLD_MONTHLY` (Bitcoin, Priced in Gold) | `shared/gold-monthly-data.js` | World Bank Pink Sheet, monthly | §1 |
 | The Power Law's three falsifiability tests (live on `/the-power-law#when-reliable`; read the statuses) | `the-power-law.js` | computed from `PL_DATA` | §9.8a |
 | Values computed once from `PL_DATA` and stored: `TREND_RATIO_PERCENTILES`; ~~Disciplined Rebalancing's percentile table~~ (live since 2026-10-04); What Daily Conviction Bought's FAQ and meta figures; the hurdle-rate meta line; Allocation Sizing's "about 0.44× today" tooltip | several | recompute from `PL_DATA` | §9.8 |
 | As-of callouts, captions and hand-typed callout values (Bitcoin vs. the Stock Market §1 and its "Through August 2026" returns; the Horizon's "through August 2026"; BvSM's §3 callout is live since 2026-10-14) | several `.njk` | recompute | §3, §4 |
@@ -296,6 +297,8 @@ month-end because the Horizon and Gallery rolling-CAGR computations key on
    daily movement (10%+) is a finding, not a rounding difference — that is
    exactly how the 2026 errors were caught.
 4. Bump the row counts and "through" months in each file's header comment.
+
+**Gold: `GOLD_MONTHLY` (`shared/gold-monthly-data.js`, from 2026-10-18; DATA_AUDIT GLD-1).** One row a month, `["YYYY-MM", dollars]`, the World Bank's monthly gold average in whole dollars, from the Bank's `CMO-Historical-Data-Monthly.xlsx` (sheet *Monthly Prices*, column *Gold*; the Bank posts the previous month in the first days of each month, and the URL's year segment changes each January: find it from the Commodity Markets page). Check the last three stored months against the new file too: the Bank revises. Then open `/bitcoin-in-gold` and read the page: every figure is live, but the prose around *Why the lines parted* describes gold's 2024–26 run and should still read true, and the two-readings paragraph shows only while the gold multiple is below 0.75×. The freshness report checks the series.
 
 **The right edge of two charts depends on this.** The heatmap and the BvSM
 wealth chart take their **end date from the last `SP500_TR_DATA` row**, not
@@ -658,6 +661,7 @@ monthly refresh and should be regenerated:
 | `og-calculators.jpg` | the featured-row mini-renderers (which themselves embed live data) |
 | `og-compare-retirement-plans-v2.jpg` | the paired balance curves for Plan A and Plan B (added 2026-08-26; bumped to `-v2` the same day after the copy review changed the page title and cut the legend to two entries) |
 | `og-bitcoin-spikes.jpg` | the Tab 2 cycle range chart (`#spDecayChart`): each cycle's low and spike against trend, with the live upper-band caption (added 2026-10-04; the stats line is fixed copy: 14× in 2011, 1.19× in 2024, 43% above trend; recheck those if a new spike or a refresh moves them) |
+| `og-bitcoin-in-gold.jpg` | the ounces chart (`#gbOzChart`): bitcoin in gold since 2011, the gold trend, the usual range and today's dot; the stats line is fixed copy with no figure (added 2026-10-18; `--only bitcoin-in-gold`) |
 | `og-disciplined-rebalancing-v2.jpg` | the calculator's rules card (`#dr2RuleCard`): both sliders on the shared 0.42×–4× scale, marked with past spikes and lows, beside the results against HODLing; the script's `inject_js` hides the page's text blocks so it fits 1280×720 (added 2026-10-06 as `-v2` so X refetched after caching a failed fetch of the old card) |
 
 Each card embeds `weeklyBtc` / `PL_DATA` / projection state, so each monthly

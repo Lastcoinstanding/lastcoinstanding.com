@@ -41,7 +41,6 @@
     "category": "foundations",
     "interactive": false
   },
-
   {
     "_comment": "── The Arguments — grouped via the `group` field; see SITE_GUIDE §30 (nav grouping). Group display order is controlled by base.njk's argumentsGroups array; item order within a group follows array order here. ──",
     "slug": "the-half-life",
@@ -135,14 +134,13 @@
     "group": "Holding & Spending",
     "interactive": true
   },
-
   {
-    "_comment": "── The Numbers — grouped via the `group` field; see SITE_GUIDE §30 (nav grouping). Group display order is controlled by base.njk's numbersGroups array; item order within a group follows array order here. ──",
+    "_comment": "── The Numbers — grouped via the `group` field; see SITE_GUIDE §30 (nav grouping). Models & Trends was split into The Power Law and Markets & Cycles on 2026-10-18 (JM). Group display order is controlled by base.njk's numbersGroups array; item order within a group follows array order here. ──",
     "_comment2": "Title in registry uses &amp; entity (for HTML safety in nav); tile_title here overrides to 'Bitcoin & The Power Law' for the tile body (which we let Nunjucks render through autoescape-off via |safe).",
     "slug": "the-power-law",
     "title": "Bitcoin &amp; The Power Law",
     "category": "numbers",
-    "group": "Models & Trends",
+    "group": "The Power Law",
     "interactive": true,
     "calculator_tile": {
       "tagline": "Where does bitcoin sit inside the channel &mdash; floor, trend, upper band &mdash; that anchors every projection on this site?",
@@ -153,34 +151,48 @@
     }
   },
   {
-    "_comment": "Title uses &amp; entity for nav HTML safety (rendered via | safe), matching the-power-law. Sibling to /the-power-law (price-vs-adoption to its price-vs-time). Interactive data explorer (proxy/era selector + fit chart); no calculator_tile — not a personal-decision tool, like the-doubling-ladder and heatmap.",
-    "slug": "bitcoin-and-metcalfes-law",
-    "title": "Bitcoin &amp; Metcalfe's Law",
+    "_comment": "Bitcoin's power law priced in ounces of gold (2026-10-18, JM). Fitted live at load from PL_DATA and GOLD_MONTHLY (shared/gold-monthly-data.js, World Bank monthly averages) from 2011; today's reading from the live bitcoin and gold prices. A read, not a calculator: no inputs, nothing stored, no calculator_tile. First page of The Power Law group, split from Models & Trends the same day (SITE_GUIDE §30).",
+    "slug": "bitcoin-in-gold",
+    "launched": "2026-10-18",
+    "title": "Bitcoin, Priced in Gold",
     "category": "numbers",
-    "group": "Models & Trends",
-    "interactive": true
+    "group": "The Power Law",
+    "interactive": false
+  },
+  {
+    "_comment": "The lower edge of the Power Law channel, taken on its own. Grouped with Models & Trends beside the-power-law, which owns the model; this page owns the line it has agreed to be judged against. interactive: true — live distance readout, episode explorer, endpoint-toggled parity instrument, live tripwire status — but it takes NO plan inputs and stores nothing, so there is no sticky state and no URL scenario params: it is a read, not a calculator. Everything historical is measured on the MODERN set (2011 onward, MODERN_FROM in the page JS, the same boundary the tripwire uses); the 2010 genesis samples appear once in the record section and are excluded from every measurement and every chart position, because a position is weight. floorParityQA() asserts three things on every load: the published full-set fixture, the modern-set fixture, and a leak check that no pre-2011 sample reaches the displayed set. Tile anchor is '' — the payload is the live readout at the top of the page. SVG tile at components/calc-tile-icons/the-bitcoin-floor.njk.",
+    "slug": "the-bitcoin-floor",
+    "title": "The Bitcoin Floor",
+    "category": "numbers",
+    "group": "The Power Law",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "The lower edge of the Power Law channel, at 0.42× trend. Where price sits against it right now, every time it has been tested, and the published criteria that would break the model.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 250
+    }
+  },
+  {
+    "_comment": "The upper side of the channel, as a counterpart to the-bitcoin-floor: where price sits now, every spike above trend since 2011 measured (shared/spike-record.js, modern set from MODERN_FROM, as on the Floor), and what holders did with them. interactive: true — live readout, an intent chooser with three answer cards (fund a bill, a one-time trim, a standing rule) and a tax-hurdle widget. Card B's headline is How Much Cash's own bandMetrics figure and hands off to /how-much-cash with ?pos&rebuy=trend&share&tax&from=spikes. No URL scenario params of its own; tabs take bare-token hash links (#decide, #record, #laws, #different). spikesQA() pins the record to the 2026-09-30 sample. Plural title signed off by JM 2026-10-04 (STYLE_GUIDE §10.4). Tile position 62 sits beside how-much-cash (60), its handoff target. SVG tile at components/calc-tile-icons/bitcoin-spikes.njk.",
+    "slug": "bitcoin-spikes",
+    "launched": "2026-10-04",
+    "title": "Bitcoin's Spikes",
+    "category": "numbers",
+    "group": "The Power Law",
+    "interactive": true,
+    "calculator_tile": {
+      "tagline": "Where bitcoin sits against its trend today, how every spike above it has ended, and what HODLers who sold into one ended up with, in bitcoin.",
+      "preview_kind": "svg",
+      "anchor": "",
+      "position": 62
+    }
   },
   {
     "slug": "the-doubling-ladder",
     "title": "The Bitcoin Doubling Ladder",
     "category": "numbers",
-    "group": "Models & Trends",
-    "interactive": true
-  },
-  {
-    "_comment": "The Heatmap was previously on /calculators as proof-of-concept for live mini-renders, then moved to /the-gallery as a visual surface. Intentionally NOT on /calculators now (no calculator_tile block).",
-    "slug": "heatmap",
-    "title": "The Bitcoin Heatmap",
-    "category": "numbers",
-    "group": "Models & Trends",
-    "interactive": true
-  },
-  {
-    "_comment": "Bull & Bear Cycles — cyclical drawdowns + CAGR/volatility spine. Interactive (live cycle status, day-zero overlay toggles, computed vol chart) but not a personal-decision calculator, so no calculator_tile — same posture as the-doubling-ladder / heatmap. Placed in Models & Trends as a cyclical-model page; cross-links heavily into Positioning & Strategy.",
-    "slug": "bull-and-bear-cycles",
-    "title": "Bitcoin Bull &amp; Bear Cycles",
-    "category": "numbers",
-    "group": "Models & Trends",
+    "group": "The Power Law",
     "interactive": true
   },
   {
@@ -188,7 +200,31 @@
     "slug": "discount-or-premium",
     "title": "Discount, or Premium?",
     "category": "numbers",
-    "group": "Models & Trends",
+    "group": "The Power Law",
+    "interactive": true
+  },
+  {
+    "_comment": "Title uses &amp; entity for nav HTML safety (rendered via | safe), matching the-power-law. Sibling to /the-power-law (price-vs-adoption to its price-vs-time). Interactive data explorer (proxy/era selector + fit chart); no calculator_tile — not a personal-decision tool, like the-doubling-ladder and heatmap.",
+    "slug": "bitcoin-and-metcalfes-law",
+    "title": "Bitcoin &amp; Metcalfe's Law",
+    "category": "numbers",
+    "group": "Markets & Cycles",
+    "interactive": true
+  },
+  {
+    "_comment": "The Heatmap was previously on /calculators as proof-of-concept for live mini-renders, then moved to /the-gallery as a visual surface. Intentionally NOT on /calculators now (no calculator_tile block).",
+    "slug": "heatmap",
+    "title": "The Bitcoin Heatmap",
+    "category": "numbers",
+    "group": "Markets & Cycles",
+    "interactive": true
+  },
+  {
+    "_comment": "Bull & Bear Cycles — cyclical drawdowns + CAGR/volatility spine. Interactive (live cycle status, day-zero overlay toggles, computed vol chart) but not a personal-decision calculator, so no calculator_tile — same posture as the-doubling-ladder / heatmap. Placed in Models & Trends as a cyclical-model page; cross-links heavily into Positioning & Strategy.",
+    "slug": "bull-and-bear-cycles",
+    "title": "Bitcoin Bull &amp; Bear Cycles",
+    "category": "numbers",
+    "group": "Markets & Cycles",
     "interactive": true
   },
   {
@@ -197,7 +233,7 @@
     "launched": "2026-08-29",
     "title": "The Bitcoin Rundown",
     "category": "numbers",
-    "group": "Models & Trends",
+    "group": "Markets & Cycles",
     "interactive": true
   },
   {
@@ -205,7 +241,7 @@
     "launched": "2026-05-14",
     "title": "Bitcoin vs. The Stock Market",
     "category": "numbers",
-    "group": "Models & Trends",
+    "group": "Markets & Cycles",
     "interactive": true,
     "calculator_tile": {
       "tagline": "The wealth-over-time stress test &mdash; bitcoin against the S&amp;P 500 and NASDAQ-100 across any holding window since 2010.",
@@ -399,35 +435,6 @@
       "preview_kind": "svg",
       "anchor": "#stress",
       "position": 200
-    }
-  },
-  {
-    "_comment": "The lower edge of the Power Law channel, taken on its own. Grouped with Models & Trends beside the-power-law, which owns the model; this page owns the line it has agreed to be judged against. interactive: true — live distance readout, episode explorer, endpoint-toggled parity instrument, live tripwire status — but it takes NO plan inputs and stores nothing, so there is no sticky state and no URL scenario params: it is a read, not a calculator. Everything historical is measured on the MODERN set (2011 onward, MODERN_FROM in the page JS, the same boundary the tripwire uses); the 2010 genesis samples appear once in the record section and are excluded from every measurement and every chart position, because a position is weight. floorParityQA() asserts three things on every load: the published full-set fixture, the modern-set fixture, and a leak check that no pre-2011 sample reaches the displayed set. Tile anchor is '' — the payload is the live readout at the top of the page. SVG tile at components/calc-tile-icons/the-bitcoin-floor.njk.",
-    "slug": "the-bitcoin-floor",
-    "title": "The Bitcoin Floor",
-    "category": "numbers",
-    "group": "Models & Trends",
-    "interactive": true,
-    "calculator_tile": {
-      "tagline": "The lower edge of the Power Law channel, at 0.42× trend. Where price sits against it right now, every time it has been tested, and the published criteria that would break the model.",
-      "preview_kind": "svg",
-      "anchor": "",
-      "position": 250
-    }
-  },
-  {
-    "_comment": "The upper side of the channel, as a counterpart to the-bitcoin-floor: where price sits now, every spike above trend since 2011 measured (shared/spike-record.js, modern set from MODERN_FROM, as on the Floor), and what holders did with them. interactive: true — live readout, an intent chooser with three answer cards (fund a bill, a one-time trim, a standing rule) and a tax-hurdle widget. Card B's headline is How Much Cash's own bandMetrics figure and hands off to /how-much-cash with ?pos&rebuy=trend&share&tax&from=spikes. No URL scenario params of its own; tabs take bare-token hash links (#decide, #record, #laws, #different). spikesQA() pins the record to the 2026-09-30 sample. Plural title signed off by JM 2026-10-04 (STYLE_GUIDE §10.4). Tile position 62 sits beside how-much-cash (60), its handoff target. SVG tile at components/calc-tile-icons/bitcoin-spikes.njk.",
-    "slug": "bitcoin-spikes",
-    "launched": "2026-10-04",
-    "title": "Bitcoin's Spikes",
-    "category": "numbers",
-    "group": "Models & Trends",
-    "interactive": true,
-    "calculator_tile": {
-      "tagline": "Where bitcoin sits against its trend today, how every spike above it has ended, and what HODLers who sold into one ended up with, in bitcoin.",
-      "preview_kind": "svg",
-      "anchor": "",
-      "position": 62
     }
   },
   {

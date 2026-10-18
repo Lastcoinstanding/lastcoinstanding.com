@@ -121,6 +121,19 @@ def btc_monthly():
 
 
 @safe
+def gold_monthly():
+    # World Bank Pink Sheet monthly gold (DATA_AUDIT GLD-1). The Bank posts the
+    # month before in the first days of each month, so the previous month is
+    # expected from the 6th.
+    s = read(PA, 'shared', 'gold-monthly-data.js')
+    ks = re.findall(r'\["(\d{4})-(\d{2})",', s)
+    last = (int(ks[-1][0]), int(ks[-1][1]))
+    exp = add_months(TODAY, -1 if TODAY.day >= 6 else -2)
+    by_expected('GOLD_MONTHLY (World Bank monthly gold)', last, (exp.year, exp.month), 'monthly', '§1',
+                'shared/gold-monthly-data.js', 'Bitcoin, Priced in Gold')
+
+
+@safe
 def tr_comparators():
     s = read(PA, 'shared', 'tr-comparator-data.js')
     for name in ('SP500_TR_DATA', 'NDQ_TR_DATA'):
