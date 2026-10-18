@@ -1356,3 +1356,51 @@ body {
     opacity: 0.55;
     margin-left: 0.5rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   STOCK-RETURN CHIPS — the projection's stress test (2026-10-18)
+   ═══════════════════════════════════════════════════════════════
+   Two aria-pressed buttons above the projection chart: the long-run
+   averages (default) and the stress test, each index's own record
+   since January 2010. Styled as the start-date presets, but their own
+   class: .bvsm-preset is wired to the start-date slider. 44px minimum
+   (STYLE_GUIDE §6.54). The read-back under them shows only under the
+   stress test. */
+.bvsm-rates {
+    margin: 0.25rem 0 0.75rem 0;
+}
+.bvsm-rate {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.85rem;
+    min-height: 44px;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+.bvsm-rate:hover,
+.bvsm-rate:focus-visible {
+    color: var(--text);
+    border-color: var(--amber-dim);
+    outline: none;
+}
+.bvsm-rate.is-active {
+    color: var(--amber);
+    border-color: var(--amber);
+    background: var(--amber-glow);
+}
+.bvsm-rate .bvsm-preset-multiple { color: var(--text-dim); }
+.bvsm-rate.is-active .bvsm-preset-multiple { color: var(--amber-dim); }
+.bvsm-rates-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    border-left: 2px solid var(--amber-dim);
+    padding: 0.15rem 0 0.15rem 0.75rem;
+    margin: 0 0 1rem 0;
+}

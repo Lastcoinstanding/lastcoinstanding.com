@@ -855,6 +855,57 @@
     body.innerHTML = html;
   }
 
+  // ── Stock-return sets for the projection (2026-10-18) ──
+  // 'long': the long-run averages the page has always used (S&P 500 total
+  //   return 1992–2026, NASDAQ-100 2007–2026; the appendix sources them).
+  // 'since2010': the stress test. Each index's own total return from the
+  //   first row of its series (January 2010, when bitcoin first had a market
+  //   price) to the last, computed here so it moves with each monthly sample.
+  //   It includes one of US stocks' strongest runs, so it makes the stock
+  //   market's case stronger; the default stays on the long-run averages.
+  var ratesKey = 'long';
+  function seriesCagr(D) {
+    var a = D[0], b = D[D.length - 1];
+    var years = (Date.parse(b[0]) - Date.parse(a[0])) / (365.2425 * 864e5);
+    return Math.pow(b[1] / a[1], 1 / years) - 1;
+  }
+  function recentRates() {
+    if (typeof SP500_TR_DATA === 'undefined' || typeof NDQ_TR_DATA === 'undefined') return null;
+    return { sp: seriesCagr(SP500_TR_DATA), ndq: seriesCagr(NDQ_TR_DATA), end: SP500_TR_DATA[SP500_TR_DATA.length - 1][0] };
+  }
+  function stockRates() {
+    var r = ratesKey === 'since2010' ? recentRates() : null;
+    return r ? { key: 'since2010', sp: r.sp, ndq: r.ndq, end: r.end } : { key: 'long', sp: 0.1086, ndq: 0.1626 };
+  }
+  function pct1(v) { return (v * 100).toFixed(1) + '%'; }
+  function monthYear(iso) {
+    try { return new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }); }
+    catch (e) { return iso; }
+  }
+  // The read-back under the chips, shown only under the stress test. Where the
+  // lower bitcoin line ends against each stock line is enumerated (STYLE_GUIDE
+  // §12): ahead of both, behind the NASDAQ-100 only, or behind both.
+  function renderRatesNote(R, H, btcLow, spEnd, ndqEnd) {
+    var el = document.getElementById('bvsmRatesNote');
+    if (!el) return;
+    if (R.key !== 'since2010') { el.hidden = true; el.textContent = ''; return; }
+    var x = btcLow / ndqEnd, y = btcLow / spEnd;
+    var times = function (v) { return v.toFixed(1) + '×'; };
+    var lead = 'Stress test: the stock lines run at each index’s own record since January 2010, ' +
+      pct1(R.sp) + ' a year for the S&P 500 and ' + pct1(R.ndq) + ' for the NASDAQ-100 through ' + monthYear(R.end) +
+      ', a stretch that includes one of US stocks’ strongest runs. ';
+    var tail;
+    if (x >= 1 && y >= 1) {
+      tail = 'At ' + H + ' years the lower bitcoin line still ends ' + times(x) + ' the NASDAQ-100’s and ' + times(y) + ' the S&P 500’s.';
+    } else if (y >= 1) {
+      tail = 'At ' + H + ' years the NASDAQ-100’s line ends ' + times(1 / x) + ' the lower bitcoin line, which still ends ' + times(y) + ' the S&P 500’s.';
+    } else {
+      tail = 'At ' + H + ' years both stock lines end above the lower bitcoin line: the NASDAQ-100’s ' + times(1 / x) + ' it, the S&P 500’s ' + times(1 / y) + '.';
+    }
+    el.textContent = lead + tail;
+    el.hidden = false;
+  }
+
   function recomputeProjection() {
     var horizonEl = document.getElementById('bvsmProjHorizon');
     var investEl = document.getElementById('bvsmProjInvest');
@@ -867,7 +918,8 @@
     var todayDate = new Date(todayISO());
     var btcToday = btcPriceOnDate(todayISO());
 
-    var SP_CAGR = 0.1086, NDQ_CAGR = 0.1626;
+    var RATES = stockRates();
+    var SP_CAGR = RATES.sp, NDQ_CAGR = RATES.ndq;
 
     // Bitcoin's two lines are the site's two scenarios for its price
     // (DEFAULTS_POLICY_2026-10-11, PR C, 2026-10-14; shared/price-cases.js),
@@ -928,6 +980,11 @@
       setTxt('[data-bvsm="trendTip"]', NT.trend + ' It starts at the amount invested; from year 3 on it equals that amount times the trend’s price at the horizon divided by today’s price.');
     }
     renderGapCallout(m0, btcTrendToday, todayISO());
+    var since = RATES.key === 'since2010' ? ', since 2010' : '';
+    setTxt('[data-bvsm="spNote"]', 'at ' + pct1(SP_CAGR) + ' nominal CAGR' + since);
+    setTxt('[data-bvsm="ndqNote"]', 'at ' + pct1(NDQ_CAGR) + ' nominal CAGR' + since);
+    var last = btcTrendData.length - 1;
+    renderRatesNote(RATES, horizonYears, Math.min(btcTrendData[last], btcMarketData[last]), spData[last], ndqData[last]);
 
     var canvas = document.getElementById('bvsmProjectionChart');
     if (!canvas || typeof Chart === 'undefined') return;
@@ -935,8 +992,8 @@
     var datasets = [
       { label: lineName('stay'),  data: btcTrendData,  borderColor: '#e09422', borderWidth: 2.2, fill: false, tension: 0.05, pointRadius: 0 },
       { label: lineName('trend'), data: btcMarketData, borderColor: '#e09422', borderWidth: 2.2, borderDash: [6, 4], fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'S&P 500 (10.9% CAGR)',    data: spData,        borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
-      { label: 'NASDAQ-100 (16.3% CAGR)', data: ndqData,       borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
+      { label: 'S&P 500 (' + pct1(SP_CAGR) + ' CAGR)',    data: spData,  borderColor: '#8aa3b5', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 },
+      { label: 'NASDAQ-100 (' + pct1(NDQ_CAGR) + ' CAGR)', data: ndqData, borderColor: '#6fa68f', borderWidth: 1.6, fill: false, tension: 0.05, pointRadius: 0 }
     ];
 
     if (projChart) projChart.destroy();
@@ -1014,6 +1071,31 @@
     ['bvsmProjHorizon', 'bvsmProjInvest'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('input', recomputeProjection);
+    });
+
+    // Stock-return chips (2026-10-18). Not a .bvsm-preset: that class is wired
+    // to the start-date presets above.
+    var rr = recentRates();
+    if (rr) {
+      var vals = document.getElementById('bvsmRatesRecentVals');
+      if (vals) vals.textContent = '(' + pct1(rr.sp) + ' · ' + pct1(rr.ndq) + ')';
+      var put = function (sel, txt) { var e = document.querySelector(sel); if (e) e.textContent = txt; };
+      put('[data-bvsm="spRecent"]', pct1(rr.sp));
+      put('[data-bvsm="ndqRecent"]', pct1(rr.ndq));
+      put('[data-bvsm="recentEnd"]', monthYear(rr.end));
+    }
+    document.querySelectorAll('.bvsm-rate').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-rates');
+        if (key === ratesKey) return;
+        ratesKey = key;
+        document.querySelectorAll('.bvsm-rate').forEach(function (b) {
+          var on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        recomputeProjection();
+      });
     });
   }
 
