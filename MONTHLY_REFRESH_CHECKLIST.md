@@ -1072,7 +1072,7 @@ Pages that state what the law is, or what is pending, go stale when a bill passe
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-09-17** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-10-18** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That
