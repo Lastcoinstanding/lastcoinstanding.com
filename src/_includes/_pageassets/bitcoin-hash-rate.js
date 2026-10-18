@@ -46,6 +46,9 @@
     for (var i = 0; i < u.length; i++) if (eh >= u[i][1]) { var v = eh / u[i][1]; return (v >= 100 ? Math.round(v) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + u[i][0]; }
     return (eh / 1e-15).toPrecision(2) + ' kH/s';
   }
+  var UNIT_NAMES = { 'ZH/s': 'zettahashes per second, 10\u00b2\u00b9 hashes a second', 'EH/s': 'exahashes per second, 10\u00b9\u2078 hashes a second',
+    'PH/s': 'petahashes per second, 10\u00b9\u2075', 'TH/s': 'terahashes per second, 10\u00b9\u00b2', 'GH/s': 'gigahashes per second, 10\u2079', 'MH/s': 'megahashes per second, 10\u2076' };
+  function unitOf(eh) { var s = fmtHash(eh); return s.slice(s.lastIndexOf(' ') + 1); }
   function fmtDays(d) { return d >= 730 ? (d / 365.25).toFixed(1) + ' years' : Math.round(d / 30.44) + ' months'; }
 
   function fitLogLog(xs, ys) {
@@ -105,7 +108,13 @@
     var d0 = dayOf(fromIso), R = PH.filter(function (p) { return p.day >= d0; });
     var f = fitLogLog(R.map(function (p) { return p.hash; }), R.map(function (p) { return p.usd; })); f.from = fromIso; f.rows = R; return f;
   }
-  var PF = [priceFit('2011-01-01'), priceFit('2016-01-01')];
+  var PF = [priceFit('2011-01-01'), priceFit('2016-01-01'), priceFit('2020-01-01')];
+  // The price's own power law of time, fitted the same way from the same starts (for "So is it a power law?").
+  var PRICE_T = STARTS.map(function (st) {
+    var d0 = dayOf(st), R = PL_DATA.filter(function (q) { return q[0] >= d0; });
+    var f = fitLogLog(R.map(function (q) { return q[0]; }), R.map(function (q) { return q[1]; })); f.from = st; return f;
+  });
+  var VIEW = { hash: 2010, price: 2011 };
 
   // Which moves first: year-over-year log change, monthly grid from 2013 (so the YoY series starts in 2014).
   var LAG = (function () {
@@ -137,18 +146,20 @@
   function renderReadout() {
     var t = TODAY; if (!t) return;
     setText('hrNow', fmtHash(t.eh));
-    var recent = ROLL[ROLL.length - 1], early = ROLL.filter(function (r) { return dateOf(r.end).getUTCFullYear() <= 2017; });
-    var earlyDbl = early.length ? early.reduce(function (s, r) { return s + r.dbl; }, 0) / early.length : NaN;
+    var unit = unitOf(t.eh);
+    setText('hrNowUnit', UNIT_NAMES[unit] || unit);
+    var recent = ROLL[ROLL.length - 1];
     setText('hrDblNow', fmtDays(recent.dbl));
-    setText('hrDblEarly', fmtDays(earlyDbl));
+    var yAgo = interpLog(HD, HV, t.day - 365.25), yoy = t.eh / yAgo - 1;
+    setText('hrYoY', (yoy >= 0 ? '+' : '\u2212') + Math.round(Math.abs(yoy) * 100) + '%');
     setText('hrBNow', recent.b.toFixed(1));
     var m = t.mult[0];
     var pos = m < 0.5 ? 'well below the line fitted to the whole record since 2011 (' + fmtX(m) + ')'
       : m < 0.9 ? 'below the line fitted to the whole record since 2011 (' + fmtX(m) + ')'
       : m <= 1.1 ? 'on the line fitted to the whole record since 2011 (' + fmtX(m) + ')'
       : 'above the line fitted to the whole record since 2011 (' + fmtX(m) + ')';
-    setHtml('hrVerdict', 'The network is running at about <strong>' + fmtHash(t.eh) + '</strong>, ' + pos +
-      ', because the growth has slowed: over the last four years hash rate doubled about every <strong>' + fmtDays(recent.dbl) + '</strong>, against about every ' + fmtDays(earlyDbl) + ' in the four-year windows ending by 2017.');
+    setHtml('hrVerdict', 'The network is making about <strong>' + fmtHash(t.eh) + '</strong> (' + (UNIT_NAMES[unit] || unit) + '), ' + pos +
+      ', because the growth has slowed. At the pace of the last four years it doubles about every <strong>' + fmtDays(recent.dbl) + '</strong>; in its early years it doubled in a matter of months.');
     var when = new Date(t.hAsOf), whenTxt = MONTHS[when.getUTCMonth()] + ' ' + when.getUTCDate() + ', ' + when.getUTCFullYear();
     setText('hrSource', t.hSrc === 'live' ? 'Mean of the last seven daily estimates from Blockchain.com, to ' + whenTxt + '.' : 'Latest weekly figure in the page’s series (week to ' + whenTxt + '); the live estimate did not load.');
   }
@@ -156,7 +167,15 @@
   // ── charts ──
   var charts = {};
   function yearTicks(v) { return Math.round(v) === v ? String(v) : ''; }
-  function decadeTick(fmt) { return function (v) { var l = Math.log10(v); return Math.abs(l - Math.round(l)) < 1e-6 ? fmt(v) : ''; }; }
+  // Log-axis labels at powers of ten; on a short range (under 2.5 decades) also at 2 and 5.
+  function decadeTick(fmt) {
+    return function (v) {
+      var l = Math.log10(v), m = +(v / Math.pow(10, Math.floor(l + 1e-9))).toPrecision(2);
+      if (Math.abs(l - Math.round(l)) < 1e-6) return fmt(v);
+      var span = Math.log10(this.max / this.min);
+      return span < 2.5 && (m === 2 || m === 5) ? fmt(v) : '';
+    };
+  }
   function base(yTitle, yTick, xMin) {
     var grid = css('--hr-grid', 'rgba(255,255,255,.05)'), muted = css('--text-muted', '#706860'), dim = css('--text-dim', '#908880');
     return {
@@ -188,12 +207,14 @@
 
   function renderHashChart() {
     var cv = document.getElementById('hrHashChart'); if (!cv || typeof Chart === 'undefined') return;
-    var x0 = 2010.5, endDay = Math.max(LASTW[0], TODAY ? TODAY.day : 0);
+    var x0 = VIEW.hash === 2010 ? 2010.5 : VIEW.hash, endDay = Math.max(LASTW[0], TODAY ? TODAY.day : 0);
     var pts = []; for (var i = 0; i < HD.length; i++) if (yearFrac(HD[i]) >= x0) pts.push({ x: yearFrac(HD[i]), y: HV[i], day: HD[i] });
     var colors = [css('--hr-fit-a', '#8fb3c9'), css('--hr-fit-b', '#d4a843'), css('--hr-fit-c', '#b07ad9')];
     var ds = [{ label: 'Hash rate (weekly mean)', data: pts, borderColor: css('--hr-hash', '#F7931A'), borderWidth: 1.6, pointRadius: 0 }];
+    // A later view shows only the fits that start inside it, so the recent stretch reads at its own scale.
     FITS.forEach(function (f, k) {
-      var d0 = dayOf(f.from), line = [];
+      if (VIEW.hash !== 2010 && +f.from.slice(0, 4) < VIEW.hash) return;
+      var d0 = Math.max(dayOf(f.from), dayOf(x0 === 2010.5 ? '2010-07-01' : x0 + '-01-01')), line = [];
       for (var d = d0; d <= endDay + 1; d += 15) line.push({ x: yearFrac(d), y: f.at(d) });
       ds.push({ label: 'Fit from ' + f.from.slice(0, 4) + ' (exponent ' + f.b.toFixed(1) + ')', data: line, borderColor: colors[k], borderWidth: 1.4, borderDash: [6, 4], pointRadius: 0 });
     });
@@ -232,26 +253,31 @@
 
   function renderPriceChart() {
     var cv = document.getElementById('hrPriceChart'); if (!cv || typeof Chart === 'undefined') return;
-    var pts = PH.filter(function (p) { return p.day >= dayOf('2011-01-01'); }).map(function (p) { return { x: p.hash, y: p.usd, p: p }; });
+    var vFrom = VIEW.price + '-01-01';
+    var pts = PH.filter(function (p) { return p.day >= dayOf(vFrom); }).map(function (p) { return { x: p.hash, y: p.usd, p: p }; });
     var xs = pts.map(function (p) { return p.x; }), lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs.concat(TODAY ? [TODAY.eh] : []));
-    var colors = [css('--hr-fit-a', '#8fb3c9'), css('--hr-fit-b', '#d4a843')];
-    var ds = [{ label: 'Monthly samples since 2011', data: pts, type: 'scatter', pointRadius: 2, pointHoverRadius: 4, backgroundColor: css('--hr-dot', 'rgba(247,147,26,.55)'), borderWidth: 0 }];
-    PF.forEach(function (f, k) {
-      var a = Math.max(lo, f.from === '2011-01-01' ? lo : interpLog(HD, HV, dayOf(f.from))), line = [];
-      for (var l = Math.log10(a); l <= Math.log10(hi) + 0.01; l += 0.05) line.push({ x: Math.pow(10, l), y: f.at(Math.pow(10, l)) });
-      ds.push({ label: 'Fit from ' + f.from.slice(0, 4) + ': price ∝ hash^' + f.b.toFixed(2), data: line, type: 'line', borderColor: colors[k], borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0 });
+    var colors = { '2011-01-01': css('--hr-fit-a', '#8fb3c9'), '2016-01-01': css('--hr-fit-b', '#d4a843'), '2020-01-01': css('--hr-fit-c', '#b07ad9') };
+    var ds = [{ label: 'Monthly samples since ' + VIEW.price, data: pts, type: 'scatter', pointRadius: 2, pointHoverRadius: 4, backgroundColor: css('--hr-dot', 'rgba(247,147,26,.55)'), borderWidth: 0 }];
+    PF.filter(function (f) { return f.from === vFrom || f.from === '2011-01-01'; }).forEach(function (f) {
+      var line = [];
+      for (var l = Math.log10(lo); l <= Math.log10(hi) + 0.01; l += 0.05) line.push({ x: Math.pow(10, l), y: f.at(Math.pow(10, l)) });
+      ds.push({ label: 'Fit from ' + f.from.slice(0, 4) + ': price \u221d hash^' + f.b.toFixed(2), data: line, type: 'line', borderColor: colors[f.from], borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0 });
     });
     if (TODAY) ds.push({ label: 'Today', data: [{ x: TODAY.eh, y: TODAY.usd, today: true }], type: 'scatter', pointRadius: 0, pointHoverRadius: 6, pointHitRadius: 10, hideInLegend: true });
+    var ys = pts.map(function (p) { return p.y; }).concat(TODAY ? [TODAY.usd] : []);
     var opt = base('Bitcoin price, USD (log scale)', decadeTick(function (v) { return '$' + v.toLocaleString('en-US'); }), lo);
+    opt.scales.y.min = Math.pow(10, Math.floor(Math.log10(Math.min.apply(null, ys)) * 2) / 2);
+    opt.scales.y.max = Math.pow(10, Math.ceil(Math.log10(Math.max.apply(null, ys)) * 2) / 2);
     opt.interaction = { mode: 'nearest', intersect: true };
-    opt.scales.x = { type: 'logarithmic', min: lo, max: hi * 1.6, title: { display: true, text: 'Hash rate (log scale)', color: css('--text-muted', '#706860'), font: { size: 10 } },
+    opt.scales.x = { type: 'logarithmic', min: lo / 1.3, max: hi * 1.6, title: { display: true, text: 'Hash rate (log scale)', color: css('--text-muted', '#706860'), font: { size: 10 } },
       ticks: { color: css('--text-muted', '#706860'), font: { size: 10 }, callback: decadeTick(function (v) { return fmtHash(v).replace(/^(\d+)\.0+ /, '$1 '); }), maxRotation: 0 }, grid: { color: css('--hr-grid', 'rgba(255,255,255,.05)') } };
     opt.plugins.tooltip.filter = function (it) { return it.datasetIndex === 0 || it.dataset.label === 'Today'; };
     opt.plugins.tooltip.callbacks = {
       title: function (it) { var r = it[0].raw; return r.today ? 'Today' : monthLabel(r.p.day); },
       label: function (it) {
         var r = it.raw, eh = r.today ? TODAY.eh : r.p.hash, usd = r.today ? TODAY.usd : r.p.usd;
-        return ['Bitcoin ' + fmtUsd(usd) + ' · hash rate ' + fmtHash(eh), fmtX(usd / PF[0].at(eh)) + ' the price the 2011 fit gives that hash rate'];
+        var F = PF.filter(function (f) { return f.from === vFrom; })[0] || PF[0];
+        return ['Bitcoin ' + fmtUsd(usd) + ' \u00b7 hash rate ' + fmtHash(eh), fmtX(usd / F.at(eh)) + ' the price the ' + F.from.slice(0, 4) + ' fit gives that hash rate'];
       }
     };
     if (charts.price) charts.price.destroy();
@@ -290,6 +316,20 @@
       '. A single power law would give the same exponent from any start. Over rolling four-year windows the exponent peaked at ' + peak.b.toFixed(1) + ' (the four years to ' + monthLabel(peak.end) + '), fell as low as ' + lowest.b.toFixed(1) + ' (to ' + monthLabel(lowest.end) + ') and stands at ' + last.b.toFixed(1) + ' now' +
       (last.b > lowest.b * 1.15 ? ', a little up from that low.' : '.'));
   }
+  function renderCompare() {
+    var body = document.getElementById('hrCompareBody'); if (!body) return;
+    body.innerHTML = STARTS.map(function (st, k) {
+      var P = PRICE_T[k], H = FITS[k];
+      return '<tr><td>' + st.slice(0, 4) + '</td><td class="num">' + P.b.toFixed(2) + '</td><td class="num">' + P.r2.toFixed(2) + '</td><td class="num">' + H.b.toFixed(2) + '</td><td class="num">' + H.r2.toFixed(2) + '</td></tr>';
+    }).join('');
+    var pb = PRICE_T.map(function (f) { return f.b; }), hb = FITS.map(function (f) { return f.b; });
+    var steady = hb.every(function (b, i) { return i === 0 || b < hb[i - 1]; });
+    setText('hrCompareRead', 'The hash rate\u2019s exponent ' + (steady ? 'falls with every later start' : 'moves with the start') + ', from ' + hb[0].toFixed(1) + ' to ' + hb[hb.length - 1].toFixed(1) +
+      ', and each of those fits is tight (R\u00b2 ' + Math.min.apply(null, FITS.map(function (f) { return f.r2; })).toFixed(2) + ' or better): the slowing is real, not noise. The price\u2019s exponent stays between ' + Math.min.apply(null, pb).toFixed(1) + ' and ' + Math.max.apply(null, pb).toFixed(1) +
+      ' with no steady drift; its fit from ' + STARTS[STARTS.length - 1].slice(0, 4) + ' is loose (R\u00b2 ' + PRICE_T[PRICE_T.length - 1].r2.toFixed(2) + ') because a few years of price are mostly one cycle, but the longer fits agree. ' +
+      'The latest hash-rate exponent, ' + hb[hb.length - 1].toFixed(1) + ', is now close to the price\u2019s ' + PRICE_T[0].b.toFixed(1) + ' from 2011.');
+  }
+
   function renderPriceRead() {
     var f0 = PF[0], f1 = PF[1], t = TODAY;
     var x3 = Math.pow(10, f0.b);
@@ -308,7 +348,19 @@
     setText('hrLagRead', txt);
   }
 
-  function renderAll() { renderReadout(); renderHashChart(); renderRollChart(); renderFitTable(); renderPriceChart(); renderPriceRead(); renderLagChart(); renderLagRead(); }
+  function renderAll() { renderReadout(); renderHashChart(); renderRollChart(); renderFitTable(); renderCompare(); renderPriceChart(); renderPriceRead(); renderLagChart(); renderLagRead(); }
+
+  function wireChips() {
+    document.querySelectorAll('.hr-chip').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var ch = b.getAttribute('data-chart'), from = +b.getAttribute('data-from');
+        if (VIEW[ch] === from) return;
+        VIEW[ch] = from;
+        document.querySelectorAll('.hr-chip[data-chart="' + ch + '"]').forEach(function (o) { var on = o === b; o.classList.toggle('is-active', on); o.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        if (ch === 'hash') renderHashChart(); else renderPriceChart();
+      });
+    });
+  }
 
   window.hrQA = function () {
     return { weeks: HASH_WEEKLY.length, fits: FITS.map(function (f) { return { from: f.from, b: f.b, r2: f.r2 }; }), roll: { first: ROLL[0], last: ROLL[ROLL.length - 1], n: ROLL.length },
@@ -316,6 +368,7 @@
   };
 
   function init() {
+    wireChips();
     computeToday(LASTW[1], 'fallback', GENESIS_MS + LASTW[0] * DAY_MS, PL_DATA[PL_DATA.length - 1][1], 'fallback');
     renderAll();
     var h = null, p = null;
