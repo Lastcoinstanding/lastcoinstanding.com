@@ -633,6 +633,30 @@ CARDS = [
         },
         "output_filename": "og-disciplined-rebalancing-v2.jpg",
     },
+    {
+        # Bitcoin, Priced in Gold (2026-10-18): the ounces chart with its gold
+        # trend and usual range. Product-forward: the fit and today's dot read
+        # live PL_DATA and GOLD_MONTHLY, so it goes stale with the data
+        # (MONTHLY_REFRESH_CHECKLIST §6).
+        "name": "bitcoin-in-gold",
+        "url": "https://lastcoinstanding.com/bitcoin-in-gold",
+        "hero_selector": "#gbOzChart",
+        "inject_js": "(()=>{const s=document.createElement('style');s.textContent='.chart-copy-btn{display:none!important}';document.head.appendChild(s);})()",
+        "wait_after_navigate_ms": 2500,
+        "wait_after_scroll_ms": 800,
+        "chrome": {
+            "title": "Bitcoin, priced in ",
+            "titleAccent": "gold",
+            "titleAfter": "",
+            "subtitle": "The power law measured in ounces of gold since 2011: the trend, the usual range, and where bitcoin sits today.",
+            "statsHTML": (
+                '<strong style="color:#F7931A; font-weight:700;">Same trend, another unit</strong>'
+                '  ·  the cycle lows in dollars and in gold'
+            ),
+            "urlText": "lastcoinstanding.com/bitcoin-in-gold",
+        },
+        "output_filename": "og-bitcoin-in-gold.jpg",
+    },
 ]
 
 
@@ -716,7 +740,15 @@ def main() -> int:
     ap.add_argument(
         "--only", action="append", choices=[c["name"] for c in CARDS],
         help="Build only the named card (can be passed multiple times)")
+    ap.add_argument(
+        "--base", default=None,
+        help="Origin to capture from instead of https://lastcoinstanding.com (e.g. a local build or a Pages preview)")
     args = ap.parse_args()
+    if args.base:
+        # Capture from another origin (a local build or a preview) before a
+        # page is on production; the card's printed URL is unchanged.
+        for c in CARDS:
+            c["url"] = c["url"].replace("https://lastcoinstanding.com", args.base.rstrip("/"))
 
     output_dir = Path(args.output_dir).resolve()
     cards = CARDS if not args.only else [c for c in CARDS if c["name"] in args.only]

@@ -295,6 +295,8 @@
             margin-bottom: 1.8rem;
         }
 
+        /* Linked from Bitcoin, Priced in Gold (2026-10-18): land below the sticky nav. */
+        .section h3[id] { scroll-margin-top: 96px; }
         .section h3 {
             font-family: 'Cormorant Garamond', serif;
             font-size: 1.3rem;
