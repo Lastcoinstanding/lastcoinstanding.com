@@ -60,10 +60,10 @@ var GOLD_MONTHLY = [
 ];
 
 var LCS_GOLD_SOURCES = [
-  { id: 'coinbase-xau', name: 'Coinbase (XAU-USD spot)',
+  { id: 'coinbase-xau', name: 'Coinbase gold spot',
     url: 'https://api.coinbase.com/v2/prices/XAU-USD/spot',
     pick: function (d) { return (d && d.data && d.data.currency === 'USD') ? parseFloat(d.data.amount) : NaN; } },
-  { id: 'kraken-paxg', name: 'Kraken (PAX Gold)',
+  { id: 'kraken-paxg', name: 'PAX Gold on Kraken',
     url: 'https://api.kraken.com/0/public/Ticker?pair=PAXGUSD',
     pick: function (d) {
       if (!d || (d.error && d.error.length) || !d.result) return NaN;
