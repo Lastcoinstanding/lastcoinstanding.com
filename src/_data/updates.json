@@ -1,5 +1,17 @@
 [
   {
+    "display": "10/18/26",
+    "date": "2026-10-18",
+    "page": "/paper-bitcoin",
+    "summary": "Paper Bitcoin vs. Real Bitcoin: the self-custody side now carries three 2026 incidents. A hardware-wallet maker's shipping partner leaked about 80,700 customers' contact details; a Coldcard firmware flaw let attackers recompute keys and take about 1,800 BTC; and Ledger devices sold through a Southeast Asian reseller carried a hidden implant that sent recovery phrases out over the mobile network (more than $86 million by on-chain estimates). None was a failure of the Bitcoin network."
+  },
+  {
+    "display": "10/18/26",
+    "date": "2026-10-18",
+    "page": "/bitcoin-vs-the-stock-market",
+    "summary": "Bitcoin vs. the Stock Market: the projection gains a stress test. The stock lines can run at each index's own record since 2010, about 14.6% a year for the S&P 500 and 19.5% for the NASDAQ-100, instead of their long-run averages: the stronger version of the stock market's case. The default stays on the long-run averages."
+  },
+  {
     "display": "10/14/26",
     "date": "2026-10-14",
     "page": "/bitcoin-fixed-income",
