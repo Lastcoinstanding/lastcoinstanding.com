@@ -1,0 +1,169 @@
+/* =============================================================
+   Bitcoin's Hash Rate — page styles (2026-10-18)
+
+   Container tier: MIXED-CONTENT (STYLE_GUIDE §4.2): 1100px page,
+   880px prose; charts and the readout take the full 1100.
+
+   Foundation preamble (NEW_PAGE_CHECKLIST §1): base.njk carries no
+   palette and no body theme, so :root and the body background are
+   declared here. Every colour routes through a var, including the
+   Chart.js configs, which read these tokens via getComputedStyle.
+   Page-scoped prefix hr-.
+   ============================================================= */
+
+:root {
+  --bg: #0a0908;
+  --bg-card: #111110;
+  --border: #1e1c1a;
+  --border-lt: #2a2826;
+  --orange: #F7931A;
+  --orange-soft: rgba(247,147,26,.08);
+  --gold: #d4a843;
+  --amber: #e09422;
+  --text: #d8d2ca;
+  --text-dim: #908880;
+  --text-bright: #f2eee8;
+  --text-body: #d0c8c0;
+  --text-muted: #706860;
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+
+  /* Page tokens (charts read these) */
+  --hr-btc: #F7931A;                 /* pulse core */
+  --hr-hash: #F7931A;                /* the hash-rate line, the best lag bar */
+  --hr-hash-soft: rgba(247,147,26,.12);
+  --hr-fit-a: #8fb3c9;               /* fit from 2011 */
+  --hr-fit-b: #d4a843;               /* fit from 2016 */
+  --hr-fit-c: #b07ad9;               /* fit from 2020 */
+  --hr-dot: rgba(247,147,26,.55);    /* monthly samples in the price chart */
+  --hr-bar: rgba(143,179,201,.55);   /* the other lag bars */
+  --hr-grid: rgba(255,255,255,.05);
+  --hr-tip-bg: rgba(20,17,13,.95);
+  --hr-tip-border: rgba(224,148,34,.3);
+  --hr-card-tint: rgba(224,148,34,.05);
+  --hr-card-border: rgba(224,148,34,.22);
+  --hr-link-line: rgba(224,148,34,.3);
+  
+  --hr-pulse-glow: rgba(247,147,26,.55);
+  --hr-pulse-ring: rgba(247,147,26,.7);
+}
+
+body { background: var(--bg); color: var(--text); font-family: var(--font-b); font-size: 1.05rem; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+/* NAV palette accents (structural rules come from base.njk) */
+.site-nav .nav-links a.active { color: var(--orange); background: var(--orange-soft); font-weight: 600; }
+.mobile-overlay a.active { color: var(--orange); background: var(--orange-soft); font-weight: 600; }
+.nav-dropdown-menu a.active { color: var(--orange); background: var(--orange-soft); font-weight: 600; }
+
+.hr-page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 60px; }
+
+/* HEADER */
+.hr-header { text-align: center; margin-bottom: 2.2rem; }
+.hr-eyebrow { font-size: .66rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); margin-bottom: .8rem; }
+.hr-header h1 { font-family: var(--font-d); font-size: clamp(2.2rem, 4.4vw, 3.6rem); font-weight: 500; color: var(--text-bright); margin-bottom: .7rem; letter-spacing: -.01em; line-height: 1.08; }
+.hr-header h1 em { font-style: italic; color: var(--amber); }
+.hr-subtitle { font-family: 'Source Serif 4', Georgia, serif; font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--text-dim); line-height: 1.6; max-width: 720px; margin: 0 auto; font-style: italic; }
+
+/* ATTRIBUTION */
+.hr-attribution { background: var(--hr-card-tint); border: 1px solid var(--hr-card-border); border-radius: 8px; padding: 1.3rem 1.6rem; margin: 0 auto 2.4rem; max-width: 880px; }
+.hr-attribution-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .15em; color: var(--amber); font-weight: 600; margin-bottom: .6rem; }
+.hr-attribution p { margin: 0; font-size: .95rem; line-height: 1.7; color: var(--text-dim); }
+.hr-attribution strong { color: var(--text-bright); }
+
+/* Links in prose blocks */
+.hr-attribution a, .hr-section a, .hr-caveats a { color: var(--amber); text-decoration: none; border-bottom: 1px solid var(--hr-link-line); transition: border-color .2s, color .2s; }
+.hr-attribution a:visited, .hr-section a:visited, .hr-caveats a:visited { color: var(--amber); }
+.hr-attribution a:hover, .hr-section a:hover, .hr-caveats a:hover { color: var(--orange); border-bottom-color: var(--orange); }
+
+/* §1 READOUT */
+.hr-readout { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1.7rem; margin: 0 auto 1.4rem; }
+.hr-readout-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; margin-bottom: 1.1rem; }
+.hr-stat { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: .9rem 1rem; text-align: center; }
+.hr-stat-key { border-color: var(--hr-card-border); background: var(--hr-card-tint); }
+.hr-stat-value { font-family: var(--font-d); font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 600; color: var(--text-bright); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.hr-stat-key .hr-stat-value { color: var(--amber); }
+.hr-stat-label { font-size: .74rem; color: var(--text-dim); line-height: 1.35; margin-top: .3rem; }
+.hr-verdict { font-size: 1rem; color: var(--text-body); line-height: 1.7; margin: 0 0 .5rem; }
+.hr-verdict strong { color: var(--text-bright); }
+.hr-source { font-size: .78rem; color: var(--text-muted); margin: 0; }
+.hr-frame { max-width: 880px; margin: 0 auto 2.4rem; font-size: .88rem; color: var(--text-dim); font-style: italic; line-height: 1.65; }
+
+/* CHARTS */
+.hr-chart-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1.8rem; margin: 1.6rem auto 2.4rem; }
+.hr-chart-kicker { font-size: .62rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); margin-bottom: .5rem; }
+.hr-chart-title { font-family: var(--font-d); font-size: 1.45rem; font-weight: 600; color: var(--text-bright); margin-bottom: 4px; line-height: 1.2; }
+.hr-chart-subtitle { font-size: .82rem; color: var(--text-muted); margin-bottom: 1.1rem; line-height: 1.5; }
+.hr-chart-wrapper { position: relative; height: 440px; }
+.hr-chart-short { height: 300px; }
+.hr-chart-source { font-size: .78rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.6; }
+.hr-chart-source strong { color: var(--text-dim); }
+
+/* SECTIONS */
+.hr-section { max-width: 880px; margin: 0 auto 2.6rem; }
+.hr-section h2 { font-family: var(--font-d); font-size: clamp(1.8rem, 3.4vw, 2.5rem); font-weight: 500; color: var(--text-bright); margin-bottom: .9rem; line-height: 1.18; }
+.hr-section h3 { font-family: var(--font-d); font-size: clamp(1.35rem, 2.4vw, 1.7rem); font-weight: 500; color: var(--text-bright); margin: 1.8rem 0 .7rem; }
+.hr-section p { font-size: 1.05rem; color: var(--text-body); line-height: 1.72; margin-bottom: 1.1rem; }
+.hr-section p strong { color: var(--text-bright); }
+.hr-read { border-left: 2px solid var(--amber); padding-left: 1rem; }
+.hr-pointer { background: var(--hr-card-tint); border: 1px solid var(--hr-card-border); border-radius: 8px; padding: 1.3rem 1.6rem; }
+.hr-pointer h2 { font-size: clamp(1.5rem, 2.8vw, 2rem); }
+.hr-pointer p:last-child { margin-bottom: 0; }
+
+/* TABLES */
+.hr-table-wrap { overflow-x: auto; margin: .4rem 0 1.2rem; }
+.hr-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.hr-table th { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted); padding: .6rem .7rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; font-weight: 600; }
+.hr-table td { padding: .6rem .7rem; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+.hr-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hr-table td strong { color: var(--text-bright); }
+.hr-when { color: var(--text-muted); font-size: .8rem; margin-left: .25rem; }
+.hr-table-sturdy th[colspan] { text-align: center; color: var(--text-dim); }
+
+/* METHOD */
+.hr-caveats { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1.8rem; margin: 2.4rem auto 0; max-width: 880px; }
+.hr-caveats h3 { font-family: var(--font-d); font-size: 1.2rem; color: var(--text-bright); margin-bottom: .9rem; }
+.hr-caveats p { font-size: .88rem; color: var(--text-dim); line-height: 1.75; margin-bottom: .9rem; }
+.hr-caveats p:last-child { margin-bottom: 0; }
+.hr-caveats strong { color: var(--text); }
+
+/* "You are here" pulse (STYLE_GUIDE §6.23, canonical lcs-pulse-halo), in
+   bitcoin orange to match the line it sits on. Still when either of today's
+   prices is a fallback (.is-static): liveness is a claim. */
+.lcs-pulse-halo {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%;
+  pointer-events: none; transform: translate(-50%, -50%);
+  background-color: var(--hr-btc); box-shadow: 0 0 6px var(--hr-pulse-glow);
+  opacity: 0; transition: opacity .35s ease; z-index: 2;
+}
+.lcs-pulse-halo.is-visible { opacity: 1; }
+.lcs-pulse-halo::before, .lcs-pulse-halo::after {
+  content: ''; position: absolute; top: 50%; left: 50%; width: 12px; height: 12px;
+  border-radius: 50%; border: 2px solid var(--hr-pulse-ring);
+  transform: translate(-50%, -50%) scale(1);
+  animation: lcsPulseRing 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+.lcs-pulse-halo::after { animation-delay: 1.3s; }
+.lcs-pulse-halo.is-static::before, .lcs-pulse-halo.is-static::after { animation: none; opacity: 0; }
+@keyframes lcsPulseRing {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: .85; }
+  100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lcs-pulse-halo::before, .lcs-pulse-halo::after { animation: none; }
+}
+
+@media (max-width: 860px) {
+  .hr-readout-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .hr-page { padding: 32px 16px 48px; }
+  .hr-chart-wrapper { height: 340px; }
+  .hr-chart-container, .hr-readout, .hr-caveats { padding: 1.2rem 1.1rem; }
+  .hr-table { font-size: .8rem; }
+  .hr-table td, .hr-table th { padding: .5rem .45rem; }
+}
+@media (max-width: 480px) {
+  .hr-chart-wrapper { height: 300px; }
+  .hr-stat { padding: .7rem .6rem; }
+}

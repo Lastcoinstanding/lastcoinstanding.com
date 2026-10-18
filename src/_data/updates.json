@@ -2,6 +2,12 @@
   {
     "display": "10/18/26",
     "date": "2026-10-18",
+    "page": "/bitcoin-hash-rate",
+    "summary": "New: Bitcoin's Hash Rate. The network's computing power fitted as a power law: it fits any stretch, but the exponent keeps falling, price rises about as its square root, and the price moves first, by about six months."
+  },
+  {
+    "display": "10/18/26",
+    "date": "2026-10-18",
     "page": "/bitcoin-in-gold",
     "summary": "New: Bitcoin, Priced in Gold. The Power Law measured in ounces of gold: where bitcoin sits against its gold trend today, the cycle lows in dollars and in gold, and why the two readings have come apart since 2024."
   },
