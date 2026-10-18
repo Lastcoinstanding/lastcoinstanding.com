@@ -3,7 +3,7 @@
     "display": "10/18/26",
     "date": "2026-10-18",
     "page": "/paper-bitcoin",
-    "summary": "Paper Bitcoin vs. Real Bitcoin: the self-custody side now carries two 2026 incidents. A hardware-wallet maker's shipping partner leaked about 80,700 customers' contact details, including orders it had said were deleted, and a Coldcard firmware flaw let attackers recompute keys and take about 1,800 BTC (an early, preliminary tally). Neither was a failure of the Bitcoin network."
+    "summary": "Paper Bitcoin vs. Real Bitcoin: the self-custody side now carries three 2026 incidents. A hardware-wallet maker's shipping partner leaked about 80,700 customers' contact details; a Coldcard firmware flaw let attackers recompute keys and take about 1,800 BTC; and Ledger devices sold through a Southeast Asian reseller carried a hidden implant that sent recovery phrases out over the mobile network (more than $86 million by on-chain estimates). None was a failure of the Bitcoin network."
   },
   {
     "display": "10/18/26",
