@@ -95,6 +95,17 @@
   var LAST = ROWS[ROWS.length - 1];
 
   // Today's reading; filled from the latest sample, then from the live prices.
+  // The dollar multiple above comes from this page's own fit (monthly, from 2011,
+  // refitted on load) so gold and dollars are compared like for like. The site's
+  // reference model (The Power Law, fixed a and b) gives a different dollar
+  // multiple; name it, so the two figures are never read as a contradiction.
+  function refNote(t) {
+    if (typeof plPrice !== 'function') return '';
+    var ref = t.btcUsd / plPrice(t.day);
+    if (!isFinite(ref) || ref <= 0) return '';
+    return ' The <a href="/the-power-law">site\u2019s reference model</a>, a separate fixed fit, puts it at <strong>' + fmtX(ref) + '</strong> its dollar trend; this page refits dollars the same way as gold so the two compare like for like.';
+  }
+
   var TODAY = null;
   function computeToday(btcUsd, btcSrc, goldUsd, goldSrc, goldLabel) {
     var day = (typeof TODAY_DAYS !== 'undefined' && isFinite(TODAY_DAYS)) ? TODAY_DAYS : LAST.day;
@@ -140,7 +151,7 @@
     var z = zoneOf(t.mg);
     setHtml('gbVerdict', 'Bitcoin sits at <strong>' + fmtX(t.mg) + '</strong> its gold trend, ' + ZONE_TEXT[z] + '. ' + rankSentence(t.rankG) +
       ' In dollars, against the same kind of fit, it sits at <strong>' + fmtX(t.mu) + '</strong>' +
-      (t.rankU < 0.5 ? ', with ' + pct(t.rankU) + ' of months lower.' : ', with ' + pct(t.rankU) + ' of months lower.'));
+      ', with ' + pct(t.rankU) + ' of months lower.' + refNote(t));
     setText('gbSource', sourceNote(t));
     var el = document.getElementById('gbReadout'); if (el) el.setAttribute('data-zone', z);
   }

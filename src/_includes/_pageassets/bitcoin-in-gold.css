@@ -70,9 +70,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); fo
 .gb-attribution strong { color: var(--text-bright); }
 
 /* Links in prose blocks */
-.gb-attribution a, .gb-section a, .gb-caveats a { color: var(--amber); text-decoration: none; border-bottom: 1px solid var(--gb-link-line); transition: border-color .2s, color .2s; }
-.gb-attribution a:visited, .gb-section a:visited, .gb-caveats a:visited { color: var(--amber); }
-.gb-attribution a:hover, .gb-section a:hover, .gb-caveats a:hover { color: var(--orange); border-bottom-color: var(--orange); }
+.gb-attribution a, .gb-section a, .gb-caveats a, .gb-verdict a { color: var(--amber); text-decoration: none; border-bottom: 1px solid var(--gb-link-line); transition: border-color .2s, color .2s; }
+.gb-attribution a:visited, .gb-section a:visited, .gb-caveats a:visited, .gb-verdict a:visited { color: var(--amber); }
+.gb-attribution a:hover, .gb-section a:hover, .gb-caveats a:hover, .gb-verdict a:hover { color: var(--orange); border-bottom-color: var(--orange); }
 
 /* §1 READOUT */
 .gb-readout { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1.7rem; margin: 0 auto 1.4rem; }
