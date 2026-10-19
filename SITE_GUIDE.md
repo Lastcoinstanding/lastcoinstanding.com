@@ -3721,6 +3721,8 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 
 **OG.** Product-forward (`build-og-images.py`, card `bitcoin-in-gold`, hero `#gbOzChart`); `--base` captures from a local build or preview before the page is on production. Regenerate with the monthly refresh (MONTHLY_REFRESH_CHECKLIST §6).
 
+**The reference-model note (2026-10-19, JM).** The readout's dollar multiple is this page's own fit (b ≈ 5.50, monthly from 2011), which on 2026-10-19 read 0.60× while The Power Law's reference model (a = 1.6e-17, b = 5.77) read 0.51×. JM spotted the mismatch while drafting an X post, so the verdict now names both: after the dollar sentence it adds the reference model's multiple, computed live from `plPrice()`, and says why this page refits dollars (like-for-like with gold). In posts, compare the *share of months lower* (7% in gold, 27% in dollars that day) rather than the dollar multiple, since the share is measured the same way in both units.
+
 **Carousel slide (2026-10-18).** Row 15 in §13: a brass balance, gold bar against an orange coin; Numbers, not Featured.
 
 ## 64. Bitcoin's Hash Rate (`/bitcoin-hash-rate.html`)
