@@ -70,7 +70,7 @@ right and evergreen. Refinements that make it work:
    larger accounts screenshot and reshare (River's bear-market table is the pattern). Make charts branded,
    embeddable, and deep-linkable so *others* spread them — this is how niche rigor travels without a big
    following of your own.
-4. **Guest podcast appearances.** Borrow established audiences, and simultaneously build the verifiable
+4. **Guest video appearances — video-first (JM, 2026-10-19).** The site is visual: a listener can't follow a chart or a calculator by ear, so prioritise interviews filmed with screen-share (YouTube shows, recorded streams) over audio-only podcasts; take audio slots only where the host will also publish video. Evidence: the Robin Seyr interview (uploaded 2026-09-20, JM walking through The Bitcoin Retirement on screen) drove 413 YouTube sessions in four weeks, the retirement page's 407-view day on Sep 21, and most of the month's 358 brand-name Google clicks — more than any other channel that month. Original item, still true: borrow established audiences, and simultaneously build the verifiable
    track record that earns a b.tc conference speaking slot (see FUNDING_STRATEGY recognition section).
 5. **Substack + email capture — ✅ LIVE (2026-08-05).** The owned audience you're not renting from an
    algorithm. Shipped Substack-first: site-wide "Get Updates" block

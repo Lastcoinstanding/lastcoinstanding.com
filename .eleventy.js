@@ -9,6 +9,7 @@ module.exports = function (eleventyConfig) {
   const staticAssets = [
     'hero-bg.jpg',
     'profile.jpg',
+    'interview-robin-seyr.jpg',
     'apple-touch-icon.png',
     'favicon.ico',
     'favicon.svg',
