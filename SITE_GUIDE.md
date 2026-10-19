@@ -3738,3 +3738,11 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 **Console.** `hrQA()`. **OG.** Product-forward (`build-og-images.py`, card `bitcoin-hash-rate`).
 
 **Carousel slide (2026-10-18).** Row 16 in §13: dark dice in a misted hall, one lit, the winning roll; Numbers, not Featured.
+
+## 65. Video card (`components/video-card.njk`, 2026-10-19)
+
+A house-styled card linking to a video interview: a self-hosted still (`interview-robin-seyr.jpg`, a 16:9 crop of `profile.jpg`), a play mark, the episode title in the site's type, one line of page-specific copy (`vc_body`, set before the include), and "Watch on YouTube ↗". The whole card is one link out; no iframe and no third-party request on page load, the same rule as the Get Updates block.
+
+**Why a house card, not the show's thumbnail (JM's call).** The show's thumbnail reads "RETIRE ON 1 BTC BY 2037" in huge type: a promise the site never makes (it is the model's answer at $100K a year, under its assumptions). The Retirement page's copy says so: "The figures are the model’s, under its assumptions; set your own below."
+
+**Placements.** The Bitcoin Retirement, directly under the tool-framing strip (the interview walks through that page; it is the site's most-visited page, and the video drove its Sep 21 spike); About, above the published-and-interviews list (the list keeps its text entry). `vc_body` must not contain a link: the card is already one. To feature a later interview, generalise the component's URL, kicker, title and still into variables at that point.
