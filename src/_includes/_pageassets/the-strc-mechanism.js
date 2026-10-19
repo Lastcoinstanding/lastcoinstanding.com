@@ -36,17 +36,17 @@
   // All figures 8-K-sourced as of `asOf`. See STRC_BELOW_PAR_DESIGN.md.
   // ═══════════════════════════════════════════════════════════════
   var STRC_DATA = {
-    asOf: "2026-10-11",       // the 8-K filed 2026-10-13 (period to Oct 11; press release Oct 12)
+    asOf: "2026-10-18",       // the 8-K filed 2026-10-19 (period Oct 12–18)
     price: 88.32,              // last close; reader-adjustable in the lens
     parAmount: 100.00,
     // From src/_data/preferredRates.json (window.PREFERRED_RATES), the one
     // place the site keeps the rate (2026-09-30); 12.00 is the fallback. A
     // change also appends a row to rateHistory below.
     rateAnnualPct: (window.PREFERRED_RATES && window.PREFERRED_RATES.strc && isFinite(window.PREFERRED_RATES.strc.ratePct)) ? window.PREFERRED_RATES.strc.ratePct : 12.00,   // paid semi-monthly, $0.50 × 2, since Jul 2026
-    // Derived: the 10-Q's ~104.6M shares at July 24, 2026, less the 16,684,339
-    // repurchased from July 27 to October 11 (weekly 8-Ks, buybackLog); no
+    // Derived: the 10-Q's ~104.6M shares at July 24, 2026, less the 18,623,119
+    // repurchased from July 27 to October 18 (weekly 8-Ks, buybackLog); no
     // STRC was issued in that time. No newer filed count exists.
-    sharesOutstanding: 87915661,
+    sharesOutstanding: 85976881,
     // Not published by Strategy: estimated from Yahoo Finance daily bars,
     // Σ(typical price × volume) ÷ Σ volume, September 2026 (August: $95.45).
     priorMonthVWAP: 98.31,
@@ -55,16 +55,17 @@
       ["2025-08", 9.00], ["2025-09", 10.00], ["2025-10", 10.25], ["2025-11", 10.50],
       ["2025-12", 10.75], ["2026-01", 11.00], ["2026-02", 11.25], ["2026-03", 11.50],
       ["2026-04", 11.50], ["2026-05", 11.50], ["2026-06", 11.50], ["2026-07", 12.00],
-      ["2026-08", 12.00], ["2026-09", 12.00], ["2026-10", 12.00]
+      ["2026-08", 12.00], ["2026-09", 12.00], ["2026-10", 12.00],
+      ["2026-11", 12.00]      // 8-K filed 2026-10-16: held for November record dates
     ],
     claimStack: {              // $B: the Q2 10-Q (filed 2026-08-03) and the weekly 8-Ks since
       seniorConvertsB: 6.70,   // $6,713.7M principal at Jun 30; unsecured, ~0.42% avg coupon, 2028–2032, no coverage triggers
       strfSeniorB: 1.284,      // no STRF issued or repurchased since
-      strcNotionalB: 8.792     // the 10-Q's $10.46B at July 24 less $1,668.4M of par repurchased to Oct 11 (derived, as sharesOutstanding)
+      strcNotionalB: 8.598     // the 10-Q's $10.46B at July 24 less $1,862.3M of par repurchased to Oct 18 (derived, as sharesOutstanding)
     },
-    btcHoldings: 848250,       // Oct 11, 2026 (8-K filed Oct 13)
-    usdReserveB: 4.88,         // Oct 11: for preferred dividends and debt interest; buybacks are funded from USD Cash, MSTR sales or bitcoin sales
-    usdCashB: 0.6405,          // Oct 11: "USD Cash", the flexible pool set up Aug 24, 2026 ($1.00B on Sep 27)
+    btcHoldings: 848517,       // Oct 18, 2026 (8-K filed Oct 19)
+    usdReserveB: 4.83,         // Oct 18: for preferred dividends and debt interest; buybacks are funded from USD Cash, MSTR sales or bitcoin sales
+    usdCashB: 0.4473,          // Oct 18: "USD Cash", the flexible pool set up Aug 24, 2026 ($1.00B on Sep 27)
     // Strategy's published annual interest + preferred dividends (investor
     // briefing, SEC FWP filed 2026-08-24, as of 2026-08-23; DATA_AUDIT BvRP-3).
     // It predates most of the STRC repurchases, so it runs a little high.
@@ -85,16 +86,19 @@
       // The 8-K filed 2026-10-05 splits its week at the quarter end: two rows.
       { window: "2026-09-28..30",    shares: 1033168, usdM: 102.6, avg: 99.31, parRetiredM: 103.317, annualDivSavedM: 12.4 },
       { window: "2026-10-01..04",    shares: 740634,  usdM: 73.7,  avg: 99.51, parRetiredM: 74.063,  annualDivSavedM: 8.9 },
-      { window: "2026-10-05..11",    shares: 1932145, usdM: 192.4, avg: 99.58, parRetiredM: 193.215, annualDivSavedM: 23.2 }
+      { window: "2026-10-05..11",    shares: 1932145, usdM: 192.4, avg: 99.58, parRetiredM: 193.215, annualDivSavedM: 23.2 },
+      { window: "2026-10-12..18",    shares: 1938780, usdM: 193.1, avg: 99.60, parRetiredM: 193.878, annualDivSavedM: 23.3 }
     ],
-    // Preferred repurchase program raised from $1.0B to $2.0B on 2026-09-08.
+    // Preferred repurchase program raised from $1.0B to $2.0B on 2026-09-08, and to
+    // $3.0B in the 8-K filed 2026-10-19 ($1.16B left at Oct 18, including earlier purchases).
     // BTC monetization: the page's last attributed figure (July); the 8-Ks for
     // the August sales don't name the program, so they aren't added to it.
-    authRemaining: { preferredM: 354.8, preferredCapB: 2.0, mstrB: 1.0, btcMonetizationUsedM: 218.5, btcMonetizationCapB: 1.25 },
+    authRemaining: { preferredM: 1160, preferredCapB: 3.0, mstrB: 1.0, btcMonetizationUsedM: 218.5, btcMonetizationCapB: 1.25 },
     supplyLog: [
       { d: "2026-07-27", t: "Policy", v: "No new STRC issuance below $100 par (stated discipline; also economic necessity below par)" },
-      { d: "2026-07-27..10-11", t: "Issuance", v: "No STRC sold under the ATM in any week (weekly 8-Ks); 16.7M shares retired, the float ≈ 87.9M" },
-      { d: "2026-09-24", t: "Proposal", v: "Daily record dates for STRC, STRF, STRK and STRD; vote Oct 28, 2026; first daily STRC dividend expected Nov 2 (8-K Sep 25)" }
+      { d: "2026-07-27..10-18", t: "Issuance", v: "No STRC sold under the ATM in any week (weekly 8-Ks); 18.6M shares retired, the float ≈ 86.0M" },
+      { d: "2026-09-24", t: "Proposal", v: "Daily record dates for STRC, STRF, STRK and STRD; vote Oct 28, 2026; first daily STRC dividend expected Nov 2 (8-K Sep 25)" },
+      { d: "2026-10-15", t: "Dividends", v: "November declared at 12.00% as daily dividends ($1.00 a share in all), payable only if the Oct 28 vote passes; if it fails, the semi-monthly Nov 15 dividend is paid instead (8-K Oct 16)" }
     ],
     fuelLog: [                 // dated rows, rendered as the fuel-gauge log
       { d: "2026-05-26..31", t: "BTC sale", v: "32 BTC / $2.5M (avg $77,135) — the “inoculation” sale" },
@@ -112,7 +116,10 @@
       { d: "2026-09-27",     t: "Reserve", v: "USD Reserve $5.02B, USD Cash $1.00B; the reserve paid $22.1M of dividends that week" },
       { d: "2026-09-28..10-04", t: "Reserve", v: "The reserve paid $142.5M of dividends and interest (USD Reserve $4.88B); USD Cash paid $154.1M of STRC repurchases" },
       { d: "2026-10-01..11", t: "BTC buy", v: "584 BTC / $50.2M ($36.7M from MSTR sales, $13.5M from USD Cash)" },
-      { d: "2026-10-11",     t: "Reserve", v: "USD Reserve $4.88B, USD Cash $640.5M (from $1.00B on Sep 27, mostly spent buying back STRC)" }
+      { d: "2026-10-11",     t: "Reserve", v: "USD Reserve $4.88B, USD Cash $640.5M (from $1.00B on Sep 27, mostly spent buying back STRC)" },
+      { d: "2026-10-12..18", t: "BTC buy", v: "267 BTC / $22.1M, from MSTR sales" },
+      { d: "2026-10-18",     t: "Buyback auth", v: "Preferred repurchase program raised $2.0B → $3.0B; $1.16B left" },
+      { d: "2026-10-18",     t: "Reserve", v: "The reserve paid $45.5M of dividends (USD Reserve $4.83B); USD Cash $447.3M after $193.1M of STRC repurchases" }
     ],
     // Company-modeled, methodology unverified at build (design §5) — carries a verify badge:
     btcBreakevenArrPct: 2.3
@@ -391,7 +398,7 @@
     setHTML('sbBidStatus',
       statusField('Cumulative repurchased', totShares.toLocaleString() + ' shares · $' + totUsd.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'M · avg ' + money2(dispAvg))
       + statusField('Par retired', '$' + totPar.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'M → $' + totSaved.toFixed(1) + 'M/yr of dividends eliminated')
-      + statusField('Authorization remaining', '~$' + STRC_DATA.authRemaining.preferredM.toFixed(0) + 'M of $' + STRC_DATA.authRemaining.preferredCapB.toFixed(1) + 'B preferred repurchase')
+      + statusField('Authorization remaining', '~' + (STRC_DATA.authRemaining.preferredM >= 1000 ? '$' + (STRC_DATA.authRemaining.preferredM / 1000).toFixed(2) + 'B' : '$' + STRC_DATA.authRemaining.preferredM.toFixed(0) + 'M') + ' of $' + STRC_DATA.authRemaining.preferredCapB.toFixed(1) + 'B preferred repurchase')
       + statusField('Sibling auths', '$' + STRC_DATA.authRemaining.mstrB.toFixed(1) + 'B MSTR (unused) · $' + STRC_DATA.authRemaining.btcMonetizationCapB.toFixed(2) + 'B BTC monetization ($' + STRC_DATA.authRemaining.btcMonetizationUsedM.toFixed(1) + 'M used)'));
     var rows = STRC_DATA.buybackLog.map(function (b) {
       return { d: b.window, t: b.shares.toLocaleString() + ' shares', v: '$' + b.usdM.toFixed(1) + 'M @ avg ' + money2(b.avg) + ' — $' + b.parRetiredM.toFixed(2) + 'M par retired, ~$' + b.annualDivSavedM.toFixed(1) + 'M/yr saved' };
