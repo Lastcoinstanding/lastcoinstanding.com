@@ -1,7 +1,7 @@
 {#
   Video card — a house-styled link to a video interview (2026-10-19, JM).
 
-  A static still (self-hosted) with a play mark, the episode title in the
+  A still from the interview (self-hosted) with a play mark, the episode title in the
   site's type, and a one-line note; the whole card links out to YouTube.
   No iframe and no third-party request on page load, in line with the
   Get Updates block's no-embed rule. JM chose a house card over the show's
@@ -20,8 +20,8 @@
 }
 .vc-card:hover, .vc-card:focus-visible { border-color: rgba(247,147,26,0.55); background: rgba(224,148,34,0.07); }
 .vc-card:focus-visible { outline: 2px solid #F7931A; outline-offset: 2px; }
-.vc-still { position: relative; flex: 0 0 240px; aspect-ratio: 16 / 9; background: #14110d; }
-.vc-still img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 60% 25%; }
+.vc-still { position: relative; flex: 0 0 300px; aspect-ratio: 16 / 9; background: #14110d; }
+.vc-still img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 .vc-still::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,9,8,0.05), rgba(10,9,8,0.35)); }
 .vc-play {
   position: absolute; left: 12px; bottom: 12px; z-index: 1;
@@ -42,7 +42,7 @@
 <div class="vc-wrap">
   <a class="vc-card" href="https://www.youtube.com/watch?v=aQhk4KKqMss" target="_blank" rel="noopener">
     <div class="vc-still">
-      <img src="/interview-robin-seyr.jpg" alt="John McCabe" width="640" height="360" loading="lazy" decoding="async">
+      <img src="/interview-robin-seyr.jpg" alt="A frame from the interview: John McCabe and Robin Seyr, with a Last Coin Standing power-law page on screen" width="800" height="450" loading="lazy" decoding="async">
       <span class="vc-play" aria-hidden="true"></span>
     </div>
     <div class="vc-text">
