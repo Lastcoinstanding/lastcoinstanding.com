@@ -38,6 +38,11 @@ body { background: var(--bg); color: var(--text); }
 .hero .hero-subtitle { font-family: var(--font-d); font-style: italic; font-size: clamp(1.1rem, 2.6vw, 1.45rem); color: var(--text-dim); margin: 0 0 0.6rem; }
 .hero .subtitle { font-family: var(--font-b); font-size: 0.98rem; line-height: 1.7; color: var(--text-dim); margin: 0.6rem auto 0; max-width: 680px; }
 .hero .subtitle em { color: var(--amber); font-style: italic; }
+/* Last-updated line (2026-10-19, JM): a dated episode page states when it was last reviewed. */
+.hero .sb-updated { display: inline-flex; align-items: baseline; gap: 0.5rem; text-align: center; margin: 1.2rem auto 0; padding: 0.4rem 0.9rem; border: 1px solid var(--border, rgba(224,148,34,0.18)); border-radius: 999px; font-family: var(--font-b); font-size: 0.78rem; line-height: 1.5; color: var(--text-dim); }
+.hero .sb-updated time { color: #f2eee8; font-weight: 600; }
+.hero .sb-updated-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); flex: 0 0 auto; align-self: center; }
+@media (max-width: 600px) { .hero .sb-updated { border-radius: 10px; font-size: 0.74rem; } }
 
 /* ── Container (mixed-content: page 1100, prose 880) ── */
 .content-area { position: relative; max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }

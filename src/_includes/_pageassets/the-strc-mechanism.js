@@ -134,6 +134,9 @@
   var STRC_CLOSE = (typeof window !== 'undefined' && window.STRC_CLOSE) || null;
   if (STRC_CLOSE && typeof STRC_CLOSE.close === 'number' && STRC_CLOSE.close > 0) STRC_DATA.price = STRC_CLOSE.close;
   STRC_DATA.closeAsOf = (STRC_CLOSE && STRC_CLOSE.asOfDate) || null;
+  // The hero's last-updated line is set in front matter; its filings date must
+  // match STRC_DATA.asOf (MONTHLY_REFRESH_CHECKLIST §7.5).
+  (function () { var el = document.getElementById('sbUpdated'); if (el && el.getAttribute('data-filings') !== STRC_DATA.asOf) { console.warn('[strc] last-updated line says filings through ' + el.getAttribute('data-filings') + ' but STRC_DATA.asOf is ' + STRC_DATA.asOf); } })();
   // "2026-08-10" → "Aug 10, 2026" (UTC noon avoids any TZ date-rollover).
   function fmtCloseDate(iso) { try { return new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return iso || 'recent'; } }
 

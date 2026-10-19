@@ -3,6 +3,13 @@ layout: base.njk
 permalink: /the-strc-mechanism.html
 slug: the-strc-mechanism
 title: The STRC Mechanism
+# Last-updated line under the hero (JM, 2026-10-19). Bump strc_reviewed at every
+# review, even a quiet one (MONTHLY_REFRESH_CHECKLIST §7.5); strc_filings_through
+# must equal STRC_DATA.asOf (the JS warns in the console if they differ).
+strc_reviewed: "2026-10-19"
+strc_reviewed_label: "October 19, 2026"
+strc_filings_through: "2026-10-18"
+strc_filings_through_label: "October 18, 2026"
 related:
   - slug: bitcoin-as-collateral
     desc: "Where economic collateral sits in the wider argument. STRC&rsquo;s bitcoin backs securities rather than a loan; that structure is scored on this page against every other way collateral gets pledged."
@@ -82,6 +89,7 @@ companion:
   <h1>The STRC <em>Mechanism</em></h1>
   <div class="hero-subtitle">A bitcoin-backed preferred stock built to trade near its $100 par &mdash; and the monthly rate lever meant to hold it there.</div>
   <p class="subtitle">Price away from par is information, in either direction. Below par, the same coupon is a higher effective yield &mdash; and a mechanism that isn&rsquo;t holding par is pricing a risk. Above par, the market is accepting less than the stated rate &mdash; paying for the mechanism&rsquo;s credibility. This page shows what STRC is, how the lever works, and how to read its price against par &mdash; with arithmetic, not adjectives, and no verdict.</p>
+  <p class="sb-updated" id="sbUpdated" data-filings="{{ strc_filings_through }}"><span class="sb-updated-dot" aria-hidden="true"></span><span>Last updated <time datetime="{{ strc_reviewed }}">{{ strc_reviewed_label }}</time> &middot; Strategy&rsquo;s filings through {{ strc_filings_through_label }} &middot; STRC&rsquo;s price updates every market day</span></p>
 </section>
 
 <main class="content-area">
