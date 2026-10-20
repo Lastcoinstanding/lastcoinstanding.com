@@ -11,13 +11,20 @@
    - Each PL_DATA sample is priced in ounces: its dollar price divided
      by gold's average for the same calendar month (UTC).
    - The gold trend is an ordinary least-squares fit of log10(ounces)
-     on log10(days since the genesis block), from FIT_FROM (2011),
-     re-fitted at every load. It is this page's fit, not the site's
+     on log10(days since the genesis block), from FIT_FROM, re-fitted at
+     every load. FIT_FROM is the reader's choice of start year (2011 by
+     default; 2013, 2016 or 2020; ?from=YYYY), added 2026-10-20 after a
+     reader showed how much the reading moves with the start. Every
+     figure built on the fit follows it. It is this page's fit, not the site's
      dollar reference model (a = 1.6e-17, b = 5.77).
    - The dollar line it is compared with is fitted the same way over
      the same months, so the two are like for like.
    - "The usual range" is the 5th to 95th percentile of the monthly
      multiples since FIT_FROM: 90% of months have sat inside it.
+   - Gold's side of the gap: the dollar fit divided by the gold fit is
+     a dollar trend for gold implied by the two (not a model of gold).
+     Bitcoin's gold multiple = its dollar multiple ÷ gold's multiple of
+     that implied trend, exactly.
    - Today: the live bitcoin price (fetchTodayPrice) over today's gold
      price (fetchGoldPrice); either falls back to its latest sample,
      and the readout names which.
@@ -27,7 +34,13 @@
 (function () {
   if (typeof PL_DATA === 'undefined' || typeof GOLD_MONTHLY === 'undefined') return;
 
-  var FIT_FROM = '2011-01-01';
+  var START_YEARS = [2011, 2013, 2016, 2020];
+  var START_YEAR = 2011;
+  (function () {
+    var q = /[?&]from=(\d{4})/.exec(location.search || '');
+    if (q && START_YEARS.indexOf(+q[1]) >= 0) START_YEAR = +q[1];
+  })();
+  var FIT_FROM = START_YEAR + '-01-01';
   var GENESIS_MS = Date.UTC(2009, 0, 3);
   var DAY_MS = 86400000;
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -79,23 +92,28 @@
     var k = monthKey(s[0]);
     if (GOLD[k]) ROWS.push({ day: s[0], usd: s[1], gold: GOLD[k], oz: s[1] / GOLD[k], key: k });
   });
-  var FROM_DAY = dayOf(FIT_FROM);
   function rowsFrom(iso) { var d0 = dayOf(iso); return ROWS.filter(function (r) { return r.day >= d0; }); }
   function fitsFrom(iso) {
     var R = rowsFrom(iso), xs = R.map(function (r) { return r.day; });
     return { rows: R, gold: fitLogLog(xs, R.map(function (r) { return r.oz; })), usd: fitLogLog(xs, R.map(function (r) { return r.usd; })) };
   }
-  var MAIN = fitsFrom(FIT_FROM);
-  var FIT_ROWS = MAIN.rows;
-  FIT_ROWS.forEach(function (r) { r.mg = r.oz / MAIN.gold.at(r.day); r.mu = r.usd / MAIN.usd.at(r.day); });
-  var SORTED_G = FIT_ROWS.map(function (r) { return r.mg; }).sort(function (a, b) { return a - b; });
-  var SORTED_U = FIT_ROWS.map(function (r) { return r.mu; }).sort(function (a, b) { return a - b; });
-  var BAND_LO = quantile(SORTED_G, 0.05), BAND_HI = quantile(SORTED_G, 0.95);
+  // The fit and everything derived from it, for the chosen start year.
+  var FROM_DAY, MAIN, FIT_ROWS, SORTED_G, SORTED_U, BAND_LO, BAND_HI;
+  function applyStart(year) {
+    START_YEAR = year; FIT_FROM = year + '-01-01'; FROM_DAY = dayOf(FIT_FROM);
+    MAIN = fitsFrom(FIT_FROM);
+    // Copies, so each start's multiples never leak into another's.
+    FIT_ROWS = MAIN.rows.map(function (r) { return { day: r.day, usd: r.usd, gold: r.gold, oz: r.oz, key: r.key, mg: r.oz / MAIN.gold.at(r.day), mu: r.usd / MAIN.usd.at(r.day) }; });
+    SORTED_G = FIT_ROWS.map(function (r) { return r.mg; }).sort(function (a, b) { return a - b; });
+    SORTED_U = FIT_ROWS.map(function (r) { return r.mu; }).sort(function (a, b) { return a - b; });
+    BAND_LO = quantile(SORTED_G, 0.05); BAND_HI = quantile(SORTED_G, 0.95);
+  }
+  applyStart(START_YEAR);
   function rankBelow(sorted, v) { var n = 0; for (var i = 0; i < sorted.length; i++) if (sorted[i] < v) n++; return n / sorted.length; }
   var LAST = ROWS[ROWS.length - 1];
 
   // Today's reading; filled from the latest sample, then from the live prices.
-  // The dollar multiple above comes from this page's own fit (monthly, from 2011,
+  // The dollar multiple above comes from this page's own fit (monthly, from the start year,
   // refitted on load) so gold and dollars are compared like for like. The site's
   // reference model (The Power Law, fixed a and b) gives a different dollar
   // multiple; name it, so the two figures are never read as a contradiction.
@@ -106,12 +124,16 @@
     return ' The <a href="/the-power-law">site\u2019s reference model</a>, a separate fixed fit, puts it at <strong>' + fmtX(ref) + '</strong> its dollar trend; this page refits dollars the same way as gold so the two compare like for like.';
   }
 
-  var TODAY = null;
+  var TODAY = null, TODAY_IN = null;
   function computeToday(btcUsd, btcSrc, goldUsd, goldSrc, goldLabel) {
+    TODAY_IN = [btcUsd, btcSrc, goldUsd, goldSrc, goldLabel];
     var day = (typeof TODAY_DAYS !== 'undefined' && isFinite(TODAY_DAYS)) ? TODAY_DAYS : LAST.day;
     var oz = btcUsd / goldUsd, trend = MAIN.gold.at(day), mg = oz / trend, mu = btcUsd / MAIN.usd.at(day);
+    // Gold's side: the dollar trend for gold the two fits imply (usd ÷ oz).
+    var goldTrendUsd = MAIN.usd.at(day) / trend;
     TODAY = { day: day, btcUsd: btcUsd, btcSrc: btcSrc, goldUsd: goldUsd, goldSrc: goldSrc, goldLabel: goldLabel,
-              oz: oz, trendOz: trend, mg: mg, mu: mu, rankG: rankBelow(SORTED_G, mg), rankU: rankBelow(SORTED_U, mu) };
+              oz: oz, trendOz: trend, mg: mg, mu: mu, rankG: rankBelow(SORTED_G, mg), rankU: rankBelow(SORTED_U, mu),
+              goldTrendUsd: goldTrendUsd, gm: goldUsd / goldTrendUsd };
     return TODAY;
   }
 
@@ -123,17 +145,17 @@
     if (m <= BAND_HI) return 'high';
     return 'above';
   }
-  var ZONE_TEXT = {
-    below: 'below the range that has held 90% of months since 2011',
-    low: 'in the lower part of its usual range',
-    near: 'close to its gold trend',
-    high: 'in the upper part of its usual range',
-    above: 'above the range that has held 90% of months since 2011'
-  };
+  function zoneText(z) {
+    return { below: 'below the range that has held 90% of months since ' + START_YEAR,
+             low: 'in the lower part of its usual range',
+             near: 'close to its gold trend',
+             high: 'in the upper part of its usual range',
+             above: 'above the range that has held 90% of months since ' + START_YEAR }[z];
+  }
   function rankSentence(r) {
-    // r = share of months since 2011 with a LOWER multiple than today.
-    if (r < 0.5) return 'Only ' + pct(r) + ' of months since 2011 sat lower against the gold trend.';
-    return pct(r) + ' of months since 2011 sat lower against the gold trend.';
+    // r = share of months since the start year with a LOWER multiple than today.
+    if (r < 0.5) return 'Only ' + pct(r) + ' of months since ' + START_YEAR + ' sat lower against the gold trend.';
+    return pct(r) + ' of months since ' + START_YEAR + ' sat lower against the gold trend.';
   }
   function sourceNote(t) {
     var b = t.btcSrc === 'live' ? 'live bitcoin price' : 'bitcoin at its ' + monthLabel(LAST.day) + ' sample';
@@ -149,7 +171,7 @@
     setText('gbGoldUsd', fmtUsd(t.goldUsd));
     setText('gbBtcUsd', fmtUsd(t.btcUsd));
     var z = zoneOf(t.mg);
-    setHtml('gbVerdict', 'Bitcoin sits at <strong>' + fmtX(t.mg) + '</strong> its gold trend, ' + ZONE_TEXT[z] + '. ' + rankSentence(t.rankG) +
+    setHtml('gbVerdict', 'Bitcoin sits at <strong>' + fmtX(t.mg) + '</strong> its gold trend, ' + zoneText(z) + '. ' + rankSentence(t.rankG) +
       ' In dollars, against the same kind of fit, it sits at <strong>' + fmtX(t.mu) + '</strong>' +
       ', with ' + pct(t.rankU) + ' of months lower.' + refNote(t));
     setText('gbSource', sourceNote(t));
@@ -181,7 +203,7 @@
           titleColor: css('--text-bright', '#f2eee8'), bodyColor: css('--text', '#d8d2ca'), padding: 10 }
       },
       scales: {
-        x: { type: 'linear', min: 2011, ticks: { color: muted, font: { size: 10 }, callback: yearTicks, autoSkip: false, maxRotation: 0 }, grid: { color: grid },
+        x: { type: 'linear', min: START_YEAR, ticks: { color: muted, font: { size: 10 }, callback: yearTicks, autoSkip: false, maxRotation: 0 }, grid: { color: grid },
              // Whole years only, every second year (every third on a phone).
              afterBuildTicks: function (sc) {
                var step = (sc.chart.width || 800) < 520 ? 3 : 2, t = [];
@@ -259,7 +281,7 @@
     var g = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.mg, day: r.day, row: r }; });
     var u = FIT_ROWS.map(function (r) { return { x: yearFrac(r.day), y: r.mu, day: r.day, row: r }; });
     var endDay = Math.max(LAST.day, TODAY ? TODAY.day : 0);
-    var one = [{ x: 2011, y: 1 }, { x: yearFrac(endDay) + 0.3, y: 1 }];
+    var one = [{ x: START_YEAR, y: 1 }, { x: yearFrac(endDay) + 0.3, y: 1 }];
     var ds = [
       { label: 'Priced in gold', data: g, borderColor: css('--gb-trend', '#d4a843'), borderWidth: 1.8, pointRadius: 0 },
       { label: 'Priced in dollars', data: u, borderColor: css('--gb-usd', '#8fb3c9'), borderWidth: 1.5, pointRadius: 0 },
@@ -301,10 +323,11 @@
   }
   function renderLows() {
     var body = document.getElementById('gbLowsBody'); if (!body) return;
-    var html = '', deepestPriorG = Infinity, deepestPriorU = Infinity, cur = null;
+    var html = '', deepestPriorG = Infinity, deepestPriorU = Infinity, cur = null, firstYear = null;
     LOWS.forEach(function (w, i) {
       var g = lowIn(w.from, w.to, 'mg'), u = lowIn(w.from, w.to, 'mu');
       if (!g || !u) return;
+      if (firstYear == null && w.to) firstYear = dateOf(Math.min(g.day, u.day)).getUTCFullYear();
       var open = !w.to;
       if (!open) { deepestPriorG = Math.min(deepestPriorG, g.mg); deepestPriorU = Math.min(deepestPriorU, u.mu); }
       else cur = { g: g, u: u };
@@ -313,17 +336,18 @@
         '<td class="num"><strong>' + fmtX(u.mu) + '</strong> <span class="gb-when">' + monthLabel(u.day) + '</span></td></tr>';
     });
     body.innerHTML = html;
-    if (cur) {
+    if (cur && deepestPriorG < Infinity) {
+      var since = 'since ' + firstYear;
       var gr = cur.g.mg / deepestPriorG, ur = cur.u.mu / deepestPriorU;
-      var gTxt = gr < 0.9 ? 'In gold, this bear market has gone well below every low since 2015: ' + fmtX(cur.g.mg) + ', against ' + fmtX(deepestPriorG) + ' at the deepest of them.'
-        : gr <= 1.1 ? 'In gold, this bear market has reached about the depth of the deepest low since 2015 (' + fmtX(cur.g.mg) + ' against ' + fmtX(deepestPriorG) + ').'
-        : 'In gold, this bear market has stayed above the lows since 2015 (' + fmtX(cur.g.mg) + ', against ' + fmtX(deepestPriorG) + ' at the deepest).';
+      var gTxt = gr < 0.9 ? 'In gold, this bear market has gone well below every low ' + since + ': ' + fmtX(cur.g.mg) + ', against ' + fmtX(deepestPriorG) + ' at the deepest of them.'
+        : gr <= 1.1 ? 'In gold, this bear market has reached about the depth of the deepest low ' + since + ' (' + fmtX(cur.g.mg) + ' against ' + fmtX(deepestPriorG) + ').'
+        : 'In gold, this bear market has stayed above the lows ' + since + ' (' + fmtX(cur.g.mg) + ', against ' + fmtX(deepestPriorG) + ' at the deepest).';
       var shallowU = Math.max.apply(null, LOWS.slice(0, 4).map(function (w) { var r = lowIn(w.from, w.to, 'mu'); return r ? r.mu : 0; }));
       var uTxt = cur.u.mu < deepestPriorU * 0.9 ? 'In dollars it has gone deeper than any of them too (' + fmtX(cur.u.mu) + ' against ' + fmtX(deepestPriorU) + ').'
         : cur.u.mu <= shallowU ? 'In dollars it looks like an ordinary bear market: ' + fmtX(cur.u.mu) + ', inside the range of the earlier lows (' + fmtX(deepestPriorU) + ' to ' + fmtX(shallowU) + ').'
         : 'In dollars it has stayed shallower than all of them (' + fmtX(cur.u.mu) + ', against ' + fmtX(shallowU) + ' at the shallowest).';
       setText('gbLowsRead', gTxt + ' ' + uTxt);
-    }
+    } else setText('gbLowsRead', '');
   }
 
   // ── §4 why the lines parted: gold's own run ──
@@ -353,17 +377,20 @@
     FIT_ROWS.forEach(function (r) { if (r.day < d0 && r.mg <= curMin) prior = r; });
     var depth = prior
       ? 'pushed bitcoin\u2019s gold price further below its trend than at any time since ' + dateOf(prior.day).getUTCFullYear()
-      : 'pushed bitcoin\u2019s gold price further below its trend than at any time since this fit begins, in 2011';
+      : 'pushed bitcoin\u2019s gold price further below its trend than at any time since this fit begins, in ' + START_YEAR;
     var uLows = LOWS.slice(0, 4).map(function (w) { var r = lowIn(w.from, w.to, 'mu'); return r ? r.mu : null; }).filter(function (v) { return v != null; });
-    var uCur = lowIn('2025-10-06', null, 'mu'), uMin = Math.min.apply(null, uLows);
-    var usdPart = !uCur ? '' : uCur.mu >= uMin * 0.9
+    var uCur = lowIn('2025-10-06', null, 'mu'), uMin = uLows.length ? Math.min.apply(null, uLows) : Infinity;
+    var uMax = uLows.length ? Math.max.apply(null, uLows) : -Infinity;
+    var usdPart = (!uCur || !uLows.length) ? '' : uCur.mu > uMax
+      ? 'So the gap between the two lines is not bitcoin doing something unusual: in dollars, this bear market\u2019s low (' + fmtX(uCur.mu) + ') is shallower than the earlier ones. '
+      : uCur.mu >= uMin * 0.9
       ? 'So the gap between the two lines is mostly not bitcoin doing something unusual: in dollars, this bear market\u2019s low (' + fmtX(uCur.mu) + ') sits among the earlier ones. '
       : 'In dollars, too, this bear market has gone deeper than the earlier ones (' + fmtX(uCur.mu) + ' against ' + fmtX(uMin) + '), so the gap between the lines is gold\u2019s run on top of an unusually deep fall. ';
     setText('gbPartedRead', usdPart + 'What stands out is the timing: the fall came during gold\u2019s run, and the two together have ' + depth + '.');
   }
 
   // ── §5 how sturdy: the fit from three start years ──
-  var STARTS = ['2011-01-01', '2013-01-01', '2016-01-01'];
+  var STARTS = START_YEARS.map(function (y) { return y + '-01-01'; });
   function renderSturdy() {
     var body = document.getElementById('gbSturdyBody'); if (!body) return;
     var html = '', bs = [], todays = [];
@@ -372,17 +399,19 @@
       var mg = TODAY ? TODAY.oz / F.gold.at(day) : LAST.oz / F.gold.at(LAST.day);
       var mu = TODAY ? TODAY.btcUsd / F.usd.at(day) : LAST.usd / F.usd.at(LAST.day);
       bs.push(F); todays.push(mg);
-      html += '<tr><td>From ' + s.slice(0, 4) + '</td>' +
+      html += '<tr' + (+s.slice(0, 4) === START_YEAR ? ' class="gb-row-now"' : '') + '><td>From ' + s.slice(0, 4) + '</td>' +
         '<td class="num">' + F.gold.b.toFixed(2) + '</td><td class="num">' + F.gold.r2.toFixed(2) + '</td><td class="num">' + fmtX(mg) + '</td>' +
         '<td class="num">' + F.usd.b.toFixed(2) + '</td><td class="num">' + F.usd.r2.toFixed(2) + '</td><td class="num">' + fmtX(mu) + '</td></tr>';
     });
     body.innerHTML = html;
+    var weakest = 0; bs.forEach(function (F, i) { if (F.gold.r2 < bs[weakest].gold.r2) weakest = i; });
+    var weakTxt = 'its fit explains least of the record from ' + STARTS[weakest].slice(0, 4) + ' (R\u00b2 ' + bs[weakest].gold.r2.toFixed(2) + ').';
     var gSpread = Math.max.apply(null, bs.map(function (F) { return F.gold.b; })) - Math.min.apply(null, bs.map(function (F) { return F.gold.b; }));
     var uSpread = Math.max.apply(null, bs.map(function (F) { return F.usd.b; })) - Math.min.apply(null, bs.map(function (F) { return F.usd.b; }));
     setText('gbSturdyRead', gSpread > uSpread * 1.5
-      ? 'The gold trend moves more with the starting year than the dollar trend does: its exponent spans ' + gSpread.toFixed(2) + ' across these three starts, against ' + uSpread.toFixed(2) + ' in dollars, and its fit explains less of the record from 2016.' +
+      ? 'The gold trend moves more with the starting year than the dollar trend does: its exponent spans ' + gSpread.toFixed(2) + ' across these four starts, against ' + uSpread.toFixed(2) + ' in dollars, and ' + weakTxt +
         (todays.every(function (m) { return m < 0.75; }) ? ' Bitcoin reads low against gold whichever start you pick, but how low depends on the choice more than it does in dollars.' : ' Where bitcoin reads against gold today depends on that choice more than it does in dollars.')
-      : 'The gold trend holds about as steady as the dollar trend across these three starts (exponents spanning ' + gSpread.toFixed(2) + ' in gold and ' + uSpread.toFixed(2) + ' in dollars).');
+      : 'The gold trend holds about as steady as the dollar trend across these four starts (exponents spanning ' + gSpread.toFixed(2) + ' in gold and ' + uSpread.toFixed(2) + ' in dollars).');
   }
 
   // ── §5b what earlier lows this deep were followed by ──
@@ -406,7 +435,7 @@
         ' (low ' + fmtX(low.mg) + ' in ' + monthLabel(low.day) + (later ? '; two years later bitcoin bought ' + (later.oz / low.oz).toFixed(0) + '× as many ounces' : '') + ')';
     });
     var txt;
-    if (!runs.length) txt = 'No earlier stretch since 2011 went below the usual range in gold. This is the first.';
+    if (!runs.length) txt = 'No earlier stretch since ' + START_YEAR + ' went below the usual range in gold. This is the first.';
     else {
       var lastRun = runs[runs.length - 1], lastYear = dateOf(lastRun[lastRun.length - 1].day).getUTCFullYear();
       var allEarly = lastYear <= 2013;
@@ -426,6 +455,11 @@
     setText('gbBandLo', fmtX(BAND_LO));
     setText('gbBandHi', fmtX(BAND_HI));
     setText('gbMonths', String(FIT_ROWS.length));
+    setText('gbFitFromLabel', 'January ' + START_YEAR);
+    // The chosen start's fit quality, said plainly; a loose fit is flagged.
+    setText('gbStartsFit', 'From ' + START_YEAR + ', the gold fit uses ' + FIT_ROWS.length + ' monthly samples and explains ' + Math.round(MAIN.gold.r2 * 100) + '% of their variation (R\u00b2 ' + MAIN.gold.r2.toFixed(2) + '; in dollars ' + MAIN.usd.r2.toFixed(2) + ').' +
+      (MAIN.gold.r2 < 0.7 ? ' That is a loose fit: a few years of prices are mostly one cycle, so read the figures below loosely.' : ''));
+    setText('gbKickerFrom', String(START_YEAR));
     setText('gbLastSample', monthLabel(LAST.day));
     setText('gbGoldLastKey', keyLabel(GOLD_MONTHLY[GOLD_MONTHLY.length - 1][0]));
   }
@@ -437,17 +471,52 @@
     el.hidden = !(TODAY.mg < 0.75);
   }
 
+  // ── §1b gold's side of the gap (prompted by a reader on X, 2026-10-20) ──
+  function renderGap() {
+    var t = TODAY; if (!t) return;
+    setText('gbGapUsd', fmtX(t.mu));
+    setText('gbGapGold', fmtX(t.gm));
+    setText('gbGapGoldTrend', fmtUsd(t.goldTrendUsd));
+    setText('gbGapGoldNow', fmtUsd(t.goldUsd));
+    setText('gbGapResult', fmtX(t.mg));
+    var lead = 'Bitcoin\u2019s ' + fmtX(t.mg) + ' against its gold trend is its ' + fmtX(t.mu) + ' against its dollar trend divided by gold\u2019s ' + fmtX(t.gm) + ' against the dollar trend the two fits imply for it (' + fmtUsd(t.goldTrendUsd) + ' an ounce; gold is at ' + fmtUsd(t.goldUsd) + '). ';
+    var read;
+    // Enumerated on which side is away from trend (STYLE_GUIDE §12).
+    if (t.mu < 1 && t.gm > 1) read = 'Both sides contribute: bitcoin is below its dollar trend and gold is above the trend implied for it' + (t.gm > 1 / t.mu ? ', and gold\u2019s side is the larger.' : ', and bitcoin\u2019s side is the larger.');
+    else if (t.mu >= 1 && t.gm > 1) read = 'The gap is gold\u2019s: bitcoin is at or above its dollar trend, and gold is above the trend implied for it.';
+    else if (t.mu < 1 && t.gm <= 1) read = 'The gap is bitcoin\u2019s: gold is at or below the trend implied for it, and bitcoin is below its dollar trend.';
+    else read = 'Bitcoin is at or above its dollar trend and gold is at or below the trend implied for it, so bitcoin reads high in ounces.';
+    setText('gbGapRead', lead + read + ' The gap can close from either side, by bitcoin rising or by gold falling back, or not at all.');
+  }
+
+  function wireStarts() {
+    document.querySelectorAll('.gb-chip').forEach(function (b) {
+      var y = +b.getAttribute('data-from'), on = y === START_YEAR;
+      b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        if (y === START_YEAR) return;
+        applyStart(y);
+        if (TODAY_IN) computeToday.apply(null, TODAY_IN);
+        document.querySelectorAll('.gb-chip').forEach(function (o) { var o2 = +o.getAttribute('data-from') === y; o.classList.toggle('is-active', o2); o.setAttribute('aria-pressed', o2 ? 'true' : 'false'); });
+        try { var u = new URL(location.href); if (y === 2011) u.searchParams.delete('from'); else u.searchParams.set('from', String(y)); history.replaceState(null, '', u.toString()); } catch (e) {}
+        renderStatic(); renderAll();
+      });
+    });
+  }
+
   function renderAll() {
     renderTwoReadings();
+    renderGap();
     renderReadout(); renderOzChart(); renderMultChart(); renderLows(); renderGoldRun(); renderParted(); renderSturdy(); renderEarlier();
   }
 
   window.gbQA = function () {
-    return { fitFrom: FIT_FROM, months: FIT_ROWS.length, gold: { a: MAIN.gold.a, b: MAIN.gold.b, r2: MAIN.gold.r2 }, usd: { a: MAIN.usd.a, b: MAIN.usd.b, r2: MAIN.usd.r2 },
+    return { fitFrom: FIT_FROM, startYear: START_YEAR, months: FIT_ROWS.length, gold: { a: MAIN.gold.a, b: MAIN.gold.b, r2: MAIN.gold.r2 }, usd: { a: MAIN.usd.a, b: MAIN.usd.b, r2: MAIN.usd.r2 },
              band: [BAND_LO, BAND_HI], last: { month: LAST.key, oz: LAST.oz, mg: LAST.mg }, today: TODAY };
   };
 
   function init() {
+    wireStarts();
     renderStatic();
     // First paint from the latest samples, so nothing waits on the network.
     computeToday(LAST.usd, 'fallback', GOLD_MONTHLY[GOLD_MONTHLY.length - 1][1], 'fallback', null);
