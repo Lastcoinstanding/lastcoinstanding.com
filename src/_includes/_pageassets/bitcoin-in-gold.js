@@ -21,6 +21,13 @@
      the same months, so the two are like for like.
    - "The usual range" is the 5th to 95th percentile of the monthly
      multiples since FIT_FROM: 90% of months have sat inside it.
+   - "Did an early fit predict today?" (2026-10-20): the Power Law page's
+     out-of-sample test, run in both units. Each fit starts at the first
+     sample (mid-2010, as on The Power Law) and stops at a cutoff (end of
+     2014 / 2016 / 2017 / 2020 / 2023; ?fit=YYYY-12); its line, carried
+     to today, is compared with the line fitted to every sample. This is
+     a different question from the start-year buttons, and the section
+     says so. Independent of START_YEAR.
    - Gold's side of the gap: the dollar fit divided by the gold fit is
      a dollar trend for gold implied by the two (not a model of gold).
      Bitcoin's gold multiple = its dollar multiple ÷ gold's multiple of
@@ -490,16 +497,91 @@
   }
 
   function wireStarts() {
-    document.querySelectorAll('.gb-chip').forEach(function (b) {
+    document.querySelectorAll('.gb-chip[data-from]').forEach(function (b) {
       var y = +b.getAttribute('data-from'), on = y === START_YEAR;
       b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
       b.addEventListener('click', function () {
         if (y === START_YEAR) return;
         applyStart(y);
         if (TODAY_IN) computeToday.apply(null, TODAY_IN);
-        document.querySelectorAll('.gb-chip').forEach(function (o) { var o2 = +o.getAttribute('data-from') === y; o.classList.toggle('is-active', o2); o.setAttribute('aria-pressed', o2 ? 'true' : 'false'); });
+        document.querySelectorAll('.gb-chip[data-from]').forEach(function (o) { var o2 = +o.getAttribute('data-from') === y; o.classList.toggle('is-active', o2); o.setAttribute('aria-pressed', o2 ? 'true' : 'false'); });
         try { var u = new URL(location.href); if (y === 2011) u.searchParams.delete('from'); else u.searchParams.set('from', String(y)); history.replaceState(null, '', u.toString()); } catch (e) {}
         renderStatic(); renderAll();
+      });
+    });
+  }
+
+  // ── §5c did an early fit predict today? (out of sample, both units) ──
+  var OOS_CUTS = [2014, 2016, 2017, 2020, 2023], OOS_CUT = 2017;
+  (function () {
+    var q = /[?&]fit=(\d{4})-12/.exec(location.search || '');
+    if (q && OOS_CUTS.indexOf(+q[1]) >= 0) OOS_CUT = +q[1];
+  })();
+  var FIRST = ROWS[0];
+  function fitRows(R) { var xs = R.map(function (r) { return r.day; }); return { gold: fitLogLog(xs, R.map(function (r) { return r.oz; })), usd: fitLogLog(xs, R.map(function (r) { return r.usd; })) }; }
+  var OOS_FULL = fitRows(ROWS);
+  function oosFor(year) {
+    var end = dayOf((year + 1) + '-01-01');
+    var train = ROWS.filter(function (r) { return r.day < end; }), test = ROWS.filter(function (r) { return r.day >= end; });
+    return { year: year, end: end, train: train, test: test, fit: fitRows(train) };
+  }
+  function signPct(v) { var n = Math.round(v * 100); return (n > 0 ? '+' : n < 0 ? '\u2212' : '\u00b1') + Math.abs(n) + '%'; }
+  function renderOos() {
+    var cv = document.getElementById('gbOosChart'); if (!cv) return;
+    var O = oosFor(OOS_CUT), day = TODAY ? TODAY.day : LAST.day;
+    var gE = O.fit.gold.at(day), gF = OOS_FULL.gold.at(day), uE = O.fit.usd.at(day), uF = OOS_FULL.usd.at(day);
+    var gMiss = gE / gF - 1, uMiss = uE / uF - 1;
+    setText('gbOosFirst', monthLabel(FIRST.day));
+    setText('gbOosCutLabel', 'end-' + OOS_CUT);
+    setText('gbOosUsdEarly', fmtUsd(uE)); setText('gbOosUsdFull', fmtUsd(uF)); setText('gbOosUsdMiss', signPct(uMiss));
+    setText('gbOosGoldEarly', fmtOz(gE) + ' oz'); setText('gbOosGoldFull', fmtOz(gF) + ' oz'); setText('gbOosGoldMiss', signPct(gMiss));
+    setText('gbOosB', 'Fitted to the data up to end-' + OOS_CUT + ' (' + O.train.length + ' monthly samples), the exponent is ' + O.fit.usd.b.toFixed(2) + ' in dollars and ' + O.fit.gold.b.toFixed(2) + ' in gold; fitted to every sample, ' + OOS_FULL.usd.b.toFixed(2) + ' and ' + OOS_FULL.gold.b.toFixed(2) + '. "Every sample" here includes 2010, so its gold trend (' + fmtOz(OOS_FULL.gold.at(day)) + ' oz today) differs a little from the one at the top of the page (' + fmtOz(MAIN.gold.at(day)) + ' oz, fitted from ' + START_YEAR + ').');
+    var au = Math.abs(uMiss), ag = Math.abs(gMiss), yrs = Math.round((day - O.end) / 365.25);
+    // Gold's own move from the cutoff to today, in words (computed, never typed).
+    var gCut = GOLD[OOS_CUT + '-12'], gNow = TODAY ? TODAY.goldUsd : GOLD_MONTHLY[GOLD_MONTHLY.length - 1][1];
+    var gRatio = gCut ? gNow / gCut : NaN;
+    var goldMove = !isFinite(gRatio) ? 'gold\u2019s own price has moved since then'
+      : 'gold\u2019s own price has gone from ' + fmtUsd(gCut) + ' an ounce at the end of ' + OOS_CUT + ' to ' + fmtUsd(gNow) + ' (' + (gRatio >= 1 ? gRatio.toFixed(1) + '\u00d7' : 'down ' + pct(1 - gRatio)) + ')';
+    setText('gbOosGoldCut', gCut ? fmtUsd(gCut) : '\u2014'); setText('gbOosGoldCutYear', String(OOS_CUT)); setText('gbOosGoldNow', fmtUsd(gNow));
+    var read;
+    // Enumerated on how each unit fared (STYLE_GUIDE §12).
+    if (O.train.length < 150) read = 'With data only to end-' + OOS_CUT + ', there is too little record for either fit to say much: both miss today\u2019s trend widely.';
+    else if (au <= 0.1 && ag > 0.25) read = 'In dollars, a line that saw nothing after end-' + OOS_CUT + ' lands within ' + Math.max(1, Math.round(au * 100)) + '% of today\u2019s trend, ' + yrs + ' years on. In gold the same test misses by ' + Math.round(ag * 100) + '%: the early fit ' + (gMiss > 0 ? 'expected bitcoin to buy far more gold today than the full record says.' : 'expected bitcoin to buy far less gold today than the full record says.') + ' The difference is the unit: ' + goldMove + ', and a line fitted to ounces up to the cutoff could not know it.';
+    else if (au <= 0.25 && ag <= 0.25) read = 'Both units hold up: from end-' + OOS_CUT + ', the early line lands within ' + Math.round(au * 100) + '% of today\u2019s trend in dollars and ' + Math.round(ag * 100) + '% in gold.';
+    else read = 'From end-' + OOS_CUT + ', the early line misses today\u2019s trend by ' + Math.round(au * 100) + '% in dollars and ' + Math.round(ag * 100) + '% in gold' + (ag > au ? '; the gold line misses by more.' : '; the dollar line misses by more.');
+    setText('gbOosRead', read);
+    // The chart: bitcoin in ounces, training vs later samples, early and full lines.
+    if (typeof Chart === 'undefined') return;
+    var x0 = yearFrac(FIRST.day), endDay = Math.max(LAST.day, day);
+    var line = function (F) { var out = []; for (var d = FIRST.day; d <= endDay + 1; d += 15) out.push({ x: yearFrac(d), y: F.at(d) }); return out; };
+    var muted = css('--gb-oos-train', 'rgba(242,238,232,0.35)');
+    var ds = [
+      { label: 'Training data (up to end-' + OOS_CUT + ')', data: O.train.map(function (r) { return { x: yearFrac(r.day), y: r.oz, day: r.day, row: r }; }), borderColor: muted, backgroundColor: muted, borderWidth: 1.4, pointRadius: 0 },
+      { label: 'After the cutoff (the test)', data: O.test.map(function (r) { return { x: yearFrac(r.day), y: r.oz, day: r.day, row: r }; }), borderColor: css('--gb-btc', '#F7931A'), borderWidth: 1.8, pointRadius: 0 },
+      { label: 'Line fitted to end-' + OOS_CUT + ' only', data: line(O.fit.gold), borderColor: css('--gb-oos-early', '#7fbf8a'), borderWidth: 1.8, pointRadius: 0 },
+      { label: 'Line fitted to every sample', data: line(OOS_FULL.gold), borderColor: css('--gb-trend', '#d4a843'), borderWidth: 1.4, borderDash: [6, 4], pointRadius: 0 }
+    ];
+    var opt = baseOptions('Ounces of gold per bitcoin (log scale)', ozTick);
+    opt.scales.x.min = Math.floor(x0); opt.scales.x.max = yearFrac(endDay) + 0.3;
+    opt.plugins.tooltip.callbacks = {
+      title: function (it) { var p = it[0].raw; return p.day != null ? monthLabel(p.day) : ''; },
+      label: function (it) { var p = it.raw; return p.row ? 'Bitcoin: ' + fmtOz(p.row.oz) + ' oz of gold' : ''; },
+      afterBody: function (it) { var p = it[0] && it[0].raw; if (!p || p.day == null) return []; return ['Early line: ' + fmtOz(O.fit.gold.at(p.day)) + ' oz \u00b7 full line: ' + fmtOz(OOS_FULL.gold.at(p.day)) + ' oz']; }
+    };
+    opt.plugins.tooltip.filter = function (it) { return it.datasetIndex <= 1; };
+    if (charts.oos) charts.oos.destroy();
+    charts.oos = new Chart(cv, { type: 'line', data: { datasets: ds }, options: opt });
+  }
+  function wireOos() {
+    document.querySelectorAll('.gb-oos-chip').forEach(function (b) {
+      var y = +b.getAttribute('data-cut'), on = y === OOS_CUT;
+      b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        if (y === OOS_CUT) return;
+        OOS_CUT = y;
+        document.querySelectorAll('.gb-oos-chip').forEach(function (o) { var o2 = +o.getAttribute('data-cut') === y; o.classList.toggle('is-active', o2); o.setAttribute('aria-pressed', o2 ? 'true' : 'false'); });
+        try { var u = new URL(location.href); if (y === 2017) u.searchParams.delete('fit'); else u.searchParams.set('fit', y + '-12'); history.replaceState(null, '', u.toString()); } catch (e) {}
+        renderOos();
       });
     });
   }
@@ -507,16 +589,18 @@
   function renderAll() {
     renderTwoReadings();
     renderGap();
-    renderReadout(); renderOzChart(); renderMultChart(); renderLows(); renderGoldRun(); renderParted(); renderSturdy(); renderEarlier();
+    renderReadout(); renderOzChart(); renderMultChart(); renderLows(); renderGoldRun(); renderParted(); renderSturdy(); renderEarlier(); renderOos();
   }
 
   window.gbQA = function () {
-    return { fitFrom: FIT_FROM, startYear: START_YEAR, months: FIT_ROWS.length, gold: { a: MAIN.gold.a, b: MAIN.gold.b, r2: MAIN.gold.r2 }, usd: { a: MAIN.usd.a, b: MAIN.usd.b, r2: MAIN.usd.r2 },
+    var O = oosFor(OOS_CUT), d = TODAY ? TODAY.day : LAST.day;
+    return { oos: { cut: OOS_CUT, n: O.train.length, goldEarly: O.fit.gold.at(d), goldFull: OOS_FULL.gold.at(d), usdEarly: O.fit.usd.at(d), usdFull: OOS_FULL.usd.at(d), bGold: O.fit.gold.b, bUsd: O.fit.usd.b },
+             fitFrom: FIT_FROM, startYear: START_YEAR, months: FIT_ROWS.length, gold: { a: MAIN.gold.a, b: MAIN.gold.b, r2: MAIN.gold.r2 }, usd: { a: MAIN.usd.a, b: MAIN.usd.b, r2: MAIN.usd.r2 },
              band: [BAND_LO, BAND_HI], last: { month: LAST.key, oz: LAST.oz, mg: LAST.mg }, today: TODAY };
   };
 
   function init() {
-    wireStarts();
+    wireStarts(); wireOos();
     renderStatic();
     // First paint from the latest samples, so nothing waits on the network.
     computeToday(LAST.usd, 'fallback', GOLD_MONTHLY[GOLD_MONTHLY.length - 1][1], 'fallback', null);

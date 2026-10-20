@@ -35,7 +35,7 @@ eleventyComputed:
   <div class="gb-starts" role="group" aria-label="Fit the trend from">
     <span class="gb-starts-label">Fit the trend from:</span><button type="button" class="gb-chip is-active" data-from="2011" aria-pressed="true">2011</button><button type="button" class="gb-chip" data-from="2013" aria-pressed="false">2013</button><button type="button" class="gb-chip" data-from="2016" aria-pressed="false">2016</button><button type="button" class="gb-chip" data-from="2020" aria-pressed="false">2020</button>
   </div>
-  <p class="gb-starts-note">The start year changes the trend, the usual range and every reading on the page. 2011 is the longest record; later starts give the recent years more weight, and the gold trend moves with the choice more than the dollar trend does. <span id="gbStartsFit"></span></p>
+  <p class="gb-starts-note">The start year changes the trend, the usual range and every reading on the page. 2011 is the longest record; later starts give the recent years more weight, and the gold trend moves with the choice more than the dollar trend does. <span id="gbStartsFit"></span> (Whether an early fit would have predicted today is a separate test: <a href="#early-fit">Did an early fit predict today?</a>)</p>
 
   <!-- §1 TODAY -->
   <section class="gb-readout" id="gbReadout" aria-live="polite">
@@ -123,6 +123,31 @@ eleventyComputed:
     <h3>Has bitcoin been this low against gold before?</h3>
     <p class="gb-read" id="gbEarlier"></p>
     <p id="gbTwoReadings">Two readings fit the chart, and the page does not choose between them. One is that bitcoin, measured in gold, has fallen unusually far below a trend it has always returned to. The other is that gold&rsquo;s run reflects something new, such as the heavy buying by central banks since 2022 (more than 1,000 tonnes a year in each of 2022, 2023 and 2024, by the <a href="https://www.gold.org/goldhub/research/gold-demand-trends" target="_blank" rel="noopener">World Gold Council</a>&rsquo;s count), and the fitted gold trend understates where gold now sits. A trend that has been tested over sixteen years of bitcoin&rsquo;s record has not yet been tested against a gold market like this one.</p>
+  </section>
+
+  <!-- §5c DID AN EARLY FIT PREDICT TODAY? (2026-10-20): out of sample, both units -->
+  <section class="gb-section" id="early-fit">
+    <h2>Did an early fit predict today?</h2>
+    <p>The buttons at the top of the page move where the fit <em>starts</em>. This section asks a different question, the one The Power Law page uses to test the dollar trend: if the line had been fitted only to the data up to a cutoff, would it have pointed to where today&rsquo;s trend is? Here every fit starts at the first sample (<span id="gbOosFirst">&mdash;</span>), as on <a href="/the-power-law#oosChart">The Power Law</a>, ends at the cutoff you choose, and is carried forward to today. Everything after the cutoff is a test the line never saw.</p>
+  </section>
+
+  <div class="gb-chart-container">
+    <div class="gb-starts gb-oos-cuts" role="group" aria-label="Fit the data up to">
+      <span class="gb-starts-label">Fit only the data up to:</span><button type="button" class="gb-chip gb-oos-chip" data-cut="2014" aria-pressed="false">end-2014</button><button type="button" class="gb-chip gb-oos-chip" data-cut="2016" aria-pressed="false">end-2016</button><button type="button" class="gb-chip gb-oos-chip is-active" data-cut="2017" aria-pressed="true">end-2017</button><button type="button" class="gb-chip gb-oos-chip" data-cut="2020" aria-pressed="false">end-2020</button><button type="button" class="gb-chip gb-oos-chip" data-cut="2023" aria-pressed="false">end-2023</button>
+    </div>
+    <div class="gb-oos-row">
+      <div class="gb-oos-card"><div class="gb-oos-unit">In dollars</div><div class="gb-oos-miss" id="gbOosUsdMiss">&mdash;</div><div class="gb-oos-cap">the line fitted to <span class="gb-oos-cut" id="gbOosCutLabel">end-2017</span> puts today&rsquo;s trend at <span id="gbOosUsdEarly">&mdash;</span>; fitted to every sample, <span id="gbOosUsdFull">&mdash;</span></div></div>
+      <div class="gb-oos-card gb-oos-gold"><div class="gb-oos-unit">In gold</div><div class="gb-oos-miss" id="gbOosGoldMiss">&mdash;</div><div class="gb-oos-cap">the same early line puts it at <span id="gbOosGoldEarly">&mdash;</span>; fitted to every sample, <span id="gbOosGoldFull">&mdash;</span></div></div>
+    </div>
+    <p class="gb-read gb-oos-read" id="gbOosRead"></p>
+    <div class="gb-chart-title">The early line, carried to today, in ounces of gold</div>
+    <div class="gb-chart-subtitle">Grey: the months the line was fitted to. Orange: every month after the cutoff, which the line never saw. Green: the early line. Gold, dashed: the line fitted to every sample. Log scale.</div>
+    <div class="gb-chart-wrapper" data-chart-copy data-chart-title="An early gold fit, carried to today" data-chart-heading="closest:.gb-chart-container .gb-chart-title" data-chart-sub="closest:.gb-chart-container .gb-chart-subtitle"><canvas id="gbOosChart" role="img" aria-label="Bitcoin's price in ounces of gold since 2010 on a log scale, with a line fitted only to the data up to the chosen cutoff and carried forward, against the line fitted to every sample."></canvas></div>
+    <div class="gb-chart-source" id="gbOosB"></div>
+  </div>
+
+  <section class="gb-section">
+    <p>Why the two units part: a dollar is the unit bitcoin&rsquo;s price is quoted in, while an ounce of gold is itself a price that moves. For the cutoff you chose, gold went from <span id="gbOosGoldCut">&mdash;</span> an ounce at the end of <span id="gbOosGoldCutYear">&mdash;</span> to <span id="gbOosGoldNow">&mdash;</span> today, and a line fitted to ounces up to the cutoff could not know that. The dollar trend is the one that has held out of sample; the gold trend is, in effect, that trend divided by whatever gold does next. The <a href="#gbReadout">&ldquo;Bitcoin cheap, or gold expensive?&rdquo;</a> card above is the same fact, read today.</p>
   </section>
 
   <!-- §6 GOLD AND BITCOIN AS MONEY -->

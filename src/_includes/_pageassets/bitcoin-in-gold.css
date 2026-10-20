@@ -47,6 +47,8 @@
   --gb-pulse-ring: rgba(247,147,26,.7);
   --gb-chip-hover: rgba(224,148,34,.45);
   --gb-chip-on: rgba(224,148,34,.1);
+  --gb-oos-early: #7fbf8a;            /* the early (training-only) line */
+  --gb-oos-train: rgba(242,238,232,.35); /* training months */
 }
 
 body { background: var(--bg); color: var(--text); font-family: var(--font-b); font-size: 1.05rem; line-height: 1.7; -webkit-font-smoothing: antialiased; }
@@ -96,6 +98,18 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); fo
 .gb-gap-op { font-family: var(--font-d); font-size: 1.6rem; color: var(--text-muted); }
 .gb-gap-read { font-size: .95rem; color: var(--text-body); line-height: 1.7; margin: 0 0 .5rem; }
 .gb-gap-note { font-size: .78rem; color: var(--text-muted); margin: 0; }
+
+/* §5c DID AN EARLY FIT PREDICT TODAY? */
+#early-fit { scroll-margin-top: 80px; }
+.gb-oos-cuts { margin-bottom: 1rem; }
+.gb-oos-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; margin-bottom: 1rem; }
+.gb-oos-card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: .9rem 1rem; text-align: center; }
+.gb-oos-gold { border-color: var(--gb-card-border); background: var(--gb-card-tint); }
+.gb-oos-unit { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: var(--text-muted); margin-bottom: .3rem; }
+.gb-oos-miss { font-family: var(--font-d); font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 600; color: var(--text-bright); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.gb-oos-gold .gb-oos-miss { color: var(--gold); }
+.gb-oos-cap { font-size: .76rem; color: var(--text-dim); line-height: 1.45; margin-top: .35rem; }
+.gb-oos-read { max-width: none; margin: 0 0 1.2rem; font-size: .95rem; line-height: 1.7; color: var(--text-body); }
 
 /* §1 READOUT */
 .gb-readout { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1.7rem; margin: 0 auto 1.4rem; }
@@ -179,6 +193,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); fo
   .gb-readout-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
+  .gb-oos-row { grid-template-columns: 1fr; }
   .gb-gap-row { grid-template-columns: 1fr; }
   .gb-gap-op { text-align: center; line-height: 1; }
   .gb-gap { padding: 1.1rem; }
