@@ -329,7 +329,9 @@ Items deferred to later phases. Trigger criteria already documented; no schedule
 
 Move items here when shipped, with commit SHA. Keep the last 5–10 for reference; archive older ones to git history when this section gets long.
 
-- [x] **Bitcoin, Priced in Gold: start year and gold's side of the gap, 2026-10-20 (branch `feat-gold-start-year`).** Fit from 2011 / 2013 / 2016 / 2020 with every reading following, and the identity card (bitcoin's gold multiple = its dollar multiple ÷ gold's multiple of the implied trend). SITE_GUIDE §63. Merge SHAs owed from earlier PRs, recorded here: #223 carousel slides `c683f76`; #224 gold reference-model note `9ca4b6a`; #225 video card `a0b4827`; #226 STRC to Oct 18 `8551330`; #227 STRC last-updated line `b101822`.
+- [x] **Bitcoin, Priced in Gold: "Did an early fit predict today?", 2026-10-20 (branch `feat-gold-oos`).** The Power Law's out-of-sample test in both units, cutoffs end-2014 to end-2023, fits from Aug 2010; independent of the start-year buttons. SITE_GUIDE §63.
+
+- [x] **Bitcoin, Priced in Gold: start year and gold's side of the gap, 2026-10-20 (#228, merge `5d42f42`; branch `feat-gold-start-year`).** Fit from 2011 / 2013 / 2016 / 2020 with every reading following, and the identity card (bitcoin's gold multiple = its dollar multiple ÷ gold's multiple of the implied trend). SITE_GUIDE §63. Merge SHAs owed from earlier PRs, recorded here: #223 carousel slides `c683f76`; #224 gold reference-model note `9ca4b6a`; #225 video card `a0b4827`; #226 STRC to Oct 18 `8551330`; #227 STRC last-updated line `b101822`.
 
 - [x] **Carousel slides for the two Power Law pages, 2026-10-18 (#223, merge `c683f76`; branch `feat-power-law-slides`).** Bitcoin, Priced in Gold (a brass balance, gold bar against an orange coin) and Bitcoin's Hash Rate (dark dice in a misted hall, one lit: the winning roll), rows 15–16 after Bitcoin's Spikes, both Numbers, not Featured. Both passed the brightness gate (gold 30.3% floor as generated; dice 26.2% after a gamma 1.3 lift from 18.2%). Copy, custody and the three-concept record for the hash-rate slide in SITE_GUIDE §13.
 
