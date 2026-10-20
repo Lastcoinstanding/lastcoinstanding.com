@@ -31,6 +31,12 @@ eleventyComputed:
     <p>Pricing bitcoin&rsquo;s power law in gold is not new. <strong>Matthew Mezinskis</strong> (<a href="https://www.porkopolis.io/" target="_blank" rel="noopener">Porkopolis Economics</a>) has charted bitcoin against gold alongside his dollar work, <strong>Stephen Perrenod</strong> published a fit in ounces in 2024 (<a href="https://stephenperrenod.substack.com/p/bitcoin-power-law-vs-gold-mid-2024" target="_blank" rel="noopener">exponent 5.47 on quarterly prices</a>), and <a href="https://b1m.io/gold" target="_blank" rel="noopener">b1m.io</a> tracks one live. The fit, the range and the comparisons below are this site&rsquo;s own, computed from the World Bank&rsquo;s monthly gold series and the site&rsquo;s bitcoin price record.</p>
   </div>
 
+  <!-- START YEAR (2026-10-20): every figure built on the fit follows it -->
+  <div class="gb-starts" role="group" aria-label="Fit the trend from">
+    <span class="gb-starts-label">Fit the trend from:</span><button type="button" class="gb-chip is-active" data-from="2011" aria-pressed="true">2011</button><button type="button" class="gb-chip" data-from="2013" aria-pressed="false">2013</button><button type="button" class="gb-chip" data-from="2016" aria-pressed="false">2016</button><button type="button" class="gb-chip" data-from="2020" aria-pressed="false">2020</button>
+  </div>
+  <p class="gb-starts-note">The start year changes the trend, the usual range and every reading on the page. 2011 is the longest record; later starts give the recent years more weight, and the gold trend moves with the choice more than the dollar trend does. <span id="gbStartsFit"></span></p>
+
   <!-- §1 TODAY -->
   <section class="gb-readout" id="gbReadout" aria-live="polite">
     <div class="gb-readout-row">
@@ -43,15 +49,29 @@ eleventyComputed:
     <p class="gb-source"><span id="gbSource"></span> Bitcoin <span id="gbBtcUsd">&mdash;</span>, gold <span id="gbGoldUsd">&mdash;</span> an ounce.</p>
   </section>
 
+  <!-- §1b GOLD'S SIDE OF THE GAP (2026-10-20, prompted by a reader on X) -->
+  <section class="gb-gap" aria-live="polite">
+    <div class="gb-gap-label">Bitcoin cheap, or gold expensive?</div>
+    <div class="gb-gap-row">
+      <div class="gb-gap-term"><div class="gb-gap-value" id="gbGapUsd">&mdash;</div><div class="gb-gap-cap">bitcoin against its dollar trend</div></div>
+      <div class="gb-gap-op" aria-hidden="true">&divide;</div>
+      <div class="gb-gap-term"><div class="gb-gap-value" id="gbGapGold">&mdash;</div><div class="gb-gap-cap">gold (<span id="gbGapGoldNow">&mdash;</span>) against the <span id="gbGapGoldTrend">&mdash;</span> trend the two fits imply for it</div></div>
+      <div class="gb-gap-op" aria-hidden="true">=</div>
+      <div class="gb-gap-term gb-gap-key"><div class="gb-gap-value" id="gbGapResult">&mdash;</div><div class="gb-gap-cap">bitcoin against its gold trend</div></div>
+    </div>
+    <p class="gb-gap-read" id="gbGapRead"></p>
+    <p class="gb-gap-note">The implied gold trend is a by-product of the two fits (the dollar trend divided by the ounce trend), not a model of gold&rsquo;s own price.</p>
+  </section>
+
   <p class="gb-frame">This page describes where bitcoin sits against a fitted line; it does not say where it goes next. A trend fitted to sixteen years of prices is a description of the past, and the reading below is a location, not a forecast.</p>
 
   <!-- §2 THE CHART -->
   <div class="gb-chart-container">
-    <div class="gb-chart-kicker">Bitcoin in ounces of gold, 2011 to today</div>
+    <div class="gb-chart-kicker">Bitcoin in ounces of gold, <span id="gbKickerFrom">2011</span> to today</div>
     <div class="gb-chart-title">The Power Law, priced in gold</div>
     <div class="gb-chart-subtitle">How many ounces of gold one bitcoin bought each month, against the gold trend fitted to those same months and the range that has held 90% of them. Log scale: each step up is ten times the last.</div>
     <div class="gb-chart-wrapper" data-chart-copy data-chart-title="Bitcoin priced in gold" data-chart-heading="closest:.gb-chart-container .gb-chart-title" data-chart-sub="closest:.gb-chart-container .gb-chart-subtitle"><canvas id="gbOzChart" role="img" aria-label="Bitcoin's price in ounces of gold since 2011 on a log scale, with the fitted gold trend, the usual range around it, and today's reading marked."></canvas><div class="lcs-pulse-halo" id="gbPulse" aria-hidden="true"></div></div>
-    <div class="gb-chart-source"><strong>The fit:</strong> ounces = a &middot; day<sup><span id="gbFitB">&mdash;</span></sup>, days counted from the genesis block, fitted to <span id="gbMonths">&mdash;</span> monthly samples from January 2011 to <span id="gbLastSample">&mdash;</span> (R&sup2; <span id="gbFitR2">&mdash;</span>). The usual range runs from <span id="gbBandLo">&mdash;</span> to <span id="gbBandHi">&mdash;</span> the trend. The same fit in dollars gives an exponent of <span id="gbFitUsdB">&mdash;</span>.</div>
+    <div class="gb-chart-source"><strong>The fit:</strong> ounces = a &middot; day<sup><span id="gbFitB">&mdash;</span></sup>, days counted from the genesis block, fitted to <span id="gbMonths">&mdash;</span> monthly samples from <span id="gbFitFromLabel">January 2011</span> to <span id="gbLastSample">&mdash;</span> (R&sup2; <span id="gbFitR2">&mdash;</span>). The usual range runs from <span id="gbBandLo">&mdash;</span> to <span id="gbBandHi">&mdash;</span> the trend. The same fit in dollars gives an exponent of <span id="gbFitUsdB">&mdash;</span>.</div>
   </div>
 
   <!-- §3 TWO UNITS -->
@@ -89,7 +109,7 @@ eleventyComputed:
   <!-- §5 HOW STURDY -->
   <section class="gb-section">
     <h2>How sturdy is the gold trend?</h2>
-    <p>A trend is only as good as its stability. Fit it from a later start and see whether it holds. Here are three starting years, in both units, with today&rsquo;s reading against each.</p>
+    <p>A trend is only as good as its stability. Fit it from a later start and see whether it holds. Here are the four starting years, in both units, with today&rsquo;s reading against each; the highlighted row is the one the page is using.</p>
     <div class="gb-table-wrap">
       <table class="gb-table gb-table-sturdy">
         <thead>
@@ -102,7 +122,7 @@ eleventyComputed:
     <p class="gb-read" id="gbSturdyRead"></p>
     <h3>Has bitcoin been this low against gold before?</h3>
     <p class="gb-read" id="gbEarlier"></p>
-    <p id="gbTwoReadings">Two readings fit the chart, and the page does not choose between them. One is that bitcoin, measured in gold, has fallen unusually far below a trend it has always returned to. The other is that gold&rsquo;s run reflects something new, such as the heavy buying by central banks since 2022 (more than 1,000 tonnes a year in each of 2022, 2023 and 2024, by the <a href="https://www.gold.org/goldhub/research/gold-demand-trends" target="_blank" rel="noopener">World Gold Council</a>&rsquo;s count), and the gold trend fitted to 2011&ndash;2026 understates where gold now sits. A trend that has been tested over sixteen years of bitcoin&rsquo;s record has not yet been tested against a gold market like this one.</p>
+    <p id="gbTwoReadings">Two readings fit the chart, and the page does not choose between them. One is that bitcoin, measured in gold, has fallen unusually far below a trend it has always returned to. The other is that gold&rsquo;s run reflects something new, such as the heavy buying by central banks since 2022 (more than 1,000 tonnes a year in each of 2022, 2023 and 2024, by the <a href="https://www.gold.org/goldhub/research/gold-demand-trends" target="_blank" rel="noopener">World Gold Council</a>&rsquo;s count), and the fitted gold trend understates where gold now sits. A trend that has been tested over sixteen years of bitcoin&rsquo;s record has not yet been tested against a gold market like this one.</p>
   </section>
 
   <!-- §6 GOLD AND BITCOIN AS MONEY -->
@@ -116,7 +136,7 @@ eleventyComputed:
     <h3>Method and sources</h3>
     <p><strong>Gold:</strong> the World Bank&rsquo;s monthly gold price (Commodity Price Data, the &ldquo;Pink Sheet&rdquo;), the average of daily rates in each month, July 2010 to <span id="gbGoldLastKey">&mdash;</span>. A monthly average smooths gold&rsquo;s moves within the month, so a single month&rsquo;s reading can differ from one taken on a given day.</p>
     <p><strong>Bitcoin:</strong> the site&rsquo;s price record (the same samples behind <a href="/the-power-law">The Power Law</a>), each divided by gold&rsquo;s average for its month. <strong>Today:</strong> the live bitcoin price over the live gold price (Coinbase&rsquo;s gold spot quote, else PAX Gold, a token redeemable for one ounce); if either is unavailable, its latest monthly figure, and the line under the readout says which.</p>
-    <p><strong>The trend:</strong> a least-squares fit of the logarithm of ounces on the logarithm of days since the genesis block (3 January 2009), from January 2011, refitted from the data each time the page loads. It is this page&rsquo;s fit, not the site&rsquo;s dollar reference model, so the dollar multiple here (fitted the same way, for a like-for-like comparison) differs a little from the one on <a href="/the-power-law">The Power Law</a>. The usual range is the 5th to 95th percentile of the monthly multiples.</p>
+    <p><strong>The trend:</strong> a least-squares fit of the logarithm of ounces on the logarithm of days since the genesis block (3 January 2009), from January of the start year you choose (2011 by default; 2013, 2016 or 2020), refitted from the data each time the page loads. It is this page&rsquo;s fit, not the site&rsquo;s dollar reference model, so the dollar multiple here (fitted the same way, for a like-for-like comparison) differs a little from the one on <a href="/the-power-law">The Power Law</a>. The usual range is the 5th to 95th percentile of the monthly multiples.</p>
     <p><strong>Sources:</strong> <a href="https://www.worldbank.org/en/research/commodity-markets" target="_blank" rel="noopener">World Bank Commodity Markets</a>; <a href="https://www.porkopolis.io/" target="_blank" rel="noopener">Porkopolis Economics</a>; <a href="https://stephenperrenod.substack.com/p/bitcoin-power-law-vs-gold-mid-2024" target="_blank" rel="noopener">Stephen Perrenod, &ldquo;Bitcoin power law vs. gold&rdquo; (2024)</a>; <a href="https://b1m.io/gold" target="_blank" rel="noopener">b1m.io, Bitcoin vs Gold</a>.</p>
   </div>
 
