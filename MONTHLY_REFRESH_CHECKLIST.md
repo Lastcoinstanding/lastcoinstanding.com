@@ -1096,7 +1096,7 @@ Pages that state what the law is, or what is pending, go stale when a bill passe
 
 ## 10. Claude project mirror refresh
 
-**Last mirror refresh: 2026-10-18** (update this line BEFORE exporting,
+**Last mirror refresh: 2026-10-21** (update this line BEFORE exporting,
 not after — see step 3).
 
 The Claude project holds a copy of the repo's strategy and design docs. That
@@ -1263,7 +1263,7 @@ In January, once the prior year's data is complete. `scripts/data-freshness.py` 
 4. **Age strings.** `grep -rni "fifteen years\|sixteen years\|seventeen years\|years old" src/*.njk`, plus Risks to Bitcoin's opening (§2).
 5. **The footer's © year** (`layouts/base.njk`).
 6. **The Gallery's BTC-per-house line** ("20 / 1.4 / 0.23 / 0.06 BTC", `the-gallery.njk` ~236) changes on 1 January.
-7. **The static chart image** `bitcoin-vs-house-prices.png` (2026-10-20): after `homeData` and `btcData` gain the year, rerun `python3 scripts/build-chart-images.py` (from production once the data is merged, or `--base` a preview), commit the PNG at the repo root, and check `curl -I https://lastcoinstanding.com/bitcoin-vs-house-prices.png` returns `image/png`. If the height changed, update the `<img>` `height` on `bitcoin-vs-real-estate.njk` to match (§6).
+7. **The static chart image** `bitcoin-vs-house-prices.png` (2026-10-20): after `homeData` and `btcData` gain the year, rerun `python3 scripts/build-chart-images.py` (from production once the data is merged, or `--base` a preview), commit the PNG at the repo root, and check `curl -I https://lastcoinstanding.com/bitcoin-vs-house-prices.png` returns `image/png`. If the height changed, update the `<img>` `height` on `bitcoin-vs-real-estate.njk` to match, and update the alt text's years (2013 to 2025, the path to 2032) with the chart's (§6).
 
 ## 12. Event-driven triggers (from 2026-09-29)
 

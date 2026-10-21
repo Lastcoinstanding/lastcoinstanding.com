@@ -48,20 +48,41 @@ IMAGES = [
         "chart": "#btcHouseChart",
         "container": ".chart-container",
         "brand": "lastcoinstanding.com/bitcoin-vs-real-estate",
+        # The page's source line says "bitcoin trades below that trend today"
+        # and "the page's appreciation setting": true on the page, undated in
+        # an image that travels. The image carries this dated version instead
+        # (STYLE_GUIDE §10.9), filled from the page's own values at capture.
+        "source_js": "bvreHouseSource",
         "width": 1600,
         "output_filename": "bitcoin-vs-house-prices.png",
     },
 ]
 
 # Hide the copy button and the page's own link to this image (.chart-static);
-# add the site's address at the foot of the container, in the page's own type
-# and amber.
+# date the source line; add the site's address at the foot of the container, in
+# the page's own type and amber.
 PREP_JS = """
-([chartSel, containerSel, brand]) => {
+([chartSel, containerSel, brand, sourceFn]) => {
   const st = document.createElement('style');
   st.textContent = '.chart-copy-btn,.chart-static{display:none!important}';
   document.head.appendChild(st);
   const box = document.querySelector(chartSel).closest(containerSel);
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const now = new Date(), when = MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+  const SOURCES = {
+    // Bitcoin vs. Real Estate, "BTC Required to Buy the Median US House".
+    bvreHouseSource: () => {
+      const yrs = Object.keys(btcData).map(Number), last = Math.max.apply(null, yrs);
+      const appr = window.ModelingAssumptions.get('homeApprNominal').value;
+      const m = TODAY_PRICE / plPrice((Date.now() / 1000 - GENESIS_TS) / 86400);
+      return 'Sources: FRED (MSPUS) for the house; bitcoin is each year\u2019s average price from the site\u2019s own series, through ' + last + '. ' +
+        'The fitted trend is a least-squares line through 2013\u2013' + last + '. The Power Law path grows the house at ' + appr +
+        '% a year and prices bitcoin at its Power Law trend; bitcoin traded ' + (m < 1 ? 'below' : 'above') + ' that trend in ' + when +
+        ', when this image was made. Neither line is a price prediction.';
+    }
+  };
+  const src = box.querySelector('.chart-source');
+  if (sourceFn && src) src.textContent = SOURCES[sourceFn]();
   const tag = document.createElement('div');
   tag.textContent = brand;
   tag.style.cssText = 'margin-top:0.9rem;text-align:right;font:600 13px Inter,-apple-system,sans-serif;letter-spacing:0.04em;color:#e09422';
@@ -77,7 +98,7 @@ def build(page, cfg, base, out_dir):
     page.goto(url, wait_until="networkidle")
     page.wait_for_selector(cfg["chart"], state="visible", timeout=15_000)
     page.wait_for_timeout(2500)  # Chart.js entry animation
-    page.evaluate(PREP_JS, [cfg["chart"], cfg["container"], cfg["brand"]])
+    page.evaluate(PREP_JS, [cfg["chart"], cfg["container"], cfg["brand"], cfg.get("source_js")])
     box = page.locator('[data-static-capture="1"]')
     box.scroll_into_view_if_needed()
     page.wait_for_timeout(600)

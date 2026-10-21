@@ -27,6 +27,12 @@ const GENESIS_TS = 1230940800;
 // This Date is pinned to `nowMs` and keeps calendar time in UTC, so the build
 // prints the same table on any machine, whatever its time zone (Cloudflare
 // builds in UTC; a laptop may not).
+// Covered: new Date(), new Date(ms), new Date(y, m, d…), Date.now, Date.UTC,
+// the local getters below and every getUTC*/toISOString. NOT covered, and
+// unused by the six modules today: the local setters, toLocale*/toString
+// (they follow the machine's zone), date strings without a Z, and Date()
+// called without `new` (a class throws). If a module starts using one, extend
+// this class, or the build becomes time-zone dependent without an error.
 function sandbox(nowMs) {
   const RealDate = Date;
   class FixedDate extends RealDate {
@@ -76,9 +82,12 @@ module.exports = function () {
   if (!RQA) throw new Error('[retirementQuickAnswer] the module did not load');
   const d = RQA.compute();
   const p = RQA.parts(d, { priceNote: '' });
-  if (!d.rows.length || !d.rows.every((r) => r.stay && r.trend && r.floor)) {
-    throw new Error('[retirementQuickAnswer] the solver returned an incomplete table');
+  const rowCount = (p.rows.match(/<tr>/g) || []).length;
+  if (rowCount !== 5 || /NaN|undefined|Infinity/.test(p.lead + p.rows + p.notes + p.asof)) {
+    throw new Error('[retirementQuickAnswer] the table did not compute cleanly (' + rowCount + ' rows)');
   }
+  // `infl` goes on the section as data-rqa-infl: the browser keeps this
+  // snapshot on a non-live price only while the reader's setting matches it.
   return Object.assign({ asOf: new Date(sampleMs).toISOString().slice(0, 10), price: last[1],
-                         multiple: d.m }, p);
+                         multiple: d.m, infl: d.infl }, p);
 };
