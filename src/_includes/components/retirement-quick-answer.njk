@@ -1,0 +1,98 @@
+{#-
+  ════════ QUICK ANSWER: HOW MUCH BITCOIN DO YOU NEED TO RETIRE? ════════
+
+  The Bitcoin Retirement's answer in plain HTML (2026-10-20, JM): bitcoin
+  needed by retirement year at the family's default withdrawal, on the two
+  scenarios and the floor stress test, so search engines and readers without
+  script get the model's answer, not only the calculator.
+
+  Every word and figure comes from shared/retirement-quick-answer.js:
+  src/_data/retirementQuickAnswer.js runs it at build time (dated to the
+  latest PL_DATA sample) and prints it here; on the page the same module
+  re-renders the block at today's price. The markup below is the frame only.
+  SITE_GUIDE §17, "Quick answer".
+
+  Scoped <style>, every selector prefixed `rqa-`, every colour a custom
+  property set on .rqa (the page's own tokens where it has them).
+-#}
+{%- set rqa = retirementQuickAnswer -%}
+<style>
+.rqa {
+  --rqa-frame: rgba(224,148,34,0.22);
+  --rqa-tint: rgba(224,148,34,0.035);
+  --rqa-rule: rgba(255,255,255,0.09);
+  --rqa-head-bg: rgba(0,0,0,0.25);
+  --rqa-accent: var(--amber, #e09422);
+  --rqa-accent-bright: var(--amber-bright, #F7931A);
+  --rqa-text: var(--ink-bright, #ece4d6);
+  --rqa-body: var(--ink, #ccc6b8);
+  --rqa-dim: var(--ink-dim, #968b7a);
+  --rqa-cons: #b9c7d2;
+  --rqa-cons-bg: rgba(185,199,210,0.12);
+  --rqa-cons-line: rgba(185,199,210,0.3);
+  --rqa-hist: #d4a843;
+  --rqa-hist-bg: rgba(212,168,67,0.12);
+  --rqa-hist-line: rgba(212,168,67,0.35);
+  --rqa-never: #cf9a8a;
+  --rqa-never-bg: rgba(207,154,138,0.1);
+  --rqa-never-line: rgba(207,154,138,0.3);
+  --rqa-stress: #c98a6e;
+  --rqa-stress-line: rgba(201,138,110,0.4);
+  max-width: 880px; margin: 0 auto 2.2rem; padding: 1.2rem 1.35rem 1.05rem;
+  border: 1px solid var(--rqa-frame); border-radius: 12px; background: var(--rqa-tint);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; text-align: left; box-sizing: border-box;
+}
+.rqa p.rqa-eyebrow { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rqa-accent); margin: 0 0 0.3rem; }
+.rqa h2.rqa-head { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.75rem; font-weight: 600; line-height: 1.2; color: var(--rqa-text); margin: 0 0 0.5rem; letter-spacing: 0; text-align: left; }
+.rqa p.rqa-lead { font-size: 0.97rem; line-height: 1.62; color: var(--rqa-body); margin: 0 0 1rem; }
+.rqa p.rqa-lead strong { color: var(--rqa-text); font-weight: 600; }
+.rqa .rqa-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.rqa table.rqa-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: var(--rqa-body); }
+.rqa .rqa-table caption { caption-side: top; text-align: left; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rqa-dim); padding: 0 0 0.5rem; }
+.rqa .rqa-table th, .rqa .rqa-table td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rqa-rule); vertical-align: bottom; }
+.rqa .rqa-table thead th { background: var(--rqa-head-bg); font-weight: 600; font-size: 0.8rem; line-height: 1.35; color: var(--rqa-text); text-align: right; }
+.rqa .rqa-table thead th:first-child { text-align: left; }
+.rqa .rqa-table tbody th { text-align: left; font-weight: 600; color: var(--rqa-text); font-variant-numeric: tabular-nums; }
+.rqa .rqa-table td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rqa .rqa-table td:nth-child(2) { color: var(--rqa-accent-bright); font-weight: 600; }
+.rqa .rqa-col { display: block; }
+.rqa .rqa-tag { display: inline-block; margin-top: 0.35rem; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.16rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+.rqa .rqa-tag--cons { color: var(--rqa-cons); background: var(--rqa-cons-bg); border: 1px solid var(--rqa-cons-line); }
+.rqa .rqa-tag--hist { color: var(--rqa-hist); background: var(--rqa-hist-bg); border: 1px solid var(--rqa-hist-line); }
+.rqa .rqa-tag--never { color: var(--rqa-never); background: var(--rqa-never-bg); border: 1px solid var(--rqa-never-line); }
+.rqa .rqa-tag--stress { color: var(--rqa-stress); background: transparent; border: 1px dashed var(--rqa-stress-line); }
+.rqa ul.rqa-notes { list-style: none; margin: 1rem 0 0; padding: 0; }
+.rqa ul.rqa-notes li { font-size: 0.85rem; line-height: 1.6; color: var(--rqa-dim); margin: 0 0 0.45rem; padding: 0; }
+.rqa ul.rqa-notes li strong { color: var(--rqa-body); font-weight: 600; }
+.rqa a { color: var(--rqa-accent); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.rqa ul.rqa-notes a, .rqa p.rqa-asof a { padding: 0.6rem 0; } /* tap target, STYLE_GUIDE §6.47 */
+.rqa a:hover { color: var(--rqa-accent-bright); }
+.rqa p.rqa-asof { font-size: 0.8rem; line-height: 1.55; color: var(--rqa-dim); margin: 0.75rem 0 0; padding-top: 0.6rem; border-top: 1px dashed var(--rqa-rule); }
+.rqa p.rqa-links { display: flex; flex-wrap: wrap; gap: 0.2rem 1.4rem; margin: 0.55rem 0 0; font-size: 0.86rem; }
+.rqa p.rqa-links a { display: inline-block; padding: 0.7rem 0; font-weight: 600; text-decoration: none; }
+@media (max-width: 600px) {
+  .rqa { padding: 1rem 0.75rem 0.9rem; }
+  .rqa h2.rqa-head { font-size: 1.5rem; }
+  .rqa p.rqa-eyebrow, .rqa p.rqa-lead, .rqa ul.rqa-notes, .rqa p.rqa-asof, .rqa p.rqa-links { padding: 0 0.2rem; }
+  .rqa table.rqa-table { font-size: 0.8rem; }
+  .rqa .rqa-table th, .rqa .rqa-table td { padding: 0.5rem 0.3rem; }
+  .rqa .rqa-table thead th { font-size: 0.7rem; }
+  .rqa .rqa-table caption { padding-left: 0.2rem; }
+  .rqa .rqa-tag { font-size: 0.54rem; letter-spacing: 0.06em; padding: 0.14rem 0.35rem; white-space: normal; line-height: 1.25; text-align: center; }
+}
+</style>
+<section class="rqa" id="quick-answer" aria-labelledby="rqaHead">
+  <p class="rqa-eyebrow">Quick answer</p>
+  <h2 class="rqa-head" id="rqaHead">How much bitcoin do you need to retire?</h2>
+  <p class="rqa-lead" data-rqa="lead">{{ rqa.lead | safe }}</p>
+  <div class="rqa-table-wrap">
+    <table class="rqa-table">
+      <caption data-rqa="caption">{{ rqa.caption | safe }}</caption>
+      <thead data-rqa="head">{{ rqa.head | safe }}</thead>
+      <tbody data-rqa="rows">{{ rqa.rows | safe }}</tbody>
+    </table>
+  </div>
+  <ul class="rqa-notes" data-rqa="notes">{{ rqa.notes | safe }}</ul>
+  <p class="rqa-asof" data-rqa="asof">{{ rqa.asof | safe }}</p>
+  <p class="rqa-links"><a href="#tab-calculator" data-rqa-go>The calculator below, for your own numbers &darr;</a><a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity &rarr;</a></p>
+</section>

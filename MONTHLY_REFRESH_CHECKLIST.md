@@ -92,7 +92,7 @@ It reads every data series, dated block and dated string straight from the sourc
 
 | When | What | § |
 |---|---|---|
-| January | Annual data (`homeData`, `btcData`, `csData`, `incomeData`, `mortgageRates`) and every year-bounded figure, range, input minimum, axis label and age string (the full list is in §11) | §11 |
+| January | Annual data (`homeData`, `btcData`, `csData`, `incomeData`, `mortgageRates`) and every year-bounded figure, range, input minimum, axis label and age string (the full list is in §11), then the static chart image built from them (`bitcoin-vs-house-prices.png`) | §11 |
 | February | Strategy's return-of-capital classification for the prior year | §7.5 step 6 |
 | March | Gold's supply growth (DATA_AUDIT I-5): the WGC's year-end above-ground stock and the year's mine output, usually out by March. Recompute growth (output ÷ opening stock), the doubling time and the stock-to-flow; if the rounded figures move (1.7%, 41 years, about 60), update the five pages in §0.7 and both source notes, which quote the tonnages | DATA_AUDIT I-5 |
 | May | Demographia affordability (both copies) | Annual: Demographia |
@@ -105,7 +105,7 @@ When one of these happens, run its list in §12: a **new all-time high**; the **
 
 ### 0.6 Nothing to refresh (computed at load)
 
-The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, Disciplined Rebalancing (its QA is §5.1c), The Bitcoin Floor (its QA is §5.1), Bitcoin's Spikes (its record QA is `[spikes-qa]`, pinned to 2026-09-30; check the console line after a PL_DATA refresh, and never re-pin the fixture to make it pass), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
+The Dashboard, The Rundown, Discount or Premium, How Much Cash, Wait or Deploy Now, Disciplined Rebalancing (its QA is §5.1c), The Bitcoin Floor (its QA is §5.1), Bitcoin's Spikes (its record QA is `[spikes-qa]`, pinned to 2026-09-30; check the console line after a PL_DATA refresh, and never re-pin the fixture to make it pass), the Heatmap cells, the Calculators tiles, and the calculators on Compare Retirement Plans, The Bitcoin Retirement, Escape Velocity, the Stress Test, What Daily Conviction Bought, The Bitcoin Hurdle Rate, Allocation Sizing and Disciplined Rebalancing all compute from the shared series and the live price. The Bitcoin Retirement's quick answer (2026-10-20) is computed at build time from the latest PL_DATA sample and re-dated by every build, then recomputed at today's price in the browser; it has nothing of its own to refresh. Their prose, presets and year bounds are listed above where they can go stale. Start Here, Synthesis, Work With Me and Bitcoin Defined carry nothing dated.
 
 ### 0.7 Cross-page agreement (monthly)
 
@@ -702,6 +702,15 @@ from the drafting chat, re-commit at the repo root, and re-verify
 `curl -I https://lastcoinstanding.com/og-dashboard.jpg` returns `image/jpeg`. If the
 position is essentially unchanged, leave it.
 
+**Static chart images (2026-10-20) — not OG cards, and annual, not monthly.**
+`scripts/build-chart-images.py` writes crawlable PNG copies of live charts,
+shown on their pages to save or share (SITE_GUIDE §14). One so far:
+`bitcoin-vs-house-prices.png`, from Bitcoin vs. Real Estate's *BTC Required to
+Buy the Median US House*. It runs on annual series, so it is rebuilt in January
+with the annual data (§11 item 7), not with the monthly OG run. Verify with
+`curl -I https://lastcoinstanding.com/bitcoin-vs-house-prices.png` →
+`image/png`.
+
 **Verification after regeneration:**
 
 ```bash
@@ -1254,6 +1263,7 @@ In January, once the prior year's data is complete. `scripts/data-freshness.py` 
 4. **Age strings.** `grep -rni "fifteen years\|sixteen years\|seventeen years\|years old" src/*.njk`, plus Risks to Bitcoin's opening (§2).
 5. **The footer's © year** (`layouts/base.njk`).
 6. **The Gallery's BTC-per-house line** ("20 / 1.4 / 0.23 / 0.06 BTC", `the-gallery.njk` ~236) changes on 1 January.
+7. **The static chart image** `bitcoin-vs-house-prices.png` (2026-10-20): after `homeData` and `btcData` gain the year, rerun `python3 scripts/build-chart-images.py` (from production once the data is merged, or `--base` a preview), commit the PNG at the repo root, and check `curl -I https://lastcoinstanding.com/bitcoin-vs-house-prices.png` returns `image/png`. If the height changed, update the `<img>` `height` on `bitcoin-vs-real-estate.njk` to match (§6).
 
 ## 12. Event-driven triggers (from 2026-09-29)
 

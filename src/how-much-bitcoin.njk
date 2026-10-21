@@ -21,6 +21,15 @@ related:
     desc: "The allocation from the other side. This page examines the fraction of a portfolio bitcoin might justify occupying; How Much Cash asks how much fiat belongs beside the stack, and what holding it costs in coins."
   - slug: what-daily-conviction-bought
     desc: "Sizing turned into a habit. Once you have a number, a daily buy is one way to reach it; this backtest replays what a small daily purchase would have accumulated, cost, and endured across bitcoin&rsquo;s history."
+faq:
+  - q: "What is the Kelly criterion?"
+    a: "A rule for sizing a position so that wealth compounds as fast as possible over the long run without going broke. John Kelly, a physicist at Bell Labs, published it in 1956; Edward Thorp later used it at the blackjack table and then in markets. For an asset held against a safe alternative, the fraction to hold is the asset’s expected excess return divided by the square of its volatility."
+  - q: "What does the Kelly criterion say about bitcoin?"
+    a: "On trend-based inputs its answer can exceed 100% of wealth, which would mean borrowing to hold more; this page computes it live on the site’s two scenarios for bitcoin’s price. Even a deliberately hostile case, a 10% expected return against 60% volatility, still allocates about 17%. Fidelity Digital Assets’ March 2026 study reached 65% with a discrete version run on bitcoin’s last ten calendar years."
+  - q: "Why not hold the full Kelly amount?"
+    a: "Three reasons, set out on this page. The expected return the formula needs is unknowable, and errors in it cost the most. The growth curve is lopsided, so holding too much costs far more than holding too little. And at full Kelly there is a 50% chance that wealth halves at some point along the way. Practitioners hold a fraction instead: half-Kelly keeps 75% of the achievable growth while the chance of a halving falls to 12.5%."
+  - q: "How much bitcoin is enough?"
+    a: "This page does not give one number, because the figures people quote answer different questions. Risk-budget figures such as BlackRock’s 1–2% ask how much volatility a portfolio can carry; the Kelly figures ask what fraction makes wealth compound fastest, and run from about 10% under hostile assumptions to past 100% on trend-based ones. <a href='/bitcoin-allocation-sizing'>Bitcoin Portfolio Allocation</a> shows what a chosen share does to a whole portfolio, crashes included."
 eleventyComputed:
   head_extras: "{% include '_pageassets/how-much-bitcoin-head.html' %}"
   page_styles: "{% include '_pageassets/how-much-bitcoin.css' %}"

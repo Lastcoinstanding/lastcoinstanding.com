@@ -2354,6 +2354,17 @@ Rules:
 - **The rest of the page follows on a throttled render** (≤ one per 90ms, trailing run); the value label moves at once. `aria-valuetext` carries the value with its unit.
 - **Use it** when the reader is choosing a level against a short, known history. **Skip it** for a continuous input with no record behind it.
 
+### 6.57 A computed answer in the HTML (`rqa-`, The Bitcoin Retirement, 2026-10-20)
+
+Canonical source: The Bitcoin Retirement's quick answer (`components/retirement-quick-answer.njk`, SITE_GUIDE §17). Use it when a page's answer to the question people search exists only after a calculator runs, so a crawler, an AI answer engine or a reader without script sees nothing.
+
+- **One module owns the figures and the words.** The page's own browser module computes and words the block (`compute()` and `parts()` returning HTML strings), and both runs use it: an Eleventy data file runs it at build time in a Node `vm` with the page's other shared modules, and the browser runs it again. The server HTML and the live HTML then differ only in their inputs. Never write a second, build-side copy of the arithmetic or the sentences.
+- **Pin the build to the data's own date.** The build clock is the latest sample's date and the price is that sample's, kept in UTC, so the table is exactly "as of" a dated price on any build machine. Reading an old price against today's trend is the browser's fallback behaviour, not something to publish.
+- **Re-render in the browser, and say which run you are reading.** Once today's price resolves (and when a sitewide assumption changes), the module refills the block, and the as-of line names the date and whether the price is live or dated (§10.9).
+- **A real `<table>`** with a `<caption>`, `<th scope>` on both axes, and the lead scenario first. A phone must show every column without sideways scrolling: tags may wrap inside their pill.
+- **Static copy around it carries no figure** (§10.8): an FAQ answer or meta description says what the block answers and points at it (`#quick-answer`), never what it says.
+- **Fail the build if the computation fails.** A stale or partial answer shipped silently is worse than a failed deploy, which the PR check shows.
+
 ## 7. Mobile considerations
 
 - All `clamp()` sizes have been chosen so the floor (mobile) is readable on a 375px viewport.
