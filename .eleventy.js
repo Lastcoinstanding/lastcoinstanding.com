@@ -10,6 +10,9 @@ module.exports = function (eleventyConfig) {
     'hero-bg.jpg',
     'profile.jpg',
     'interview-robin-seyr.jpg',
+    // Static chart images (scripts/build-chart-images.py, 2026-10-20): crawlable
+    // copies of live charts, shown on their pages to save or share.
+    'bitcoin-vs-house-prices.png',
     'apple-touch-icon.png',
     'favicon.ico',
     'favicon.svg',

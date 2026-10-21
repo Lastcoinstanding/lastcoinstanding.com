@@ -32,7 +32,7 @@ companion:
     desc: "John and Robin Seyr on the retirement model: what each 0.2 BTC does to the retirement date, on default inputs."
 faq:
   - q: "How much bitcoin do I need to retire?"
-    a: "There is no single number — it depends on your annual withdrawal, your retirement year, and what you assume about bitcoin’s price path. This calculator lets you set all three and shows whether a given stack sustains your withdrawals year by year, including the scenarios where it depletes. The answer is a range you explore, not a figure anyone can hand you."
+    a: "It depends on three things: how much you withdraw each year, when you retire, and what bitcoin’s price does against its trend. The <a href='#quick-answer'>quick answer</a> at the top of this page gives the model’s figures for a few retirement years on bitcoin’s two price scenarios. The calculator takes your own numbers and shows, year by year, whether a given stack covers your withdrawals, including the plans that run out. The figures are projections under stated assumptions, not forecasts."
   - q: "Can you really retire on bitcoin alone?"
     a: "Under some assumptions yes, under others no — and the difference is visible in the projection. A stack that reaches escape velocity under one price model can deplete under a harsher one, and a bear market early in retirement changes the picture more than one that comes late. The companion <a href='/the-bitcoin-retirement-stress-test'>Stress Test</a> models exactly that risk."
   - q: "How does the calculator project bitcoin’s future price?"
@@ -44,7 +44,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-head.html' %}"
   page_styles: "{% include '_pageassets/the-bitcoin-retirement.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/shared/retirement-quick-answer.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
 ---
 <div class="page">
 
@@ -62,6 +62,10 @@ eleventyComputed:
   {# Video card (2026-10-19): the interview walks through this page. #}
   {% set vc_body = 'A walk through this calculator on camera: how much bitcoin a retirement needs, and how that changes with the year you start. The figures are the model&rsquo;s, under its assumptions; set your own below.' %}
   {% include 'components/video-card.njk' %}
+
+  {# Quick answer (2026-10-20): the model's answer in the HTML, rendered at
+     build time and refreshed at today's price on load. SITE_GUIDE §17. #}
+  {% include 'components/retirement-quick-answer.njk' %}
 
   <!-- TAB NAV -->
   <div class="tab-nav">

@@ -93,19 +93,41 @@ _Note: the WebApplication item flags "missing aggregateRating (optional)". Delib
 the only way to satisfy it is to publish a self-declared rating for our own tool, which is dishonest
 and contrary to Google's own guidance on self-serving review markup._
 
-**Remaining backfill (open),** highest query-intent first: Bull & Bear Cycles ("bitcoin 4 year cycle"),
-Borrowing Against Your Stack, Lump Sum or Ladder In (owns "lump sum vs DCA bitcoin" — keep that query
-off Wait-or-Deploy), The Power Law, Bitcoin vs. The Stock Market, How Much Bitcoin?, How Much Cash?,
-the Stress Test, Disciplined Rebalancing, Bitcoin-Backed Mortgages. Conceptual pages and hubs are
-deliberately excluded — low query intent, and an FAQ on an essay reads as furniture.
+**Remaining backfill (updated 2026-10-20).** Shipped since this list was written: Bull & Bear Cycles,
+Borrowing Against Your Stack, The Power Law and the Stress Test (by 2026-09-30), and How Much Bitcoin?
+and Bitcoin vs. The Stock Market (2026-10-20, four questions each). Still open, highest query-intent
+first: Lump Sum or Ladder In (owns "lump sum vs DCA bitcoin" — keep that query off Wait-or-Deploy),
+How Much Cash?, Disciplined Rebalancing, Bitcoin-Backed Mortgages (Search Console shows "bitcoin
+mortgage" at positions 60–96). Conceptual pages and hubs are deliberately excluded — low query intent,
+and an FAQ on an essay reads as furniture.
 
 ## Priority 4 — WebApplication schema on calculator pages ✅ SHIPPED
 All calculator pages now carry WebApplication JSON-LD (eight added; the five newest already had it).
 Power Law additionally gained Article schema with git-history datePublished 2026-04-18 (`fc6ca03`).
 
-## Priority 5 — Keyword-aware headings + anchor text (light) — OPEN
+## Priority 5 — Keyword-aware headings + anchor text (light) — PARTLY DONE (2026-10-20)
 Add the plain-language question as an early H2 on flagship pages where natural; descriptive anchor text
-in `related:` cross-links. Low urgency; fold into future page work.
+in `related:` cross-links. Low urgency; fold into future page work. **2026-10-20:** The Bitcoin
+Retirement's quick answer opens with the H2 "How much bitcoin do you need to retire?" above the tabs.
+The other flagships already carry question H2s where the search is a question (Bitcoin vs. The Stock
+Market: "What if you bought at the worst time?", "How long does the bitcoin advantage last?"; Bitcoin
+vs. Real Estate: "What If You Postponed the House Purchase?", "What Might Happen Going Forward?"), and
+their FAQ questions are question-style headings too, so no essay heading was rewritten.
+
+## Search read, 2026-10-20 — the bottleneck is authority and direct answers
+Search Console, 90 days to 2026-10-18: 462 clicks, nearly all on the site's name; 1.65K impressions.
+About 95 topic searches already show the site, ranked too low to be seen: retirement searches at
+positions 40–75 (the largest cluster: "how much bitcoin do you need to retire", "how many bitcoin to
+retire in 2030", "bitcoin needed to retire"), real-estate searches 30–50 ("bitcoin vs real estate",
+"bitcoin vs house prices", several "…chart" variants), portfolio-share searches 60–66, power-law
+searches 60–90. How Much Bitcoin? already ranks 3–19 for "kelly criterion". Indexing is healthy and the
+titles already carry the searched phrases, so rewording titles will not move a page from position 50.
+Two things can: answers a search engine can read without running a calculator, and links from other
+sites. Shipped for the first (2026-10-20): the Retirement quick answer (a table computed at build time,
+STYLE_GUIDE §6.57), FAQ blocks on How Much Bitcoin? and Bitcoin vs. The Stock Market, and a static
+image of Bitcoin vs. Real Estate's house-in-bitcoin chart for image search. The second is outreach
+(REACH_GROWTH_PLAN): the link asks were drafted for JM the same day (project side,
+`claude/LINK_ASKS_2026-10-20.md`, because it names people).
 
 ## Honest expectations + how SEO fits with X
 SEO compounds over **months**, not days — it's the long-term, near-passive base, not an instant lever.
