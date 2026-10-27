@@ -15,6 +15,15 @@ related:
     desc: "The growth model that makes the long-duration pledge-instead-of-sale case work. If bitcoin's CAGR exceeds your mortgage rate over the duration, the pledged collateral compounds away the loan."
   - slug: the-bitcoin-retirement
     desc: "The framework where housing decisions sit inside a broader retirement plan. Mortgages that don't force liquidation extend the bitcoin retirement runway in ways traditional debt products cannot."
+faq:
+  - q: "What is a bitcoin-backed mortgage?"
+    a: "It is two loans, not one. A 30-year Fannie Mae-conforming mortgage covers the home in the conventional way; alongside it, a second-lien loan collateralized by pledged bitcoin (or USDC) funds the down payment, so the buyer does not have to sell bitcoin. Better Home &amp; Finance originates and services the loans, and Coinbase holds the collateral. Both loans share one interest rate and term, roughly 0.5 to 1.5 percentage points above a standard 30-year mortgage."
+  - q: "Does a bitcoin-backed mortgage have a margin call?"
+    a: "No price-based one, at any drawdown level. The only liquidation trigger is 60 days of delinquency on the mortgage payments, whereas CeFi bitcoin loans typically liquidate on price, at a 75&ndash;90% LTV. The 250% over-collateralization is what makes that possible. The risk moves rather than disappears: the no-margin-call feature protects against bitcoin&rsquo;s price moves, not against losing the income that makes the monthly payments."
+  - q: "How much bitcoin do you have to pledge for a bitcoin-backed mortgage?"
+    a: "$2.50 of bitcoin for every $1.00 of down-payment credit, a 40% LTV on the pledged stack, or roughly 2.5 times the down payment. It must sit at Coinbase Prime custody for the life of the loan; self-custody is not currently accepted. The lockup can end early: the bitcoin is returned in full once the second-lien loan, or the whole structure, is repaid, refinanced or paid off through a home sale, and any prepayment penalty is capped at 2% of the balance in the first three years and zero after."
+  - q: "Should I pledge bitcoin or sell it for a down payment?"
+    a: "It turns on whether bitcoin&rsquo;s long-run growth beats the cost of the debt. Pledging keeps the coins and defers capital-gains tax, but carries a rate premium on the full borrowed amount and counterparty risk at Fannie Mae, Better and Coinbase, and it depends on steady income for the payments. If you don&rsquo;t expect that growth, selling is the cheaper path, and not borrowing at all avoids the counterparty risk and the collateral lockup. The calculator on this page compares the two paths on two price scenarios, neither a forecast."
 companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-backed-mortgages-head.html' %}"
