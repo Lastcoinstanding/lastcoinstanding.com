@@ -25,6 +25,15 @@ related:
     desc: "The calculator that shows this protocol's historical work. This page states the discipline; How Much Cash prices it — what the trim costs after tax, where in the channel it has historically paid, and how long the round trip took."
   - slug: bitcoin-spikes
     desc: "The spikes this protocol trims into, measured one by one. Bitcoin&rsquo;s Spikes shows how a sell-above, buy-back-below rule fared in each cycle, including the ones where it fired early or never fired."
+faq:
+  - q: "What is a bitcoin rebalancing strategy?"
+    a: "On this page it means two rules, both set as multiples of bitcoin&rsquo;s <a href='/the-power-law'>Power Law trend</a>: sell a share of your stack when price is high against the trend, and buy it back when price falls to a lower level. It is not the conventional rotation back to a target mix of assets. The calculator runs your rules through the price record since 2011 or 2014 and reports what they would have done. It is a record, not a forecast."
+  - q: "How do you decide when to take profits on bitcoin?"
+    a: "By where price sits against the trend, not by a view of where it is going. You choose a sell level, such as 2&times; trend, and how the sale fires: as price rises through the level, or after a spike reaches it and falls back. In the page&rsquo;s worked comparison, selling as the spike faded did better, because the run-up kept going after early sales. But a fade rule needs the spike to reach the level first. The 2024&ndash;25 spike never reached 2&times; trend, so no 2&times; rule fired."
+  - q: "Can you sell bitcoin at the top and buy it back lower?"
+    a: "Not at the top: the rules sell high against the trend and buy back lower against it. Both can fire as designed and still leave you with less bitcoin than HODLing, because the levels are multiples of a rising trend while you sell and buy back in dollars. Rules that sold in March or April 2013, at about $70 to $131, bought back in January 2015 at about $234 to $270. If price stays above the upper band, the buy back may never come, and a deadline buys back higher."
+  - q: "Does rebalancing bitcoin make sense in a taxable account?"
+    a: "This page treats a tax-advantaged account as a prerequisite; outside one, the framework is far less defensible. Inside one, sales and buy backs are not taxed, so the only cost of a failed round trip is the bitcoin you don&rsquo;t get back. In a taxable account each sale is taxed on its gain, and the tax comes out of the cash meant for the buy back. <a href='/how-much-cash'>How Much Cash?</a> prices a trim after tax. Results here leave out trading costs and assume the rules are followed perfectly."
 companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/disciplined-rebalancing-head.html' %}"

@@ -93,12 +93,12 @@ _Note: the WebApplication item flags "missing aggregateRating (optional)". Delib
 the only way to satisfy it is to publish a self-declared rating for our own tool, which is dishonest
 and contrary to Google's own guidance on self-serving review markup._
 
-**Remaining backfill (updated 2026-10-20).** Shipped since this list was written: Bull & Bear Cycles,
-Borrowing Against Your Stack, The Power Law and the Stress Test (by 2026-09-30), and How Much Bitcoin?
-and Bitcoin vs. The Stock Market (2026-10-20, four questions each). Still open, highest query-intent
-first: Lump Sum or Ladder In (owns "lump sum vs DCA bitcoin" — keep that query off Wait-or-Deploy),
-How Much Cash?, Disciplined Rebalancing, Bitcoin-Backed Mortgages (Search Console shows "bitcoin
-mortgage" at positions 60–96). Conceptual pages and hubs are deliberately excluded — low query intent,
+**Backfill complete (updated 2026-10-27).** Shipped since this list was written: Bull & Bear Cycles,
+Borrowing Against Your Stack, The Power Law and the Stress Test (by 2026-09-30), How Much Bitcoin?
+and Bitcoin vs. The Stock Market (2026-10-20), and (2026-10-27) Lump Sum or Ladder In (owns
+"lump sum vs DCA bitcoin" — keep that query off Wait-or-Deploy), How Much Cash?, Disciplined
+Rebalancing and Bitcoin-Backed Mortgages (Search Console showed "bitcoin mortgage" at positions
+60–96; re-read ~Nov 18), four questions each. Conceptual pages and hubs are deliberately excluded — low query intent,
 and an FAQ on an essay reads as furniture.
 
 ## Priority 4 — WebApplication schema on calculator pages ✅ SHIPPED

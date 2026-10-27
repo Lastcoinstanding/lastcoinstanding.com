@@ -202,11 +202,11 @@ and conflating them is how most of this debate goes wrong.
 2. ✅ **DONE** — Allocation, Wait-or-Deploy and BvRE all shipped by hand (this line said "later pass"
    until 2026-07-26; it was stale, and a build prompt written from it caused a duplicate-FAQ error).
    Discount-or-Premium also shipped its own FAQ as part of that page's build.
-3. ⬜ **OPEN — the remaining backfill (updated 2026-10-20).** Shipped: Bull & Bear Cycles, Borrowing
-   Against Your Stack, The Power Law, the Stress Test, and (2026-10-20) How Much Bitcoin? and Bitcoin
-   vs. The Stock Market. Still open, highest query-intent first: Lump Sum or Ladder In (this one owns
+3. ✅ **DONE — the backfill (completed 2026-10-27).** Shipped: Bull & Bear Cycles, Borrowing
+   Against Your Stack, The Power Law, the Stress Test, (2026-10-20) How Much Bitcoin? and Bitcoin
+   vs. The Stock Market, and (2026-10-27, branch `feat-faq-backfill`) Lump Sum or Ladder In (owns
    the "lump sum vs DCA bitcoin" query — keep it off Wait-or-Deploy), How Much Cash?, Disciplined
-   Rebalancing, Bitcoin-Backed Mortgages. **Do not** add FAQs to conceptual pages (Bitcoin Defined, The Synthesis, What Money Is
+   Rebalancing and Bitcoin-Backed Mortgages, four questions each. **Do not** add FAQs to conceptual pages (Bitcoin Defined, The Synthesis, What Money Is
    For, Half-Life, Fixed Pie) or hubs — low query intent, and an FAQ appended to an essay reads as
    furniture and cheapens the pattern where it does real work.
 4. 🔄 **IN FLIGHT** — branch `faq-component`: layout-level component + `faq:` front matter, single-
