@@ -8,6 +8,7 @@ module.exports = function (eleventyConfig) {
   // Each entry maps source-path -> destination-path-within-output.
   const staticAssets = [
     'hero-bg.jpg',
+    'hero-bg.webp',
     'profile.jpg',
     'interview-robin-seyr.jpg',
     // Static chart images (scripts/build-chart-images.py, 2026-10-20): crawlable
@@ -125,6 +126,10 @@ module.exports = function (eleventyConfig) {
 
   // Videos folder — only enable when present locally (production has it; local test may not)
   eleventyConfig.addPassthroughCopy({ 'videos': 'videos' });
+  // Self-hosted web fonts and their OFL licences; see components/web-fonts.njk
+  eleventyConfig.addPassthroughCopy({ 'fonts': 'fonts' });
+  // Self-hosted third-party libraries (Chart.js); see base.njk `chartjs`
+  eleventyConfig.addPassthroughCopy({ 'vendor': 'vendor' });
   // Lightning Address endpoint — Cloudflare Pages serves .well-known files; _headers sets Content-Type
   eleventyConfig.addPassthroughCopy({ '.well-known': '.well-known' });
   eleventyConfig.addPassthroughCopy({ '_headers': '_headers' });
@@ -258,8 +263,38 @@ module.exports = function (eleventyConfig) {
   // defines is invalid at computed-value time: colour quietly inherits,
   // borders fall to currentColor. Checked on the rendered HTML, so shared
   // modules and layout CSS are included. Comments are stripped first.
+  // Minify inline <script> and <style> blocks (2026-10-29 speed pass; project
+  // doc claude/SPEED_A11Y_READ_2026-10-29.md). Every page carries ~130 KB of
+  // layout JS and CSS inline, design-history comments included; minifying
+  // takes the median page from ~83 to ~48 KB compressed. Comments stay in the
+  // source files, which remain the reference. Skipped: scripts with src, JSON
+  // and JSON-LD blocks, and anything esbuild cannot parse (left as written,
+  // with a warning). esbuild keeps top-level names when no output format is
+  // set, so globals the pages share (PL_DATA, plPrice, the ?qa helpers) keep
+  // their names. Set LCS_NO_MINIFY=1 to build unminified for debugging.
+  const esbuild = require('esbuild');
+  eleventyConfig.addTransform('minify-inline', function (content) {
+    const out = this.page && this.page.outputPath;
+    if (process.env.LCS_NO_MINIFY || !out || !out.endsWith('.html') || typeof content !== 'string') return content;
+    const warn = (kind, e) => console.warn(`[minify-inline] ${out}: left one ${kind} block as written (${String(e.message || e).split('\n')[0]})`);
+    let html = content.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, (m, attrs, body) => {
+      if (/\bsrc\s*=/i.test(attrs) || !body.trim()) return m;
+      const type = (attrs.match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
+      if (type && !/^(text\/javascript|module|application\/javascript)$/i.test(type)) return m;
+      try { return `<script${attrs}>${esbuild.transformSync(body, { loader: 'js', minify: true }).code.trim()}</script>`; }
+      catch (e) { warn('script', e); return m; }
+    });
+    html = html.replace(/<style\b([^>]*)>([\s\S]*?)<\/style>/gi, (m, attrs, body) => {
+      if (!body.trim()) return m;
+      try { return `<style${attrs}>${esbuild.transformSync(body, { loader: 'css', minify: true }).code.trim()}</style>`; }
+      catch (e) { warn('style', e); return m; }
+    });
+    return html;
+  });
+
   eleventyConfig.on('eleventy.after', ({ results }) => {
     const errs = [];
+    const vendorErrs = [];
     (results || []).forEach((r) => {
       if (!r.outputPath || !r.outputPath.endsWith('.html') || typeof r.content !== 'string') return;
       const html = r.content
@@ -276,7 +311,14 @@ module.exports = function (eleventyConfig) {
       const useRe = /var\(\s*(--[\w-]+)\s*\)/g;
       while ((m = useRe.exec(html))) if (!defined.has(m[1])) missing.add(m[1]);
       if (missing.size) errs.push(`${r.outputPath}: ${[...missing].join(', ')}`);
+      // Fonts are self-hosted (components/web-fonts.njk, 2026-10-29). A Google
+      // Fonts link would bring back the render-blocking third-party stylesheet.
+      if (/fonts\.(googleapis|gstatic)\.com/.test(html)) vendorErrs.push(r.outputPath);
+      // Chart.js is self-hosted and emitted once by base.njk (`chartjs: true`).
+      const charts = (html.match(/<script[^>]*src="[^"]*chart(\.js-[\d.]+)?\.umd(\.min)?\.js"/gi) || []);
+      if (charts.length > 1 || charts.some(t => !t.includes('/vendor/chart.js-'))) vendorErrs.push(r.outputPath + ' (Chart.js: use chartjs: true, not a <script> tag)');
     });
+    if (vendorErrs.length) throw new Error('Third-party font or Chart.js tag found; fonts are self-hosted (components/web-fonts.njk), Chart.js comes from `chartjs: true` (base.njk):\n  ' + vendorErrs.join('\n  '));
     if (errs.length) throw new Error('Undefined CSS variable lint failed (define it in the page :root, or give the var() a fallback):\n  ' + errs.join('\n  '));
   });
 

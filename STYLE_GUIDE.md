@@ -1039,7 +1039,7 @@ A reusable Python + Pillow generator for site OG cards (1280×720 JPG) lives in 
 | Italic subtitle | `(100, ~340)`, word-wrap at 480px | Cormorant Garamond Italic | 30px | `#BEB2A0` (TEXT_DIM) |
 | URL footer | `(100, 668)`, letterspaced ~4.5px | Inter Medium | 18px | `#827A6E` (TEXT_MUTED) |
 
-**Font sourcing.** Cormorant Garamond pulled at generation time via the Google Fonts CSS API (`https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap`) — parse the latin font-face blocks for woff2 URLs, download, convert to TTF via `fontTools`. Inter via the `fonts-inter` apt package (system-installed). No font assets committed to the repo.
+**Font sourcing.** Cormorant Garamond pulled at generation time via the Google Fonts CSS API (`https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap`) — parse the latin font-face blocks for woff2 URLs, download, convert to TTF via `fontTools`. Inter via the `fonts-inter` apt package (system-installed). (Since 2026-10-29 the site's own woff2 files are in the repo at `/fonts`, the same Google binaries, for the pages; the OG generators still fetch their own and need no change.)
 
 **Save as JPEG quality 80 with `optimize=True`** to land at ~75–95 KB per card, matching the size of existing OG images. (All shipped per-page `build-og-*.py` scripts use `quality=80`; the doc previously said 88 — corrected 2026-07 to match the scripts.) Cormorant Garamond doesn't include U+20BF (`₿`); use Inter for that single character if it appears in a title.
 

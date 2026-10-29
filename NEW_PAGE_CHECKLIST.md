@@ -782,8 +782,13 @@ the following. Copy from a complete reference (e.g.
   `twitter:title`, `twitter:description`, `twitter:image`,
   `twitter:image:alt`. Same content as OG but separately declared so
   Twitter's older parser picks them up reliably.
-- **Font preconnects + Google Fonts stylesheet** — matches the site's
-  Cormorant + Inter (+ Source Serif 4 for some pages) loading pattern.
+- **No font links and no Chart.js tag** — both are layout-level since
+  2026-10-29: fonts come from `components/web-fonts.njk` (self-hosted;
+  every family and weight the site uses is already declared), and a
+  chart page sets `chartjs: true` in its front matter instead of a
+  `<script>` tag. The build fails on a Google Fonts link or a Chart.js
+  tag in a head fragment. See SITE_GUIDE "Speed: fonts, Chart.js,
+  minified inline code".
 
 Additionally for content-type pages (essays, data-analysis pages):
 

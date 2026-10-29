@@ -317,7 +317,7 @@ The site is built by **Eleventy 3.1.5** from `src/` templates, deployed by Cloud
 | Body content of a page | `src/<slug>.njk` |
 | Page CSS | `src/_includes/_pageassets/<slug>.css` |
 | Page-specific JS | `src/_includes/_pageassets/<slug>.js` |
-| Page `<head>` (title, meta, OG tags, JSON-LD, fonts, favicons, GA) | `src/_includes/_pageassets/<slug>-head.html` |
+| Page `<head>` (title, meta, OG tags, JSON-LD) | `src/_includes/_pageassets/<slug>-head.html` (fonts, favicons, GA and Chart.js are layout-level; see "Speed: fonts, Chart.js, minified inline code" below) |
 | Page-specific atmospheric chrome (`grain-overlay`, `atmosphere`, etc.) before nav | `src/_includes/_pageassets/<slug>-chrome.html` |
 | Site-wide nav, footer, generic JS | `src/_includes/layouts/base.njk` (affects all pages) |
 | Nav dropdown / footer-nav exploration list | `src/_data/explorations.json` |
@@ -333,6 +333,14 @@ The site is built by **Eleventy 3.1.5** from `src/` templates, deployed by Cloud
 4. Push to main; CF builds and deploys
 
 **Local dev:** `npm install` once, then `npm run build` produces `_site/`. `npm run serve` runs Eleventy with hot reload at `localhost:8080`.
+
+### Speed: fonts, Chart.js, minified inline code (2026-10-29)
+
+Three layout-level rules from the speed pass (branch `perf-speed-pass`). Each has a build lint in `.eleventy.js`, so a page that breaks one fails the build rather than quietly slowing down.
+
+- **Web fonts are self-hosted.** `src/_includes/components/web-fonts.njk` (included by `base.njk` before `head_extras`) preloads Inter and Cormorant Garamond, regular and italic (latin; all four are above the fold on nearly every page, and the italics' late swap was How Much Bitcoin?'s 0.14 layout shift) and declares every face the site uses: Inter, Cormorant Garamond, EB Garamond, Outfit and Source Serif 4 italic, in the latin, latin-ext and greek subsets. The woff2 files in `/fonts` are Google's own binaries (version in each filename; OFL licences in `/fonts/licenses`), and `_headers` caches `/fonts/*` for a year, immutable. Each family is declared once with its full weight range, so every page has every face; a browser downloads only the files a page actually draws with. **Do not add a Google Fonts `<link>` to a head fragment** (lint: "Third-party font or Chart.js tag found"). A new family or weight: fetch Google's css2 for it, download the woff2 for the three subsets into `/fonts` under the same naming, add the `@font-face` rules to `web-fonts.njk`.
+- **Chart.js is one self-hosted copy, loaded at the end of `<body>`.** A chart page sets `chartjs: true` in its front matter; `base.njk` then emits `<script src="/vendor/chart.js-4.4.1.umd.min.js">` immediately before `page_scripts`, so page code still finds `window.Chart` synchronously, while the page above it renders without waiting for the library. The file is the npm `chart.js@4.4.1` `dist/chart.umd.js`, byte-identical to the jsdelivr copy the pages used to load; `_headers` caches `/vendor/*` immutable. **Do not add a Chart.js `<script>` to a head fragment**, and do not use Chart from a script that runs before `page_scripts` (a head fragment or an inline `<script>` in the body). To upgrade: add the new version under a new filename and change the one tag in `base.njk`.
+- **Inline `<script>` and `<style>` blocks are minified at build** by an esbuild transform (`minify-inline` in `.eleventy.js`): comments and whitespace go, top-level names are kept (no format is set, so nothing global is renamed). JSON-LD and other non-JS script types, and external scripts, are left alone; a block esbuild cannot parse is left as written, with a build warning naming the page. `LCS_NO_MINIFY=1 npm run build` builds without it, for reading the output. Production-HTML hashes changed once when this shipped (2026-10-29); any byte-level comparison against an older build has to use an unminified build.
 
 **Direct GitHub-API commits** (legacy mechanism, useful for hot-fixes when local checkout isn't at hand):
 
@@ -1207,7 +1215,7 @@ The pair line under the hero and the series strip at the top (§53.2) link to §
 
 ## 15. Chart.js patterns and lessons
 
-- **Version:** 4.4.1 via CDN (`cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js`)
+- **Version:** 4.4.1, self-hosted at `/vendor/chart.js-4.4.1.umd.min.js` and loaded by `base.njk` for pages with `chartjs: true` (2026-10-29; was the jsdelivr CDN in each page's `<head>`). See "Speed: fonts, Chart.js, minified inline code" in the build pipeline section.
 - **Log-log charts:** Use `type: 'scatter'` with both axes set to `type: 'logarithmic'`. Trend lines as `type: 'line'` datasets overlaid.
 - **Tooltip conflicts on multi-dataset charts:** When tooltip picks up values from model-line datasets (trend/floor/ceiling), either suppress them (return `[]` from label callback) or add proper labels. Bare unlabeled values confuse users.
 - **Year labels on log-scale x-axis:** Use `afterBuildTicks` to override with year-based ticks. Raw day values are meaningless to readers.
