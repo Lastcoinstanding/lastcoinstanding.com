@@ -1848,3 +1848,21 @@
     document.addEventListener('DOMContentLoaded', init);
   } else { init(); }
 })();
+
+// Label in name (WCAG 2.5.3, 2026-10-29): each stepper value button shows a
+// value (2035, 1.5 BTC, $100,000) but was named only "Retire in" etc. Keep the
+// visible value inside the name: "Retire in 2035, click to type a value".
+(function () {
+  // Both value-button styles: the steppers and the sliders' typed-entry values.
+  document.querySelectorAll('button[data-role="value"][aria-label]').forEach(function (b) {
+    var base = b.getAttribute('aria-label') || '';
+    if (!base) return;
+    function sync() {
+      var v = b.textContent.trim();
+      // A function replacer: in a string, "$100,000" would be read as "$1" + "00,000".
+      b.setAttribute('aria-label', v && v !== '—' ? base.replace(/(,|$)/, function (m) { return ' ' + v + m; }) : base);
+    }
+    sync();
+    if ('MutationObserver' in window) new MutationObserver(sync).observe(b, { childList: true, characterData: true, subtree: true });
+  });
+})();
