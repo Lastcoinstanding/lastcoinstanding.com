@@ -729,6 +729,18 @@ _Otherwise none currently._ (The **STRC Below Par** slide shipped July 2026 — 
 
 **Documentation drift resolved (May 2026):** the previously-flagged drift between markup and this inventory was closed when What Money Is For (now slide 34) landed. The three previously-undocumented slides (`vid-heatmap`, `vid-bbm`, `vid-lob`) have had their inventory rows scraped from `src/index.njk` and added to the table below; the prior slide-17 entry (Borrowing Against Your Stack) has been renumbered to 18 to match the live markup. The table below now matches `src/index.njk` slide-for-slide.
 
+### Loading and motion (2026-10-29)
+
+How the carousel decides what to download and when to move (`_pageassets/index.js`, header comment; branch `perf-homepage-carousel`). Before this, the boot call loaded and played a random Featured clip whether or not anyone had scrolled to it, and auto-advance fetched the next one every ~10 seconds while the page stayed open: on a phone, ~5 MB before the first scroll (project doc `claude/SPEED_A11Y_READ_2026-10-29.md`).
+
+- **Nothing loads until the carousel is near.** Every slide is rendered (opacity 0, grid-stacked), so a `poster` attribute in the markup would fetch all 49. Posters therefore live in `data-poster` and the script sets them on the active slide and the next one once `#insightSlides` comes within 300px of the viewport.
+- **A clip plays only while the slides are on screen** (30% visible) **and the browser tab is visible.** Scrolling away or switching tabs pauses it, so auto-advance never fetches clips nobody is watching.
+- **Pause control** (`#insightPause`, top-right corner of the video): stops the clip and auto-advance until pressed again; its label reads "Pause the slideshow" / "Play the slideshow" (WCAG 2.2.2). Manual navigation still turns auto-advance off and loops the clip, as before; while paused, the arrows, dots and tabs show posters.
+- **`prefers-reduced-motion` and Save-Data start paused:** the reader sees each slide's poster, the clip's opening frame, and can press play. Migration's opening frame is nearly black (its clip opens a door onto light), so that slide's still is dark; a different still frame per slide would need a second poster set.
+- **Encode:** every clip was re-encoded at CRF 24 `-tune film` (`NEW_PAGE_CHECKLIST §8` step 4), 243.7 MB → 95.0 MB for the 49, with each clip's gate figures unchanged to within 0.3 points. **Custody moved with it:** the sizes and SHA-1s on the inventory rows below are the masters as they landed; the current files are listed in `CAROUSEL_REENCODE_2026-10-29.md`.
+- **Controls, same PR (disclosed accessibility fixes in the component being changed):** the category buttons are a `role="group"` of `aria-pressed` toggles (a `role="tablist"` needs `role="tab"` children, which they never had); each dot is a 24×44px target drawn around the same 10px dot, rows wrapping instead of shrinking (the Numbers tab's 34 dots had been squeezed to 2px wide on a phone, two off-screen); the tabs, arrows and pause button answer taps across 44px without changing how they look.
+- **Left as it was:** on desktop the arrows sit at −16px and `.insight-slides { overflow: hidden }` clips their outer halves (TECH_DEBT §6).
+
 ### Typography tune
 
 - Label: 0.78rem, 2.5px tracking, 0.85 opacity
@@ -755,7 +767,7 @@ Every slide video is briefed against one default register: **warm, hopeful, cons
 2. **No sustained falling brightness arc.**
 3. **The closing frame is at least as bright as the opening frame**, unless the page's subject justifies otherwise — the Stress Test exemption above, not a general escape hatch.
 
-Reference take: **The Bitcoin Retirement** (row 34), a 42% floor on a rising arc. Footage that cannot clear the gate does not get a wiring PR; it gets another brief. **Chain of custody:** once footage clears the gate chat-side, the wiring PR verifies that the bytes the preview serves are **identical to the gate-passed files** — SHA-1 of the downloaded file against the committed one, plus the re-encode fingerprint the gate pass leaves behind (video stream only, no mjpeg thumbnail stream, `+faststart`; none of which a raw Grok original carries). That closes the gap between "a file passed the gate" and "this is that file" without needing to re-measure luminance on the deploy.
+Reference take: **The Bitcoin Retirement** (row 34), a 42% floor on a rising arc. Footage that cannot clear the gate does not get a wiring PR; it gets another brief. **Chain of custody:** once footage clears the gate chat-side, the wiring PR verifies that the bytes the preview serves are **identical to the gate-passed files** — SHA-1 of the downloaded file against the committed one, plus the re-encode fingerprint the gate pass leaves behind (video stream only, no mjpeg thumbnail stream, `+faststart`; none of which a raw Grok original carries). That closes the gap between "a file passed the gate" and "this is that file" without needing to re-measure luminance on the deploy. **Since 2026-10-29 the gate is measured on the web encode** (`NEW_PAGE_CHECKLIST §8` step 4: CRF 24 `-tune film`, video stream only, `+faststart`), since that is the file committed; the re-encode of the existing 49 moved no clip's figures by more than 0.3 points (`CAROUSEL_REENCODE_2026-10-29.md`).
 
 **How the gate is measured, not just what it requires.** The three criteria above are applied to a **per-frame mean-luminance series**, extracted chat-side with ffmpeg's `signalstats` filter:
 
