@@ -567,22 +567,37 @@ it didn't; the vine either reached the upper-right or it didn't. This is a chat
 sandbox step (see the tooling note above) — `ffmpeg` does the extraction, no
 JM's machine required.
 
-### 4. Strip audio AND the mjpeg thumbnail stream
+### 4. Encode for the web: video stream only, CRF 24, plus a poster
 
 A Grok download carries THREE streams: h264 video, an AAC audio track, AND an
 embedded mjpeg thumbnail. The mjpeg cover is itself a *video-type* stream, so
 `-c:v copy` (or a bare `-c copy`) copies it through — only an explicit
 `-map 0:v:0` selects the h264 stream alone and drops both the audio and the
-thumbnail:
+thumbnail. **Re-encode every take** (since 2026-10-29; a straight stream copy
+kept Grok's 1–9 Mbps and averaged 4.3 MB a Featured clip):
 
 ```bash
-ffmpeg -i take.mp4 -map 0:v:0 -c copy -an -movflags +faststart videos/<slug>.mp4
+ffmpeg -i take.mp4 -map 0:v:0 -an -map_metadata -1 \
+  -c:v libx264 -preset veryfast -crf 24 -tune film -pix_fmt yuv420p \
+  -movflags +faststart videos/<slug>.mp4
 ```
 
-`+faststart` relocates the moov atom to the front for web streaming. Re-encode
-only if size or format needs it (the deployment trilogy's P2 needed a 2-pass
-re-encode to land in the size band; the raw was ~11 MB). Target 3–10 MB, 720p,
-~10 seconds.
+`+faststart` relocates the moov atom to the front for web streaming. CRF 24 with
+`-tune film` keeps the grain in smooth glows from turning into blotches (CRF 26
+did, on the Migration doorway); the 49 clips of 2026-10-29 landed at 0.2–6.1 MB,
+1.9 MB on average (`CAROUSEL_REENCODE_2026-10-29.md`). Keep 1280×720, ~10
+seconds. **Measure the brightness gate (`SITE_GUIDE §13`) on this file**, since
+it is the one committed; any gamma lift goes in the same command (`-vf
+eq=gamma=1.25` before `-c:v`).
+
+**Then the poster** — the encode's first frame, converted the way browsers show
+the video:
+
+```bash
+ffmpeg -i videos/<slug>.mp4 -frames:v 1 \
+  -vf "scale=in_range=tv:in_color_matrix=bt709:out_range=pc,format=bgra" \
+  -c:v libwebp -quality 72 -compression_level 6 videos/posters/<slug>.webp
+```
 
 **Verify the strip before committing — zero audio streams must remain.** The
 primary check is `ffprobe`: list audio streams and confirm the output is empty.
@@ -607,8 +622,12 @@ master is a known bug class (Metcalfe, June 2026; see `SITE_GUIDE §13`).
   `videos/wait-or-deploy-now.mp4`). Match the existing files.
 - **Commit the silent master** — only after step 4 verifies clean.
 - **Wire the slide into `src/index.njk`.** Add the slide config with a
-  `video.carousel-video`; `index.js` plays/pauses whatever video sits in the
-  active slide, so no per-id JS registration is needed.
+  `video.carousel-video` carrying `preload="none"` and
+  `data-poster="/videos/posters/<slug>.webp"` (never a `poster` attribute:
+  every slide is rendered, so markup posters would all download at once).
+  `index.js` plays/pauses whatever video sits in the active slide and sets its
+  poster when the carousel nears the screen, so no per-id JS registration is
+  needed (`SITE_GUIDE §13`, "Loading and motion").
 - **Promote in `SITE_GUIDE §13`:** move the page's entry out of "Pending
   additions" into the inventory table, and add an **iteration record** — what
   each take cost and why, in the voice of the existing records. That record is
