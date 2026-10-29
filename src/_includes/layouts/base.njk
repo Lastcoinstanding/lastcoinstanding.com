@@ -44,6 +44,9 @@
 <script>
 {% include '_pageassets/shared/chart-fonts.js' %}
 </script>
+{# Self-hosted web fonts (2026-10-29): preloads plus @font-face rules. After the
+   chart-fonts listener, before head_extras. See components/web-fonts.njk. #}
+{% include 'components/web-fonts.njk' %}
 {{ head_extras | safe }}
 {# FAQPage JSON-LD — layout-level, single-sourced from the `faq` front matter
    (same array the visible page-faq.njk block renders in the body). Emitted here
@@ -919,6 +922,19 @@ h1, h2, h3 {
 </script>
 {%- endif %}
 
+{# Chart.js (2026-10-29 speed pass) — one self-hosted copy for every chart page,
+   loaded here, at the end of <body> and just before page_scripts, instead of
+   in each page's <head>. In the head it was a render-blocking third-party
+   download (jsdelivr, or cdnjs on one page; 4.4.0 deferred on another): the
+   page drew nothing until ~70 KB of library arrived. Here the page renders
+   first, and page_scripts still find window.Chart defined, synchronously,
+   exactly as before. Opt in with `chartjs: true` in front matter. The file is
+   the npm chart.js@4.4.1 dist/chart.umd.js, byte-identical to what jsdelivr
+   served; versioned filename, so _headers caches /vendor/* immutable. Do NOT
+   add a Chart.js <script> to a head fragment; the build lint fails on one. #}
+{%- if chartjs %}
+<script src="/vendor/chart.js-4.4.1.umd.min.js"></script>
+{%- endif %}
 {%- if page_scripts %}
     <script>
 {{ page_scripts | safe }}

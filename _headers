@@ -16,3 +16,14 @@
   Content-Type: application/json; charset=utf-8
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=300
+
+# Self-hosted web fonts (2026-10-29). Each filename carries the upstream font
+# version, so a file at a given URL never changes: cache it for a year. A new
+# font version gets a new filename (see src/_includes/components/web-fonts.njk).
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# Self-hosted libraries (2026-10-29): versioned filenames, so immutable.
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
