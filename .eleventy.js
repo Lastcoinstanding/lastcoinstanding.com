@@ -8,6 +8,7 @@ module.exports = function (eleventyConfig) {
   // Each entry maps source-path -> destination-path-within-output.
   const staticAssets = [
     'hero-bg.jpg',
+    'hero-bg.webp',
     'profile.jpg',
     'interview-robin-seyr.jpg',
     // Static chart images (scripts/build-chart-images.py, 2026-10-20): crawlable

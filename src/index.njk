@@ -1,6 +1,7 @@
 ---
 layout: base.njk
-lcp_image: /hero-bg.jpg
+lcp_image: /hero-bg.webp
+lcp_image_type: image/webp
 permalink: /index.html
 slug: index
 feedback: false
@@ -21,7 +22,12 @@ eleventyComputed:
 <!-- HERO WITH BACKGROUND IMAGE -->
 <section class="hero">
     <div class="hero-bg">
-        <img src="hero-bg.jpg" alt="" loading="eager" fetchpriority="high">
+        {# WebP (42 KB, quality 90) with the JPEG (167 KB) as fallback; 2026-10-29.
+           The base.njk preload (lcp_image) names the WebP, so keep the two in step. #}
+        <picture>
+            <source srcset="/hero-bg.webp" type="image/webp">
+            <img src="hero-bg.jpg" alt="" loading="eager" fetchpriority="high">
+        </picture>
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content">

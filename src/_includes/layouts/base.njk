@@ -47,11 +47,12 @@
 {# Self-hosted web fonts (2026-10-29): preloads plus @font-face rules. After the
    chart-fonts listener, before head_extras. See components/web-fonts.njk. #}
 {# A page whose LCP element is an image names it in front matter
-   (`lcp_image: /hero-bg.jpg`); the preload goes ahead of the font preloads so
-   the browser asks for the image first. Homepage only, 2026-10-29: with the
-   fonts preloaded, its hero image was requested ~0.5 s later in Lighthouse. #}
+   (`lcp_image`, plus `lcp_image_type` when it is a <picture> source such as
+   WebP, so a browser that cannot use the type skips the preload); the preload
+   goes ahead of the font preloads so the browser asks for the image first.
+   Homepage only, 2026-10-29. #}
 {%- if lcp_image %}
-<link rel="preload" href="{{ lcp_image }}" as="image" fetchpriority="high">
+<link rel="preload" href="{{ lcp_image }}" as="image"{% if lcp_image_type %} type="{{ lcp_image_type }}"{% endif %} fetchpriority="high">
 {%- endif %}
 {% include 'components/web-fonts.njk' %}
 {{ head_extras | safe }}
