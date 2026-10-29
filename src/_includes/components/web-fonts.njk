@@ -16,15 +16,22 @@
    /fonts/licenses (SIL OFL 1.1). Filenames carry the upstream version, so
    _headers can mark /fonts/* immutable; a new version is a new filename.
 
-   Preloaded: Inter regular (body text on every page) and Cormorant Garamond
-   regular (page titles), latin subset only. Preload nothing else: every
-   preload competes with the HTML's own critical resources.
+   Preloaded, latin subset only: Inter regular (body text) and italic (the
+   nav tagline, on every page), Cormorant Garamond regular and italic (page
+   titles and their italic word). All four are above the fold on nearly
+   every page, so preloading adds no bytes, it only fetches them before
+   first paint. Without the italics, their late swap reflowed the hero
+   (How Much Bitcoin? layout shift 0.14, measured 2026-10-29; 0.001 with
+   them). Preload nothing else: every preload competes with the page's own
+   critical resources.
 
    Do NOT add a fonts.googleapis.com link to a head fragment; the build lint in
    .eleventy.js fails on one. A new family or weight: fetch its woff2 the same
    way, add the rule here, see SITE_GUIDE "Web fonts". #}
 <link rel="preload" href="/fonts/inter-v20-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cormorant-garamond-v21-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cormorant-garamond-v21-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/inter-v20-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style id="web-fonts">
 @font-face{font-family:'Inter';font-style:italic;font-weight:400 500;font-display:swap;src:url(/fonts/inter-v20-italic-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Inter';font-style:italic;font-weight:400 500;font-display:swap;src:url(/fonts/inter-v20-italic-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
