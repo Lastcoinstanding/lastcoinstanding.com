@@ -1006,6 +1006,8 @@ if (typeof ResizeObserver !== 'undefined') {
 
 The guard prevents the hidden-canvas corruption. The `ResizeObserver` catches the canvas going from 0×0 to real dimensions (when the user activates the tab) and runs the deferred fix exactly once. ResizeObserver is well-supported in evergreen browsers (Chrome 64+, Safari 13.4+, Firefox 69+); when absent, the deferred path silently doesn't fire and the worst case is a slightly stale chart on first tab-view, which is the original bug — i.e. the fallback is no worse than not having the pattern.
 
+**Or build the chart when its tab opens (2026-10-31).** A chart wrapped in `lcsWhenNear(canvas, build)` (`shared/chart-startup.js`) is not built until its canvas is near the viewport, which for a closed tab means after it opens, so it is never laid out at 0×0 and this pattern is not needed for it. Its updates must then cope with the chart not existing yet (`if (chart)`, build from current state). See SITE_GUIDE "Speed: fonts, Chart.js, minified inline code".
+
 **Where this lives in practice.** Disciplined Rebalancing's channel viz uses this pattern (see the `pendingLayoutFix` / `ResizeObserver` block in `disciplined-rebalancing.js`). New chart-bearing pages that use the `.tab-content` system should adopt it whenever sticky-values or any other init-time event can change the chart's data domain. Pages whose chart is the only thing on the page (no tabs, always visible) don't need it — the canvas always has dimensions when init runs.
 
 ### 6.15 OG card generation pattern

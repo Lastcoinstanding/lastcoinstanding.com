@@ -19,7 +19,7 @@
     ceilLine.push({x: d, y: tv * PL_CEIL});
   }
 
-  new Chart(ctx, {
+  lcsWhenNear(ctx, function(){ new Chart(ctx, {
     type: 'scatter',
     data: {
       datasets: [
@@ -170,7 +170,7 @@
         axis: 'x'
       }
     }
-  });
+  }); });
 })();
 
 // ═══════ TABS ═══════
@@ -230,7 +230,7 @@
     sp500Line.push(10);
   }
 
-  new Chart(ctx, {
+  lcsWhenNear(ctx, function(){ new Chart(ctx, {
     type: 'bar',
     data: {
       labels: years,
@@ -293,7 +293,7 @@
         }
       }
     }
-  });
+  }); });
 })();
 
 // ═══════ OUT-OF-SAMPLE CHART (v2: reader-driven fit window) ═══════
@@ -380,7 +380,8 @@
     }).join('');
   }
 
-  var chart = new Chart(ctx, {
+  var chart = null;
+  lcsWhenNear(ctx, function(){ chart = new Chart(ctx, {
     type: 'scatter',
     data: {
       datasets: [
@@ -479,7 +480,7 @@
         }
       }
     }
-  });
+  }); });
 
   // ── readout: fitted (a,b), implied trend today, Δ vs the full-data self-fit,
   //    plus a live drive-home sentence and a channel-position line. ──
@@ -546,10 +547,12 @@
     if(i<MIN_I) ym = MIN_YM; else if(i>MAX_I) ym = MAX_YM;
     curYm = ym;
     f = fit(ymToCutoffDays(curYm));
-    chart.data.datasets[0].data = trainScatter();
-    chart.data.datasets[1].data = testScatter();
-    chart.data.datasets[2].data = buildLine();
-    chart.update('none');
+    if(chart){ // built lazily (lcsWhenNear); when it is, it reads curYm
+      chart.data.datasets[0].data = trainScatter();
+      chart.data.datasets[1].data = testScatter();
+      chart.data.datasets[2].data = buildLine();
+      chart.update('none');
+    }
     updateReadout();
     writeFitToUrl(curYm);
     highlightPreset();
@@ -682,13 +685,16 @@
   var xs = [];
   for(var d=dayOf(2011); d<=dayOf(2060); d+=90) xs.push(d);
   function lineFor(p){ return xs.map(function(d){ return {x:d, y:price(p,d)}; }); }
+  function labelOf(p){ return p.name.replace(/&mdash;/g,'–').replace(/&[a-z]+;/g,''); }
+  var cur = PAIRS[3]; // the selection; the chart is built lazily from it (lcsWhenNear)
 
-  var chart = new Chart(ctx, {
+  var chart = null;
+  lcsWhenNear(ctx, function(){ chart = new Chart(ctx, {
     type:'scatter',
     data:{ datasets:[
       { label:'Reference (5.77)', data:lineFor(CANON), type:'line',
         borderColor:'rgba(224,148,34,0.9)', borderWidth:2.5, pointRadius:0, fill:false, order:2 },
-      { label:'selected', data:lineFor(PAIRS[3]), type:'line',
+      { label:labelOf(cur), data:lineFor(cur), type:'line',
         borderColor:'rgba(76,175,80,0.9)', borderWidth:2.5, borderDash:[6,3], pointRadius:0, fill:false, order:1 }
     ]},
     options:{
@@ -721,7 +727,7 @@
         }
       }
     }
-  });
+  }); });
 
   // ── implied-price table + chip selection ──
   var impBody = document.getElementById('expImpliedBody');
@@ -739,9 +745,12 @@
     impBody.innerHTML = row(CANON,false) + row(p,true);
   }
   function select(p){
-    chart.data.datasets[1].label = p.name.replace(/&mdash;/g,'–').replace(/&[a-z]+;/g,'');
-    chart.data.datasets[1].data = lineFor(p);
-    chart.update('none');
+    cur = p;
+    if(chart){
+      chart.data.datasets[1].label = labelOf(p);
+      chart.data.datasets[1].data = lineFor(p);
+      chart.update('none');
+    }
     renderImplied(p);
     var chips = document.querySelectorAll('.exp-chip');
     for(var i=0;i<chips.length;i++) chips[i].classList.toggle('active', chips[i].getAttribute('data-key')===p.key);
@@ -788,7 +797,7 @@
     trendLine.push({x:m, y:3.5*Math.pow(m,0.75)});
   }
 
-  new Chart(ctx, {
+  lcsWhenNear(ctx, function(){ new Chart(ctx, {
     type:'scatter',
     data:{
       datasets:[
@@ -819,7 +828,7 @@
         }
       }
     }
-  });
+  }); });
 })();
 
 // ═══════ CITY SCALING CHART ═══════
@@ -850,7 +859,7 @@
     trendLine.push({x:p,y:90*Math.pow(p,1.15)});
   }
 
-  new Chart(ctx, {
+  lcsWhenNear(ctx, function(){ new Chart(ctx, {
     type:'scatter',
     data:{
       datasets:[
@@ -881,7 +890,7 @@
         }
       }
     }
-  });
+  }); });
 })();
 
 
@@ -1445,7 +1454,7 @@
             'Next 4 years inside its channel: ' + (r.in4y===null ? 'not yet known' : r.in4y + '%')];
   }
   var Y_MAX = 16;
-  new Chart(cTop, {
+  lcsWhenNear(cTop, function(){ new Chart(cTop, {
     type:'line',
     data:{ datasets:[
       { label:'Stable range (0.68×–1.24×)', data:[{x:2016,y:BAND_HI},{x:2025.25,y:BAND_HI}], borderWidth:0, pointRadius:0, fill:'+1', backgroundColor:'rgba(111,191,115,0.10)' },
@@ -1463,12 +1472,12 @@
       plugins:{ legend:{display:false}, tooltip: Object.assign({}, tip, { filter:function(it){ return it.datasetIndex===3; },
         callbacks:{ title:function(it){ return 'Fit made at the end of ' + it[0].raw.r.label; }, label:function(it){ return tipLines(it.raw.r); } } }) } },
     plugins:[divider]
-  });
+  }); });
   var inRows = rows.filter(function(r){ return r.in4y !== null; });
   // Bars on a linear time axis need an explicit width: about half a quarter's
   // spacing, so they never touch at any width (updated on resize).
   function barW(w){ return Math.max(1.5, Math.min(7, (w || cBot.parentNode.clientWidth) / ((2025.25 - 2012) * 4) * 0.55)); }
-  new Chart(cBot, {
+  lcsWhenNear(cBot, function(){ new Chart(cBot, {
     type:'bar',
     data:{ datasets:[
       { label:'80% threshold', type:'line', data:[{x:2012,y:IN_MIN},{x:2025.25,y:IN_MIN}], borderColor:'rgba(255,255,255,0.3)', borderDash:[4,4], borderWidth:1, pointRadius:0, fill:false },
@@ -1481,7 +1490,7 @@
       plugins:{ legend:{display:false}, tooltip: Object.assign({}, tip, { filter:function(it){ return it.datasetIndex===1; },
         callbacks:{ title:function(it){ return 'Fit made at the end of ' + it[0].raw.r.label; }, label:function(it){ return tipLines(it.raw.r); } } }) } },
     plugins:[divider]
-  });
+  }); });
 
   // ── table view (year-end fits) ──
   var tb = document.querySelector('#roosTable tbody');
