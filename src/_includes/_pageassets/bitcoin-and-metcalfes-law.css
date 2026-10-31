@@ -42,6 +42,8 @@ section.block{padding:54px 0; border-top:1px solid var(--line)}
 .section-num .novel-inline{color:var(--teal); margin-left:8px}
 h2{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(1.7rem,3.4vw,2.4rem); line-height:1.12; color:var(--ink-bright); margin-bottom:8px}
 h2 em{font-style:italic; color:var(--amber)}
+/* The footer heading became an h2 (2026-10-31); keep this page's h2 line-height off it. */
+.site-footer .footer-cta h2{line-height:inherit}
 .dek{font-size:1.02rem; color:var(--ink-dim); margin-bottom:24px; font-style:italic}
 .essay p{margin-bottom:20px; color:var(--ink)}
 .essay p strong{color:var(--ink-bright); font-weight:600}

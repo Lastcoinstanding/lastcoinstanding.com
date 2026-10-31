@@ -474,7 +474,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         // ── BITCOIN CARD (left) ──
         const btcHtml =
           '<div class="calc-card bitcoin">' +
-            '<h4>&#8383; Rented, invested in bitcoin</h4>' +
+            '<h3>&#8383; Rented, invested in bitcoin</h3>' +
             '<div class="period-label">' + startLabel + ' · Bought</div>' +
             '<div class="invested-line">Invested <strong>' + rFmt(R.upfront) + '</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(the buyer’s up-front cash)</span></div>' +
             '<div class="detail-line">' + R.btcUpfront.toFixed(4) + ' BTC at ' + rFmt(R.entryPrice) + ' <span style="' + mutedS + '">(' + sy + '’s average price), after ' + rPct(D.btcTxPct) + ' costs</span></div>' +
@@ -501,7 +501,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             : ('Each month: ' + rFmt(f1.owner) + ' in ' + startLabel + ' <span style="' + mutedS + '">(mortgage ' + rFmt(f1.pi) + ' + property tax ' + rFmt(f1.tax) + ' + insurance ' + rFmt(f1.ins) + ' + maintenance ' + rFmt(f1.maint) + '); the mortgage payment is fixed, the rest follows the home’s value, reset each July</span>');
         const houseHtml =
           '<div class="calc-card house">' +
-            '<h4>&#127968; Bought the house</h4>' +
+            '<h3>&#127968; Bought the house</h3>' +
             '<div class="period-label">' + startLabel + ' · Bought</div>' +
             '<div class="invested-line">Invested <strong>' + rFmt(R.upfront) + '</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(' + (cash ? 'the full price' : _dpLabel + '% down') + ' of ' + rFmt(hs) + ' + ' + rFmt(R.closing) + ' closing costs)</span></div>' +
             (cash ? '' : '<div class="detail-line">Mortgage: ' + rFmt(R.loan) + ' at ' + rPct(rate) + ', 30-year fixed</div>') +
@@ -884,7 +884,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     // ── BITCOIN CARD (left) ──
     var btcHtml =
       '<div class="calc-card bitcoin">' +
-        '<h4>&#8383; Rented, invested in bitcoin</h4>' +
+        '<h3>&#8383; Rented, invested in bitcoin</h3>' +
         '<div class="period-label">'+startYear+' · Today</div>' +
         '<div class="invested-line">Invested <strong>'+fmt(P.upfront)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">(the buyer’s up-front cash)</span></div>' +
         '<div class="detail-line">'+P.btcUpfront.toFixed(4)+' BTC at '+fmt(btcNow)+' <span style="'+mutedS+'">after '+pctTxt(btcTxPct)+' costs</span></div>' +
@@ -910,7 +910,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
       : ('Each month: '+fmt(f1.owner)+' in year 1 <span style="'+mutedS+'">(mortgage '+fmt(f1.pi)+' + property tax '+fmt(f1.tax)+' + insurance '+fmt(f1.ins)+' + maintenance '+fmt(f1.maint)+'); the mortgage payment is fixed, the rest rises with the home’s value</span>');
     var houseHtml =
       '<div class="calc-card house">' +
-        '<h4>&#127968; Bought the house</h4>' +
+        '<h3>&#127968; Bought the house</h3>' +
         '<div class="period-label">'+startYear+' · Today</div>' +
         '<div class="invested-line">Invested <strong>'+fmt(P.upfront)+'</strong> <span style="text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--text-muted)">('+(cash ? 'the full price' : _fdpLabel+'% down')+' of '+fmt(homePrice)+' + '+fmt(P.closing)+' closing costs)</span></div>' +
         '<div class="detail-line">'+ownerMonthly+'</div>' +
@@ -1113,7 +1113,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         labels.forEach(function(l){
             var isActive = l.dataset.mode === mode;
             l.classList.toggle('active', isActive);
-            l.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            l.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
         contents.forEach(function(c){
             c.classList.toggle('active', c.id === 'calc-mode-' + mode);
