@@ -529,8 +529,10 @@ footer a:hover { text-decoration: underline; }
     position: absolute;
     inset: -3px;
 }
-.insight-arrow.prev { left: -16px; }
-.insight-arrow.next { right: -16px; }
+/* Inside the slide edge (2026-10-31, JM): at -16px the slides' overflow:hidden
+   clipped the outer half of each arrow, so only ~24 of 40px showed or took clicks. */
+.insight-arrow.prev { left: 8px; }
+.insight-arrow.next { right: 8px; }
 @media (max-width: 768px) {
     .insight-arrow { width: 34px; height: 34px; font-size: 0.9rem; top: 22%; }
     .insight-arrow::before { inset: -6px; }

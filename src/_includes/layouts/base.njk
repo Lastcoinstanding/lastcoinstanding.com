@@ -447,7 +447,8 @@ h1, h2, h3 {
 /* ─── Canonical footer ─── */
 .site-footer { background: #0a0908; padding: 4rem 2rem 3rem; text-align: center; border-top: 1px solid rgba(224,148,34,0.08); margin-top: 4rem; }
 .site-footer .footer-cta { max-width: 540px; margin: 0 auto; }
-.site-footer .footer-cta h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: #ece4d6; margin: 0 0 0.9rem; }
+/* h2, not h3 (2026-10-31): the footer is a page-level section, and an h3 there skipped a level on pages whose last heading is the h1 (Lighthouse heading-order on Work With Me). Bitcoin and Metcalfe's Law pins its line-height in its own CSS: its page-wide h2 rule would otherwise reach it. */
+.site-footer .footer-cta h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: #ece4d6; margin: 0 0 0.9rem; }
 .site-footer .footer-cta p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.48); line-height: 1.6; margin: 0 0 2.4rem; }
 .site-footer .footer-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem 2rem; max-width: 960px; margin: 0 auto 2.6rem; text-align: left; }
 .site-footer .footer-nav-section { display: flex; flex-direction: column; gap: 0.55rem; }
@@ -859,7 +860,7 @@ h1, h2, h3 {
 
 <footer class="site-footer">
     <div class="footer-cta">
-        <h3>Continue Exploring</h3>
+        <h2>Continue Exploring</h2>
         <p>Each interactive visualization on Last Coin Standing examines a different dimension of Bitcoin through contrast, tradeoffs, and philosophical clarity.</p>
     </div>
     <nav class="footer-nav">
