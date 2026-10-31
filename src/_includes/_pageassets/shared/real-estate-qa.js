@@ -328,6 +328,8 @@
     });
   }
   function captureBvreStatic(){
+    // Charts in closed tabs are built lazily (lcsWhenNear, 2026-10-31); build them before reading.
+    if (window.lcsWhenNear && lcsWhenNear.flush) lcsWhenNear.flush();
     return { houses: html('housesVisual'), returnTable: html('returnTable'), returnEnd: html('returnTableEndPrices'),
              charts: ['eraBarChart', 'divergenceChart', 'globalAffordabilityChart', 'btcHouseChart',
                       'seesawChart', 'burdenChart', 'totalCostChart'].map(chartData) };

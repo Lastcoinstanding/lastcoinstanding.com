@@ -949,6 +949,14 @@ h1, h2, h3 {
    add a Chart.js <script> to a head fragment; the build lint fails on one. #}
 {%- if chartjs %}
 <script src="/vendor/chart.js-4.4.1.umd.min.js"></script>
+{# lcsWhenNear (build a chart when it nears the viewport) and, with
+   `chart_entrance: false`, no entrance animation. See shared/chart-startup.js. #}
+<script>
+{% include '_pageassets/shared/chart-startup.js' %}
+{%- if chart_entrance === false %}
+lcsChartStartup.noEntrance();
+{%- endif %}
+</script>
 {%- endif %}
 {%- if page_scripts %}
     <script>
