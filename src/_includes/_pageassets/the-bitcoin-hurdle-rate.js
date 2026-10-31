@@ -677,7 +677,7 @@
       labels.forEach(function(l){
         var on = l.dataset.mode === mode;
         l.classList.toggle('active', on);
-        l.setAttribute('aria-selected', on ? 'true' : 'false');
+        l.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       contents.forEach(function(c){ c.classList.toggle('active', c.id === 'calc-mode-' + mode); });
       if (presets) presets.setAttribute('data-lens', mode);
@@ -806,7 +806,7 @@
       toggle.querySelectorAll('.calc-mode-label').forEach(function(lb){
         var on = lb.dataset.mode === S.lens;
         lb.classList.toggle('active', on);
-        lb.setAttribute('aria-selected', on ? 'true' : 'false');
+        lb.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
     }
     document.querySelectorAll('.hr-lens-panel').forEach(function(c){ c.classList.toggle('active', c.id === 'calc-mode-' + S.lens); });

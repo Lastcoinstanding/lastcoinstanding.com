@@ -171,15 +171,15 @@ eleventyComputed:
               same comparison, opposite directions in time. Inspired by
               the Money Trees toggle pattern (yin-yang duality).
             -->
-            <div class="calc-mode-toggle" data-active-mode="retrospective" role="tablist" aria-label="Calculator mode">
-                <button type="button" class="calc-mode-label retrospective active" data-mode="retrospective" role="tab" aria-selected="true" aria-controls="calc-mode-retrospective">
+            <div class="calc-mode-toggle" data-active-mode="retrospective" role="group" aria-label="Calculator mode">
+                <button type="button" class="calc-mode-label retrospective active" data-mode="retrospective" aria-pressed="true" aria-controls="calc-mode-retrospective">
                     <span class="calc-mode-name">Retrospective</span>
                     <span class="calc-mode-sub">What if you'd bought bitcoin?</span>
                 </button>
                 <button type="button" class="calc-mode-switch" aria-label="Toggle calculator mode">
                     <span class="calc-mode-thumb"></span>
                 </button>
-                <button type="button" class="calc-mode-label projection" data-mode="projection" role="tab" aria-selected="false" aria-controls="calc-mode-projection">
+                <button type="button" class="calc-mode-label projection" data-mode="projection" aria-pressed="false" aria-controls="calc-mode-projection">
                     <span class="calc-mode-name">Projection</span>
                     <span class="calc-mode-sub">What might happen going forward?</span>
                 </button>
@@ -212,7 +212,7 @@ eleventyComputed:
             </details>
 
             <!-- RETROSPECTIVE MODE (default) -->
-            <div class="calc-mode-content active" id="calc-mode-retrospective" role="tabpanel" aria-labelledby="retrospective-tab">
+            <div class="calc-mode-content active" id="calc-mode-retrospective" role="region" aria-label="Retrospective calculator">
 
             <div class="section-intro"><h2>What If You <em>Postponed</em> the House Purchase?</h2><p>The conventional wisdom says: buy a house as soon as you can. Lock in a mortgage. Build equity. But what if you took the money you would have used as a down payment and bought bitcoin instead? Pick a start year to see whether, by today, the bitcoin path would have bought the house outright, with no mortgage. This is not investment advice, and past bitcoin returns are not a forecast.</p></div>
 
@@ -265,7 +265,7 @@ eleventyComputed:
             </div><!-- /calc-mode-retrospective -->
 
             <!-- PROJECTION MODE (migrated from /the-power-law.html#calculator) -->
-            <div class="calc-mode-content" id="calc-mode-projection" role="tabpanel" aria-labelledby="projection-tab">
+            <div class="calc-mode-content" id="calc-mode-projection" role="region" aria-label="Projection calculator">
 
                 <div class="section-intro"><h2>What Might Happen <em>Going Forward?</em></h2><p>The retrospective calculator above shows what <em>did</em> happen when you chose bitcoin over a house. This calculator asks the same question forward: what does the Power Law model suggest happens from here? Enter your own assumptions and compare. The projection is built on the Power Law growth model; market behavior may diverge.</p></div>
 

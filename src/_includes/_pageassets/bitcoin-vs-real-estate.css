@@ -258,9 +258,9 @@
 .calc-card { border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; background: rgba(255,255,255,0.01); }
 .calc-card.bitcoin { background: linear-gradient(135deg, var(--amber-glow), transparent); border-color: var(--amber-dim); }
 .calc-card.house { background: linear-gradient(135deg, rgba(192,57,43,0.08), transparent); border-color: var(--red-dim); }
-.calc-card h4 { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.8rem; }
-.calc-card.bitcoin h4 { color: var(--amber); }
-.calc-card.house h4 { color: var(--red); }
+.calc-card h3 { font-family: 'Inter', -apple-system, sans-serif; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.8rem; }
+.calc-card.bitcoin h3 { color: var(--amber); }
+.calc-card.house h3 { color: var(--red); }
 .calc-card .invested-line { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.3rem; }
 .calc-card .invested-line strong { color: var(--text-dim); font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 0.92rem; }
 .calc-card .period-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.8px; color: var(--text-muted); font-weight: 500; margin-bottom: 0.5rem; opacity: 0.85; }
