@@ -1198,9 +1198,9 @@ function bindPrintPopulation() {
 **Core principle:** Two equal-weight labels flank a sliding switch in the middle. The switch physically moves left↔right (or top↔bottom on mobile) when toggled, communicating "these are paired by design, not just two unrelated options."
 
 ```html
-<div class="calc-mode-toggle" data-active-mode="retrospective" role="tablist" aria-label="Calculator mode">
+<div class="calc-mode-toggle" data-active-mode="retrospective" role="group" aria-label="Calculator mode">
   <button type="button" class="calc-mode-label retrospective active"
-          data-mode="retrospective" role="tab" aria-selected="true"
+          data-mode="retrospective" aria-pressed="true"
           aria-controls="calc-mode-retrospective">
     <span class="calc-mode-name">Retrospective</span>
     <span class="calc-mode-sub">What if you'd bought bitcoin?</span>
@@ -1209,16 +1209,18 @@ function bindPrintPopulation() {
     <span class="calc-mode-thumb"></span>
   </button>
   <button type="button" class="calc-mode-label projection"
-          data-mode="projection" role="tab" aria-selected="false"
+          data-mode="projection" aria-pressed="false"
           aria-controls="calc-mode-projection">
     <span class="calc-mode-name">Projection</span>
     <span class="calc-mode-sub">What might happen going forward?</span>
   </button>
 </div>
 
-<div class="calc-mode-content active" id="calc-mode-retrospective" role="tabpanel">[content for mode 1]</div>
-<div class="calc-mode-content" id="calc-mode-projection" role="tabpanel">[content for mode 2]</div>
+<div class="calc-mode-content active" id="calc-mode-retrospective" role="region" aria-label="Retrospective calculator">[content for mode 1]</div>
+<div class="calc-mode-content" id="calc-mode-projection" role="region" aria-label="Projection calculator">[content for mode 2]</div>
 ```
+
+**ARIA (corrected 2026-10-31).** A `role="group"` of `aria-pressed` buttons, not a tablist: the switch button in the middle is not a tab, so a tablist holding it fails `aria-required-children` (Lighthouse, on BvRE and the Hurdle Rate, both fixed). Panels are labelled regions. Keep `aria-pressed` in step in `setMode`.
 
 **Visual design.** Two labels at 0.5 opacity when inactive, full when active. Active label color signals the mode (gray/cool for retrospective, amber for projection in BvRE). Label structure: Cormorant Garamond title (1.5rem) + Inter subtitle (0.78rem, italic, muted). Switch: 64×32px pill (mobile: 32×64px). Track shifts color when active mode is on the right side. Thumb (24×24px circle) slides with `transition: left 0.3s cubic-bezier(.4,.0,.2,1)`. Active state driven by `data-active-mode` attribute on `.calc-mode-toggle` parent; CSS uses attribute selector to swap thumb position and track color. Both labels and the central switch are clickable.
 
@@ -1237,7 +1239,7 @@ function bindPrintPopulation() {
     labels.forEach(function(l){
       var isActive = l.dataset.mode === mode;
       l.classList.toggle('active', isActive);
-      l.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      l.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
     contents.forEach(function(c){
       c.classList.toggle('active', c.id === 'calc-mode-' + mode);
