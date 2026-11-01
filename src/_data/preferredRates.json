@@ -1,12 +1,12 @@
 {
-  "asOf": "2026-10-19",
-  "asOfLabel": "October 19, 2026",
+  "asOf": "2026-10-29",
+  "asOfLabel": "October 29, 2026",
   "note": "The one place the site keeps the bitcoin-backed preferreds' dividend rates. Read by Bitcoin and Fixed Income (prose, tax example, calculator), Bitcoin vs. Rental Property (YIELD_RATES) and The STRC Mechanism (STRC_DATA). MONTHLY_REFRESH_CHECKLIST §0.7 and §7.1; DATA_AUDIT BvRP-5, BvRP-14.",
   "strc": {
     "ratePct": 12.0,
     "since": "July 2026",
-    "schedule": "semi-monthly since July 2026",
-    "source": "Strategy 8-K filed 2026-10-16 (event 2026-10-15): 12.00% held for November 2026 record dates, declared as daily dividends ($1.00 a share in all) contingent on the October 28 vote, else the semi-monthly November 15 dividend; management will recommend 12.00% until STRC trades sustainably near $100"
+    "schedule": "daily since November 1, 2026 (semi-monthly July to October 2026)",
+    "source": "Strategy 8-K filed 2026-10-16 (event 2026-10-15): 12.00% held for November 2026 record dates, declared as daily dividends ($1.00 a share in all) contingent on the October 28 vote; 8-Ks filed 2026-10-28 and 2026-10-29: the vote passed and the amended certificate takes effect November 1, 2026, so November is paid daily and the November 15 dividend is not paid; management will recommend 12.00% until STRC trades sustainably near $100"
   },
   "sata": {
     "ratePct": 13.0,
