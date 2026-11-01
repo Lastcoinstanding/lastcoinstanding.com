@@ -101,11 +101,11 @@ function draw(){
   const opts={responsive:true,maintainAspectRatio:false,animation:{duration:350},
     plugins:{legend:{display:false},tooltip:{enabled:false}},
     scales:{
-      x:{type:'logarithmic',title:{display:true,text:xTitle,color:'#6f6b63',font:{size:11}},
-         ticks:{display:true,color:'#6f6b63',font:{size:10},autoSkip:false,maxRotation:0,callback:fmtCount},
+      x:{type:'logarithmic',title:{display:true,text:xTitle,color:'#8d8576',font:{size:11}},
+         ticks:{display:true,color:'#8d8576',font:{size:10},autoSkip:false,maxRotation:0,callback:fmtCount},
          grid:{color:'#2a2e34'}},
-      y:{type:'logarithmic',title:{display:true,text:'Price (USD, log scale)',color:'#6f6b63',font:{size:11}},
-         ticks:{display:true,color:'#6f6b63',font:{size:10},autoSkip:false,callback:fmtPrice},
+      y:{type:'logarithmic',title:{display:true,text:'Price (USD, log scale)',color:'#8d8576',font:{size:11}},
+         ticks:{display:true,color:'#8d8576',font:{size:10},autoSkip:false,callback:fmtPrice},
          grid:{color:'#2a2e34'}}
     }};
   if(chart){chart.data=data;chart.options=opts;chart.update();}else chart=new Chart(document.getElementById('fitChart'),{data,options:opts});

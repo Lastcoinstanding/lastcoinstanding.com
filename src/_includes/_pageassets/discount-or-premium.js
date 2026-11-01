@@ -36,7 +36,7 @@
   var RW = window.ReturnWindow;
 
   // ── Palette (shared conventions) ──
-  var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080';
+  var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#877e6f', MUTED_LINE = '#7a7367', DIM = '#9a9080';
 
   // ── Horizon bounds: 6 months – 5 years, in whole months ──
   var MIN_M = 6, MAX_M = 60, YEAR_D = 365.25;
@@ -718,7 +718,7 @@
         // Array order = draw order (index 0 at the back). Highlight markers, the
         // two paths, and the current-position dot sit on top of the channel lines.
         datasets: [
-          { label: 'Price history', data: s.hist, borderColor: MUTED, borderWidth: 1, pointRadius: 0, tension: 0, fill: false },
+          { label: 'Price history', data: s.hist, borderColor: MUTED_LINE, borderWidth: 1, pointRadius: 0, tension: 0, fill: false },
           { label: '3.0× upper band', data: s.ceil, borderColor: 'rgba(224,148,34,0.28)', borderWidth: 1, borderDash: [3, 4], pointRadius: 0, tension: 0, fill: false },
           { label: '0.42× floor — historical', data: s.floor, borderColor: 'rgba(192,57,43,0.55)', borderWidth: 1.2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false },
           { label: 'Trend', data: s.trend, borderColor: AMBER, borderWidth: 2, pointRadius: 0, tension: 0, fill: false },

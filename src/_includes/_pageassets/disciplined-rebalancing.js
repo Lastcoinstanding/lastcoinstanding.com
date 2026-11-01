@@ -242,7 +242,7 @@
   var amber  = '#e09422';
   var rust   = '#c0392b';
   var gold   = '#e8c820';
-  var muted  = 'rgba(160,160,160,0.55)';
+  var muted  = '#877e6f';
   var priceColor = 'rgba(232,224,210,0.55)';
 
   // X-domain: full historical record + ~5 years of forward projection.

@@ -146,7 +146,7 @@ function drawDecayCurve() {
   });
 
   // Y-axis labels
-  ctx.fillStyle = 'rgba(255,255,255,.2)';
+  ctx.fillStyle = 'rgba(255,255,255,.52)';
   ctx.font = '500 10px Inter, sans-serif';
   ctx.textAlign = 'right';
   [100, 75, 50, 25, 0].forEach(function(v) {
@@ -171,7 +171,7 @@ function drawDecayCurve() {
   ctx.setLineDash([]);
 
   // $50 label
-  ctx.fillStyle = 'rgba(192,57,43,.5)';
+  ctx.fillStyle = '#d06053';
   ctx.font = '600 10px Inter, sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText('$50', pad.l - 8, yP(50) + 4);
@@ -243,7 +243,7 @@ function drawDecayCurve() {
     ctx.fill();
 
     // Label above the dot
-    ctx.fillStyle = '#c0392b';
+    ctx.fillStyle = '#d06053';
     ctx.font = '700 13px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(hl.toFixed(1) + ' years', dotX, dotY - 14);
@@ -251,7 +251,7 @@ function drawDecayCurve() {
   }
 
   // $100 start label
-  ctx.fillStyle = 'rgba(255,255,255,.3)';
+  ctx.fillStyle = 'rgba(255,255,255,.52)';
   ctx.font = '500 10px Inter, sans-serif';
   ctx.fillText('$100', pad.l + 4, yP(100) + 14);
 }

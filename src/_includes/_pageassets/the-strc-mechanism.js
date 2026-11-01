@@ -172,7 +172,7 @@
   var TSY_YIELD = 0.043;
 
   // ── Palette (shared house conventions) ──
-  var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080', PULSE = '#F7931A';
+  var AMBER = '#e09422', BLUE = '#6db3d4', MUTED = '#877e6f', DIM = '#9a9080', PULSE = '#F7931A';
 
   // ── Horizon bounds ──
   var MIN_M = 6, MAX_M = 60, YEAR_D = 365.25;

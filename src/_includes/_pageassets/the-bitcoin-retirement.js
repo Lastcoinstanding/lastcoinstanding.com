@@ -1355,7 +1355,7 @@
             title: { display: false },
             grid: { color: 'rgba(224,148,34,0.05)' },
             ticks: {
-              color: '#7a7367',
+              color: '#877e6f',
               font: { family: 'Inter, sans-serif', size: 11 },
               stepSize: 10,
               callback: function(v){ return Math.round(v); }
@@ -1368,7 +1368,7 @@
             max: yMax,
             grid: { color: 'rgba(224,148,34,0.06)' },
             ticks: {
-              color: '#7a7367',
+              color: '#877e6f',
               font: { family: 'Inter, sans-serif', size: 11 },
               callback: function(v){
                 if (v >= 1e9) return '$' + (v/1e9).toFixed(0) + 'B';
@@ -2454,7 +2454,7 @@
             },
             grid: { color: 'rgba(224,148,34,0.04)' },
             ticks: {
-              color: '#7a7367',
+              color: '#877e6f',
               font: { family: 'Inter, sans-serif', size: 11 },
               stepSize: 5,
               callback: function(v) { return Math.round(v); }
@@ -2472,7 +2472,7 @@
             },
             grid: { color: 'rgba(224,148,34,0.05)' },
             ticks: {
-              color: '#7a7367',
+              color: '#877e6f',
               font: { family: 'Inter, sans-serif', size: 11 },
               callback: function(v) {
                 // Label only powers of ten — log scale gets noisy otherwise

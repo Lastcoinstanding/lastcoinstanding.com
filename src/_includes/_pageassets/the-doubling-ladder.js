@@ -211,10 +211,10 @@ function dlYearTicks(axis){
       interaction:{ mode:'nearest', intersect:true },
       scales:{
         x:{ type:'logarithmic',
-            title:{display:true, text:'Days since Genesis (log) — labelled by year', color:'#706860', font:{size:11}},
+            title:{display:true, text:'Days since Genesis (log) — labelled by year', color:'#877e6f', font:{size:11}},
             grid:{color:'rgba(255,255,255,0.04)'},
             min:400, max:11000,
-            ticks:{ color:'#706860', font:{size:10}, autoSkip:false,
+            ticks:{ color:'#877e6f', font:{size:10}, autoSkip:false,
               callback:function(v){
                 var marks={500:1,730:1,1095:1,1826:1,2922:1,4017:1,5113:1,6209:1,7305:1,8401:1,9131:1,10227:1};
                 return marks[Math.round(v)] ? dlYearLabel(v) : '';
@@ -225,9 +225,9 @@ function dlYearTicks(axis){
             }
         },
         y:{ type:'logarithmic',
-            title:{display:true, text:'Price level — each rung doubles the last (log)', color:'#706860', font:{size:11}},
+            title:{display:true, text:'Price level — each rung doubles the last (log)', color:'#877e6f', font:{size:11}},
             grid:{color:'rgba(255,255,255,0.04)'},
-            ticks:{ color:'#706860', font:{size:10},
+            ticks:{ color:'#877e6f', font:{size:10},
               callback:function(v){
                 var marks=[0.1,1,10,100,1000,10000,100000,1000000];
                 return marks.indexOf(v)>=0 ? dlFmtUSD(v) : '';
@@ -319,15 +319,15 @@ function dlYearTicks(axis){
       interaction:{ mode:'index', intersect:false },
       scales:{
         x:{ type:'linear',
-            title:{display:true, text:'Year', color:'#706860', font:{size:11}},
+            title:{display:true, text:'Year', color:'#877e6f', font:{size:11}},
             grid:{color:'rgba(255,255,255,0.04)'},
-            ticks:{ color:'#706860', font:{size:10}, callback:function(v){ return dlYearLabel(v); } },
+            ticks:{ color:'#877e6f', font:{size:10}, callback:function(v){ return dlYearLabel(v); } },
             afterBuildTicks:dlYearTicks
         },
         y:{ type:'linear', min:-1.8, max:2.7,
-            title:{display:true, text:'Market ÷ trend  (multiple; ln in parentheses)', color:'#706860', font:{size:11}},
+            title:{display:true, text:'Market ÷ trend  (multiple; ln in parentheses)', color:'#877e6f', font:{size:11}},
             grid:{ color:function(c){ return c.tick.value===0 ? 'rgba(236,228,214,0.25)' : 'rgba(255,255,255,0.04)'; } },
-            ticks:{ color:'#706860', font:{size:10},
+            ticks:{ color:'#877e6f', font:{size:10},
               // Multiple of trend primary, raw ln value secondary.
               callback:function(v){ var r=Math.exp(v); return '×'+(r<1?r.toFixed(2):r.toFixed(1))+'  ('+(v>=0?'+':'')+v.toFixed(1)+')'; } }
         }

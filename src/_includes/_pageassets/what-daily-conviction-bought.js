@@ -258,14 +258,14 @@
           min: r.contribPts.length ? r.contribPts[0].x : S.startDay, max: LAST_DAY,
           grid: { color: 'rgba(255,255,255,0.04)' },
           ticks: {
-            color: '#6a6256', font: { size: 10 }, maxTicksLimit: 9,
+            color: '#877e6f', font: { size: 10 }, maxTicksLimit: 9,
             callback: function(v){ return dayToDate(v).getUTCFullYear(); }
           }
         },
         y: {
           type: 'linear', beginAtZero: true,
           grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return usdCompact(v); } }
+          ticks: { color: '#877e6f', font: { size: 10 }, callback: function(v){ return usdCompact(v); } }
         }
       },
       interaction: { mode: 'index', intersect: false },   // hover/tap a date → full readout; touch-friendly

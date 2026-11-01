@@ -28,7 +28,7 @@
 
   // ── Palette ──
   var AMBER = '#e09422', BLUE = '#6db3d4', RUST = '#c0392b';
-  var MUTED = '#6a6256', DIM = '#9a9080', TREND = '#e09422', HISTORY = 'rgba(232,224,210,0.6)';
+  var MUTED = '#877e6f', DIM = '#9a9080', TREND = '#e09422', HISTORY = 'rgba(232,224,210,0.6)';
 
   // ── Channel-position math (log-space, floor→ceiling) ──
   var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;

@@ -72,10 +72,10 @@
       scales: {
         x: {
           type: 'logarithmic',
-          title: {display: true, text: 'Year (log scale — days since Genesis Block, Jan 3 2009)', color: '#706860', font: {size: 11}},
+          title: {display: true, text: 'Year (log scale — days since Genesis Block, Jan 3 2009)', color: '#877e6f', font: {size: 11}},
           grid: {color: 'rgba(255,255,255,0.04)'},
           ticks: {
-            color: '#706860',
+            color: '#877e6f',
             font: {size: 10},
             callback: function(v){
               var yr = 2009 + v/365.25;
@@ -96,10 +96,10 @@
         },
         y: {
           type: 'logarithmic',
-          title: {display: true, text: 'Price USD (log scale)', color: '#706860', font: {size: 11}},
+          title: {display: true, text: 'Price USD (log scale)', color: '#877e6f', font: {size: 11}},
           grid: {color: 'rgba(255,255,255,0.04)'},
           ticks: {
-            color: '#706860',
+            color: '#877e6f',
             font: {size: 10},
             callback: function(v){
               if([0.01,0.1,1,10,100,1000,10000,100000,1000000].indexOf(v) >= 0){
@@ -261,13 +261,13 @@
       scales: {
         x: {
           grid: {color: 'rgba(255,255,255,0.04)'},
-          ticks: {color: '#706860', font: {size: 10}},
-          title: {display: true, text: 'Year of Bitcoin purchase', color: '#706860', font: {size: 11}}
+          ticks: {color: '#877e6f', font: {size: 10}},
+          title: {display: true, text: 'Year of Bitcoin purchase', color: '#877e6f', font: {size: 11}}
         },
         y: {
           grid: {color: 'rgba(255,255,255,0.04)'},
-          ticks: {color: '#706860', font: {size: 10}, callback: function(v){return v+'%'}},
-          title: {display: true, text: 'Implied CAGR to 2035', color: '#706860', font: {size: 11}},
+          ticks: {color: '#877e6f', font: {size: 10}, callback: function(v){return v+'%'}},
+          title: {display: true, text: 'Implied CAGR to 2035', color: '#877e6f', font: {size: 11}},
           beginAtZero: true
         }
       },
@@ -419,10 +419,10 @@
       scales: {
         x: {
           type: 'logarithmic',
-          title: {display: true, text: 'Year (log scale)', color: '#706860', font: {size: 11}},
+          title: {display: true, text: 'Year (log scale)', color: '#877e6f', font: {size: 11}},
           grid: {color: 'rgba(255,255,255,0.04)'},
           ticks: {
-            color: '#706860', font: {size: 10},
+            color: '#877e6f', font: {size: 10},
             callback: function(v){
               var yr = 2009 + v/365.25;
               var r = Math.round(yr);
@@ -439,10 +439,10 @@
         },
         y: {
           type: 'logarithmic',
-          title: {display: true, text: 'Price USD (log scale)', color: '#706860', font: {size: 11}},
+          title: {display: true, text: 'Price USD (log scale)', color: '#877e6f', font: {size: 11}},
           grid: {color: 'rgba(255,255,255,0.04)'},
           ticks: {
-            color: '#706860', font: {size: 10},
+            color: '#877e6f', font: {size: 10},
             callback: function(v){
               if([0.01,0.1,1,10,100,1000,10000,100000,1000000].indexOf(v)>=0){
                 return '$'+(v>=1000?(v/1000)+'K':v<1?v:v.toLocaleString());
@@ -701,15 +701,15 @@
       responsive:true, maintainAspectRatio:false,
       scales:{
         x:{ type:'logarithmic',
-          title:{display:true,text:'Year (log scale)',color:'#706860',font:{size:11}},
+          title:{display:true,text:'Year (log scale)',color:'#877e6f',font:{size:11}},
           grid:{color:'rgba(255,255,255,0.04)'},
-          ticks:{color:'#706860',font:{size:10},callback:function(v){var y=Math.round(2009+v/365.25);return (y%5===0&&y>=2010&&y<=2060)?y:'';}},
+          ticks:{color:'#877e6f',font:{size:10},callback:function(v){var y=Math.round(2009+v/365.25);return (y%5===0&&y>=2010&&y<=2060)?y:'';}},
           afterBuildTicks:function(axis){var t=[];for(var y=2010;y<=2060;y+=5)t.push({value:(y-2009)*365.25});axis.ticks=t;}
         },
         y:{ type:'logarithmic',
-          title:{display:true,text:'Trend price USD (log scale)',color:'#706860',font:{size:11}},
+          title:{display:true,text:'Trend price USD (log scale)',color:'#877e6f',font:{size:11}},
           grid:{color:'rgba(255,255,255,0.04)'},
-          ticks:{color:'#706860',font:{size:10},callback:function(v){
+          ticks:{color:'#877e6f',font:{size:10},callback:function(v){
             if([1000,10000,100000,1000000,10000000,100000000].indexOf(v)>=0) return '$'+(v>=1e6?(v/1e6)+'M':(v/1e3)+'K');
             return '';
           }}
@@ -808,8 +808,8 @@
     options:{
       responsive:true,maintainAspectRatio:false,
       scales:{
-        x:{type:'logarithmic',title:{display:true,text:'Body Mass (kg, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([0.01,0.1,1,10,100,1000,10000].indexOf(v)>=0)return v>=1?v+'kg':v+'kg';return''}}},
-        y:{type:'logarithmic',title:{display:true,text:'Metabolic Rate (watts, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([0.1,1,10,100,1000,10000].indexOf(v)>=0)return v;return''}}}
+        x:{type:'logarithmic',title:{display:true,text:'Body Mass (kg, log scale)',color:'#877e6f',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#877e6f',font:{size:9},callback:function(v){if([0.01,0.1,1,10,100,1000,10000].indexOf(v)>=0)return v>=1?v+'kg':v+'kg';return''}}},
+        y:{type:'logarithmic',title:{display:true,text:'Metabolic Rate (watts, log scale)',color:'#877e6f',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#877e6f',font:{size:9},callback:function(v){if([0.1,1,10,100,1000,10000].indexOf(v)>=0)return v;return''}}}
       },
       plugins:{
         legend:{display:true,position:'top',labels:{color:'#908880',font:{size:10,family:'Inter'},boxWidth:10,padding:12,usePointStyle:true}},
@@ -870,8 +870,8 @@
     options:{
       responsive:true,maintainAspectRatio:false,
       scales:{
-        x:{type:'logarithmic',title:{display:true,text:'Population (millions, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([0.1,0.5,1,2,5,10,20,50].indexOf(v)>=0)return v+'M';return''}}},
-        y:{type:'logarithmic',title:{display:true,text:'GDP (billions USD, log scale)',color:'#706860',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#706860',font:{size:9},callback:function(v){if([10,50,100,200,500,1000,2000,5000].indexOf(v)>=0)return '$'+v+'B';return''}}}
+        x:{type:'logarithmic',title:{display:true,text:'Population (millions, log scale)',color:'#877e6f',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#877e6f',font:{size:9},callback:function(v){if([0.1,0.5,1,2,5,10,20,50].indexOf(v)>=0)return v+'M';return''}}},
+        y:{type:'logarithmic',title:{display:true,text:'GDP (billions USD, log scale)',color:'#877e6f',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#877e6f',font:{size:9},callback:function(v){if([10,50,100,200,500,1000,2000,5000].indexOf(v)>=0)return '$'+v+'B';return''}}}
       },
       plugins:{
         legend:{display:true,position:'top',labels:{color:'#908880',font:{size:10,family:'Inter'},boxWidth:10,padding:12,usePointStyle:true}},
@@ -1066,7 +1066,7 @@
   var amber = 'rgba(247,147,26,0.9)';
   var rust = '#b04525';
   var gold = '#e8c820';
-  var muted = 'rgba(160,160,160,0.55)';
+  var muted = '#877e6f';
   var historyColor = 'rgba(232,224,210,0.8)';
 
   // Plugin: render a "Today" vertical line across the chart
@@ -1439,7 +1439,7 @@
   var GREY = 'rgba(150,140,130,0.75)', AMBER = 'rgba(224,148,34,0.95)';
   function col(r){ return r.modern ? AMBER : GREY; }
   var xScale = { type:'linear', min:2012, max:2025.25, offset:false, grid:{color:'rgba(255,255,255,0.04)'},
-    ticks:{ color:'#706860', font:{size:10}, stepSize:1, maxRotation:0, autoSkip:false,
+    ticks:{ color:'#877e6f', font:{size:10}, stepSize:1, maxRotation:0, autoSkip:false,
       callback:function(v){ var every = (this.chart && this.chart.width < 560) ? 4 : 2; return (v % every === 0) ? String(v) : ''; } } };
   // 2016 divider + label: era is shown by position and text, not colour alone
   var divider = { id:'roosDivider', afterDatasetsDraw:function(ch){
@@ -1468,7 +1468,7 @@
     options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'nearest', axis:'x', intersect:false},
       scales:{ x: xScale, y:{ type:'logarithmic', min:0.3, max:Y_MAX, grid:{color:'rgba(255,255,255,0.04)'}, afterFit:function(ax){ ax.width = 44; },
         afterBuildTicks:function(ax){ ax.ticks = [0.5,1,2,4,8,16].map(function(v){ return {value:v}; }); },
-        ticks:{ color:'#706860', font:{size:10}, callback:function(v){ return v+'×'; } } } },
+        ticks:{ color:'#877e6f', font:{size:10}, callback:function(v){ return v+'×'; } } } },
       plugins:{ legend:{display:false}, tooltip: Object.assign({}, tip, { filter:function(it){ return it.datasetIndex===3; },
         callbacks:{ title:function(it){ return 'Fit made at the end of ' + it[0].raw.r.label; }, label:function(it){ return tipLines(it.raw.r); } } }) } },
     plugins:[divider]
@@ -1486,7 +1486,7 @@
     ]},
     options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'nearest', axis:'x', intersect:false},
       onResize:function(ch, size){ ch.data.datasets[1].barThickness = barW(size.width); },
-      scales:{ x: xScale, y:{ min:0, max:100, grid:{color:'rgba(255,255,255,0.04)'}, afterFit:function(ax){ ax.width = 44; }, ticks:{ color:'#706860', font:{size:10}, stepSize:25, callback:function(v){ return v+'%'; } } } },
+      scales:{ x: xScale, y:{ min:0, max:100, grid:{color:'rgba(255,255,255,0.04)'}, afterFit:function(ax){ ax.width = 44; }, ticks:{ color:'#877e6f', font:{size:10}, stepSize:25, callback:function(v){ return v+'%'; } } } },
       plugins:{ legend:{display:false}, tooltip: Object.assign({}, tip, { filter:function(it){ return it.datasetIndex===1; },
         callbacks:{ title:function(it){ return 'Fit made at the end of ' + it[0].raw.r.label; }, label:function(it){ return tipLines(it.raw.r); } } }) } },
     plugins:[divider]

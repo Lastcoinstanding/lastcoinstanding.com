@@ -62,7 +62,7 @@
     --dr-floor: #c0392b;
     --dr-upper: #e8c820;
     --dr-history: rgba(232,224,210,0.7);
-    --dr-axis: rgba(160,160,160,0.55);
+    --dr-axis: #877e6f; /* chart axis text; was rgba(160,160,160,0.55), 3:1 (WCAG AA, 2026-11-01) */
     --dr-grid: rgba(255,255,255,0.04);
     --dr-tip-bg: rgba(10,9,8,0.95);
     --dr-tip-border: rgba(224,148,34,0.5);

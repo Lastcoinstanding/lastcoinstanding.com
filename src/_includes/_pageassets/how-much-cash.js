@@ -54,7 +54,7 @@
   var FLOOR_C = '#b04525', TREND_C = '#e09422', UPPER_C = '#e8c820';
   var HIST_C = 'rgba(232,224,210,0.55)', SEL_C = '#6db3d4';
   var GAIN_C = '#6fae6f', LOSS_C = '#c0392b', REBUY_C = '#6fae6f';   // rebuy-target line: green, distinct from the blue sell line
-  var MUTED = '#7a7367', DIM = '#9a9080';
+  var MUTED = '#877e6f', DIM = '#9a9080';
 
   var ZONE_MULT = 0.60;
   var ALARM_AT = 80;              // past this the cash share stops being a buffer

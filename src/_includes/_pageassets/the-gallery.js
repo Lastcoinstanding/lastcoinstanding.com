@@ -361,7 +361,7 @@
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 18, boxHeight: 2, padding: 14, usePointStyle: false }
           },
           tooltip: {
@@ -402,7 +402,7 @@
               ? function(axis){ axis.ticks = buildYearTicks(axis.min, axis.max); }
               : undefined,
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               maxRotation: 0, autoSkip: bounds.xType === 'linear',
               callback: function(v){ return formatXTick(v, bounds.xType); }
@@ -413,7 +413,7 @@
             type: 'logarithmic', min: bounds.yMin, max: bounds.yMax,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               callback: formatYTick
             },
@@ -626,7 +626,7 @@
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 14, padding: 14 }
           },
           tooltip: {
@@ -645,17 +645,17 @@
         scales: {
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             title: { display: true, text: 'Year of Bitcoin purchase',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           },
           y: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                      callback: function(v){ return v + '%'; } },
             title: { display: true, text: 'Implied CAGR to 2035',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             beginAtZero: true, border: { display: false }
           }
         },
@@ -766,7 +766,7 @@ var chartInstance = null;
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
           },
           tooltip: {
@@ -795,7 +795,7 @@ var chartInstance = null;
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: function(c){ return c.index > 12 ? 'rgba(220,200,170,0.25)' : 'rgba(220,200,170,0.45)'; },
+              color: function(c){ return c.index > 12 ? 'rgba(220,200,170,0.62)' : 'rgba(220,200,170,0.62)'; },
               font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0
             },
             border: { display: false }
@@ -804,7 +804,7 @@ var chartInstance = null;
             type: 'logarithmic', min: 0.5, max: 2000,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               callback: function(v){
                 var marks = [0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000];
@@ -812,7 +812,7 @@ var chartInstance = null;
               }
             },
             title: { display: true, text: 'Bitcoin Required',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           }
         },
@@ -911,7 +911,7 @@ var chartInstance = null;
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
           },
           tooltip: {
@@ -935,14 +935,14 @@ var chartInstance = null;
         scales: {
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
             border: { display: false }
           },
           y: {
             type: 'logarithmic', min: 30,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+              color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
               callback: function(v){
                 var marks = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 12000];
                 if (marks.indexOf(v) === -1) return '';
@@ -951,7 +951,7 @@ var chartInstance = null;
               }
             },
             title: { display: true, text: 'Growth of $1 Invested',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           }
         },
@@ -1084,7 +1084,7 @@ var chartInstance = null;
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
           },
           tooltip: {
@@ -1101,16 +1101,16 @@ var chartInstance = null;
         scales: {
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
             border: { display: false }
           },
           y: {
             min: 2, max: 25,
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                      stepSize: 5, callback: function(v){ return v + '\u00d7'; } },
             title: { display: true, text: 'Price-to-Income Ratio',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           }
         },
@@ -1249,12 +1249,12 @@ var chartInstance = null;
             type: 'linear', min: todayYear, max: endYear,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               stepSize: 5, callback: function(v){ return Math.round(v); }
             },
             title: { display: true, text: 'Retirement year',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                      padding: { top: 8 } },
             border: { display: false }
           },
@@ -1262,7 +1262,7 @@ var chartInstance = null;
             type: 'logarithmic', min: 0.04, max: 30,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               callback: function(v){
                 var marks = [0.1, 1, 10];
@@ -1270,7 +1270,7 @@ var chartInstance = null;
               }
             },
             title: { display: true, text: 'BTC needed at trend price',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           }
         }
@@ -1438,7 +1438,7 @@ var chartInstance = null;
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
           },
           tooltip: {
@@ -1462,17 +1462,17 @@ var chartInstance = null;
         scales: {
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' }, maxRotation: 0 },
             title: { display: true, text: 'End year of 4-year window',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           },
           y: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                      callback: function(v){ return v + '%'; } },
             title: { display: true, text: 'Annualized return over the window',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false },
             beginAtZero: true
           }
@@ -1665,7 +1665,7 @@ var chartInstance = null;
     // Y-axis horizon labels (left of grid)
     for (var i = 0; i < nRows; i++) {
       var ly = mt + i * cellH + cellH / 2 + 4;
-      parts.push('<text x="' + (ml - 8) + '" y="' + ly.toFixed(2) + '" font-size="11" font-family="Inter, sans-serif" fill="rgba(220,200,170,0.55)" text-anchor="end">' + hLabels[i] + '</text>');
+      parts.push('<text x="' + (ml - 8) + '" y="' + ly.toFixed(2) + '" font-size="11" font-family="Inter, sans-serif" fill="rgba(220,200,170,0.62)" text-anchor="end">' + hLabels[i] + '</text>');
     }
 
     // X-axis year labels (decadal-ish anchors)
@@ -1675,7 +1675,7 @@ var chartInstance = null;
       var yr = startDates[col].getUTCFullYear();
       if (yr !== lastYr && anchorYears[yr]) {
         var xx = ml + col * cellW + cellW / 2;
-        parts.push('<text x="' + xx.toFixed(2) + '" y="' + (vbH - 6) + '" font-size="11" font-family="Inter, sans-serif" fill="rgba(220,200,170,0.55)" text-anchor="middle">' + yr + '</text>');
+        parts.push('<text x="' + xx.toFixed(2) + '" y="' + (vbH - 6) + '" font-size="11" font-family="Inter, sans-serif" fill="rgba(220,200,170,0.62)" text-anchor="middle">' + yr + '</text>');
         lastYr = yr;
       }
     }
@@ -1782,7 +1782,7 @@ var chartInstance = null;
         ctx.setLineDash([]);
 
         // "Half-life: ~Xy" label near the intersection
-        ctx.fillStyle = 'rgba(192,57,43,0.85)';
+        ctx.fillStyle = '#d06053';
         ctx.font = '600 11px Inter, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('Half-life: ' + halfLifeYr.toFixed(1) + ' years', hlX + 6, fifty - 6);
@@ -1833,26 +1833,26 @@ var chartInstance = null;
             type: 'linear', min: 0, max: MAX_YEARS,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               stepSize: 5,
               callback: function(v){ return v + 'y'; }
             },
             title: { display: true, text: 'Years from today',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           },
           y: {
             min: 0, max: 100,
             grid: { color: 'rgba(220,200,170,0.04)' },
             ticks: {
-              color: 'rgba(220,200,170,0.45)',
+              color: 'rgba(220,200,170,0.62)',
               font: { size: 11, family: 'Inter, sans-serif' },
               stepSize: 25,
               callback: function(v){ return '$' + v; }
             },
             title: { display: true, text: 'Purchasing power of $100',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           }
         },
@@ -2032,7 +2032,7 @@ var chartInstance = null;
         plugins: {
           legend: {
             display: true, position: 'top',
-            labels: { color: 'rgba(220,200,170,0.55)', font: { size: 11, family: 'Inter, sans-serif' },
+            labels: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                       boxWidth: 14, padding: 14, usePointStyle: true, pointStyle: 'circle' }
           },
           tooltip: {
@@ -2055,19 +2055,19 @@ var chartInstance = null;
         scales: {
           x: {
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             title: { display: true, text: 'Holding horizon',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           },
           y: {
             min: -60, max: 250,           // cap so the 1y/2y BTC bars clip
             grid: { color: 'rgba(220,200,170,0.04)' },
-            ticks: { color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' },
+            ticks: { color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' },
                      stepSize: 50,
                      callback: function(v){ return v + '%'; } },
             title: { display: true, text: 'Annualized rolling return',
-                     color: 'rgba(220,200,170,0.45)', font: { size: 11, family: 'Inter, sans-serif' } },
+                     color: 'rgba(220,200,170,0.62)', font: { size: 11, family: 'Inter, sans-serif' } },
             border: { display: false }
           }
         },
