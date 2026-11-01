@@ -13,8 +13,8 @@
   --amber-dim: #b8791c;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
-  --red: #c0392b;
+  --text-muted: #877e6f; --line-muted: #6a6256;
+  --red: #c0392b; --red-text: #d06053;
   --red-dim: rgba(192,57,43,0.6);
   --green: #6fae6f;
   --blue: #6db3d4;
@@ -60,7 +60,7 @@ body { background: var(--bg); color: var(--text); }
 .wd-intro-quiet { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-left: 3px solid rgba(224,148,34,0.4); }
 .wd-intro-live { background: rgba(192,57,43,0.06); border: 1px solid rgba(192,57,43,0.3); border-left: 3px solid var(--red); }
 .wd-intro-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-right: 0.5rem; }
-.wd-intro-tag-live { color: var(--red); }
+.wd-intro-tag-live { color: var(--red-text); }
 
 /* ── The comparator surface ── */
 .wd-calc { max-width: 1100px; margin: 2.5rem auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1.8rem 2rem; }
@@ -143,7 +143,7 @@ body { background: var(--bg); color: var(--text); }
 .wd-dd-num-word { font-size: clamp(1.15rem, 3vw, 1.55rem); letter-spacing: 0; font-variant-numeric: normal; line-height: 1.15; }
 .wd-dd-sub { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.45; color: var(--text-dim); margin: 0.4rem auto 0; max-width: 15rem; }
 .wd-dd-sub strong { color: var(--text); font-weight: 600; }
-.wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-muted); margin: 0; padding: 0.5rem 1rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }
+.wd-dd-caveat { font-family: 'Inter', sans-serif; font-size: 0.74rem; line-height: 1.5; color: var(--text-dim); margin: 0; padding: 0.5rem 1rem; border-top: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.06); }
 .wd-dd-caveat strong { color: var(--text-dim); font-weight: 600; }
 
 .wd-legs { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.55; color: var(--text-dim); margin: 0 0 0.6rem; padding: 0.55rem 0.9rem; border-left: 2px solid rgba(224,148,34,0.45); background: rgba(255,255,255,0.015); }
@@ -171,7 +171,7 @@ body { background: var(--bg); color: var(--text); }
 
 /* ── Cautions (loud, headed) ── */
 .wd-cautions { border-left: 3px solid rgba(192,57,43,0.45); padding-left: 1.4rem; }
-.wd-cautions .wd-eyebrow { color: var(--red); }
+.wd-cautions .wd-eyebrow { color: var(--red-text); }
 .wd-cautions-intro { font-family: 'Inter', sans-serif; font-size: 0.92rem; line-height: 1.7; color: var(--text-dim); margin: 0 0 0.4rem; max-width: 60rem; }
 .wd-cautions-intro em { color: var(--amber); font-style: italic; }
 .wd-caution-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem 1.8rem; margin: 1.4rem 0 0; }
@@ -191,7 +191,7 @@ body { background: var(--bg); color: var(--text); }
 .wd-method li strong { color: var(--text-dim); }
 
 /* ── Canonical Style-Guide tooltip (.help-tip / .tip-content) ── */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }

@@ -15,7 +15,7 @@
   --amber-dim: #b8791c;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
+  --text-muted: #877e6f;
   --red: #c0392b;
   --red-soft: #e08a7a;
   --green: #6fae6f;
@@ -83,7 +83,7 @@ body { background: var(--bg); color: var(--text); }
 .bb-table tbody tr.bb-row-ongoing td { background: rgba(224,148,34,0.05); }
 .bb-table .bb-cy { font-family: var(--font-d); font-size: 1.15rem; font-weight: 600; color: #f2eee8; }
 .bb-table .bb-dd { font-weight: 600; color: var(--red-soft); }
-.bb-table .bb-when { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
+.bb-table .bb-when { display: block; font-size: 0.72rem; color: var(--text-dim); margin-top: 0.15rem; }
 .bb-table .bb-tag-ongoing { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); border: 1px solid rgba(224,148,34,0.4); border-radius: 3px; padding: 0.1rem 0.35rem; margin-left: 0.35rem; vertical-align: middle; }
 .bb-table .bb-ast-mark { color: var(--amber); }
 .bb-table-note { font-family: var(--font-b); font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); margin: 0 0 0; max-width: 900px; }

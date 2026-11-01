@@ -67,7 +67,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
     font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-    color: rgba(232,224,213,0.5);
+    color: rgba(232, 224, 213, 0.6);
     margin: 1.4rem 0 0;
     letter-spacing: 0.015em;
 }
@@ -412,7 +412,7 @@
     font-size: 0.7rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: rgba(232,224,213,0.45);
+    color: rgba(232, 224, 213, 0.6);
     flex-shrink: 0;
 }
 @media (max-width: 600px) {
@@ -622,3 +622,9 @@
         animation: none !important;
     }
 }
+
+/* Page background set here (2026-10-31). The page declared color-scheme: dark and left the
+   background to the browser's own dark canvas, which differs between Chrome, Safari and Firefox
+   and made contrast checkers read every text colour against white. Same #0a0908 as the site. */
+:root { --bg: #0a0908; }
+body { background: var(--bg); }

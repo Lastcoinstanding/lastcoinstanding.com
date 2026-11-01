@@ -11,14 +11,14 @@
   --gold: #c9a84c;
   --gold-dim: rgba(201,168,76,.35);
   --gold-soft: rgba(201,168,76,.09);
-  --red: #c0392b;
+  --red: #c0392b; --red-text: #d06053;
   --red-dim: rgba(192,57,43,.30);
   --red-soft: rgba(192,57,43,.10);
   --text: #d8d2ca;
   --text-dim: #908880;
   --text-bright: #f2eee8;
   --text-body: #d0c8c0;
-  --text-muted: #706860;
+  --text-muted: #877e6f;
   --font-d: 'Cormorant Garamond', Georgia, serif;
   --font-b: 'Inter', -apple-system, sans-serif;
 }
@@ -130,7 +130,7 @@ body::before {
 }
 .section-title .amber { color: var(--orange); }
 .section-title .gold-t { color: var(--gold); }
-.section-title .red { color: var(--red); }
+.section-title .red { color: var(--red-text); }
 .prose {
   font-size: .97rem;
   color: var(--text-body);
@@ -141,7 +141,7 @@ body::before {
 .prose strong { color: var(--text-bright); font-weight: 600; }
 .prose .amber { color: var(--orange); font-weight: 500; }
 .prose .gold-t { color: var(--gold); font-weight: 500; }
-.prose .red { color: var(--red); font-weight: 500; }
+.prose .red { color: var(--red-text); font-weight: 500; }
 
 /* ═══════════════════════════════════════
    TAB 1 - THE FIXED SLICE
@@ -172,7 +172,7 @@ body::before {
   letter-spacing: .14em;
   text-transform: uppercase;
 }
-.sc-fiat .sc-label { color: var(--red); }
+.sc-fiat .sc-label { color: var(--red-text); }
 .sc-gold .sc-label { color: var(--gold); }
 .sc-btc  .sc-label { color: var(--orange); }
 
@@ -190,7 +190,7 @@ body::before {
   display: inline-block;
   align-self: flex-start;
 }
-.sc-fiat .sc-rate { background: var(--red-soft); color: var(--red); }
+.sc-fiat .sc-rate { background: var(--red-soft); color: var(--red-text); }
 .sc-gold .sc-rate { background: var(--gold-soft); color: var(--gold); }
 .sc-btc  .sc-rate { background: var(--orange-soft); color: var(--orange); }
 .sc-note { font-size: .82rem; color: var(--text-muted); line-height: 1.6; }
@@ -358,7 +358,7 @@ input[type="range"]::-moz-range-thumb {
   text-transform: uppercase;
   margin-bottom: 4px;
 }
-.st-fiat .st-label { color: var(--red); }
+.st-fiat .st-label { color: var(--red-text); }
 .st-gold .st-label { color: var(--gold); }
 .st-btc  .st-label { color: var(--orange); }
 
@@ -375,7 +375,7 @@ input[type="range"]::-moz-range-thumb {
   margin-bottom: 4px;
   transition: all .4s;
 }
-.st-fiat .st-big { color: var(--red); }
+.st-fiat .st-big { color: var(--red-text); }
 .st-gold .st-big { color: var(--gold); }
 .st-btc  .st-big { color: var(--orange); }
 
@@ -388,7 +388,7 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 600;
   line-height: 1.4;
 }
-.st-fiat .st-verdict { background: var(--red-soft); color: var(--red); }
+.st-fiat .st-verdict { background: var(--red-soft); color: var(--red-text); }
 .st-gold .st-verdict { background: var(--gold-soft); color: var(--gold); }
 .st-btc  .st-verdict { background: var(--orange-soft); color: var(--orange); }
 
@@ -425,7 +425,7 @@ input[type="range"]::-moz-range-thumb {
   margin-bottom: 10px;
 }
 .takeaway h3 .amber { color: var(--orange); }
-.takeaway h3 .red { color: var(--red); }
+.takeaway h3 .red { color: var(--red-text); }
 .takeaway p {
   font-size: .92rem;
   color: var(--text-dim);
@@ -599,7 +599,7 @@ canvas#cagrChart {
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-dim);
   margin-bottom: 6px;
 }
 .po-value {
@@ -611,7 +611,7 @@ canvas#cagrChart {
   margin-bottom: 4px;
   transition: all .3s;
 }
-.po-multiplier { font-size: .78rem; color: var(--text-muted); }
+.po-multiplier { font-size: .78rem; color: var(--text-dim); }
 
 .proj-disclaimer {
   margin-top: 18px;
@@ -620,7 +620,7 @@ canvas#cagrChart {
   border: 1px solid var(--border);
   border-radius: 6px;
   font-size: .78rem;
-  color: var(--text-muted);
+  color: var(--text-dim);
   line-height: 1.6;
 }
 .proj-disclaimer strong { color: var(--text-dim); }

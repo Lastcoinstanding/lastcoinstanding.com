@@ -14,8 +14,8 @@
   --amber-dim: #b8791c;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
-  --red: #c0392b;
+  --text-muted: #877e6f; --line-muted: #6a6256;
+  --red: #c0392b; --red-text: #d06053;
   --red-dim: rgba(192,57,43,0.6);
   --blue: #6db3d4;
   --border: rgba(224,148,34,0.12);
@@ -68,9 +68,9 @@ body { background: var(--bg); color: var(--text); }
 .dp-style button { flex: 1; background: rgba(224,148,34,0.03); border: none; border-right: 1px solid var(--border); color: var(--text-dim); cursor: pointer; padding: 1rem 1rem; font-family: 'Inter', sans-serif; transition: background 0.18s, color 0.18s; text-align: center; }
 .dp-style button:last-child { border-right: none; }
 .dp-style .dp-style-name { display: block; font-size: 1rem; font-weight: 600; }
-.dp-style .dp-style-sub { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
+.dp-style .dp-style-sub { display: block; font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem; }
 .dp-style button.active { background: rgba(224,148,34,0.14); color: var(--amber); }
-.dp-style button.active .dp-style-sub { color: var(--amber-dim); }
+.dp-style button.active .dp-style-sub { color: var(--amber); }
 
 /* Plan inputs */
 .dp-config { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.1rem 1.6rem; margin: 0 0 1.4rem; }
@@ -96,7 +96,7 @@ body[data-dp-view="projective"] .dp-anchor-row { display: none; }
 .dp-risk[hidden] { display: none; }
 .dp-risk strong { color: var(--text); font-weight: 600; }
 .dp-risk a { color: var(--blue); text-decoration: none; border-bottom: 1px dotted rgba(109,179,212,0.5); }
-.dp-risk .dp-risk-tag { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-right: 0.4rem; }
+.dp-risk .dp-risk-tag { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red-text); margin-right: 0.4rem; }
 .dp-risk .dp-risk-thin { display: block; margin-top: 0.5rem; color: var(--text-muted); font-style: italic; }
 
 /* Verdict */
@@ -190,13 +190,13 @@ body[data-dp-view="retrospective"] #dpSumRow { display: none; }
 .dp-timing-link { max-width: 1100px; margin: 2.4rem auto 0; font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.65; border-radius: 10px; padding: 1rem 1.3rem; }
 .dp-timing-link strong { color: var(--text); font-weight: 600; }
 .dp-timing-muted { color: var(--text-muted); background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
-.dp-timing-muted .dp-timing-note { display: block; margin-top: 0.4rem; font-style: italic; opacity: 0.85; }
+.dp-timing-muted .dp-timing-note { display: block; margin-top: 0.4rem; font-style: italic; opacity: 1; }
 .dp-timing-surfaced { color: var(--text-dim); background: rgba(224,148,34,0.06); border: 1px solid rgba(224,148,34,0.35); border-left-width: 3px; }
 .dp-timing-surfaced a { color: var(--amber); }
 .dp-timing-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-right: 0.4rem; }
 
 /* Canonical Style-Guide tooltip (.help-tip / .tip-content) — for the "Today's position" ⓘ */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }
@@ -221,7 +221,7 @@ body[data-dp-view="retrospective"] #dpSumRow { display: none; }
 
 /* ── Cautions (loud, headed — rule #4) ── */
 .dp-cautions { border-left: 3px solid rgba(192,57,43,0.45); padding-left: 1.4rem; }
-.dp-cautions .dp-eyebrow { color: var(--red); }
+.dp-cautions .dp-eyebrow { color: var(--red-text); }
 .dp-caution-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 1.2rem 1.8rem; margin: 1.4rem 0 0; }
 .dp-caution { background: rgba(192,57,43,0.04); border: 1px solid rgba(192,57,43,0.18); border-radius: 8px; padding: 1.1rem 1.3rem; }
 .dp-caution.dp-caution-blindspot { border-color: rgba(192,57,43,0.4); background: rgba(192,57,43,0.07); }

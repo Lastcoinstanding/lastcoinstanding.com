@@ -40,8 +40,8 @@
     --text-body:     #ded5c6;
     --text-bright:   #f2eee8;
     --text-dim:      #968b7a;
-    --text-muted:    #6a6256;
-    --text-faint:    #5a5247;
+    --text-muted:    #877e6f; --line-muted: #6a6256;
+    --text-faint:    #877e6f; --line-faint: #5a5247;
     --amber:         #e09422;
     --amber-dim:     rgba(224,148,34,0.55);
     --amber-soft:    rgba(224,148,34,0.13);
@@ -352,7 +352,7 @@ body {
 .bac-callout p + p { margin-top: 0.9rem; }
 .bac-callout strong { color: var(--text-bright); font-weight: 600; }
 .bac-callout .bac-lede { color: var(--amber); font-weight: 600; }
-.bac-callout.bac-quiet { border-left-color: var(--text-faint); }
+.bac-callout.bac-quiet { border-left-color: var(--line-faint); }
 
 /* The signature line closing The Scorecard. */
 .bac-sig {
@@ -389,7 +389,7 @@ body {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--line-muted);
     color: var(--text-muted);
     font-size: 0.65rem;
     font-style: normal;
@@ -448,7 +448,7 @@ body {
 /* Inline defined term — dotted underline, carries a help-tip sibling. */
 .bac-term {
     font-style: normal;
-    border-bottom: 1px dotted var(--text-faint);
+    border-bottom: 1px dotted var(--line-faint);
 }
 
 /* ─── 7. TABLES ─── */

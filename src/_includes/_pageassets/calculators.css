@@ -308,3 +308,9 @@
     font-size: 1.45rem;
   }
 }
+
+/* Page background set here (2026-10-31). The page declared color-scheme: dark and left the
+   background to the browser's own dark canvas, which differs between Chrome, Safari and Firefox
+   and made contrast checkers read every text colour against white. Same #0a0908 as the site. */
+:root { --bg: #0a0908; }
+body { background: var(--bg); }

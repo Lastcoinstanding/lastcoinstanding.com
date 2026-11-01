@@ -13,7 +13,7 @@
   --ink-bright: #ece4d6;
   --ink: #ccc6b8;
   --ink-dim: #968b7a;
-  --ink-faint: #5a5247;
+  --ink-faint: #877e6f;
   --border-faint: rgba(255,255,255,0.06);
   --border-amber: rgba(224,148,34,0.20);
   --border-strong: rgba(224,148,34,0.30);
@@ -986,7 +986,7 @@ html, body {
 }
 .stress-chip-sub {
   font-size: 0.68rem;
-  color: var(--ink-faint, #5a5247);
+  color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
 }
 

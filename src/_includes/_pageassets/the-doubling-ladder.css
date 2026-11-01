@@ -9,7 +9,7 @@
   --orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-soft:rgba(247,147,26,.08);
   --gold:#d4a843;--green:#5a8a3a;--green-soft:rgba(90,138,58,.10);
   --red:#c0392b;--red-soft:rgba(192,57,43,.10);--amber:#e09422;
-  --text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;
+  --text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#877e6f;
   --font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif;
   color-scheme:dark;
 }

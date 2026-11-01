@@ -1344,12 +1344,12 @@
     var word = positionLabelForMultiple(multiplier);
     var col = multiplier < PL_FLOOR ? rust : multiplier >= PL_CEIL ? gold : multiplier >= 1 ? amber : '';
     var bandLabel = col ? '<span style="color:'+col+'">'+word+'</span>' : word;
-    var src = isLive ? '' : ' <span style="opacity:0.6">(' + todayPriceAsOf() + ')</span>';
+    var src = isLive ? '' : ' <span style="color:var(--text-muted)">(' + todayPriceAsOf() + ')</span>';
     statusEl.innerHTML =
       '<strong>Today&rsquo;s bitcoin price:</strong> <span style="color:var(--amber)">' + fmtUSD(currentPrice) + '</span>' + src +
       ' &middot; <span style="color:var(--amber)">' + multiplier.toFixed(2) + '&times; trend</span>' +
       ' &middot; ' + bandLabel +
-      ' <span style="opacity:0.55;margin-left:0.5rem">(Power Law trend = ' + fmtUSD(todayPrice) + ')</span>';
+      ' <span style="color:var(--text-muted);margin-left:0.5rem">(Power Law trend = ' + fmtUSD(todayPrice) + ')</span>';
   }
 
   // Live BTC via the shared helper (one fetch + one consistent fallback

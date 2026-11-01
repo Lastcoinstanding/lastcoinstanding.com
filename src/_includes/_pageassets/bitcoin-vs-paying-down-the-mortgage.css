@@ -15,7 +15,7 @@
     --amber-soft: rgba(224,148,34,0.08);
     --text: #e8e0d4;
     --text-dim: #9a9080;
-    --text-muted: #6a6256;
+    --text-muted: #877e6f; --line-muted: #6a6256;
     --text-bright: #f2eee8;
     --red: #d0665a;
     --green: #5fa872;
@@ -133,7 +133,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .mp-method li { margin-bottom: 0.5rem; }
 
 /* Help-tip (canonical §6.13; same markup and tokens as the lenders page) */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--text-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--line-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
 .help-tip:hover, .help-tip:focus { color: var(--amber); border-color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: min(260px, calc(100vw - 32px)); padding: 0.85rem 1rem; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; line-height: 1.5; color: var(--text); background: var(--bg-card); border: 1px solid var(--amber-glow); border-radius: 5px; box-shadow: 0 4px 18px rgba(0,0,0,0.55); z-index: 50; text-align: left; letter-spacing: 0; text-transform: none; white-space: normal; }
 .help-tip .tip-content strong { color: var(--text-bright); font-weight: 600; }

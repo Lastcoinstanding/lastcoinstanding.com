@@ -4,7 +4,7 @@
   --bg-raised: #111010;
   --ink: #e8e4dc;
   --ink-dim: #a8a29a;
-  --ink-faint: #6e6860;
+  --ink-faint: #877e6f; --line-faint: #6e6860;
   --amber: #e09422;
   --amber-dim: #a06a28;
   --amber-soft: rgba(224, 148, 34, 0.18);
@@ -299,7 +299,7 @@ section:first-of-type { border-top: none; }
   letter-spacing: 1.4px;
   text-transform: uppercase;
   color: var(--ink-dim);
-  border-bottom: 1px solid var(--ink-faint);
+  border-bottom: 1px solid var(--line-faint);
   background: rgba(255,255,255,0.012);
 }
 .compare-table thead th.btc-col {
@@ -528,7 +528,7 @@ section:first-of-type { border-top: none; }
   transition: all 0.18s;
   min-height: 44px;
 }
-.btn-row button:hover { color: var(--ink); border-color: var(--ink-faint); }
+.btn-row button:hover { color: var(--ink); border-color: var(--line-faint); }
 .btn-row button.active {
   color: var(--amber);
   border-color: var(--amber);

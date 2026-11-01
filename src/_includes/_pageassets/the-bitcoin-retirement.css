@@ -18,7 +18,7 @@
   --ink-bright: #ece4d6;
   --ink: #ccc6b8;
   --ink-dim: #968b7a;
-  --ink-faint: #5a5247;
+  --ink-faint: #877e6f; --line-faint: #5a5247;
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-flourish: 'Source Serif 4', Georgia, serif;
@@ -258,7 +258,7 @@ body {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  border-bottom-color: var(--ink-faint);
+  border-bottom-color: var(--line-faint);
 }
 .essay-prose .math-table td {
   color: var(--ink);
@@ -524,7 +524,7 @@ a.powerlaw-link:hover {
 .zone-footer .reset-link:visited {
   color: var(--ink-dim);
   text-decoration: none;
-  border-bottom: 1px dotted var(--ink-faint);
+  border-bottom: 1px dotted var(--line-faint);
 }
 .zone-footer .reset-link:hover {
   color: var(--amber);
@@ -570,7 +570,7 @@ a.powerlaw-link:hover {
   font-size: 0.82rem;
   color: var(--amber);
   text-decoration: none;
-  opacity: 0.7;
+  opacity: 0.85;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -1012,7 +1012,7 @@ a.powerlaw-link:hover {
 }
 .cluster-label-help {
   font-size: 0.85rem;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   font-style: italic;
   flex: 1;
   min-width: 14em;
@@ -1098,7 +1098,7 @@ a.powerlaw-link:hover {
 
 /* ─── "Worth $X today → $Y at retirement" secondary line ─── */
 .stack-value-line { margin-top: 6px; font-size: 0.72rem; font-style: italic;
-  color: rgba(255,255,255,0.42); line-height: 1.3; }
+  color: rgba(255,255,255,0.52); line-height: 1.3; }
 .stack-value-line strong { color: rgba(255,255,255,0.62); font-weight: 600; font-style: normal; }
 .stack-value-arrow { opacity: 0.5; margin: 0 3px; }
 
@@ -1110,7 +1110,7 @@ a.powerlaw-link:hover {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 1px solid var(--ink-faint);
+  border: 1px solid var(--line-faint);
   color: var(--ink-faint);
   font-size: 0.65rem;
   font-style: normal;
@@ -1380,7 +1380,7 @@ a.powerlaw-link:hover {
   top: -5px;
   bottom: -5px;
   width: 1px;
-  background: var(--ink-faint);
+  background: var(--line-faint);
   opacity: 0.55;
   z-index: 2;
 }

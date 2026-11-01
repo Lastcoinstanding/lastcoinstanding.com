@@ -19,8 +19,8 @@
   --amber-dim: #b8791c;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
-  --red: #c0392b;
+  --text-muted: #877e6f;
+  --red: #c0392b; --red-text: #d06053;
   --green: #6fae6f;
   --blue: #6db3d4;
   --sage: #7da586;  /* muted sage for the Treasury column — the Middle Seat infographic's "capital preservation" hue (no existing house token; page-scoped) */
@@ -66,7 +66,7 @@ body { background: var(--bg); color: var(--text); }
 .sb-note a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted rgba(224,148,34,0.4); }
 
 /* Verify + latest badges (honesty affordances) */
-.sb-verify-badge { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.35); border-radius: 3px; padding: 0.05rem 0.35rem; vertical-align: 1px; }
+.sb-verify-badge { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red-text); background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.35); border-radius: 3px; padding: 0.05rem 0.35rem; vertical-align: 1px; }
 .sb-latest-badge { flex: 0 0 auto; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); background: rgba(224,148,34,0.12); border: 1px solid rgba(224,148,34,0.3); border-radius: 3px; padding: 0.05rem 0.35rem; align-self: center; }
 .sb-asof-badge { display: inline-block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 3px; padding: 0.05rem 0.4rem; }
 

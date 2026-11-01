@@ -24,6 +24,7 @@
 
     /* — Cool camp ramp (life's burdens: light → structural) — */
     --slate:         #6a7580;
+    --slate-text:    #727d86;  /* --slate lifted for text (WCAG AA, 2026-10-31) */
     --slate-light:   #8a9098;
     --slate-bright:  #a8b2bc;
     --slate-dark:    #454550;
@@ -190,7 +191,7 @@
     letter-spacing: 0.2em;
     text-transform: uppercase;
   }
-  .q-cell.q-captured .q-cell-verdict { color: var(--slate); }
+  .q-cell.q-captured .q-cell-verdict { color: var(--slate-text); }
   .q-cell.q-captured .q-cell-title { color: var(--text-dim); text-decoration: line-through; text-decoration-color: rgba(106,117,128,0.5); text-decoration-thickness: 1px; }
   .q-cell.q-alight {
     border-color: rgba(247, 147, 26, 0.45);
@@ -253,7 +254,7 @@
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--text-dim);
-    opacity: 0.8;
+    opacity: 1;
     white-space: nowrap;
   }
   .preset-btn {
@@ -366,7 +367,7 @@
     border: 1px solid var(--border);
     border-radius: 3px;
     color: var(--text-dim);
-    opacity: 0.55;
+    opacity: 0.95;
     transition: all 0.4s ease;
     user-select: none;
   }
@@ -409,7 +410,7 @@
     color: var(--text-dim);
   }
   .grid-legend span { display: block; }
-  .legend-warm { color: var(--amber-dim); }
+  .legend-warm { color: var(--amber); }
   .legend-cool { color: var(--slate-light); }
   .legend-note { font-style: italic; margin-top: 0.4rem; color: var(--text-dim); }
 

@@ -16,7 +16,7 @@
   --accent: #e09422;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
+  --text-muted: #877e6f; --line-muted: #6a6256;
   --border: rgba(224,148,34,0.12);
   --font-h: 'Cormorant Garamond', Georgia, serif;
   --font-b: 'Inter', -apple-system, sans-serif;
@@ -80,7 +80,7 @@ body { background: var(--bg); color: var(--text); }
    Verbatim from the sibling pages, with this page's token names. The
    `display: none` on .tip-content is load-bearing: without this whole block the
    tooltip body renders as inline text in the middle of the label it annotates. */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; }
 .help-tip:hover, .help-tip:focus { border-color: var(--accent); color: var(--accent); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }
@@ -96,7 +96,7 @@ body { background: var(--bg); color: var(--text); }
 .hc-section > .hc-eyebrow, .hc-section > .hc-h2 { max-width: 880px; margin-left: auto; margin-right: auto; }
 
 /* ── Controls ── */
-.hc-control-note { font-family: var(--font-b); font-size: 0.75rem; color: var(--text-muted); margin: 0.45rem 0 0; }
+.hc-control-note { font-family: var(--font-b); font-size: 0.75rem; color: var(--text-dim); margin: 0.45rem 0 0; }
 .hc-range { width: 100%; }
 
 .hc-seg { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; }
@@ -296,7 +296,7 @@ body { background: var(--bg); color: var(--text); }
 .hc-card-note { font-family: var(--font-h); font-size: 1.0rem; line-height: 1.38; margin: 0.5rem auto 0; color: var(--text); }
 .hc-card-note strong { font-weight: 600; }
 .hc-card-hero-pays  { border-color: rgba(111,174,111,0.4);  background: rgba(111,174,111,0.06); }
-.hc-card-hero-wash  { border-color: var(--text-muted); }
+.hc-card-hero-wash  { border-color: var(--line-muted); }
 .hc-card-hero-costs { border-color: rgba(224,148,34,0.4);   background: rgba(224,148,34,0.06); }
 .hc-card-hero-floor { border-color: #b04525;                background: rgba(176,69,37,0.08); }
 .hc-card-note-pays  { color: #cfe0cf; }
@@ -313,7 +313,7 @@ body { background: var(--bg); color: var(--text); }
 .hc-card-half-num { font-family: var(--font-h); font-size: clamp(1.5rem, 3.8vw, 2rem); font-weight: 600; line-height: 1; letter-spacing: -.01em; color: #f2eee8; font-variant-numeric: tabular-nums; }
 .hc-card-half-sub { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.42; color: var(--text-dim); margin: 0.3rem auto 0; max-width: 15rem; }
 .hc-card-half-sub strong { color: var(--text); font-weight: 600; }
-.hc-card-foot { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.45; color: var(--text-muted); margin: 0; padding: 0.45rem 0.85rem; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+.hc-card-foot { font-family: var(--font-b); font-size: 0.72rem; line-height: 1.45; color: var(--text-dim); margin: 0; padding: 0.45rem 0.85rem; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
 .hc-card-foot strong { color: var(--text-dim); font-weight: 600; }
 .hc-card-foot em { color: var(--accent); font-style: italic; }
 

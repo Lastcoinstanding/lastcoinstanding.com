@@ -32,9 +32,9 @@ const FITS = {
 let cur={proxy:'bal', era:'all'};
 function perDouble(b){ return Math.pow(2,b).toFixed(1); }
 function fitTier(r2){
-  if(r2>=0.7) return {c:'var(--good)', t:`R² ${r2.toFixed(2)} — strong`};
-  if(r2>=0.4) return {c:'var(--warn)', t:`R² ${r2.toFixed(2)} — weak`};
-  return {c:'var(--bad)', t:`R² ${r2.toFixed(2)} — broken`};
+  if(r2>=0.7) return {c:'var(--good)', ct:'var(--good-text)', t:`R² ${r2.toFixed(2)} — strong`};
+  if(r2>=0.4) return {c:'var(--warn)', ct:'var(--warn-text)', t:`R² ${r2.toFixed(2)} — weak`};
+  return {c:'var(--bad)', ct:'var(--bad-text)', t:`R² ${r2.toFixed(2)} — broken`};
 }
 function insightText(f){
   if(f.inverted) return `<strong>The proxy has inverted.</strong> In the ETF era, active addresses move <em>opposite</em> to price: on-chain activity fell while price rose, because ETFs and Layer-2 moved transactions off-chain. This isn't a Metcalfe exponent — it's a broken instrument, and the clearest possible sign that activity is no longer a good measure of adoption.`;
@@ -76,7 +76,7 @@ function draw(){
   document.getElementById('perDoubleVal').innerHTML = f.beta>0 ? `${perDouble(f.beta)}<small>×</small>` : '<small>inverted</small>';
   const tier=fitTier(f.r2);
   document.querySelector('#fitQ .dot').style.background=tier.c;
-  const ft=document.getElementById('fitTxt'); ft.textContent=tier.t; ft.style.color=tier.c;
+  const ft=document.getElementById('fitTxt'); ft.textContent=tier.t; ft.style.color=tier.ct;
   document.getElementById('insight').innerHTML=insightText(f);
 
   // Real scatter: actual price-vs-adoption points for this proxy + era.
