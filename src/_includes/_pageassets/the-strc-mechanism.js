@@ -36,21 +36,24 @@
   // All figures 8-K-sourced as of `asOf`. See STRC_BELOW_PAR_DESIGN.md.
   // ═══════════════════════════════════════════════════════════════
   var STRC_DATA = {
-    asOf: "2026-10-18",       // the 8-K filed 2026-10-19 (period Oct 12–18)
+    asOf: "2026-10-25",       // the 8-K filed 2026-10-26 (period Oct 19–25); vote and Q3 8-Ks filed Oct 28–29 folded in
     price: 88.32,              // last close; reader-adjustable in the lens
     parAmount: 100.00,
     // From src/_data/preferredRates.json (window.PREFERRED_RATES), the one
     // place the site keeps the rate (2026-09-30); 12.00 is the fallback. A
     // change also appends a row to rateHistory below.
-    rateAnnualPct: (window.PREFERRED_RATES && window.PREFERRED_RATES.strc && isFinite(window.PREFERRED_RATES.strc.ratePct)) ? window.PREFERRED_RATES.strc.ratePct : 12.00,   // paid semi-monthly, $0.50 × 2, since Jul 2026
-    // Derived: the 10-Q's ~104.6M shares at July 24, 2026, less the 18,623,119
-    // repurchased from July 27 to October 18 (weekly 8-Ks, buybackLog); no
-    // STRC was issued in that time. No newer filed count exists.
-    sharesOutstanding: 85976881,
+    rateAnnualPct: (window.PREFERRED_RATES && window.PREFERRED_RATES.strc && isFinite(window.PREFERRED_RATES.strc.ratePct)) ? window.PREFERRED_RATES.strc.ratePct : 12.00,   // 12% since Jul 2026; paid semi-monthly ($0.50 × 2) Jul–Oct, daily from Nov 1, 2026
+    // Derived: the 10-Q's ~104.6M shares at July 24, 2026, less the 20,691,578
+    // repurchased from July 27 to October 25 (weekly 8-Ks, buybackLog); no
+    // STRC was issued in that time. No newer filed count exists. Cross-check:
+    // the Q3 release (8-K filed Oct 29) gives 20,980,508 repurchased year to
+    // date at Oct 25 = this log including the Jul 20–26 row, exactly.
+    sharesOutstanding: 83908422,
     // Not published by Strategy: estimated from Yahoo Finance daily bars,
-    // Σ(typical price × volume) ÷ Σ volume, September 2026 (August: $95.45).
-    priorMonthVWAP: 98.31,
-    priorMonthVWAPLabel: "September 2026 VWAP ≈ $98.31, estimated from daily bars",
+    // Σ(typical price × volume) ÷ Σ volume, October 2026, 22 sessions
+    // (September: $98.31; August: $95.45).
+    priorMonthVWAP: 99.28,
+    priorMonthVWAPLabel: "October 2026 VWAP ≈ $99.28, estimated from daily bars",
     rateHistory: [             // 8-K-sourced, one row per month since April 2026 (holds included)
       ["2025-08", 9.00], ["2025-09", 10.00], ["2025-10", 10.25], ["2025-11", 10.50],
       ["2025-12", 10.75], ["2026-01", 11.00], ["2026-02", 11.25], ["2026-03", 11.50],
@@ -61,11 +64,11 @@
     claimStack: {              // $B: the Q2 10-Q (filed 2026-08-03) and the weekly 8-Ks since
       seniorConvertsB: 6.70,   // $6,713.7M principal at Jun 30; unsecured, ~0.42% avg coupon, 2028–2032, no coverage triggers
       strfSeniorB: 1.284,      // no STRF issued or repurchased since
-      strcNotionalB: 8.598     // the 10-Q's $10.46B at July 24 less $1,862.3M of par repurchased to Oct 18 (derived, as sharesOutstanding)
+      strcNotionalB: 8.391     // the 10-Q's $10.46B at July 24 less $2,069.2M of par repurchased to Oct 25 (derived, as sharesOutstanding)
     },
-    btcHoldings: 848517,       // Oct 18, 2026 (8-K filed Oct 19)
-    usdReserveB: 4.83,         // Oct 18: for preferred dividends and debt interest; buybacks are funded from USD Cash, MSTR sales or bitcoin sales
-    usdCashB: 0.4473,          // Oct 18: "USD Cash", the flexible pool set up Aug 24, 2026 ($1.00B on Sep 27)
+    btcHoldings: 848517,       // Oct 25, 2026 (8-K filed Oct 26: no bitcoin bought or sold Oct 19–25)
+    usdReserveB: 4.83,         // Oct 25: for preferred dividends and debt interest; buybacks are funded from USD Cash, MSTR sales or bitcoin sales
+    usdCashB: 0.2424,          // Oct 25: "USD Cash", the flexible pool set up Aug 24, 2026 ($1.00B on Sep 27)
     // Strategy's published annual interest + preferred dividends (investor
     // briefing, SEC FWP filed 2026-08-24, as of 2026-08-23; DATA_AUDIT BvRP-3).
     // It predates most of the STRC repurchases, so it runs a little high.
@@ -87,18 +90,20 @@
       { window: "2026-09-28..30",    shares: 1033168, usdM: 102.6, avg: 99.31, parRetiredM: 103.317, annualDivSavedM: 12.4 },
       { window: "2026-10-01..04",    shares: 740634,  usdM: 73.7,  avg: 99.51, parRetiredM: 74.063,  annualDivSavedM: 8.9 },
       { window: "2026-10-05..11",    shares: 1932145, usdM: 192.4, avg: 99.58, parRetiredM: 193.215, annualDivSavedM: 23.2 },
-      { window: "2026-10-12..18",    shares: 1938780, usdM: 193.1, avg: 99.60, parRetiredM: 193.878, annualDivSavedM: 23.3 }
+      { window: "2026-10-12..18",    shares: 1938780, usdM: 193.1, avg: 99.60, parRetiredM: 193.878, annualDivSavedM: 23.3 },
+      { window: "2026-10-19..25",    shares: 2068459, usdM: 204.9, avg: 99.06, parRetiredM: 206.846, annualDivSavedM: 24.8 }
     ],
     // Preferred repurchase program raised from $1.0B to $2.0B on 2026-09-08, and to
-    // $3.0B in the 8-K filed 2026-10-19 ($1.16B left at Oct 18, including earlier purchases).
+    // $3.0B in the 8-K filed 2026-10-19; $956.8M left at Oct 25 (8-K filed 2026-10-26).
     // BTC monetization: the page's last attributed figure (July); the 8-Ks for
     // the August sales don't name the program, so they aren't added to it.
-    authRemaining: { preferredM: 1160, preferredCapB: 3.0, mstrB: 1.0, btcMonetizationUsedM: 218.5, btcMonetizationCapB: 1.25 },
+    authRemaining: { preferredM: 956.8, preferredCapB: 3.0, mstrB: 1.0, btcMonetizationUsedM: 218.5, btcMonetizationCapB: 1.25 },
     supplyLog: [
       { d: "2026-07-27", t: "Policy", v: "No new STRC issuance below $100 par (stated discipline; also economic necessity below par)" },
-      { d: "2026-07-27..10-18", t: "Issuance", v: "No STRC sold under the ATM in any week (weekly 8-Ks); 18.6M shares retired, the float ≈ 86.0M" },
+      { d: "2026-07-27..10-25", t: "Issuance", v: "No STRC sold under the ATM in any week (weekly 8-Ks); 20.7M shares retired, the float ≈ 83.9M" },
       { d: "2026-09-24", t: "Proposal", v: "Daily record dates for STRC, STRF, STRK and STRD; vote Oct 28, 2026; first daily STRC dividend expected Nov 2 (8-K Sep 25)" },
-      { d: "2026-10-15", t: "Dividends", v: "November declared at 12.00% as daily dividends ($1.00 a share in all), payable only if the Oct 28 vote passes; if it fails, the semi-monthly Nov 15 dividend is paid instead (8-K Oct 16)" }
+      { d: "2026-10-15", t: "Dividends", v: "November declared at 12.00% as daily dividends ($1.00 a share in all), payable only if the Oct 28 vote passes; if it fails, the semi-monthly Nov 15 dividend is paid instead (8-K Oct 16)" },
+      { d: "2026-10-28", t: "Vote", v: "Daily dividends approved (381.4M for, 2.2M against); STRC's daily record dates start Nov 1, 2026, the others' Jan 1, 2027. November's daily dividends ($1.00 a share in all) replace the Nov 15 one (8-Ks Oct 28, Oct 29)" }
     ],
     fuelLog: [                 // dated rows, rendered as the fuel-gauge log
       { d: "2026-05-26..31", t: "BTC sale", v: "32 BTC / $2.5M (avg $77,135) — the “inoculation” sale" },
@@ -119,7 +124,9 @@
       { d: "2026-10-11",     t: "Reserve", v: "USD Reserve $4.88B, USD Cash $640.5M (from $1.00B on Sep 27, mostly spent buying back STRC)" },
       { d: "2026-10-12..18", t: "BTC buy", v: "267 BTC / $22.1M, from MSTR sales" },
       { d: "2026-10-18",     t: "Buyback auth", v: "Preferred repurchase program raised $2.0B → $3.0B; $1.16B left" },
-      { d: "2026-10-18",     t: "Reserve", v: "The reserve paid $45.5M of dividends (USD Reserve $4.83B); USD Cash $447.3M after $193.1M of STRC repurchases" }
+      { d: "2026-10-18",     t: "Reserve", v: "The reserve paid $45.5M of dividends (USD Reserve $4.83B); USD Cash $447.3M after $193.1M of STRC repurchases" },
+      { d: "2026-10-19..25", t: "Reserve", v: "No bitcoin bought or sold, no ATM sales; USD Cash paid $204.9M of STRC repurchases (USD Reserve $4.83B, USD Cash $242.4M)" },
+      { d: "2026-10-29",     t: "Q3 results", v: "Strategy: “returned STRC to health”, USD Reserve + USD Cash $5.07B ≈ 3.4 years of dividends and interest; 12.00% held “to support STRC trading near its $100” stated amount; a regular buyer while STRC is below $100 (8-K Oct 29)" }
     ],
     // Company-modeled, methodology unverified at build (design §5) — carries a verify badge:
     btcBreakevenArrPct: 2.3
@@ -346,7 +353,7 @@
     // Visible status carries the latest row so the collapsed 12-row log isn't needed
     // to read "where the rate is now" (progressive disclosure).
     setHTML('sbRateStatus',
-      statusField('Current annualized rate', pct2(RATE) + ' <span class="sb-mini">semi-monthly, $0.50 × 2</span>')
+      statusField('Current annualized rate', pct2(RATE) + ' <span class="sb-mini">paid daily from Nov 1, 2026 ($1.00 a share in November)</span>')
       + statusField('History', pct2(RATE) + ' since ' + prettyMonth(rh[runStart][0]) + ' · ' + priorChanges + ' prior changes'));
 
     // Bracket dial: framework-says (from prior-month VWAP) vs board-did vs posture.
@@ -359,7 +366,7 @@
     setHTML('sbBracketDial',
       '<div class="sb-dial-cap">The bracket dial <span class="sb-mini">policy formalized Feb 5, 2026</span></div>'
       + '<div class="sb-dial-row"><span class="sb-dial-lbl">Framework says</span><span class="sb-dial-val">' + fw + '</span></div>'
-      + '<div class="sb-dial-row"><span class="sb-dial-lbl">Board did</span><span class="sb-dial-val">held 12.00% for August and September periods (8-Ks Aug 3, Sep 1); the Jun 29 +50bps matched the &lt;$95 bracket</span></div>'
+      + '<div class="sb-dial-row"><span class="sb-dial-lbl">Board did</span><span class="sb-dial-val">held 12.00% for every period from August to November (8-Ks Aug 3, Sep 1, Oct 1, Oct 16); the Jun 29 +50bps matched the &lt;$95 bracket</span></div>'
       + '<div class="sb-dial-row"><span class="sb-dial-lbl">Declared posture</span><span class="sb-dial-val">hold at 12% until STRC shows &ldquo;sustained, healthy trading near $100&rdquo; &mdash; Aug 31, 2026</span></div>'
       + '<div class="sb-dial-brackets"><span>&lt;$95 &rarr; +50bps+</span><span>$95&ndash;98.99 &rarr; +25bps+</span><span>$99&ndash;100.99 &rarr; hold ±25</span><span>&ge;$101 &rarr; cut / reissue</span></div>');
 
