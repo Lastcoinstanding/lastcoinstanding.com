@@ -1,8 +1,8 @@
 :root{
   --bg:#0f1012; --bg-raise:#16181b; --panel:#1a1d21; --line:#2a2e34;
-  --ink:#e7e3da; --ink-bright:#f4f1ea; --ink-dim:#a8a39a; --ink-faint:#6f6b63;
+  --ink:#e7e3da; --ink-bright:#f4f1ea; --ink-dim:#a8a39a; --ink-faint:#8d8576; --line-faint: #6f6b63;
   --amber:#d99a2b; --amber-soft:#e7b75e; --red:#c1502e; --teal:#3a8a82;
-  --good:#5a8f6b; --warn:#b07d2e; --bad:#b3523a;
+  --good:#5a8f6b; --warn:#b07d2e; --good-text:#739f80; --warn-text:#ba8d49; --bad-text:#c36f59; /* *-text: the tier colours lifted for text on the panels (WCAG AA, 2026-10-31) */ --bad:#b3523a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:1.05rem;line-height:1.7;-webkit-font-smoothing:antialiased}
@@ -61,8 +61,8 @@ blockquote cite{display:block; font-style:normal; font-size:.82rem; color:var(--
 .exp-row .who small{display:block; color:var(--ink-faint); font-size:.74rem; margin-top:2px}
 .exp-row .beta{font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--amber-soft); font-weight:500; min-width:60px; text-align:right}
 .exp-row .tag{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:20px; white-space:nowrap}
-.tag.asserted{background:rgba(176,125,46,.16); color:var(--warn)}
-.tag.fitted{background:rgba(90,143,107,.16); color:var(--good)}
+.tag.asserted{background:rgba(176,125,46,.16); color:var(--warn-text)}
+.tag.fitted{background:rgba(90,143,107,.16); color:var(--good-text)}
 
 /* INTERACTIVE TOOL */
 .tool{background:var(--bg-raise); border:1px solid var(--line); border-radius:14px; padding:28px; margin:8px auto 0}
@@ -74,7 +74,7 @@ blockquote cite{display:block; font-style:normal; font-size:.82rem; color:var(--
 .proxy-seg button{flex:1; background:var(--panel); border:1px solid var(--line); color:var(--ink-dim); padding:11px 14px; border-radius:8px; font-family:inherit; font-size:.86rem; cursor:pointer; transition:all .15s; position:relative}
 .proxy-seg button:hover{border-color:var(--amber-soft); color:var(--ink)}
 .proxy-seg button[aria-pressed="true"]{background:rgba(217,154,43,.14); border-color:var(--amber); color:var(--amber-soft)}
-.tip{display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid var(--ink-faint); color:var(--ink-faint); font-size:.6rem; cursor:help; position:relative; font-style:normal}
+.tip{display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid var(--line-faint); color:var(--ink-faint); font-size:.6rem; cursor:help; position:relative; font-style:normal}
 .tip:hover .tip-body{opacity:1; visibility:visible; transform:translateX(-50%) translateY(0)}
 .tip-body{position:absolute; bottom:140%; left:50%; transform:translateX(-50%) translateY(4px); width:240px; background:#23272d; border:1px solid var(--line); border-radius:8px; padding:11px 13px; font-size:.76rem; line-height:1.5; color:var(--ink); letter-spacing:0; text-transform:none; font-weight:400; opacity:0; visibility:hidden; transition:all .18s; z-index:10; box-shadow:0 8px 24px rgba(0,0,0,.4)}
 /* era rail — continuous epochs, like hero */

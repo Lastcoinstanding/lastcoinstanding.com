@@ -35,7 +35,7 @@
   // ── Palette ──
   var FLOOR_C = '#b04525', TREND_C = '#e09422', UPPER_C = '#e8c820';
   var REVERT_C = '#ece4d6', TRAJ_C = '#5e7a92', HIST_C = 'rgba(232,224,210,0.55)';
-  var MUTED = '#7a7367', DIM = '#9a9080', AMBER = '#e09422';
+  var MUTED = '#877e6f', DIM = '#9a9080', AMBER = '#e09422';
 
   // ── Channel-position math (log-space) ──
   var LF = Math.log(PL_FLOOR), LC = Math.log(PL_CEIL), SPAN = LC - LF;

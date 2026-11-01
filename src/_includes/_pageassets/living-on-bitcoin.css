@@ -40,7 +40,7 @@
     --ink-bright: #ece4d6;
     --ink: #ccc6b8;
     --ink-dim: #968b7a;
-    --ink-faint: #5a5247;
+    --ink-faint: #877e6f; --line-faint: #5a5247;
     --red: #c0392b;
     --red-dim: rgba(192,57,43,0.6);
     --border: rgba(224,148,34,0.15);
@@ -342,7 +342,7 @@ body { background: var(--bg-page); color: var(--ink); }
 .cluster-label-help {
     font-family: var(--font-body);
     font-size: 0.8rem;
-    color: var(--ink-faint);
+    color: var(--ink-dim);
     font-style: italic;
     flex: 1;
     min-width: 14em;
@@ -393,7 +393,7 @@ body { background: var(--bg-page); color: var(--ink); }
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid var(--ink-faint);
+    border: 1px solid var(--line-faint);
     color: var(--ink-faint);
     font-size: 0.65rem;
     font-style: normal;
@@ -696,7 +696,7 @@ body { background: var(--bg-page); color: var(--ink); }
     -webkit-appearance: none;
     width: 12px;
     height: 12px;
-    border: 1.5px solid var(--ink-faint);
+    border: 1.5px solid var(--line-faint);
     border-radius: 50%;
     margin: 0;
     cursor: pointer;
@@ -747,7 +747,7 @@ body { background: var(--bg-page); color: var(--ink); }
     border-top: 1px dashed var(--border-faint);
     font-size: 0.72rem;
     line-height: 1.5;
-    color: var(--ink-faint);
+    color: var(--ink-dim);
 }
 .projection-scenario-note:empty { display: none; }
 .projection-scenario-or {

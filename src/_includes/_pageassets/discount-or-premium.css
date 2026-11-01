@@ -19,8 +19,8 @@
   --amber-dim: #b8791c;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
-  --red: #c0392b;
+  --text-muted: #877e6f;
+  --red: #c0392b; --red-text: #d06053;
   --red-dim: rgba(192,57,43,0.6);
   --green: #6fae6f;
   --blue: #6db3d4;
@@ -206,7 +206,7 @@ body { background: var(--bg); color: var(--text); }
 .dp-delta { font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6; text-align: center; color: var(--text-dim); margin: 0 0 1.1rem; padding: 0.7rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); }
 .dp-delta strong { font-weight: 600; }
 .dp-delta-up strong { color: var(--green); }
-.dp-delta-down strong { color: var(--red); }
+.dp-delta-down strong { color: var(--red-text); }
 .dp-delta-flat strong { color: var(--text); }
 
 .dp-chart-block { margin: 0 0 1.1rem; }
@@ -265,7 +265,7 @@ body { background: var(--bg); color: var(--text); }
 .dp-table tr.dp-group-sep td { padding: 0; height: 0; border-bottom: 1px solid rgba(224,148,34,0.2); }
 .dp-table td { text-align: right; padding: 0.6rem; border-bottom: 1px solid rgba(224,148,34,0.07); color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .dp-table td:first-child { color: var(--text); font-weight: 500; }
-.dp-table .dp-neg { color: var(--red); }
+.dp-table .dp-neg { color: var(--red-text); }
 .dp-table .dp-pos { color: var(--green); }
 .dp-table tr.dp-today-row td { background: rgba(224,148,34,0.05); color: var(--text); font-weight: 600; border-bottom: 1px solid rgba(224,148,34,0.2); }
 .dp-table tr.dp-today-row td:first-child { color: var(--amber); }

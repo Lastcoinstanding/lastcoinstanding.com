@@ -37,7 +37,7 @@
     --amber-soft: rgba(224,148,34,0.08);
     --text: #e8e0d4;
     --text-dim: #9a9080;
-    --text-muted: #6a6256;
+    --text-muted: #877e6f; --line-muted: #6a6256;
     --text-bright: #f2eee8;
     --red: #d0665a;
     --red-dim: rgba(208,102,90,0.45);
@@ -67,7 +67,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .ln-live-ctl-label { display: inline-flex; align-items: center; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .ln-radio { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; color: var(--text); }
 .ln-radio input { accent-color: var(--amber); margin: 0; }
-.ln-own { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.45; transition: opacity 0.2s; }
+.ln-own { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.85; transition: opacity 0.2s; }
 .ln-live[data-mode="own"] .ln-own { opacity: 1; }
 .ln-own input[type="range"] { width: 9rem; accent-color: var(--amber); }
 .ln-own strong { min-width: 2.6rem; }
@@ -75,7 +75,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 /* ─── 4. FILTER CHIPS + STATE SELECT ─── */
 .ln-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0 0 0.6rem; }
 .ln-chip { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--border-lt); background: none; border-radius: 999px; padding: 0.38rem 0.8rem; color: var(--text-dim); cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; }
-.ln-chip:hover { color: var(--text); border-color: var(--text-muted); }
+.ln-chip:hover { color: var(--text); border-color: var(--line-muted); }
 .ln-chip.on { border-color: var(--amber); color: var(--amber); background: var(--amber-soft); }
 .ln-state { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
 .ln-state select { font-family: var(--font-b); font-size: 0.78rem; color: var(--text); background: var(--bg-card); border: 1px solid var(--border-lt); border-radius: 6px; padding: 0.3rem 0.5rem; }
@@ -188,7 +188,7 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .ln-dialog-bar { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1.4rem; background: var(--bg-card); border-bottom: 1px solid var(--border); z-index: 1; }
 .ln-dialog-crumb { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
 .ln-dialog-close { font-family: var(--font-b); font-size: 1.6rem; line-height: 1; color: var(--text-dim); background: none; border: 1px solid var(--border-lt); border-radius: 8px; width: 2.2rem; height: 2.2rem; cursor: pointer; }
-.ln-dialog-close:hover { color: var(--text-bright); border-color: var(--text-muted); }
+.ln-dialog-close:hover { color: var(--text-bright); border-color: var(--line-muted); }
 .ln-dialog-body { padding: 1.4rem 1.6rem 1.8rem; display: grid; gap: 1.1rem; font-size: 1rem; line-height: 1.65; }
 .ln-dialog-body .ln-name { font-size: 2.2rem; }
 .ln-dialog-body .ln-model { font-size: 0.86rem; }
@@ -242,7 +242,7 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .ln-spike-note { margin: 1rem 0 0; padding-top: .8rem; border-top: 1px solid var(--border); font-size: 0.88rem; color: var(--text-dim); }
 .ln-spike-note a { color: var(--amber); }
 .ln-links { display: flex; justify-content: flex-end; }
-.ln-site { font-size: 0.78rem; color: var(--text-dim); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+.ln-site { font-size: 0.78rem; color: var(--text-dim); text-decoration: none; border-bottom: 1px dotted var(--line-muted); }
 .ln-site:hover { color: var(--amber); border-color: var(--amber-dim); }
 .ln-site-big { display: inline-block; margin-top: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--amber); border: 1px solid var(--amber-dim); border-bottom: 1px solid var(--amber-dim); border-radius: 8px; padding: 0.45rem 0.8rem; }
 .ln-site-big:hover { background: var(--amber-soft); }
@@ -253,7 +253,7 @@ a.ln-depth { display: inline-block; margin-top: 0.4rem; font-size: 0.82rem; colo
 .ln-dialog-body .ln-links { display: none; }
 
 /* ─── 11. HELP-TIP (canonical §6.13; same markup and tokens as BAS) ─── */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--text-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--line-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
 .help-tip:hover, .help-tip:focus { color: var(--amber); border-color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: min(260px, calc(100vw - 32px)); padding: 0.85rem 1rem; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; line-height: 1.5; color: var(--text); background: var(--bg-card); border: 1px solid var(--amber-glow); border-radius: 5px; box-shadow: 0 4px 18px rgba(0,0,0,0.55); z-index: 50; text-align: left; letter-spacing: 0; text-transform: none; white-space: normal; }
 .help-tip .tip-content strong { color: var(--text-bright); font-weight: 600; }

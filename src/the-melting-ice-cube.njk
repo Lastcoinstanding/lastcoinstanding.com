@@ -82,7 +82,7 @@ eleventyComputed:
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
             <div class="btc-zero-box">
               <span class="btc-zero-pct">0%</span>
-              <span style="font-size:.72rem;color:var(--text-muted)">terminal · certain</span>
+              <span style="font-size:.72rem;color:var(--text-dim)">terminal · certain</span>
             </div>
             <div class="btc-epoch-box">
               <span class="btc-epoch-rate" id="issuanceCard">0.83%/yr</span>
@@ -194,8 +194,8 @@ eleventyComputed:
         <div class="calc-block-title">Bitcoin Growth Assumption</div>
         <div class="opt-group" id="cagrBtns">
           <button class="opt-btn sel" data-val="powerlaw" onclick="setCagr(this)">Power Law model</button>
-          <button class="opt-btn" data-val="20" onclick="setCagr(this)">20% <span style="font-weight:400;font-size:.7em;opacity:.65">moderate</span></button>
-          <button class="opt-btn" data-val="10" onclick="setCagr(this)">10% <span style="font-weight:400;font-size:.7em;opacity:.65">conservative</span></button>
+          <button class="opt-btn" data-val="20" onclick="setCagr(this)">20% <span style="font-weight:400;font-size:.7em;color:var(--text-dim)">moderate</span></button>
+          <button class="opt-btn" data-val="10" onclick="setCagr(this)">10% <span style="font-weight:400;font-size:.7em;color:var(--text-dim)">conservative</span></button>
         </div>
         <div class="cagr-note" id="cagrNote">Current trend ~36%/yr, declining as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a></div>
       </div>
@@ -324,8 +324,8 @@ eleventyComputed:
         <div class="calc-block-title">Bitcoin Growth Assumption</div>
         <div class="opt-group" id="t3CagrBtns">
           <button class="opt-btn sel" data-val="powerlaw" onclick="setT3Cagr(this)">Power Law model</button>
-          <button class="opt-btn" data-val="20" onclick="setT3Cagr(this)">20% <span style="font-weight:400;font-size:.7em;opacity:.65">moderate</span></button>
-          <button class="opt-btn" data-val="10" onclick="setT3Cagr(this)">10% <span style="font-weight:400;font-size:.7em;opacity:.65">conservative</span></button>
+          <button class="opt-btn" data-val="20" onclick="setT3Cagr(this)">20% <span style="font-weight:400;font-size:.7em;color:var(--text-dim)">moderate</span></button>
+          <button class="opt-btn" data-val="10" onclick="setT3Cagr(this)">10% <span style="font-weight:400;font-size:.7em;color:var(--text-dim)">conservative</span></button>
         </div>
         <div class="cagr-note" id="t3CagrNote">Current trend ~36%/yr, declining as adoption matures. Source: <a href="https://www.porkopolis.io/thechart/" target="_blank" rel="noopener">porkopolis.io/thechart</a></div>
       </div>

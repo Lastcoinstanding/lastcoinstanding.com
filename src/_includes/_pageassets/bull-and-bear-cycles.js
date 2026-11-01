@@ -24,7 +24,7 @@
   if (typeof PL_DATA === 'undefined' || typeof plPrice !== 'function') return;
 
   // ── Palette ──
-  var AMBER = '#e09422', RED = '#e08a7a', DIM = '#9a9080', MUTED = '#7a7367';
+  var AMBER = '#e09422', RED = '#e08a7a', DIM = '#9a9080', MUTED = '#877e6f';
   var LIVE_C = '#f2d38a';
 
   // ── Documented daily-close cycle extremes (register §1). Headline %s are
@@ -34,7 +34,7 @@
   //    NEXT cycle's peak (register §13). ──
   var CYCLES = [
     { id: '2011', peakDate: '2011-06-08', peak: 31.50,  troughDate: '2011-11-18', trough: 2.05,   ddPct: -93, recovery: '621×', asterisk: true,  color: '#8a7f6d' },
-    { id: '2013', peakDate: '2013-11-30', peak: 1163,   troughDate: '2015-01-14', trough: 180,    ddPct: -85, recovery: '130×', color: '#b04525' },
+    { id: '2013', peakDate: '2013-11-30', peak: 1163,   troughDate: '2015-01-14', trough: 180,    ddPct: -85, recovery: '130×', color: '#b04525', labelColor: '#c7664a' },
     { id: '2017', peakDate: '2017-12-17', peak: 19783,  troughDate: '2018-12-15', trough: 3183,   ddPct: -84, recovery: '22×',  color: '#c98a2e' },
     { id: '2021', peakDate: '2021-11-10', peak: 69000,  troughDate: '2022-11-21', trough: 15476,  ddPct: -77, recovery: '8×',   color: '#6db3d4' },
     { id: '2025', peakDate: '2025-10-06', peak: 126198, troughDate: null,         trough: null,   ddPct: null, recovery: null, ongoing: true,  color: LIVE_C }
@@ -253,7 +253,7 @@
         if (!last) return;
         ctx.save();
         ctx.font = '600 11px Inter, sans-serif';
-        ctx.fillStyle = ds.borderColor;
+        ctx.fillStyle = ds._labelColor || ds.borderColor;
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
         var tx = Math.min(last.x + 6, chart.chartArea.right - 46);
@@ -280,6 +280,7 @@
         tension: 0.15,
         hidden: !shown[c.id],
         _depthLabel: isLive ? 'now' : (c.ddPct + '%'),
+        _labelColor: c.labelColor,
         order: isLive ? 0 : 2
       };
     });

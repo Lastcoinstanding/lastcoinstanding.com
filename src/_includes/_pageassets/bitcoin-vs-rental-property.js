@@ -1290,7 +1290,7 @@
         var tEl = document.getElementById('calc-port-total');
         if (tEl) {
           tEl.textContent = total + '%';
-          tEl.style.color = total === 100 ? 'var(--green)' : '#e07a6d';
+          tEl.style.color = total === 100 ? 'var(--green-text)' : '#e07a6d';
         }
         rerender();
       });

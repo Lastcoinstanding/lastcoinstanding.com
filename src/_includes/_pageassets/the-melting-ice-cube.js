@@ -488,13 +488,13 @@ function drawT2Chart(){
     var gy=yP(gv);
     ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(PAD.left,gy);ctx.lineTo(PAD.left+cW,gy);ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='10px Inter,sans-serif';
     ctx.textAlign='right';ctx.textBaseline='middle';
     ctx.fillText(fmtM(gv),PAD.left-6,gy);
   }
   /* X labels */
   [0,4,8,12,16,20].forEach(function(yr){
-    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='10px Inter,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='top';
     ctx.fillText('Yr '+yr,xP(yr),H-PAD.bottom+6);
   });
@@ -709,12 +709,12 @@ function drawT3Chart(){
     var gv=minVal+(maxVal-minVal)*(i/5),gy=yP(gv);
     ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(PAD.left,gy);ctx.lineTo(PAD.left+cW,gy);ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='10px Inter,sans-serif';
     ctx.textAlign='right';ctx.textBaseline='middle';
     ctx.fillText(fmtM(gv),PAD.left-6,gy);
   }
   [0,4,8,12,16,20].forEach(function(yr){
-    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Inter,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='10px Inter,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='top';
     ctx.fillText('Yr '+yr,xP(yr),H-PAD.bottom+6);
   });

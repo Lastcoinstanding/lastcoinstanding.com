@@ -946,8 +946,8 @@
           tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtVal(ctx.parsed.y); } } }
         },
         scales: {
-          x: { ticks: { color: '#6a6256', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { type: 'logarithmic', ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return fmtVal(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+          x: { ticks: { color: '#877e6f', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { type: 'logarithmic', ticks: { color: '#877e6f', font: { size: 10 }, callback: function(v){ return fmtVal(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
         }
       }
     });
@@ -1145,8 +1145,8 @@
           tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y); } } }
         },
         scales: {
-          x: { ticks: { color: '#6a6256', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { type: 'logarithmic', ticks: { color: '#6a6256', font: { size: 10 }, callback: function(v){ return fmtUsd(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+          x: { ticks: { color: '#877e6f', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { type: 'logarithmic', ticks: { color: '#877e6f', font: { size: 10 }, callback: function(v){ return fmtUsd(v); } }, grid: { color: 'rgba(255,255,255,0.04)' } }
         }
       }
     });

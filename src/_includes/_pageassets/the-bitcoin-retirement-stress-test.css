@@ -11,7 +11,7 @@
   --amber: #e09422;
   --text: #e8e0d4;
   --text-dim: #9a9080;
-  --text-muted: #6a6256;
+  --text-muted: #877e6f; --line-muted: #6a6256;
   --red: #c0392b;
   --red-soft: #e08a7a;
   --green: #6fae6f;
@@ -107,7 +107,7 @@ body { background: var(--bg); color: var(--text); }
 .st-part-badge { display: inline-block; font-family: var(--font-b); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); border: 1px solid rgba(224,148,34,0.4); border-radius: 3px; padding: 0.08rem 0.3rem; vertical-align: middle; margin-left: 0.4rem; }
 
 /* ── Canonical Style-Guide tooltip (.help-tip / .tip-content) ── */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 230px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: var(--font-b); font-size: 0.78rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }

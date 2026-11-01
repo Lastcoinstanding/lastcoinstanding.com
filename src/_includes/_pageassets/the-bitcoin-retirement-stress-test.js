@@ -37,7 +37,7 @@
 
   // ── Palette (retirement/house conventions) ──
   var C_TREND = 'rgba(224,148,34,0.30)', C_FLOOR = 'rgba(176,69,37,0.35)';
-  var C_BASE = '#6db3d4', C_CRASH = '#e08a7a', MUTED = '#7a7367', DIM = '#9a9080';
+  var C_BASE = '#6db3d4', C_CRASH = '#e08a7a', MUTED = '#877e6f', DIM = '#9a9080';
   // Mitigated ("Spending cut") sweep bars: amber/cream, NOT the rose crash family,
   // so the three-bar groups read apart at a glance (JM v2.1 review, item D).
   var C_MIT = '#e6c88f';
@@ -244,7 +244,7 @@
         var xp = xS.getPixelForValue(m.x);
         if (xp < xS.left - 1 || xp > xS.right + 1) return;
         ctx.strokeStyle = m.color; ctx.beginPath(); ctx.moveTo(xp, yS.top); ctx.lineTo(xp, yS.bottom); ctx.stroke();
-        ctx.setLineDash([]); ctx.font = '600 10px Inter, sans-serif'; ctx.fillStyle = m.color; ctx.textAlign = 'center';
+        ctx.setLineDash([]); ctx.font = '600 10px Inter, sans-serif'; ctx.fillStyle = m.labelColor || m.color; ctx.textAlign = 'center';
         ctx.fillText(m.label, xp, yS.top - 3);
         ctx.setLineDash([3, 3]);
       });
@@ -316,7 +316,7 @@
     // COLOR (amber vs the rose crash) as well as dash. Closes the v2.1 item-D remainder:
     // blue baseline, rose crash (solid), amber cut (dashed) — three distinguishable hues.
     if (reduced) ds.push(Object.assign({ label: 'With the crash + ' + FLEX + '% cut' }, lineFrom(reduced, C_MIT, 2, [6, 3])));
-    var markers = [{ x: SCENARIO.retirementYear, color: 'rgba(236,228,214,0.5)', label: 'Retire' },
+    var markers = [{ x: SCENARIO.retirementYear, color: 'rgba(236,228,214,0.5)', labelColor: 'rgba(236,228,214,0.62)', label: 'Retire' },
                    { x: crash.crashYear, color: C_CRASH, label: 'Crash' }];
     if (crashed.depletionYear) markers.push({ x: crashed.depletionYear, color: '#c0392b', label: 'Depleted' });
     if (reduced && reduced.depletionYear && reduced.depletionYear !== crashed.depletionYear) markers.push({ x: reduced.depletionYear, color: C_MIT, label: 'Reduced depleted' });

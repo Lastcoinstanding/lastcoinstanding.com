@@ -363,7 +363,7 @@ function drawAnnotations(chart) {
     ctx.textAlign  = 'left';
     ctx.font       = `600 10px 'Inter', sans-serif`;
     ctx.fillText(todayText, bx + 10, by + 12);
-    ctx.fillStyle  = '#887060';
+    ctx.fillStyle  = '#8e8577';
     ctx.font       = `400 9px 'Inter', sans-serif`;
     ctx.fillText(subText, bx + 10, by + 26);
   }
@@ -379,7 +379,7 @@ function drawAnnotations(chart) {
   ctx.font         = `600 11px 'Inter', sans-serif`;
   ctx.fillStyle    = '#504840';
   ctx.fillText('Source: lastcoinstanding.com', brandX + 1, brandY + 1);
-  ctx.fillStyle    = '#786860';
+  ctx.fillStyle    = '#8e8577';
   ctx.fillText('Source: lastcoinstanding.com', brandX, brandY);
 
   ctx.restore();

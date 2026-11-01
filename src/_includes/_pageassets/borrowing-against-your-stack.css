@@ -28,9 +28,9 @@
     --amber-glow: rgba(224,148,34,0.15);
     --text: #e8e0d4;
     --text-dim: #9a9080;
-    --text-muted: #6a6256;
+    --text-muted: #877e6f; --line-muted: #6a6256;
     --text-bright: #f2eee8;   /* used by .bas-cagr-as-of-body strong; was undefined until 2026-09-23 */
-    --red: #c0392b;
+    --red: #c0392b; --red-text: #d06053;
     --red-dim: rgba(192,57,43,0.6);
     --green: #27ae60;
     --green-dim: rgba(39,174,96,0.6);
@@ -1007,7 +1007,7 @@
     background: rgba(224,148,34,0.08);
 }
 .bas-calc-preset.bas-calc-preset-warning {
-    color: #c0392b;
+    color: var(--red-text);
     border-color: rgba(192,57,43,0.3);
 }
 .bas-calc-preset.bas-calc-preset-warning:hover {
@@ -1066,7 +1066,7 @@
     line-height: 1;
     color: var(--text-muted);
     background: transparent;
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--line-muted);
     border-radius: 50%;
     cursor: help;
     margin-left: 0.4rem;
@@ -1688,7 +1688,7 @@
 }
 .bas-calc-preset-bvs.bas-calc-preset-warning {
     border-color: rgba(192,57,43,0.35);
-    color: rgba(232,127,111,0.75);
+    color: rgba(232,127,111,0.9);
 }
 .bas-calc-preset-bvs.bas-calc-preset-warning:hover,
 .bas-calc-preset-bvs.bas-calc-preset-warning.bas-calc-preset-active {
@@ -2036,7 +2036,7 @@
     --ink: #1a1a1a;
     --ink-bright: black;
     --ink-dim: #333;
-    --ink-faint: #666;
+    --ink-faint: #877e6f;
     --border: #999;
     --border-strong: #555;
     --border-faint: #ccc;
@@ -2257,3 +2257,8 @@
     color: var(--amber, #e09422);
     font-weight: 600;
 }
+
+/* Page background set here (2026-10-31). The page declared color-scheme: dark and left the
+   background to the browser's own dark canvas, which differs between Chrome, Safari and Firefox
+   and made contrast checkers read every text colour against white. Same #0a0908 as the site. */
+body { background: var(--bg); }

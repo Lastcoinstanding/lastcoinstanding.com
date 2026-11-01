@@ -11,7 +11,7 @@
    the-power-law.css / the-bitcoin-hurdle-rate.css.
 ============================================================ */
 
-:root{--bg:#0a0908;--bg-card:#111110;--bg-card-2:#1a1917;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
+:root{--bg:#0a0908;--bg-card:#111110;--bg-card-2:#1a1917;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#877e6f; --line-muted: #706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1.05rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
 /* ── Hero ── */
@@ -61,7 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 
 /* ── Live provenance chip (dot pulses ONLY when source === 'live' — labeling canon) ── */
 .dash-live { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-style: italic; color: var(--text-muted); }
-.dash-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); flex: 0 0 auto; }
+.dash-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line-muted); flex: 0 0 auto; }
 .is-live .dash-live-dot { background: var(--amber); animation: dashPulse 2.2s ease-out infinite; }
 @keyframes dashPulse { 0% { box-shadow: 0 0 0 0 rgba(224,148,34,0.45); } 70% { box-shadow: 0 0 0 7px rgba(224,148,34,0); } 100% { box-shadow: 0 0 0 0 rgba(224,148,34,0); } }
 @media (prefers-reduced-motion: reduce) { .is-live .dash-live-dot { animation: none; } }
@@ -84,7 +84,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 /* Channel position bar: floor(0%) → trend(computed tick) → upper(100%) */
 .dash-posbar { max-width: 100%; }   /* v3: track runs the full content width of the hero tile */
 .dash-posbar-track { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(192,57,43,0.30) 0%, rgba(224,148,34,0.28) 44%, rgba(212,168,67,0.30) 100%); border: 1px solid var(--border-lt); }
-.dash-posbar-tick { position: absolute; top: -3px; width: 1px; height: 14px; background: var(--text-muted); }
+.dash-posbar-tick { position: absolute; top: -3px; width: 1px; height: 14px; background: var(--line-muted); }
 .dash-posbar-trend { background: var(--text-dim); }
 .dash-posbar-marker { position: absolute; top: 50%; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--amber); border: 2px solid #14110d; transform: translate(-50%, -50%); transition: left 0.5s cubic-bezier(.4,0,.2,1); box-shadow: 0 0 10px rgba(224,148,34,0.5); }
 /* Freshness (v2): the position marker gets the ribbon dot's live pulse/glow — the
@@ -137,7 +137,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dash-jump-carry { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--amber); background: rgba(224,148,34,0.10); border: 1px solid rgba(224,148,34,0.28); border-radius: 4px; padding: 0.1rem 0.4rem; white-space: nowrap; }
 
 /* ── help-tip (canonical, STYLE_GUIDE §6.13) ── */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.15rem; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.15rem; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 230px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: var(--font-b); font-size: 0.78rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }

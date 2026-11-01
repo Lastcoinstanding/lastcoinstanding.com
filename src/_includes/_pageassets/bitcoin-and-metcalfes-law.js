@@ -32,9 +32,9 @@ const FITS = {
 let cur={proxy:'bal', era:'all'};
 function perDouble(b){ return Math.pow(2,b).toFixed(1); }
 function fitTier(r2){
-  if(r2>=0.7) return {c:'var(--good)', t:`R² ${r2.toFixed(2)} — strong`};
-  if(r2>=0.4) return {c:'var(--warn)', t:`R² ${r2.toFixed(2)} — weak`};
-  return {c:'var(--bad)', t:`R² ${r2.toFixed(2)} — broken`};
+  if(r2>=0.7) return {c:'var(--good)', ct:'var(--good-text)', t:`R² ${r2.toFixed(2)} — strong`};
+  if(r2>=0.4) return {c:'var(--warn)', ct:'var(--warn-text)', t:`R² ${r2.toFixed(2)} — weak`};
+  return {c:'var(--bad)', ct:'var(--bad-text)', t:`R² ${r2.toFixed(2)} — broken`};
 }
 function insightText(f){
   if(f.inverted) return `<strong>The proxy has inverted.</strong> In the ETF era, active addresses move <em>opposite</em> to price: on-chain activity fell while price rose, because ETFs and Layer-2 moved transactions off-chain. This isn't a Metcalfe exponent — it's a broken instrument, and the clearest possible sign that activity is no longer a good measure of adoption.`;
@@ -76,7 +76,7 @@ function draw(){
   document.getElementById('perDoubleVal').innerHTML = f.beta>0 ? `${perDouble(f.beta)}<small>×</small>` : '<small>inverted</small>';
   const tier=fitTier(f.r2);
   document.querySelector('#fitQ .dot').style.background=tier.c;
-  const ft=document.getElementById('fitTxt'); ft.textContent=tier.t; ft.style.color=tier.c;
+  const ft=document.getElementById('fitTxt'); ft.textContent=tier.t; ft.style.color=tier.ct;
   document.getElementById('insight').innerHTML=insightText(f);
 
   // Real scatter: actual price-vs-adoption points for this proxy + era.
@@ -101,11 +101,11 @@ function draw(){
   const opts={responsive:true,maintainAspectRatio:false,animation:{duration:350},
     plugins:{legend:{display:false},tooltip:{enabled:false}},
     scales:{
-      x:{type:'logarithmic',title:{display:true,text:xTitle,color:'#6f6b63',font:{size:11}},
-         ticks:{display:true,color:'#6f6b63',font:{size:10},autoSkip:false,maxRotation:0,callback:fmtCount},
+      x:{type:'logarithmic',title:{display:true,text:xTitle,color:'#8d8576',font:{size:11}},
+         ticks:{display:true,color:'#8d8576',font:{size:10},autoSkip:false,maxRotation:0,callback:fmtCount},
          grid:{color:'#2a2e34'}},
-      y:{type:'logarithmic',title:{display:true,text:'Price (USD, log scale)',color:'#6f6b63',font:{size:11}},
-         ticks:{display:true,color:'#6f6b63',font:{size:10},autoSkip:false,callback:fmtPrice},
+      y:{type:'logarithmic',title:{display:true,text:'Price (USD, log scale)',color:'#8d8576',font:{size:11}},
+         ticks:{display:true,color:'#8d8576',font:{size:10},autoSkip:false,callback:fmtPrice},
          grid:{color:'#2a2e34'}}
     }};
   if(chart){chart.data=data;chart.options=opts;chart.update();}else chart=new Chart(document.getElementById('fitChart'),{data,options:opts});

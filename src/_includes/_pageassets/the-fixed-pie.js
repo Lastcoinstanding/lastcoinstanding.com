@@ -77,14 +77,14 @@ function drawShareChart(highlightYear) {
     ctx.strokeStyle = pct === 100 ? '#2a2826' : '#1e1c1a';
     ctx.lineWidth = pct === 100 ? 1.2 : 0.8;
     ctx.stroke();
-    ctx.fillStyle = '#706860';
+    ctx.fillStyle = '#877e6f';
     ctx.fillText(pct + '%', pad.left - 8, y);
   });
 
   // X axis ticks
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillStyle = '#706860';
+  ctx.fillStyle = '#877e6f';
   [0, 10, 20, 30, 40, 50].forEach(yr => {
     const x = xOf(yr);
     ctx.beginPath();
@@ -95,7 +95,7 @@ function drawShareChart(highlightYear) {
   });
 
   // X axis label
-  ctx.fillStyle = '#504840';
+  ctx.fillStyle = '#877e6f';
   ctx.font = `${Math.round(9 * dpr) / dpr}px Inter, sans-serif`;
   ctx.fillText('Years', pad.left + cw / 2, pad.top + ch + 30);
 
@@ -103,7 +103,7 @@ function drawShareChart(highlightYear) {
   const lines = [
     { growth: 0,    color: '#F7931A', label: 'Bitcoin', lineWidth: 3 },
     { growth: 0.017, color: '#c9a84c', label: 'Gold',    lineWidth: 2 },
-    { growth: 0.065, color: '#c0392b', label: 'USD',    lineWidth: 2 },  // M2, ~6.5%/yr over 50 years (the site-wide m2-growth preset; DATA_AUDIT I-2)
+    { growth: 0.065, color: '#c0392b', textColor: '#d06053', label: 'USD',    lineWidth: 2 },  // M2, ~6.5%/yr over 50 years (the site-wide m2-growth preset; DATA_AUDIT I-2)
   ];
 
   lines.forEach(line => {
@@ -166,7 +166,7 @@ function drawShareChart(highlightYear) {
     ctx.font = `600 ${Math.round(10 * dpr) / dpr}px Inter, sans-serif`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = line.color;
+    ctx.fillStyle = line.textColor || line.color;
     // Only show label if close to right edge
     if (endY >= maxYear * 0.85 || !animating) {
       const pct = shareRetained(line.growth, endY);
@@ -342,7 +342,7 @@ function drawCagrChart() {
     ctx.font = `${Math.round(9 * dpr)/dpr}px Inter, sans-serif`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#555048';
+    ctx.fillStyle = '#877e6f';
     if (v <= 200) ctx.fillText(v + '%', pad.left - 6, y);
   });
 
@@ -393,13 +393,13 @@ function drawCagrChart() {
     // Period label below
     ctx.font = `${Math.round(8.5 * dpr)/dpr}px Inter, sans-serif`;
     ctx.textBaseline = 'top';
-    ctx.fillStyle = '#706860';
+    ctx.fillStyle = '#877e6f';
     ctx.fillText(d.period, bx + barW / 2, pad.top + ch + 8);
   });
 
   // "All positive ↑" annotation
   ctx.font = `italic ${Math.round(9 * dpr)/dpr}px Inter, sans-serif`;
-  ctx.fillStyle = 'rgba(247,147,26,0.4)';
+  ctx.fillStyle = 'rgba(247,147,26,0.75)';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.fillText('← all windows positive', pad.left + 4, pad.top + ch + 28);

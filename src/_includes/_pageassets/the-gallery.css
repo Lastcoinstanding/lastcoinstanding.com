@@ -27,8 +27,8 @@
     --text:         #d8d2ca;
     --text-bright:  #f2eee8;
     --text-dim:     #908880;
-    --text-muted:   rgba(220,200,170,0.55);
-    --text-faint:   rgba(220,200,170,0.38);
+    --text-muted:   #877e6f;
+    --text-faint:   #877e6f;
 }
 
 body {

@@ -20,8 +20,8 @@
     --amber-glow: rgba(224,148,34,0.15);
     --text: #e8e0d4;
     --text-dim: #9a9080;
-    --text-muted: #6a6256;
-    --red: #c0392b;
+    --text-muted: #877e6f; --line-muted: #6a6256;
+    --red: #c0392b; --red-text: #d06053;
     --red-dim: rgba(192,57,43,0.6);
     --green: #27ae60;
     --border: rgba(224,148,34,0.12);
@@ -62,7 +62,7 @@
     --dr-floor: #c0392b;
     --dr-upper: #e8c820;
     --dr-history: rgba(232,224,210,0.7);
-    --dr-axis: rgba(160,160,160,0.55);
+    --dr-axis: #877e6f; /* chart axis text; was rgba(160,160,160,0.55), 3:1 (WCAG AA, 2026-11-01) */
     --dr-grid: rgba(255,255,255,0.04);
     --dr-tip-bg: rgba(10,9,8,0.95);
     --dr-tip-border: rgba(224,148,34,0.5);
@@ -832,7 +832,7 @@ input[type="range"]::-moz-range-track {
 }
 .dr-swatch-discipline { background: var(--amber); width: 14px; height: 3px; border-radius: 1px; }
 .dr-swatch-hodl { background: rgba(154,144,128,0.55); width: 14px; height: 3px; border-radius: 1px; }
-.dr-swatch-sell { color: var(--red); }
+.dr-swatch-sell { color: var(--red-text); }
 .dr-swatch-rebuy { color: var(--green); }
 
 /* Account-type comparison panel (Regular mode) */
@@ -847,7 +847,7 @@ input[type="range"]::-moz-range-track {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: var(--red);
+    color: var(--red-text);
     font-weight: 500;
     margin-bottom: 0.6rem;
 }
@@ -1017,7 +1017,7 @@ input[type="range"]::-moz-range-track {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: var(--red);
+    color: var(--red-text);
     font-weight: 500;
     margin-bottom: 0.85rem;
 }
@@ -1648,7 +1648,7 @@ input[type="range"]::-moz-range-track {
     margin: 0.9rem 0 0.6rem;
     padding: 0.7rem 0.9rem;
     background: rgba(255,255,255,0.02);
-    border-left: 2px solid var(--text-muted);
+    border-left: 2px solid var(--line-muted);
     border-radius: 3px;
 }
 .dr-hist-summary p {
@@ -1943,7 +1943,7 @@ input[type="range"]::-moz-range-track {
     height: 14px;
     border-radius: 50%;
     background: transparent;
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--line-muted);
     color: var(--text-muted);
     font-family: 'Inter', sans-serif;
     font-size: 0.65rem;
@@ -2187,7 +2187,7 @@ table.dr2-table tr.won td.mult { color: var(--dr2-green); font-weight: 600; }
 .dr2-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .75rem; color: var(--text-dim); }
 .dr2-legend i { display: inline-block; width: 14px; height: 0; vertical-align: middle; margin-right: .35rem; }
 .dr2-key-rule { border-top: 2px solid var(--orange); }
-.dr2-key-hodl { border-top: 2px dashed var(--text-muted); }
+.dr2-key-hodl { border-top: 2px dashed var(--line-muted); }
 /* Handoffs */
 .dr2-next { display: grid; gap: .9rem; }
 .dr2-handoffs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
@@ -2233,14 +2233,14 @@ table.dr2-table tr.won td.mult { color: var(--dr2-green); font-weight: 600; }
 /* Spinners hidden for width; arrow keys still step by the field's step. */
 .dr2-bf input::-webkit-inner-spin-button, .dr2-bf input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .dr2-bf select { padding: 0 .3rem; max-width: 9.5rem; }
-.dr2-bf input:hover, .dr2-bf select:hover { border-color: var(--text-muted); }
+.dr2-bf input:hover, .dr2-bf select:hover { border-color: var(--line-muted); }
 .dr2-bar-acct { display: flex; gap: .2rem; }
 .dr2-bar-edit { margin-left: auto; }
 .dr2-bar-line { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .74rem; color: var(--text-dim); }
 .dr2-bar-rule { font-size: .76rem; color: var(--text); font-weight: 500; }
 .dr2-bar-sum::before { content: " · "; }
 .dr2-chip { background: none; border: 1px solid var(--border-lt); color: var(--text-dim); border-radius: 6px; padding: 0 .5rem; min-height: 44px; min-width: 44px; font-family: inherit; font-size: .74rem; font-weight: 500; cursor: pointer; }
-.dr2-chip:hover { border-color: var(--text-muted); }
+.dr2-chip:hover { border-color: var(--line-muted); }
 .dr2-chip[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
 .dr2-bar-edit { background: var(--orange-soft); border: 1px solid var(--orange); color: var(--orange); border-radius: 6px; padding: 0 .75rem; min-height: 44px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .dr2-bar button:focus-visible, .dr2-bar input:focus-visible, .dr2-bar select:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
@@ -2349,7 +2349,7 @@ details.dr2-how .body b { color: var(--text); }
 .dr2-scale .ax { position: absolute; top: 6px; font-size: 11.5px; white-space: nowrap; color: var(--text-muted); transform: translateX(-50%); }
 .dr2-scale .ax.s { transform: none; }
 .dr2-scale .ax.e { transform: translateX(-100%); }
-.dr2-scale .ax::before { content: ""; position: absolute; left: 50%; top: -6px; width: 1px; height: 5px; background: var(--text-muted); }
+.dr2-scale .ax::before { content: ""; position: absolute; left: 50%; top: -6px; width: 1px; height: 5px; background: var(--line-muted); }
 .dr2-scale .ax.s::before { left: 0; }
 .dr2-scale .ax.e::before { left: auto; right: 0; }
 .dr2-scale .base { position: absolute; left: 10px; right: 10px; top: 33px; height: 2px; background: var(--border-lt); }
@@ -2377,3 +2377,8 @@ details.dr2-how .body b { color: var(--text); }
 .dr2-why { font-size: .8rem; color: var(--text); background: var(--dr2-red-soft); border: 1px solid var(--dr2-red-border); border-radius: 8px; padding: .55rem .7rem; line-height: 1.5; display: grid; gap: .3rem; }
 .dr2-why[hidden] { display: none; }
 .dr2-why b { color: var(--dr2-red-txt); }
+
+/* Page background set here (2026-10-31). The page declared color-scheme: dark and left the
+   background to the browser's own dark canvas, which differs between Chrome, Safari and Firefox
+   and made contrast checkers read every text colour against white. Same #0a0908 as the site. */
+body { background: var(--bg); }

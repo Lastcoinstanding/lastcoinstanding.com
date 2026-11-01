@@ -71,7 +71,7 @@
 
   // ── Chart palette (canvas can't read CSS vars) ──
   var AMBER = '#e09422', BAND = 'rgba(224,148,34,0.14)', FLOORLINE = 'rgba(224,148,34,0.40)';
-  var CAND = '#6db3d4', MUTED = '#7a7367', DIM = '#9a9080', INK = '#0a0908';
+  var CAND = '#6db3d4', MUTED = '#877e6f', DIM = '#9a9080', INK = '#0a0908';
 
   // ── State ──
   var S = {

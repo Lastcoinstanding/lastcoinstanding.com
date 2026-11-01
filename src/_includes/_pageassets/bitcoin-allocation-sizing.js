@@ -38,7 +38,7 @@
   var BTC_VOL = 0.45, TRAD_VOL = 0.12, CORR = 0.50;
 
   // ── Palette ──
-  var MUTED = '#7a7367', DIM = '#9a9080', C_DOWN = '#e08a7a';
+  var MUTED = '#877e6f', MUTED_LINE = '#7a7367', DIM = '#9a9080', C_DOWN = '#e08a7a';
   // Drift-chart sleeve colors (page-scoped per STYLE_GUIDE §8): bitcoin "Resonant"
   // orange and the site's traditional-60/40 blue-gray, matching the Retirement chart.
   var BTC_ORANGE = '#F7931A', TRAD_BLUE = '#5e7a92';
@@ -535,7 +535,7 @@
     // legend when closed. Neutral dim dash (NOT danger red — it's a benchmark).
     if (S.crashOn) {
       sets.push({ label: 'No-bitcoin portfolio (total)', data: xy(paths.noBtc), fill: false, stack: 'nobtc',
-        borderColor: MUTED, borderWidth: 1.4, borderDash: [6, 4], pointRadius: 0, tension: 0.2 });
+        borderColor: MUTED_LINE, borderWidth: 1.4, borderDash: [6, 4], pointRadius: 0, tension: 0.2 });
     }
     return sets;
   }

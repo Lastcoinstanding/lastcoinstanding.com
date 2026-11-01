@@ -42,7 +42,7 @@
     --amber-glow: rgba(224,148,34,0.15);
     --text: #e8e0d4;
     --text-dim: #9a9080;
-    --text-muted: #6a6256;
+    --text-muted: #877e6f; --line-muted: #6a6256;
     --red: #c0392b;
     --red-dim: rgba(192,57,43,0.6);
     --green: #27ae60;
@@ -189,7 +189,7 @@ body {
     align-items: center;
     justify-content: center;
     background: rgba(255,255,255,0.04);
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--line-muted);
     border-radius: 50%;
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-weight: 500;
@@ -584,7 +584,7 @@ body {
 .cluster-label-help {
     font-family: 'Inter', -apple-system, sans-serif;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-dim);
     font-style: italic;
     flex: 1;
     min-width: 14em;
@@ -860,7 +860,7 @@ body {
     line-height: 1;
     color: var(--text-muted);
     background: transparent;
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--line-muted);
     border-radius: 50%;
     cursor: help;
     margin-left: 0.4rem;

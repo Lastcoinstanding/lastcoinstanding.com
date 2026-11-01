@@ -9,7 +9,7 @@
    resolve to canvastext and the page paints on the browser's light
    canvas (washed-out hero, black var-based borders). Canonical values
    copied from the-power-law.css. */
-:root{--bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--red-dim:rgba(192,57,43,.30);--red-soft:rgba(192,57,43,.10);--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
+:root{--bg:#0a0908;--bg-card:#111110;--border:#1e1c1a;--border-lt:#2a2826;--orange:#F7931A;--orange-dim:rgba(247,147,26,.45);--orange-glow:rgba(247,147,26,.12);--orange-soft:rgba(247,147,26,.08);--gold:#d4a843;--gold-dim:rgba(212,168,67,.35);--gold-soft:rgba(212,168,67,.10);--red:#c0392b;--red-dim:rgba(192,57,43,.30);--red-soft:rgba(192,57,43,.10);--amber:#e09422;--text:#d8d2ca;--text-dim:#908880;--text-bright:#f2eee8;--text-body:#d0c8c0;--text-muted:#877e6f; --line-muted: #706860;--font-d:'Cormorant Garamond',Georgia,serif;--font-b:'Inter',-apple-system,sans-serif}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:1.05rem;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
 /* ── Hero ── */
@@ -54,8 +54,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 
 /* ── Lens toggle (§6.17 canonical, adapted: Company neutral / Personal amber) ── */
 .calc-mode-toggle { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin: 0 auto 1.2rem; padding: 0; max-width: 720px; }
-.calc-mode-label { background: none; border: none; cursor: pointer; padding: 0.5rem 0; text-align: center; font-family: 'Inter', -apple-system, sans-serif; flex: 1 0 0; max-width: 300px; opacity: 0.5; transition: opacity 0.25s, color 0.25s; color: var(--text-muted); }
-.calc-mode-label:hover { opacity: 0.8; }
+.calc-mode-label { background: none; border: none; cursor: pointer; padding: 0.5rem 0; text-align: center; font-family: 'Inter', -apple-system, sans-serif; flex: 1 0 0; max-width: 300px; opacity: 1; transition: opacity 0.25s, color 0.25s; color: var(--text-muted); }
+.calc-mode-label:hover .calc-mode-name { color: var(--text-dim); }
 .calc-mode-label.active { opacity: 1; }
 .calc-mode-label:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 4px; }
 .calc-mode-name { display: block; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 500; line-height: 1.15; margin-bottom: 0.3rem; letter-spacing: 0.005em; }
@@ -64,7 +64,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .calc-mode-sub { display: block; font-size: 0.78rem; color: var(--text-muted); font-style: italic; line-height: 1.45; }
 .calc-mode-switch { width: 64px; height: 32px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 16px; cursor: pointer; padding: 0; position: relative; flex: 0 0 auto; transition: background 0.28s, border-color 0.28s; }
 .calc-mode-switch:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
-.calc-mode-thumb { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--text-muted); transition: left 0.3s cubic-bezier(.4,.0,.2,1), background 0.28s; pointer-events: none; }
+.calc-mode-thumb { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--line-muted); transition: left 0.3s cubic-bezier(.4,.0,.2,1), background 0.28s; pointer-events: none; }
 .calc-mode-toggle[data-active-mode="personal"] .calc-mode-switch { background: rgba(224,148,34,0.08); border-color: rgba(224,148,34,0.35); }
 .calc-mode-toggle[data-active-mode="personal"] .calc-mode-thumb { left: 35px; background: var(--amber); }
 .calc-mode-content { display: none; }
@@ -164,7 +164,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .hr-stat-adj { display: block; margin-top: 0.3rem; padding-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.72rem; font-style: italic; color: var(--text-dim); }
 
 /* Help-tip / inline tooltip (STYLE_GUIDE §6.13) — used by stat cards + the funding-source label. */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 230px; padding: 0.6rem 0.75rem; background: var(--bg-card); border: 1px solid rgba(224,148,34,0.3); border-radius: 4px; font-family: var(--font-b); font-size: 0.78rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }

@@ -35,7 +35,7 @@
   --text: #d8d2ca;
   --text-dim: #908880;
   --text-bright: #f2eee8;
-  --text-muted: #706860;
+  --text-muted: #877e6f; --line-muted: #706860;
   --font-d: 'Cormorant Garamond', Georgia, serif;
   --font-b: 'Inter', -apple-system, 'Segoe UI', sans-serif;
 
@@ -99,7 +99,7 @@ body { background: var(--bg); color: var(--text); }
 .sp-ro-meta { font-size: .82rem; color: var(--text-dim); margin: .4rem 0 0; }
 .sp-ro-meta:last-of-type { margin-bottom: .8rem; }
 .sp-ro-meta strong { color: var(--orange); font-weight: 600; }
-.sp-pill { display: inline-block; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 999px; border: 1px solid var(--text-muted); color: var(--text); }
+.sp-pill { display: inline-block; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 999px; border: 1px solid var(--line-muted); color: var(--text); }
 .sp-pill.warm { border-color: var(--amber); color: var(--amber); }
 .sp-pill.hot { border-color: var(--red); color: var(--sp-hot-text); }
 .sp-ro-lede { font-family: var(--font-d); font-size: 1.22rem; line-height: 1.4; color: var(--text); margin: .8rem 0 0 !important; }
@@ -135,7 +135,7 @@ body { background: var(--bg); color: var(--text); }
 .sp-pair-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .6rem; }
 /* Standard help tip (STYLE_GUIDE §6.13), as on How Much Cash, tokenized.
    tip-clamp.js (layout-level) keeps the card on screen at narrow widths. */
-.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; letter-spacing: 0; text-transform: none; }
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-muted); color: var(--text-muted); font-size: 0.65rem; font-style: normal; cursor: help; position: relative; font-weight: 400; vertical-align: middle; margin-left: 0.35rem; letter-spacing: 0; text-transform: none; }
 .help-tip:hover, .help-tip:focus { border-color: var(--amber); color: var(--amber); outline: none; }
 .help-tip .tip-content { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: min(240px, calc(100vw - 32px)); padding: 0.6rem 0.75rem; background: var(--bg-card-2); border: 1px solid var(--sp-tip-border); border-radius: 4px; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; color: var(--text); line-height: 1.45; text-align: left; letter-spacing: 0; text-transform: none; white-space: normal; pointer-events: none; z-index: 10; box-shadow: 0 6px 18px var(--sp-shadow); }
 .help-tip:hover .tip-content, .help-tip:focus .tip-content { display: block; pointer-events: auto; }
@@ -167,7 +167,7 @@ body { background: var(--bg); color: var(--text); }
 .sp-row .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
 .sp-bar { height: .6rem; background: var(--border); border-radius: 3px; position: relative; overflow: hidden; }
 .sp-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
-.sp-bar .mid { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--text-muted); }
+.sp-bar .mid { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--line-muted); }
 .sp-row .note { grid-column: 2 / 4; font-size: .74rem; color: var(--text-muted); margin-top: -.3rem; }
 .sp-caveat { font-size: .8rem; color: var(--text-muted); margin: 1rem 0 0 !important; }
 .sp-handoff { margin-top: 1.3rem; border-top: 1px solid var(--border-lt); padding-top: 1rem; display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; align-items: center; justify-content: space-between; }

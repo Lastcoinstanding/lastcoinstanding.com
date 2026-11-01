@@ -51,4 +51,5 @@
 .re-grid td { text-align: center; padding: 0.55rem 0.4rem; border-radius: 0.3rem; border: 1px solid transparent; }
 .re-grid td.re-grid-mine { border-color: var(--text, var(--ink, #ccc6b8)); }
 .re-grid-v { display: block; font-size: 0.86rem; font-weight: 600; color: var(--text, var(--ink, #ccc6b8)); }
-.re-grid-w { display: block; font-size: 0.66rem; color: var(--text-dim, var(--ink-dim, #968b7a)); }
+/* Body colour, not dim (2026-10-31): the cells are heat-coloured up to #673d15, where dim was 2.8–4.1:1. */
+.re-grid-w { display: block; font-size: 0.66rem; color: var(--text-body, var(--ink, #d0c8c0)); }
