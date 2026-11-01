@@ -241,7 +241,7 @@ The palette is dark by default. Migration's essay-mode is the only cream-backgro
 --ink-bright:     #ece4d6;   /* primary text on dark */
 --ink:            #ccc6b8;   /* default body */
 --ink-dim:        #968b7a;   /* secondary, captions */
---ink-faint:      #5a5247;   /* metadata, very tertiary */
+--ink-faint:      #877e6f;   /* metadata, very tertiary (was #5a5247; see Text contrast below) */
 --ink-essay:      #2a2520;   /* dark ink on cream — Migration only */
 --ink-essay-dim:  #5a5247;   /* dim ink on cream */
 
@@ -253,6 +253,19 @@ The palette is dark by default. Migration's essay-mode is the only cream-backgro
 --border:         rgba(224, 148, 34, 0.15);   /* dim amber rule */
 --border-strong:  rgba(224, 148, 34, 0.3);    /* visible amber rule */
 ```
+
+### Text contrast (WCAG AA, 2026-10-31)
+
+Every piece of text, on every background it sits on, is at least **4.5:1** (WCAG 2.2 AA). The 2026-10-31 audit found 1,802 failing elements on 57 pages; the fix (JM's option A, "minimum lift") left the look as close as possible:
+
+- **Muted and faint text is `#877e6f`** on every page (`--text-muted`, `--ink-faint`, `--text-faint`; was `#6a6256` / `#706860` / `#5a5247`, 2.4–3.6:1). It is 4.97:1 on the page and ≥4.5:1 on the standard cards (`#111110`–`#161615`). Dim (`#908880` / `#9a9080`) and body are unchanged.
+- **Lines keep the old shade.** Where a page used the muted or faint token for a border, rule, dot or fill, that declaration now reads `--line-muted` / `--line-faint`, which hold the old value. Lines are not text and were not brightened.
+- **On lighter or tinted panels** (amber-tinted price-case cards, stat panels up to `#261d0f`) muted text is under 4.5:1, so those components use the page's dim colour (`--text-dim` / `--ink-dim`). When you put muted text on a panel lighter than `#161615`, use dim instead.
+- **Coloured text gets a `-text` variant.** A colour used for lines and fills that is too dark for text gets a lifted twin for text only: `--red-text: #d06053` (lines stay `--red: #c0392b`), `--fl-break-text`, `--fl-graze-text` (The Bitcoin Floor), `--slate-text` (Paper Bitcoin), `--green-text` (Bitcoin vs. Rental Property), `--good-text` / `--warn-text` / `--bad-text` (Metcalfe), `--purple-text` (The Half-Life).
+- **Unselected options are not faded.** A toggle's unselected side, a mode control or a chip stays at full (or ≥0.85) opacity; the selected one is marked by colour (bright, amber). Fading below that drops the text under 4.5:1. WCAG exempts only *disabled* controls.
+- **Shared labels:** `.related-label`, `.companion-label` and `.usd-footnote` are 0.52 white; `.related-kind-marker` and `.companion-kind` amber at 0.8.
+- **Set the page background on `body`.** A page that declares `color-scheme: dark` still sets `body { background: var(--bg) }`: the browser's own dark canvas differs between Chrome, Safari and Firefox, and contrast checkers read text against white without it.
+- **Check:** axe `color-contrast` on every page and every tab, at 1280 and 390 px, waiting about a second after each tab switch (tabs fade in, and a mid-fade read is a false failure). Chart.js axis and legend text is drawn on canvas, which the checker cannot read; it was left as it was.
 
 ### Color usage rules
 
@@ -474,7 +487,7 @@ These have all been observed on the site and need fixing.
 6. **Editorial attributions inside the shared footer.** Page-specific citations (Vitalik Buterin on Trilemma, data sources on Real Estate) are *content*, not chrome. → Use a `.page-attribution` content section above the canonical footer (see §6.5).
 7. **Sans-serif chosen by aesthetic preference rather than page register.** The right question for a new page is not "which sans do I like?" but "is this page editorial (Inter) or system/diagrammatic (Outfit)?" — see §1. DM Sans was previously rogue on multiple pages and is forbidden in either register; cleaned up via 89011ea + 6c6c7c2.
 8. **Inconsistent tab styling across pages.** → Use the canonical tab component (§6.2).
-9. **Low-contrast text below 0.5 opacity.** Migration cover subtitle hits this. → Keep text-on-dark above 0.6 opacity for body text; mini-labels can go to 0.5 if size is ≥0.7rem.
+9. **Low-contrast text.** → Every piece of text at least 4.5:1 against what it sits on (§3, "Text contrast"); no exception for mini-labels or unselected options. Check the result, not the opacity: 0.5 white is 4.0:1 on the page and fails.
 10. **SVG-rendered text below 14px effective size on mobile.** Synthesis component circles hit this. → Add mobile breakpoint that bumps SVG container or text size.
 11. **Paragraph-level `max-width` constraints that fight the page container.** A global `p { max-width: 68ch }` (or similar) makes body text float as a narrow column inside a wider container, leaving visible empty space on the right and creating visual inconsistency vs. canonical pages where prose fills the container. → Remove the global `p` constraint; let prose fill its parent. If a narrower reading column is required (mixed-content pattern, see §4.2), apply the `max-width` to the wrapping *block* element (`.section`, `.essay`, `.narrative`) AND add `margin: 0 auto` so the block centers in the container. Per-element constraints on specific cards (intro blocks, callouts, pull-quotes) are still fine — the anti-pattern is the *global* `p` rule and any constrained block missing its centering margins.
 
