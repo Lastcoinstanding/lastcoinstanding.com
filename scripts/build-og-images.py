@@ -259,10 +259,13 @@ CARDS = [
             #   "38×" — the MEDIAN of those 116 cells' outperformance multiples.
             #     Mean is 1,738× and geometric mean 72× (dominated by 2010–2012
             #     entries); the former "164.5×" reproduced under no definition.
+            # Re-derived 2026-11-05 from the grid with data through 2026-10: 118 of
+            #   118, median 34.9× (shown as 35×). Read from the DOM: every
+            #   .bvsm-heatmap-cell[data-horizon="84"], data-outperf >= 1, median.
             "statsHTML": (
                 '<strong style="color:#F7931A; font-weight:700;">No losing 7-year window</strong>'
-                '  ·  <strong style="color:#F7931A; font-weight:700;">116 of 116</strong>'
-                ' entries since 2010  ·  median <strong style="color:#F7931A; font-weight:700;">38×</strong>'
+                '  ·  <strong style="color:#F7931A; font-weight:700;">118 of 118</strong>'
+                ' entries since 2010  ·  median <strong style="color:#F7931A; font-weight:700;">35×</strong>'
                 ' outperformance'
             ),
             "urlText": "lastcoinstanding.com/heatmap",

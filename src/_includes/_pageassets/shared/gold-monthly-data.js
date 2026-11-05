@@ -7,7 +7,7 @@
    the average of daily rates (London afternoon fixing, 99.5% fine,
    until May 2025; spot average from June 2025), in whole dollars as
    the Bank publishes it. Read from CMO-Historical-Data-Monthly.xlsx
-   (updated 2 October 2026), 195 rows, 2010-07 to 2026-09.
+   (updated 3 November 2026), 196 rows, 2010-07 to 2026-10.
    DATA_AUDIT GLD-1.
 
    A monthly AVERAGE, not a close: a bitcoin sample is priced in gold
@@ -56,7 +56,7 @@ var GOLD_MONTHLY = [
   ["2025-01",2710],["2025-02",2895],["2025-03",2983],["2025-04",3218],["2025-05",3309],["2025-06",3353],
   ["2025-07",3340],["2025-08",3368],["2025-09",3668],["2025-10",4058],["2025-11",4087],["2025-12",4309],
   ["2026-01",4753],["2026-02",5020],["2026-03",4856],["2026-04",4721],["2026-05",4587],["2026-06",4228],
-  ["2026-07",4073],["2026-08",4411],["2026-09",4319]
+  ["2026-07",4073],["2026-08",4411],["2026-09",4319],["2026-10",4105]
 ];
 
 var LCS_GOLD_SOURCES = [

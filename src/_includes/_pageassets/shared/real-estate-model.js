@@ -321,16 +321,16 @@
   var _PR = (typeof window !== 'undefined' && window.PREFERRED_RATES) || {};
   function _prRate(k, d){ return (_PR[k] && isFinite(_PR[k].ratePct)) ? _PR[k].ratePct : d; }
   var YIELD_RATES = {
-    asOf: 'September 2026',
+    asOf: 'November 2026',
     strc: _prRate('strc', 12.0),   // % a year, return of capital (DATA_AUDIT BvRP-5)
     sata: _prRate('sata', 13.0),   // % a year, return of capital (BvRP-14)
     lending: 4.0,    // % a year, ordinary income: the median of the four
-                     // lending rates below (4.04%), rounded (BvRP-28)
+                     // lending rates below (3.85%), rounded (BvRP-28)
     verifiable: [
-      { name: '3-month Treasury bill', kind: 'Reference (risk-free)', rate: 4.08, source: 'FRED DTB3, 24 Sep 2026', us: 'Yes' },
-      { name: 'Sky Savings Rate (sUSDS)', kind: 'DeFi savings', rate: 3.60, source: 'DefiLlama, base rate, 28 Sep 2026', us: 'Permissionless' },
-      { name: 'Aave v3 USDC (Ethereum)', kind: 'DeFi lending', rate: 3.63, source: 'DefiLlama, base rate, 28 Sep 2026', us: 'Permissionless' },
-      { name: 'Compound v3 USDC (Ethereum)', kind: 'DeFi lending', rate: 4.45, source: 'DefiLlama, base rate, 28 Sep 2026', us: 'Permissionless' },
+      { name: '3-month Treasury bill', kind: 'Reference (risk-free)', rate: 4.03, source: 'FRED DTB3, 3 Nov 2026', us: 'Yes' },
+      { name: 'Sky Savings Rate (sUSDS)', kind: 'DeFi savings', rate: 3.80, source: 'DefiLlama, base rate, 5 Nov 2026', us: 'Permissionless' },
+      { name: 'Aave v3 USDC (Ethereum)', kind: 'DeFi lending', rate: 3.89, source: 'DefiLlama, base rate, 5 Nov 2026', us: 'Permissionless' },
+      { name: 'Compound v3 USDC (Ethereum)', kind: 'DeFi lending', rate: 3.23, source: 'DefiLlama, base rate, 5 Nov 2026', us: 'Permissionless' },
       { name: 'Ledn Growth Account (USDC)', kind: 'CeFi lending', rate: 5.00, source: 'Ledn rates page, Sep 2026', us: 'No' }
     ]
   };
