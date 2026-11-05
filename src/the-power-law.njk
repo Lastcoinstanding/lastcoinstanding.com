@@ -62,11 +62,11 @@ faq:
   - q: "Why do Bitcoin power law models use different exponents?"
     a: "Because different authors fit different windows of data, different price series, and slightly different methods, so reasonable people land on slightly different coefficients. The like-for-like comparison is not the bare exponent but the price each fit implies at a fixed date, since a and b trade off."
   - q: "Do Bitcoin power law coefficients change over time?"
-    a: "Yes — a fit refreshes as new data arrives. Two Porkopolis snapshots of the same fit differ by well under 2%. That is drift, not revision: the model is re-measured against a few more years, not rewritten."
+    a: "Yes — a fit refreshes as new data arrives. The reference this site uses is Porkopolis's fit as recorded in May 2026; the fit Porkopolis showed in November 2026 (a = 2.2 × 10⁻¹⁷, b = 5.73) sits about 3% lower today and about 7% lower by 2060. That is drift, not revision: the model is re-measured against a few more years, not rewritten."
   - q: "How much do the different Bitcoin power law fits disagree?"
     a: "Fitted to the same history they agree within single digits on today's trend, then fan out with the horizon. BitcoinPower.law runs about 9% below the reference fit today but roughly 17% below by 2060. The disagreement is mostly about the far future, not the present — which is the real uncertainty to disclose."
   - q: "Which Bitcoin power law exponent does this site use, and why?"
-    a: "The Porkopolis reference fit, a = 1.6 × 10⁻¹⁷ and b = 5.77 — the longest-standing published fit with a disclosed methodology, and the one whose structural floor fits tightest. It stays fixed across the site and is reviewed once a year, because a reference line's value is stability: refitting it monthly would move every number on the site and break every saved scenario link."
+    a: "The Porkopolis reference fit as recorded in May 2026, a = 1.6 × 10⁻¹⁷ and b = 5.77 — the longest-standing published fit with a disclosed methodology, and the one whose structural floor fits tightest. It stays fixed across the site and is reviewed once a year, because a reference line's value is stability: refitting it monthly would move every number on the site and break every saved scenario link."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-power-law-head.html' %}"
   page_styles: "{% include '_pageassets/the-power-law.css' %}"
@@ -124,7 +124,7 @@ eleventyComputed:
       <div class="chart-title">Bitcoin Price vs. Power Law Trend</div>
       <div class="chart-subtitle">Log-log scale &middot; Daily prices since 2010 with the trend, the floor and the upper band</div>
       <div class="chart-wrapper" data-chart-copy data-chart-heading="closest:.chart-container .chart-title" data-chart-sub="closest:.chart-container .chart-subtitle" data-chart-title="Bitcoin price vs. the Power Law trend"><canvas id="powerLawChart"></canvas></div>
-      <div class="chart-source">Model uses Porkopolis coefficients (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77). Floor &asymp; 0.42&times; trend. Upper band &asymp; 3&times; trend. Genesis block: January 3, 2009. Price data: Blockchain.info.</div>
+      <div class="chart-source">Model uses the Porkopolis reference coefficients as recorded in May 2026 (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77; Porkopolis showed 2.2&times;10<sup>&minus;17</sup> and 5.73 in November 2026). Floor &asymp; 0.42&times; trend. Upper band &asymp; 3&times; trend. Genesis block: January 3, 2009. Price data: Blockchain.info.</div>
     </div>
 
     <!-- THE 13% INSIGHT -->
@@ -253,7 +253,7 @@ eleventyComputed:
         <div class="roos-test" data-test="channel"><div class="roos-test-status">&mdash;</div><div class="roos-test-body"><div class="roos-test-name">3 &middot; A fit that fails its own channel</div><div class="roos-test-rule">Any fit made since 2016 with less than 80% of its next four years inside its own channel.</div><div class="roos-test-now"></div></div></div>
       </div>
       <p class="roos-tests-note">Thresholds fixed on 2026-09-23 and computed live from the same price series as the charts. Ruled in advance so they cannot be moved after the fact.</p>
-      <p class="prose" id="roosRicher"><strong>One more thing a careful reader should know.</strong> The reference line this site draws (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) is the Porkopolis fit, published from the price history its authors had. Fitting the same method to every price through <span class="roos-r-date">&mdash;</span> gives a slightly shallower line (b&nbsp;=&nbsp;<span class="roos-r-b">&mdash;</span>) that puts today&rsquo;s trend about <span class="roos-r-pct">&mdash;</span> lower. Against that line, today&rsquo;s price sits at <span class="roos-r-refit">&mdash;</span> trend rather than <span class="roos-r-canon">&mdash;</span>. So wherever this site says bitcoin is below trend, a fresh fit says it is somewhat less far below.</p>
+      <p class="prose" id="roosRicher"><strong>One more thing a careful reader should know.</strong> The reference line this site draws (a&nbsp;=&nbsp;1.6&times;10<sup>&minus;17</sup>, b&nbsp;=&nbsp;5.77) is the Porkopolis fit as recorded here in May 2026, from the price history its authors had then. Fitting the same method to every price through <span class="roos-r-date">&mdash;</span> gives a slightly shallower line (b&nbsp;=&nbsp;<span class="roos-r-b">&mdash;</span>) that puts today&rsquo;s trend about <span class="roos-r-pct">&mdash;</span> lower. Against that line, today&rsquo;s price sits at <span class="roos-r-refit">&mdash;</span> trend rather than <span class="roos-r-canon">&mdash;</span>. So wherever this site says bitcoin is below trend, a fresh fit says it is somewhat less far below.</p>
     </div>
 
 
@@ -309,7 +309,7 @@ eleventyComputed:
           </table>
         </div>
       </div>
-      <p class="prose"><strong>Do they change over time?</strong> Yes &mdash; fits refresh as new data arrives. The two Porkopolis rows are the same author at two moments, and they differ by well under 2%. That is drift, not revision: the model is not being rewritten, it is being re-measured against a few more years.</p>
+      <p class="prose"><strong>Do they change over time?</strong> Yes &mdash; fits refresh as new data arrives. The three Porkopolis rows are the same author at three moments. The reference is the fit as recorded here in May 2026; the one The Chart showed in November 2026 sits about 3% below it today and about 7% below by 2060. Porkopolis does not date its refits, so all we can say is that the newer curve appeared some time between those two readings. That is drift, not revision: the model is not being rewritten, it is being re-measured against a few more years.</p>
       <p class="prose"><strong>What do the differences imply?</strong> Fitted to the same history, every source agrees within single digits on where the trend sits <em>today</em> &mdash; then they fan out with the horizon. Deviation from the reference fit keeps widening, decade after decade: BitcoinPower.law runs about &minus;9% today but roughly &minus;17% by 2060. That is the real disclosure &mdash; how much of the long-run return case rests on a parameter that is itself uncertain.</p>
       <p class="prose"><strong>Why do we use the one we use?</strong> The reference fit is the longest-standing published one with a disclosed methodology, and the structural floor derived from it has the tightest fit of any band on the chart. A reference line's chief virtue is stability: refitting it every month would quietly move every number on the site and break every saved scenario link. So it stays fixed across the site, reviewed once a year, with its divergence from the other fits shown above rather than hidden.</p>
     </div>
