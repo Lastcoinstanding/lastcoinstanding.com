@@ -1,8 +1,95 @@
 {
   "note": "The dated change log on /bitcoin-lenders (JM's rulings 2026-10-01: a section above the cards plus card badges and per-card history; seeded with the changes the 2026-09-30 research found with exact, sourced dates; every monthly re-read logged even when nothing changed). Newest entries may go anywhere: the index (lenderLogIndex.js) sorts by date. kind: 'check' (a re-read of the cards; give read and changed counts) | 'page' (a card added or removed) | 'lender' (something the lender changed). type, for kind 'lender' or 'page': 'rate' | 'terms' | 'availability' | 'launch' | 'added' | 'removed' | 'exit' (kind 'lender': the lender changed something) | 'updated' (kind 'page': the card brought into line with the lender’s own pages at a re-read, whether the lender changed or the card was incomplete; no claim about when the lender changed it). lender: the card id in lenders.json. source: the lender's own page for the change. changes (optional, kind 'lender' or 'page'): [{field, was}] with field one of rate, open, call, liq, trig, coins, terms, minimum, where, track; the card highlights those lines for 14 days, showing 'was …' when `was` is short. lenders (optional, kind 'check'): the card ids the check covered; absent means every card. Procedure: MONTHLY_REFRESH_CHECKLIST §7.6.",
-  "nextCheck": "2026-10-31",
-  "nextCheckLabel": "31 Oct 2026",
+  "nextCheck": "2026-12-01",
+  "nextCheckLabel": "1 Dec 2026",
   "entries": [
+    {"date": "2026-11-05", "kind": "check", "read": 20, "changed": 12,
+      "text": "Monthly re-read: all twenty cards checked line by line against each lender’s own pages (Ledn’s state list and Coinbase’s help pages in a desktop browser); twelve cards changed. Strike’s volatility-proof loan reached Washington and its credit line fell to 11.25%; APX moved to 1–5 year terms; Firefish published default interest of 15%; Aave raised how much you can borrow against bitcoin to 81%, with liquidation at 85%. Unchanged: Ledn, Figure, SALT, both Kraken products, Nexo, Unchained and Better." },
+    {"date": "2026-10-05", "kind": "lender", "type": "availability", "lender": "strike",
+      "text": "Strike’s volatility-proof loan is now offered in Washington; it is still not offered in CT, DE, MD, NY, PR, SC or TX.",
+      "source": "https://strike.me/support/where-is-bitcoin-backed-borrowing-available/",
+      "changes": [
+        { "field": "where", "was": "not in CT, DE, MD, NY, PR, SC, TX or WA" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "strike",
+      "text": "Strike’s credit line rate now reads 11.25% (it was 13.25%; Strike resets it each quarter from the prime rate), and the card adds Strike’s higher minimums for monthly-interest loans in Iowa, Oklahoma and South Carolina.",
+      "source": "https://strike.me/support/what-are-the-interest-rates-for-borrowing-against-bitcoin/",
+      "changes": [
+        { "field": "rate", "was": "credit line 13.25%" },
+        { "field": "minimum" }
+      ] },
+    {"date": "2026-10-26", "kind": "lender", "type": "terms", "lender": "apx",
+      "text": "APX rewrote its loans page: terms are now 1 to 5 years with interest billed monthly, and repaying early costs three months’ interest on the amount repaid; the 5-year credit line and the instalment and deferred options are no longer listed.",
+      "source": "https://apxlending.com/loans",
+      "changes": [
+        { "field": "terms", "was": "3–60 months, extendable" },
+        { "field": "rate" }
+      ] },
+    {"date": "2026-10-19", "kind": "lender", "type": "terms", "lender": "firefish",
+      "text": "Firefish’s liquidation FAQ now spells out default: if you don’t repay at maturity, default interest of 15% a year runs from the due date and a liquidation premium of about 5% is taken.",
+      "source": "https://docs.firefish.io/faq/borrowing/collateral",
+      "changes": [
+        { "field": "terms", "was": "a 5% fee if you default" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "aave",
+      "text": "Aave’s Ethereum market now lets you borrow up to 81% of WBTC or cbBTC and liquidates at 85% (the card had 73% and 78%); rates refreshed to 5 November (USDT 4.61%, USDC 5.63%).",
+      "source": "https://app.aave.com/reserve-overview/?underlyingAsset=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599&marketName=proto_mainnet_v3",
+      "changes": [
+        { "field": "open", "was": "73%" },
+        { "field": "liq", "was": "78%" },
+        { "field": "rate", "was": "4.5–15.2%" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "arch",
+      "text": "Arch’s site footer no longer lists Hawaii among excluded states for individuals; the card also corrects the eligibility article’s count to 43 states, DC and Puerto Rico.",
+      "source": "https://www.archlending.com/",
+      "changes": [
+        { "field": "where" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "debifi",
+      "text": "Debifi’s offer book refreshed to 5 November (8.5–14.25%); its FAQ adds 0.3% to the opening fee for a second year, and a $500 minimum for card loans.",
+      "source": "https://debifi.com/offers",
+      "changes": [
+        { "field": "rate", "was": "8.5–11%" },
+        { "field": "minimum" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "hodlhodl",
+      "text": "Hodl Hodl’s offer book refreshed to 5 November: 9.5–12.5% a year.",
+      "source": "https://lend.hodlhodl.com/offers/borrow",
+      "changes": [
+        { "field": "rate", "was": "9.9–10.25%" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "morpho",
+      "text": "Morpho’s Base cbBTC/USDC market refreshed to 5 November: 5.7% (6-hour average), $177 million available.",
+      "source": "https://app.morpho.org/base/variable/0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836/usdc-cbbtc",
+      "changes": [
+        { "field": "rate", "was": "4.9%" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "coinbase",
+      "text": "The card adds Coinbase’s 1% fee on fixed-rate loans and its optional loan protection, which tops up collateral from your balance at a loan-to-value you set.",
+      "source": "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/collateral",
+      "changes": [
+        { "field": "rate" },
+        { "field": "trig" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "lava",
+      "text": "The card adds Lava’s optional Liquidation Protection, which tops up collateral from your Lava bitcoin balance past a threshold.",
+      "source": "https://www.lava.xyz/faq/how-do-liquidations-work",
+      "changes": [
+        { "field": "trig" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "milo",
+      "text": "Milo’s pages re-read: the product page still says 7–9% and $275,000, its 2026 guide 6.5–8.5% and $200,000 to $25 million; the calculator’s default quote is now 7.625% on $400,000.",
+      "source": "https://www.milo.io/blog/bitcoin-mortgage-complete-guide-2026/",
+      "changes": [
+        { "field": "rate" },
+        { "field": "minimum" }
+      ] },
+    {"date": "2026-11-05", "kind": "page", "type": "updated", "lender": "cadena",
+      "text": "The “servers are currently down” banner Cadena showed on 30 September was gone by 5 October; the track record line now says so.",
+      "source": "https://cadenabitcoin.com/",
+      "changes": [
+        { "field": "track" }
+      ] },
     {
       "date": "2026-10-01",
       "kind": "check",

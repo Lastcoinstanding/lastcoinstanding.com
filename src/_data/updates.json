@@ -2,6 +2,12 @@
   {
     "display": "11/5/26",
     "date": "2026-11-05",
+    "page": "/bitcoin-lenders",
+    "summary": "Bitcoin Lenders: all twenty cards re-read against the lenders' own pages; twelve changed. Strike's volatility-proof loan now reaches Washington, APX moved to 1–5 year terms, Firefish spelled out 15% default interest, and Aave now lets you borrow up to 81% of your bitcoin, with liquidation at 85%."
+  },
+  {
+    "display": "11/5/26",
+    "date": "2026-11-05",
     "page": "/the-strc-mechanism",
     "summary": "The STRC Mechanism: by the page's own test the below-par episode resolved in October (VWAP ≈ $99.28, estimated), so it now reads \"resolved, under watch\"; a post-mortem follows in early December. Filings through November 1, and the dividend bill is now about $1.49B a year, from Strategy's Q3 results."
   },
