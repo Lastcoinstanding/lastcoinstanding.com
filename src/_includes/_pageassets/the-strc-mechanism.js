@@ -36,19 +36,19 @@
   // All figures 8-K-sourced as of `asOf`. See STRC_BELOW_PAR_DESIGN.md.
   // ═══════════════════════════════════════════════════════════════
   var STRC_DATA = {
-    asOf: "2026-10-25",       // the 8-K filed 2026-10-26 (period Oct 19–25); vote and Q3 8-Ks filed Oct 28–29 folded in
+    asOf: "2026-11-01",       // the 8-K filed 2026-11-02 (period Oct 26–Nov 1); vote and Q3 8-Ks filed Oct 28–29 folded in
     price: 88.32,              // last close; reader-adjustable in the lens
     parAmount: 100.00,
     // From src/_data/preferredRates.json (window.PREFERRED_RATES), the one
     // place the site keeps the rate (2026-09-30); 12.00 is the fallback. A
     // change also appends a row to rateHistory below.
     rateAnnualPct: (window.PREFERRED_RATES && window.PREFERRED_RATES.strc && isFinite(window.PREFERRED_RATES.strc.ratePct)) ? window.PREFERRED_RATES.strc.ratePct : 12.00,   // 12% since Jul 2026; paid semi-monthly ($0.50 × 2) Jul–Oct, daily from Nov 1, 2026
-    // Derived: the 10-Q's ~104.6M shares at July 24, 2026, less the 20,691,578
-    // repurchased from July 27 to October 25 (weekly 8-Ks, buybackLog); no
+    // Derived: the 10-Q's ~104.6M shares at July 24, 2026, less the 22,783,613
+    // repurchased from July 27 to November 1 (weekly 8-Ks, buybackLog); no
     // STRC was issued in that time. No newer filed count exists. Cross-check:
     // the Q3 release (8-K filed Oct 29) gives 20,980,508 repurchased year to
-    // date at Oct 25 = this log including the Jul 20–26 row, exactly.
-    sharesOutstanding: 83908422,
+    // date at Oct 25 = this log to Oct 25 including the Jul 20–26 row, exactly.
+    sharesOutstanding: 81816387,
     // Not published by Strategy: estimated from Yahoo Finance daily bars,
     // Σ(typical price × volume) ÷ Σ volume, October 2026, 22 sessions
     // (September: $98.31; August: $95.45).
@@ -62,17 +62,21 @@
       ["2026-11", 12.00]      // 8-K filed 2026-10-16: held for November record dates
     ],
     claimStack: {              // $B: the Q2 10-Q (filed 2026-08-03) and the weekly 8-Ks since
-      seniorConvertsB: 6.70,   // $6,713.7M principal at Jun 30; unsecured, ~0.42% avg coupon, 2028–2032, no coverage triggers
+      seniorConvertsB: 6.70,   // $6,713.7M principal at Jun 30; Q3 release (Oct 29): $6,715.4M carrying incl. $39.8M other secured debt, no change; unsecured, ~0.42% avg coupon, 2028–2032, no coverage triggers
       strfSeniorB: 1.284,      // no STRF issued or repurchased since
-      strcNotionalB: 8.391     // the 10-Q's $10.46B at July 24 less $2,069.2M of par repurchased to Oct 25 (derived, as sharesOutstanding)
+      strcNotionalB: 8.182     // the 10-Q's $10.46B at July 24 less $2,278.4M of par repurchased to Nov 1 (derived, as sharesOutstanding)
     },
-    btcHoldings: 848517,       // Oct 25, 2026 (8-K filed Oct 26: no bitcoin bought or sold Oct 19–25)
-    usdReserveB: 4.83,         // Oct 25: for preferred dividends and debt interest; buybacks are funded from USD Cash, MSTR sales or bitcoin sales
-    usdCashB: 0.2424,          // Oct 25: "USD Cash", the flexible pool set up Aug 24, 2026 ($1.00B on Sep 27)
-    // Strategy's published annual interest + preferred dividends (investor
-    // briefing, SEC FWP filed 2026-08-24, as of 2026-08-23; DATA_AUDIT BvRP-3).
-    // It predates most of the STRC repurchases, so it runs a little high.
-    annualObligationsB: 1.703,
+    btcHoldings: 849327,       // Nov 1, 2026 (8-K filed Nov 2: 811 BTC bought Oct 26–Nov 1 for $65.5M)
+    usdReserveB: 4.79,         // Nov 1: for preferred dividends and debt interest; buybacks are funded from USD Cash, MSTR sales or bitcoin sales
+    usdCashB: 0.1327,          // Nov 1: "USD Cash", the flexible pool set up Aug 24, 2026 ($1.00B on Sep 27)
+    // Annual interest + preferred dividends, from Strategy's Q3 results (8-K
+    // filed 2026-10-29): USD Reserve + USD Cash $5.07B ≈ "3.4 years" of
+    // dividends and interest → ≈$1.49B a year (DATA_AUDIT BvRP-3; JM
+    // 2026-11-05). A bottom-up check at the Oct 25 floats (STRC 12%, STRF 10%,
+    // STRK 8%, STRD 10%, STRE, convert interest) also gives ≈$1.49B. Replaced
+    // the investor briefing's $1.703B (as of 2026-08-23), which predated
+    // ~$2.07B of STRC par retired.
+    annualObligationsB: 1.49,
     buybackLog: [              // append-only, one row per disclosed window (weekly 8-Ks)
       { window: "2026-07-20..26", shares: 288930, usdM: 25.0, avg: 86.52,
         parRetiredM: 28.893, annualDivSavedM: 3.5 },
@@ -91,16 +95,17 @@
       { window: "2026-10-01..04",    shares: 740634,  usdM: 73.7,  avg: 99.51, parRetiredM: 74.063,  annualDivSavedM: 8.9 },
       { window: "2026-10-05..11",    shares: 1932145, usdM: 192.4, avg: 99.58, parRetiredM: 193.215, annualDivSavedM: 23.2 },
       { window: "2026-10-12..18",    shares: 1938780, usdM: 193.1, avg: 99.60, parRetiredM: 193.878, annualDivSavedM: 23.3 },
-      { window: "2026-10-19..25",    shares: 2068459, usdM: 204.9, avg: 99.06, parRetiredM: 206.846, annualDivSavedM: 24.8 }
+      { window: "2026-10-19..25",    shares: 2068459, usdM: 204.9, avg: 99.06, parRetiredM: 206.846, annualDivSavedM: 24.8 },
+      { window: "2026-10-26..11-01", shares: 2092035, usdM: 208.2, avg: 99.52, parRetiredM: 209.204, annualDivSavedM: 25.1 }
     ],
     // Preferred repurchase program raised from $1.0B to $2.0B on 2026-09-08, and to
-    // $3.0B in the 8-K filed 2026-10-19; $956.8M left at Oct 25 (8-K filed 2026-10-26).
+    // $3.0B in the 8-K filed 2026-10-19; $748.6M left at Nov 1 (8-K filed 2026-11-02).
     // BTC monetization: the page's last attributed figure (July); the 8-Ks for
     // the August sales don't name the program, so they aren't added to it.
-    authRemaining: { preferredM: 956.8, preferredCapB: 3.0, mstrB: 1.0, btcMonetizationUsedM: 218.5, btcMonetizationCapB: 1.25 },
+    authRemaining: { preferredM: 748.6, preferredCapB: 3.0, mstrB: 1.0, btcMonetizationUsedM: 218.5, btcMonetizationCapB: 1.25 },
     supplyLog: [
       { d: "2026-07-27", t: "Policy", v: "No new STRC issuance below $100 par (stated discipline; also economic necessity below par)" },
-      { d: "2026-07-27..10-25", t: "Issuance", v: "No STRC sold under the ATM in any week (weekly 8-Ks); 20.7M shares retired, the float ≈ 83.9M" },
+      { d: "2026-07-27..11-01", t: "Issuance", v: "No STRC sold under the ATM in any week (weekly 8-Ks); 22.8M shares retired, the float ≈ 81.8M" },
       { d: "2026-09-24", t: "Proposal", v: "Daily record dates for STRC, STRF, STRK and STRD; vote Oct 28, 2026; first daily STRC dividend expected Nov 2 (8-K Sep 25)" },
       { d: "2026-10-15", t: "Dividends", v: "November declared at 12.00% as daily dividends ($1.00 a share in all), payable only if the Oct 28 vote passes; if it fails, the semi-monthly Nov 15 dividend is paid instead (8-K Oct 16)" },
       { d: "2026-10-28", t: "Vote", v: "Daily dividends approved (381.4M for, 2.2M against); STRC's daily record dates start Nov 1, 2026, the others' Jan 1, 2027. November's daily dividends ($1.00 a share in all) replace the Nov 15 one (8-Ks Oct 28, Oct 29)" }
@@ -126,7 +131,8 @@
       { d: "2026-10-18",     t: "Buyback auth", v: "Preferred repurchase program raised $2.0B → $3.0B; $1.16B left" },
       { d: "2026-10-18",     t: "Reserve", v: "The reserve paid $45.5M of dividends (USD Reserve $4.83B); USD Cash $447.3M after $193.1M of STRC repurchases" },
       { d: "2026-10-19..25", t: "Reserve", v: "No bitcoin bought or sold, no ATM sales; USD Cash paid $204.9M of STRC repurchases (USD Reserve $4.83B, USD Cash $242.4M)" },
-      { d: "2026-10-29",     t: "Q3 results", v: "Strategy: “returned STRC to health”, USD Reserve + USD Cash $5.07B ≈ 3.4 years of dividends and interest; 12.00% held “to support STRC trading near its $100” stated amount; a regular buyer while STRC is below $100 (8-K Oct 29)" }
+      { d: "2026-10-29",     t: "Q3 results", v: "Strategy: “returned STRC to health”, USD Reserve + USD Cash $5.07B ≈ 3.4 years of dividends and interest; 12.00% held “to support STRC trading near its $100” stated amount; a regular buyer while STRC is below $100 (8-K Oct 29)" },
+      { d: "2026-10-26..11-01", t: "Reserve", v: "811 BTC / $65.5M from MSTR sales; the reserve paid $43.4M of dividends (USD Reserve $4.79B); USD Cash $132.7M after $208.2M of STRC repurchases" }
     ],
     // Company-modeled, methodology unverified at build (design §5) — carries a verify badge:
     btcBreakevenArrPct: 2.3
@@ -421,7 +427,7 @@
       statusField('Constants as of', STRC_DATA.asOf + ' <span class="sb-mini">every figure below is filing-sourced and refreshed monthly (reserve, dividend bill, claim stack, operating cash flow when shown)</span>')
       + statusField('USD reserve', fmtBillions(STRC_DATA.usdReserveB) + ' <span class="sb-mini">≈ ' + RESERVE_MONTHS.toFixed(0) + ' months of all preferred dividends and debt interest; buybacks are funded from USD Cash (' + fmtBillions(STRC_DATA.usdCashB) + '), MSTR sales or bitcoin sales</span>')
       + statusField('STRC dividend bill', fmtBillions(STRC_BILL_B) + '/yr <span class="sb-mini">= ' + STRC_NOTIONAL_B.toFixed(2) + 'B notional × ' + pct2(RATE) + ', computed float × rate</span>')
-      + statusField('Total bill', '~' + fmtBillions(TOTAL_BILL_B) + '/yr <span class="sb-mini">all preferred dividends and debt interest, as Strategy publishes it (investor briefing, Aug 23, 2026); it predates most of the STRC repurchases</span>')
+      + statusField('Total bill', '~' + fmtBillions(TOTAL_BILL_B) + '/yr <span class="sb-mini">all preferred dividends and debt interest, implied by Strategy&rsquo;s Q3 results (Oct 29, 2026: $5.07B of USD Reserve and USD Cash &asymp; 3.4 years); a bottom-up sum of each series&rsquo; rate gives the same</span>')
       + statusField('Senior converts', fmtBillions(SENIOR) + ' <span class="sb-mini">~0.42% avg coupon, 2028–2032, no margin/coverage liquidation triggers</span>')
       + statusField('BTC breakeven ARR', '~' + STRC_DATA.btcBreakevenArrPct.toFixed(1) + '% <span class="sb-verify-badge">verify</span> <span class="sb-mini">company modeling; methodology not independently reproduced</span>'));
     setHTML('sbFuelLog', logRows(STRC_DATA.fuelLog));

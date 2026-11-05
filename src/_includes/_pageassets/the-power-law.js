@@ -640,10 +640,12 @@
 
   var CANON = {a:1.6e-17, b:5.77};
   var PAIRS = [
-    {key:'canonical', name:'Porkopolis &mdash; reference', a:1.6e-17,   b:5.77,
-      just:'The site reference fit; Porkopolis &ldquo;The Chart&rdquo; fit.'},
+    {key:'canonical', name:'Porkopolis &mdash; reference (May 2026)', a:1.6e-17,   b:5.77,
+      just:'The site reference fit: Porkopolis &ldquo;The Chart&rdquo; as recorded here in May 2026, held fixed since.'},
     {key:'refit',     name:'Porkopolis &mdash; later refit', a:1.69e-17,  b:5.763,
-      just:'Same source, refit later (the Doubling Ladder&rsquo;s constants); ~0.7% below the reference fit today.'},
+      just:'Same source, a later snapshot (the Doubling Ladder&rsquo;s constants); ~0.7% below the reference fit today.'},
+    {key:'pork2611',  name:'Porkopolis &mdash; current (Nov 2026)', a:2.2e-17,  b:5.73,
+      just:'Same source, as The Chart showed it on 5 November 2026; it refits as data arrives and does not date its changes, so this curve appeared some time after May 2026.'},
     {key:'bpl',       name:'BitcoinPower.law', a:Math.pow(10,-16.493), b:5.68,
       just:'Independent log-log regression over the full price history.'},
     {key:'bret',      name:'bitcoinretirement.net', a:1.0117e-17, b:5.82,
@@ -686,7 +688,7 @@
   for(var d=dayOf(2011); d<=dayOf(2060); d+=90) xs.push(d);
   function lineFor(p){ return xs.map(function(d){ return {x:d, y:price(p,d)}; }); }
   function labelOf(p){ return p.name.replace(/&mdash;/g,'–').replace(/&[a-z]+;/g,''); }
-  var cur = PAIRS[3]; // the selection; the chart is built lazily from it (lcsWhenNear)
+  var cur = PAIRS.filter(function(p){return p.key==='bret';})[0]; // the selection; the chart is built lazily from it (lcsWhenNear)
 
   var chart = null;
   lcsWhenNear(ctx, function(){ chart = new Chart(ctx, {
@@ -766,7 +768,7 @@
       chipWrap.appendChild(b);
     });
   }
-  select(PAIRS[3]); // default: bitcoinretirement.net (matches the worked-example callout)
+  select(cur); // default: bitcoinretirement.net (matches the worked-example callout)
 })();
 
 

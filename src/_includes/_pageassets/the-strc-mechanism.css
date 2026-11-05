@@ -88,6 +88,8 @@ body { background: var(--bg); color: var(--text); }
 .sb-stat-sub { font-family: var(--font-b); font-size: 0.78rem; line-height: 1.5; color: var(--text-dim); margin: 0.35rem 0 0; }
 .sb-stat-sub strong { color: var(--text); font-weight: 600; }
 .sb-status-meta { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-muted); margin: 1.1rem 0 0.6rem; }
+.sb-episode { font-family: var(--font-b); font-size: 0.85rem; line-height: 1.6; color: var(--text-dim); margin: 0.9rem 0 0.4rem; padding: 0.7rem 0.9rem; border-left: 3px solid var(--amber); background: var(--bg); }
+.sb-episode strong { color: var(--text); }
 .sb-asof-line { font-family: var(--font-b); font-size: 0.76rem; color: var(--text-muted); margin: 0; line-height: 1.6; }
 /* Moved to the top of the strip (confidence-first) — needs bottom spacing there. */
 .sb-asof-top { margin: 0 0 1.1rem; }
