@@ -2747,6 +2747,22 @@ links, so an accent would compete with them — and it hides with those links
 
 ### 40.2 The live-price sources and cache (infra rider)
 
+**First-party proxy (2026-11-06).** The list now starts with the site's own
+**`/api/price`** (`functions/api/price.js`, a Cloudflare Pages Function). It asks
+Coinbase → Kraken → **Bitstamp** → mempool.space → CoinGecko server-side (3 s
+each; Bitstamp works there because CORS doesn't apply), takes the first answer
+between $1,000 and $10M, and caches it at the edge for **30 s** under one fixed
+key, so one upstream request serves every reader at that data centre in the
+window. It returns `{price, provider, providerName, ts, cached}`; the browser
+records `provider` (the upstream that answered, via the source's `providerOf`),
+so the credit on the page names the real provider, and `todayPriceProviderName()`
+also knows `bitstamp`. Same-origin, so no ad-block list or CORS rule blocks it.
+It has a 4 s timeout in the browser; if the Function fails (503 when every
+upstream fails) or isn't running (a local static build: 404), the browser walks
+the four direct sources below exactly as before, then the dated fallback. A
+normal page load is now one same-origin request. Nothing about the reader is
+sent or stored.
+
 **Sources (2026-09-29).** `fetchTodayPrice` walks `LCS_PRICE_SOURCES` in order
 and takes the first sane answer: **Coinbase** spot → **Kraken** last trade →
 **mempool.space** price index → **CoinGecko**'s multi-exchange average (last:

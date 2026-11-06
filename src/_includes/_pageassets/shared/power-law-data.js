@@ -150,6 +150,9 @@ function todayPriceProviderName(){
   for (var i = 0; i < LCS_PRICE_SOURCES.length; i++) {
     if (LCS_PRICE_SOURCES[i].id === TODAY_PRICE_PROVIDER) return LCS_PRICE_SOURCES[i].name;
   }
+  // Providers the site's own /api/price can answer with that the browser
+  // never asks directly (Bitstamp sends no CORS header).
+  if (TODAY_PRICE_PROVIDER === 'bitstamp') return 'Bitstamp';
   return '';
 }
 
@@ -176,7 +179,19 @@ function todayPriceProviderName(){
 // one another by a few hundredths of a percent, well inside any readout's
 // rounding. A normal page load makes ONE request (Coinbase), and the
 // sessionStorage cache below keeps it to one per 10 minutes per tab.
+// FIRST-PARTY PROXY (2026-11-06). The list now starts with the site's own
+// /api/price (functions/api/price.js, a Cloudflare Pages Function), which asks
+// the same providers server-side, plus Bitstamp, and caches the answer at the
+// edge for 30 s. Same-origin, so no ad-block list or CORS rule stands in the
+// way, and one upstream request serves every reader in the window. It reports
+// which upstream answered, so the provider credited on the page is still the
+// real one (providerOf). Where the Function isn't running (a local build
+// served statically, or the Function failing) it fails fast and the browser
+// walks the direct sources below exactly as before.
 var LCS_PRICE_SOURCES = [
+  { id: 'site', name: 'Last Coin Standing', url: '/api/price', timeout: 4000,
+    pick: function(d){ return d ? d.price : NaN; },
+    providerOf: function(d){ return (d && typeof d.provider === 'string') ? d.provider : 'site'; } },
   { id: 'coinbase', name: 'Coinbase',
     url: 'https://api.coinbase.com/v2/prices/BTC-USD/spot',
     pick: function(d){ return (d && d.data && d.data.currency === 'USD') ? parseFloat(d.data.amount) : NaN; } },
@@ -334,14 +349,16 @@ function fetchTodayPrice(onResult){
     var next = function(){ trySource(i + 1, passesLeft); };
     var p;
     try {
-      lcsFetchJson(src.url, LCS_PRICE_SOURCE_TIMEOUT_MS).then(function(d){
+      lcsFetchJson(src.url, src.timeout || LCS_PRICE_SOURCE_TIMEOUT_MS).then(function(d){
         try { p = src.pick(d); } catch (e) { p = NaN; }
         if (lcsSanePrice(p)) {
+          var prov = src.id;
+          try { if (src.providerOf) prov = src.providerOf(d); } catch (e) { prov = src.id; }
           TODAY_PRICE = p;
-          TODAY_PRICE_PROVIDER = src.id;
+          TODAY_PRICE_PROVIDER = prov;
           window.__lcsPriceFallbackTs = null;
-          lcsWritePriceCache(p, 'live', src.id);
-          flush(p, 'live', src.id);
+          lcsWritePriceCache(p, 'live', prov);
+          flush(p, 'live', prov);
         } else { next(); }
       }, next);
     } catch (e) { next(); } // fetch unavailable or threw synchronously
