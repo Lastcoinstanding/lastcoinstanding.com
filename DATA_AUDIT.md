@@ -26,20 +26,20 @@ Citations behind the sitewide modeling-assumption presets. See `STYLE_GUIDE.md �
 
 | # | Component | Value | Source | URL | Last audited | Next due |
 |---|---|---|---|---|---|---|
-| I-1 | CPI Official baseline | 3.5% | BLS Consumer Price Index | https://www.bls.gov/cpi/ | 2026-05-02 | 2026-11-02 |
-| I-2 | M2 money supply growth (the `m2-growth` preset, 6.5%) | **6.58%** a year, Jan 1974 → Jan 2024 (859.7 → 20,835.5 $B); **6.37%** over the latest 50 years (Jan 1976 → Aug 2026, 1,026.7 → 23,342.8); **6.62%** since Aug 1971 (685.5). Compound rates; the "~6.8%" this row carried until 2026-10-14 does not reproduce as one. The preset's 6.5% stands; dollar half-life at 6.5% = ln 2 ÷ ln 1.065 = **11.0 years** | FRED M2SL series (table data read 2026-10-14) | https://fred.stlouisfed.org/data/M2SL | 2026-10-14 | 2026-11-02 |
-| I-3 | Real GDP growth, 1974–2024 average | ~2.5% | FRED GDPC1 series | https://fred.stlouisfed.org/series/GDPC1 | 2026-05-02 | 2026-11-02 |
-| I-4 | Shadow Stats methodology baseline | ~8% | ShadowStats Alternate CPI | http://www.shadowstats.com/alternate_data/inflation-charts | 2026-05-02 | 2026-11-02 |
+| I-1 | CPI Official baseline | 3.5% preset; checked 2026-11-06: CPI-U (NSA) 57.6 in Sep 1976 → 336.940 in Sep 2026 = **3.60%** a year over 50 years, so 3.5% stands as "close to the 50-year average"; latest 12-month change **3.7%** (Sep 2026). The Retirement presets table now says so | BLS CPI release of 2026-10-14 (Sep 2026 index); historical CPI-U table (Sep 1976) | https://www.bls.gov/news.release/archives/cpi_10142026.htm | 2026-11-06 | 2027-05-06 |
+| I-2 | M2 money supply growth (the `m2-growth` preset, 6.5%) | **6.58%** a year, Jan 1974 → Jan 2024 (859.7 → 20,835.5 $B); **6.37%** over the latest 50 years (Jan 1976 → Aug 2026, 1,026.7 → 23,342.8); **6.62%** since Aug 1971 (685.5). Compound rates; the "~6.8%" this row carried until 2026-10-14 does not reproduce as one. The preset's 6.5% stands; dollar half-life at 6.5% = ln 2 ÷ ln 1.065 = **11.0 years** | FRED M2SL series (table data read 2026-10-14) | https://fred.stlouisfed.org/data/M2SL | 2026-10-14 (re-derived; unchanged 2026-11-06) | 2027-04-14 |
+| I-3 | Real GDP growth, 1974–2024 average | ~2.5% — **not used on any page** (grep 2026-11-06); not re-verified this round because FRED does not answer from the build environment. Retire the row or re-check by hand | FRED GDPC1 series | https://fred.stlouisfed.org/series/GDPC1 | 2026-11-06 | 2027-05-06 |
+| I-4 | Shadow Stats methodology baseline | 8% preset; checked 2026-11-06: ShadowStats' public chart (1980-based Alternate CPI) was **last published 14 June 2023, through May 2023** (≈12% then); the series ran ≈8–11% through 2010–2019. The data itself is subscription-only and the site's pages look unmaintained (copyright 2022). 8% stays as a conservative reading of that series; the Retirement presets table now gives the range and the staleness | ShadowStats Alternate CPI | http://www.shadowstats.com/alternate_data/inflation-charts | 2026-11-06 | 2027-05-06 |
 | I-5 | Gold's supply growth and half-life (The Half-Life, The Fixed Share, The Bitcoin Migration, What Money Has to Be, What Bitcoin Is) | **~1.7% a year, half-life (doubling) ~41 years, stock-to-flow ~60.** 2025 mine output **3,672 t** (a record, preliminary) against **216,219 t** above ground at the start of the year and **219,891 t** at end-2025: 3,672 ÷ 216,219 = 1.70%; ln 2 ÷ ln 1.017 = 41.1 years; 219,891 ÷ 3,672 = 59.9. The WGC's above-ground page reads 222,600 t at end-Q2 2026. Recycled gold is excluded (already in the stock). Was 2% / 35 years on three pages, "~1.5–2%" on WMHTB and S2F ~62 with 35 years on the Migration (JM, 2026-10-18) | World Gold Council, "You asked, we answered: are we running out of gold?" (March 2026; Metals Focus data); WGC above-ground stocks | https://www.gold.org/goldhub/gold-focus/2026/03/you-asked-we-answered-are-we-running-out-gold · https://www.gold.org/goldhub/data/how-much-gold | 2026-10-18 | 2027-03-31 |
 
 ### Real returns (diversified portfolio)
 
 | # | Component | Value | Source | URL | Last audited | Next due |
 |---|---|---|---|---|---|---|
-| R-1 | S&P 500 long-run real return, 1928–2024 | ~6.7% | Damodaran historical returns dataset | https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html | 2026-05-02 | 2026-11-02 |
-| R-2 | US 10-yr Treasury long-run real return, 1928–2024 | ~2.0% | Damodaran historical returns dataset | https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html | 2026-05-02 | 2026-11-02 |
-| R-3 | Vanguard 10-year US equity forward CMA | ~3.5–5% nominal | Vanguard Capital Markets Model | https://corporate.vanguard.com/content/corporatesite/us/en/corp/articles/economic-market-outlook.html | 2026-05-02 | 2026-11-02 |
-| R-4 | GMO 7-year asset class forecast | varies | GMO 7-Year Asset Class Forecast | https://www.gmo.com/americas/research-library/gmo-7-year-asset-class-forecast/ | 2026-05-02 | 2026-11-02 |
+| R-1 | S&P 500 long-run real return, 1928–2025 | **6.8%** a year geometric (corrected from "~6.7%, 1928–2024"): Damodaran's $100 → $1,157,599 at end-2025 = 10.02% nominal over 98 years, deflated by CPI-U annual averages 17.4 (1927) → 321.943 (2025) = 3.02%. Not used on any page (grep 2026-11-06) | Damodaran historical returns, updated 5 January 2026 (data through 2025) | https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html | 2026-11-06 | 2027-05-06 |
+| R-2 | US 10-yr Treasury long-run real return, 1928–2025 | **1.5%** a year geometric (the row's "~2.0%" does not reproduce on either end-year: 1.43% through 2024): $100 → $7,752.88 = 4.54% nominal, less 3.02% CPI. Not used on any page | Damodaran historical returns, updated 5 January 2026 (data through 2025) | https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html | 2026-11-06 | 2027-05-06 |
+| R-3 | Vanguard 10-year US equity forward CMA | US equities **4.8–6.8%** a year nominal over 10 years (as of 30 Sep 2026); developed ex-US 5.3–7.3%; emerging 3.7–5.7%; US aggregate bonds 5.1–6.1%. Not used on any page | Vanguard Capital Markets Model return forecasts page | https://corporate.vanguard.com/content/corporatesite/us/en/corp/vemo/vemo-return-forecasts.html | 2026-11-06 | 2027-05-06 |
+| R-4 | GMO 7-year asset class forecast | varies; the August 2026 forecast is published (Advisor Perspectives, 2026-09-22) but its table could not be read from here this round. Not used on any page | GMO 7-Year Asset Class Forecast | https://www.gmo.com/americas/research-library/gmo-7-year-asset-class-forecast/ | 2026-11-06 | 2027-05-06 |
 
 ### Real estate appreciation
 
@@ -154,8 +154,8 @@ Citations already present on the site as of Stage 1 (commit context: pending).
 
 | # | Component | Value | Source | URL | Last audited | Next due |
 |---|---|---|---|---|---|---|
-| MIC-1 | Power Law coefficients | (same as PL-1) | Porkopolis Economics: The Chart | https://www.porkopolis.io/thechart/ | 2026-05-02 | 2026-11-02 |
-| MIC-2 | Public treasury holdings (treasury cash positions) | various, as of 2024–2025 | Public corporate filings (in-page note) | n/a — sourced from filings, not single URL | 2026-05-02 | 2026-11-02 |
+| MIC-1 | Power Law coefficients | (same as PL-1: the pinned 1.6×10⁻¹⁷ / 5.77; Porkopolis's current fit 2.2×10⁻¹⁷ / 5.73 recorded under PL-1, 2026-11-05) | Porkopolis Economics: The Chart | https://www.porkopolis.io/thechart/ | 2026-11-05 | 2027-05-05 |
+| MIC-2 | Public treasury holdings (treasury cash positions) | **No treasury-holdings figures remain on /the-melting-ice-cube** (grep 2026-11-06: the page speaks of treasuries generically); retire the row | Public corporate filings (in-page note) | n/a — sourced from filings, not single URL | 2026-11-06 | — |
 
 ### bitcoin-vs-real-estate
 
@@ -242,7 +242,7 @@ _Section created 2026-10-02 with the page (SITE_GUIDE §58; `MORTGAGE_PAYDOWN_DE
 
 | # | Component | Value | Source | URL | Last audited | Next due |
 |---|---|---|---|---|---|---|
-| BH-1 | Bitcoin volatility-compression data | various | Fidelity Digital Assets (in-page note) | https://www.fidelitydigitalassets.com/research-and-insights | 2026-05-02 | 2026-11-02 |
+| BH-1 | Bitcoin volatility-compression data | Generic link to Fidelity Digital Assets' research library, cited by name on Bull & Bear Cycles ("maturation, return persistence"); the library resolves; no figure on the page depends on it | Fidelity Digital Assets (in-page note) | https://www.fidelitydigitalassets.com/research-and-insights | 2026-11-06 | 2027-05-06 |
 
 ### shared comparator series
 
