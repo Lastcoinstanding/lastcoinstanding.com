@@ -191,6 +191,9 @@ input[type="range"]:disabled::-moz-range-thumb { cursor: not-allowed; }
    and all six items (69-128px to spare at 1100px, by page). A seventh item
    (about 115px) does not fit at 1100px: raise this breakpoint to roughly
    1200px before adding one, and re-measure on the deploy.
+   2026-11-07: "About" became "About Me" (+~30px). Re-measured on 6 pages
+   at 1100/1120/1200/1440px: nav stays 65px, the wordmark on one line, and
+   "About Me" ends 24-32px inside the edge at 1100px.
    Rejected: keeping the links down to 1000px (the brand would drop its mark and
    tagline at 1000-1099px) or to 880px with the coin mark alone (no name or
    tagline at 880-1099px). Comparison image and measurements in the PR. */
@@ -713,7 +716,7 @@ h1, h2, h3 {
             Raise the menu-button breakpoint (to roughly 1200px) first. -#}
         <a href="/the-gallery"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
-        <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+        <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About Me</a>
     </div>
         <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="mobileOverlay"><span></span><span></span><span></span></button>
     </nav>
@@ -776,7 +779,7 @@ h1, h2, h3 {
         <a href="/dashboard"{% if slug == 'dashboard' %} class="active"{% endif %}>The Dashboard</a>
         <a href="/the-gallery"{% if slug == 'the-gallery' %} class="active"{% endif %}>The Gallery</a>
         <a href="/calculators"{% if slug == 'calculators' %} class="active"{% endif %}>Calculators</a>
-        <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About</a>
+        <a href="/about"{% if slug == 'about' %} class="active"{% endif %}>About Me</a>
         <div class="mobile-legend"><span class="nav-interactive-marker">&bull;</span> indicates pages with interactive tools</div>
     </div>
 
@@ -887,7 +890,7 @@ h1, h2, h3 {
             <div class="footer-nav-label">Site</div>
             <a href="/the-gallery">The Gallery</a>
             <a href="/calculators">Calculators</a>
-            <a href="/about">About</a>
+            <a href="/about">About Me</a>
             <a href="/work-with-me">Work With Me</a>
         </div>
         {#- The personal-brand pointer, added 2026-08-29. Ruled to the footer

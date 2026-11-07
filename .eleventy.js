@@ -35,6 +35,8 @@ module.exports = function (eleventyConfig) {
     // OG cards
     'og-image.jpg',
     'og-about.jpg',
+    'og-about-me.jpg',
+    'og-work-with-me.jpg',
     'og-money-trees.jpg',
     'og-not-a-bubble.jpg',
     'og-synthesis.jpg',
