@@ -3815,3 +3815,18 @@ A house-styled card linking to a video interview: a self-hosted still (`intervie
 **Why a house card, not the show's thumbnail (JM's call).** The show's thumbnail reads "RETIRE ON 1 BTC BY 2037" in huge type: a promise the site never makes (it is the model's answer at $100K a year, under its assumptions). The Retirement page's copy says so: "The figures are the model’s, under its assumptions; set your own below."
 
 **Placements.** The Bitcoin Retirement, directly under the tool-framing strip (the interview walks through that page; it is the site's most-visited page, and the video drove its Sep 21 spike); About, above the published-and-interviews list (the list keeps its text entry). `vc_body` must not contain a link: the card is already one. To feature a later interview, generalise the component's URL, kicker, title and still into variables at that point.
+
+## 66. Short links and For Podcast Hosts (`_redirects`, `/for-hosts.html`, 2026-11-09)
+
+**Short links.** Codes a listener can hear once and type: `lastcoinstanding.com/retire`, `/ev`, `/pl`, `/hmb`, `/ladder`, `/wait`, `/floor`, `/stocks`, `/house`, `/lenders`, `/strc`, `/dash`, `/start`. Each is a line in the SHORT LINKS block of `_redirects`, a **302** (so a code can be re-pointed later without browsers having cached it) to the page with `utm_source=shortlink&utm_medium=spoken&utm_campaign=<code>`. In GA4: Traffic acquisition, filter session source "shortlink", read session campaign.
+
+**Show-specific links.** Cloudflare keeps a listener's query string only when the destination has none of its own, so `/ev?ref=robin` loses `ref`. A link for one show is therefore its own line, with the show in `utm_content`:
+
+```
+/ev-rs   /bitcoin-escape-velocity?utm_source=shortlink&utm_medium=spoken&utm_campaign=ev&utm_content=robin-seyr   302
+```
+
+Keep codes short and unambiguous when spoken (no digits that sound like words, no hyphens unless needed), and never reuse a path an existing page owns. `/hosts` → `/for-hosts` is deliberately untagged: it is for hosts, not listeners.
+
+**For Podcast Hosts.** A utility page (no updates strip, share bar, feedback, homepage card or llms.txt entry), linked from Work With Me's "A show" paragraph. Bios are copyable (`for-hosts.js`: Clipboard API, select-text fallback). The **dated facts** are copied from pages that compute them (Horizon, Heatmap, Bitcoin vs. the Stock Market), each with "data through" its month; re-check them at the monthly refresh or drop them. When a new appearance airs, add it to "Previous appearances" here and on Work With Me.
+

@@ -76,6 +76,7 @@
   <url><loc>https://lastcoinstanding.com/calculators</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/about</loc><priority>0.5</priority><changefreq>yearly</changefreq></url>
   <url><loc>https://lastcoinstanding.com/work-with-me</loc><priority>0.5</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://lastcoinstanding.com/for-hosts</loc><priority>0.5</priority><changefreq>yearly</changefreq></url>
 
   <!-- No #fragment URLs in this sitemap: Google ignores fragments and reports them as "Discovered – currently not indexed" (removed Sep 2026, 23 entries). -->
 </urlset>

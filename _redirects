@@ -24,3 +24,6 @@
 /strc     /the-strc-mechanism?utm_source=shortlink&utm_medium=spoken&utm_campaign=strc          302
 /dash     /dashboard?utm_source=shortlink&utm_medium=spoken&utm_campaign=dash                   302
 /start    /start-here?utm_source=shortlink&utm_medium=spoken&utm_campaign=start                 302
+
+# For hosts, not listeners: no tagging.
+/hosts    /for-hosts    302
