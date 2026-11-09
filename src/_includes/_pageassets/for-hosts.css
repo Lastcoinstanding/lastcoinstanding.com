@@ -1,0 +1,146 @@
+
+    /* ── PALETTE ──
+       base.njk carries no site-wide palette, link rules, or page background
+       (NEW_PAGE_CHECKLIST §1), so this page declares its own. Cloned from
+       work-with-me.css (2026-11-09). */
+    :root {
+      --btc-orange: #f7931a;
+      --bg: #0a0c0f;
+      --text: #e8e0d5;
+      --text-muted: #8b8680;
+      --text-dim: #666;
+      --border: #1a1a1a;
+      --surface: rgba(255,255,255,0.03);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+/* ─── NAV palette accents (structure inherited from canonical-nav-css in base.njk) ─── */
+.site-nav .brand:hover { color: var(--orange, #F7931A); }
+.site-nav .nav-links a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+.mobile-overlay a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+.nav-dropdown-menu a.active { color: var(--orange, #F7931A); background: rgba(247,147,26,0.08); font-weight: 600; }
+
+@media (max-width: 480px) {
+    .site-nav { padding: 10px 14px; }
+    .site-nav .brand { font-size: 0.72rem; letter-spacing: 0.14em; }
+}
+
+    /* ── PAGE LAYOUT ── */
+    .fh-page {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+    .page-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 400;
+      font-size: 2.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 28px;
+      color: var(--text);
+    }
+    .fh-intro {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.35rem;
+      line-height: 1.55;
+      text-align: center;
+      margin: 0 auto 48px;
+      max-width: 40rem;
+    }
+    .fh-section { margin-bottom: 48px; }
+    .fh-section p { margin-bottom: 14px; }
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--btc-orange);
+      margin-bottom: 18px;
+    }
+    a { color: var(--btc-orange); }
+    a:hover { color: var(--text); }
+
+    /* Copyable bios */
+    .fh-copy {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 14px 18px 4px;
+      margin-bottom: 16px;
+    }
+    .fh-copy-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .fh-copy-label {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .fh-copy-btn {
+      min-height: 44px;
+      min-width: 76px;
+      padding: 0 14px;
+      font: 600 0.85rem 'Inter', sans-serif;
+      color: var(--btc-orange);
+      background: transparent;
+      border: 1px solid rgba(247, 147, 26, 0.4);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .fh-copy-btn:hover, .fh-copy-btn:focus-visible { background: rgba(247, 147, 26, 0.08); }
+
+    .fh-photo-row { display: flex; gap: 18px; align-items: center; margin-top: 8px; }
+    .fh-photo-row p { margin: 0; }
+    .fh-photo {
+      width: 200px;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid rgba(247, 147, 26, 0.15);
+    }
+
+    /* Topics */
+    .fh-topics { display: grid; gap: 14px; }
+    .fh-topic {
+      border: 1px solid var(--border);
+      border-left: 3px solid rgba(247, 147, 26, 0.55);
+      border-radius: 4px;
+      padding: 16px 18px 4px;
+      background: var(--surface);
+    }
+    .fh-topic h3 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .fh-topic-meta { font-size: 0.92rem; }
+    .fh-topic-meta strong { color: var(--text); font-weight: 600; }
+
+    .fh-facts, .fh-past { padding-left: 1.2em; }
+    .fh-facts li, .fh-past li { margin-bottom: 10px; }
+    .fh-note { font-size: 0.9rem; color: var(--text-muted); }
+
+    @media (max-width: 480px) {
+      .fh-page { padding: 32px 16px 72px; }
+      .page-title { font-size: 2rem; }
+      .fh-photo-row { flex-direction: column; align-items: flex-start; }
+    }

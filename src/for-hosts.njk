@@ -1,0 +1,121 @@
+---
+layout: base.njk
+permalink: /for-hosts.html
+slug: for-hosts
+# Utility page for podcast and show hosts (2026-11-09, JM's slate item 2):
+# everything a host needs to prepare in five minutes — bios to read out, a
+# photo, topics with the page to screen-share for each, the short links
+# listeners can type, and a few dated facts. Linked from Work With Me ("A
+# show") and About Me; short link /hosts. No llms.txt entry, no homepage
+# card, no updates strip, like the other utility pages.
+#
+# The dated facts are copied from pages that compute them; re-check them in
+# the monthly refresh (MONTHLY_REFRESH_CHECKLIST §0.1 row and §3; the §3 grep finds
+# "through October 2026") or drop the
+# date-bound ones.
+get_updates: false
+share_in_layout: false
+feedback: false
+eleventyComputed:
+  head_extras: "{% include '_pageassets/for-hosts-head.html' %}"
+  page_styles: "{% include '_pageassets/for-hosts.css' %}"
+  page_scripts: "{% include '_pageassets/for-hosts.js' %}"
+---
+<main class="fh-page">
+
+  <h1 class="page-title">For Podcast Hosts</h1>
+
+  <p class="fh-intro">Thank you for thinking of having me on. Everything you need to prepare is on this page: a bio to read out, a photo, the topics I cover with the page to share on screen for each, and short links your listeners can type.</p>
+
+  <section class="fh-section" aria-labelledby="fh-bio">
+    <h2 id="fh-bio" class="section-label">Bio</h2>
+
+    <div class="fh-copy">
+      <div class="fh-copy-head"><span class="fh-copy-label">One line</span><button type="button" class="fh-copy-btn" data-copy="bio-short">Copy</button></div>
+      <p id="bio-short">John McCabe builds Last Coin Standing, free interactive tools that test the case for bitcoin as an asset, with every assumption stated and the risks shown alongside it.</p>
+    </div>
+
+    <div class="fh-copy">
+      <div class="fh-copy-head"><span class="fh-copy-label">Short paragraph</span><button type="button" class="fh-copy-btn" data-copy="bio-long">Copy</button></div>
+      <p id="bio-long">John McCabe is the one person behind Last Coin Standing (lastcoinstanding.com), a set of free interactive tools on bitcoin as an asset: how much bitcoin a retirement needs, how bitcoin has compared with stocks and real estate over every holding period, what the power law does and doesn&rsquo;t say, and what it costs to borrow against bitcoin. Before bitcoin he spent 25 years in product management in Silicon Valley, including Yahoo and Mastercard. He holds an MBA from Kellogg and a degree in Economics and Business from Trinity College Dublin, has written for Bitcoin Magazine, and is a co-founder of Saturday Bitcoin, a directory of places to spend bitcoin.</p>
+    </div>
+
+    <div class="fh-photo-row">
+      <img src="/profile.jpg" alt="John McCabe" class="fh-photo" width="200" height="134">
+      <p>Photo: <a href="/profile.jpg" download>profile.jpg</a> (1024 &times; 684, JPEG). Free to use with an episode or post about the show.</p>
+    </div>
+  </section>
+
+  <section class="fh-section" aria-labelledby="fh-topics">
+    <h2 id="fh-topics" class="section-label">Topics</h2>
+    <p>Each topic has a live page to share on screen. Pick one or two; each works as a segment of 10 to 20 minutes. The short link is the one to say out loud.</p>
+
+    <div class="fh-topics">
+      <article class="fh-topic">
+        <h3>How much bitcoin do you need to retire?</h3>
+        <p>The bitcoin a retirement needs, by retirement year, on two scenarios for bitcoin&rsquo;s price, with the floor case as a stress test.</p>
+        <p class="fh-topic-meta">On screen: <a href="/the-bitcoin-retirement">The Bitcoin Retirement</a> &middot; Say: <strong>lastcoinstanding.com/retire</strong></p>
+      </article>
+      <article class="fh-topic">
+        <h3>Escape velocity</h3>
+        <p>When you retire, what you retire with and what you draw: the threshold past which a bitcoin retirement stops drawing down.</p>
+        <p class="fh-topic-meta">On screen: <a href="/bitcoin-escape-velocity">Bitcoin Escape Velocity</a> &middot; Say: <strong>lastcoinstanding.com/ev</strong></p>
+      </article>
+      <article class="fh-topic">
+        <h3>The power law, and how it could fail</h3>
+        <p>Why bitcoin&rsquo;s price has tracked a power law for fifteen years, the tests that would show it breaking, and where its limits are.</p>
+        <p class="fh-topic-meta">On screen: <a href="/the-power-law">The Power Law</a> &middot; Say: <strong>lastcoinstanding.com/pl</strong></p>
+      </article>
+      <article class="fh-topic">
+        <h3>Bitcoin against the stock market, over every holding period</h3>
+        <p>Every entry month since 2010 against the S&amp;P 500, including the windows where stocks won, and what changes as the holding period lengthens.</p>
+        <p class="fh-topic-meta">On screen: <a href="/bitcoin-vs-the-stock-market">Bitcoin vs. the Stock Market</a> &middot; Say: <strong>lastcoinstanding.com/stocks</strong></p>
+      </article>
+      <article class="fh-topic">
+        <h3>Buy now or wait for the dip?</h3>
+        <p>Deploying now against waiting for a lower entry, tested on bitcoin&rsquo;s whole history, including how often waiting meant paying more.</p>
+        <p class="fh-topic-meta">On screen: <a href="/wait-or-deploy-now">Wait or Deploy Now</a> &middot; Say: <strong>lastcoinstanding.com/wait</strong></p>
+      </article>
+      <article class="fh-topic">
+        <h3>Borrowing against bitcoin</h3>
+        <p>Every lender that takes bitcoin as collateral, re-read against its own terms each month: rates, the price that triggers a margin call, custody and the catch.</p>
+        <p class="fh-topic-meta">On screen: <a href="/bitcoin-lenders">Bitcoin Lenders</a> &middot; Say: <strong>lastcoinstanding.com/lenders</strong></p>
+      </article>
+      <article class="fh-topic">
+        <h3>STRC and Strategy&rsquo;s balance sheet</h3>
+        <p>How Strategy&rsquo;s bitcoin-backed preferred is built to trade near $100, what the 2026 slip below par was telling holders, and the coverage math behind it.</p>
+        <p class="fh-topic-meta">On screen: <a href="/the-strc-mechanism">The STRC Mechanism</a> &middot; Say: <strong>lastcoinstanding.com/strc</strong></p>
+      </article>
+    </div>
+  </section>
+
+  <section class="fh-section" aria-labelledby="fh-facts">
+    <h2 id="fh-facts" class="section-label">A few facts, with their dates</h2>
+    <ul class="fh-facts">
+      <li>Across bitcoin&rsquo;s recorded monthly closes, no holding period of 64 months or more has ended in a nominal loss (data through October 2026). <a href="/the-bitcoin-horizon">The Bitcoin Horizon</a></li>
+      <li>In all 118 seven-year windows starting each month from 2010, bitcoin beat the S&amp;P 500 with dividends reinvested; the median window by about 35 times (data through October 2026). <a href="/heatmap">The Heatmap</a></li>
+      <li>Over five years to October 2026 the S&amp;P 500 was ahead, up about 81% to bitcoin&rsquo;s 26%, because October 2021 was the last cycle&rsquo;s top. The site shows the windows where bitcoin lost, too. <a href="/bitcoin-vs-the-stock-market">Bitcoin vs. the Stock Market</a></li>
+    </ul>
+    <p class="fh-note">The pages update every month; if a figure here has moved, the page is right and this list is behind.</p>
+  </section>
+
+  <section class="fh-section" aria-labelledby="fh-past">
+    <h2 id="fh-past" class="section-label">Previous appearances</h2>
+    <ul class="fh-past">
+      <li>The Robin Seyr Podcast, September 2026: <a href="https://www.youtube.com/watch?v=aQhk4KKqMss" target="_blank" rel="noopener">Every 0.2 Bitcoin Retires You 3 Years Faster</a></li>
+      <li>Once Bitten! A Bitcoin Podcast, episode 480: <a href="https://overcast.fm/+Xf9H0x50I" target="_blank" rel="noopener">Working On Bitcoin</a></li>
+      <li>Bitcoin for Millennials, with Bram Kanstein: <a href="https://www.youtube.com/watch?v=PH6C9AncQEo" target="_blank" rel="noopener">Video interview</a></li>
+    </ul>
+  </section>
+
+  <section class="fh-section" aria-labelledby="fh-practical">
+    <h2 id="fh-practical" class="section-label">Practical</h2>
+    <ul class="fh-past">
+      <li>I&rsquo;m on Pacific time.</li>
+      <li>I can share my screen on any of the pages above; they also work on a phone if you&rsquo;d rather point listeners to them.</li>
+      <li>This is education, not investment advice: I don&rsquo;t recommend securities or tell anyone what to buy.</li>
+    </ul>
+    <p class="fh-closing">To book a time, email <a href="mailto:john@lastcoinstanding.com">john@lastcoinstanding.com</a> or use <a href="/work-with-me">Work With Me</a>.</p>
+  </section>
+
+</main>

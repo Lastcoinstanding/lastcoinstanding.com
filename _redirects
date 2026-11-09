@@ -2,3 +2,28 @@
 # Cloudflare Pages preserves query strings on static redirects, so ?h=/&dv=/&ov=/&p= scenario params survive.
 /strc-below-par.html    /the-strc-mechanism    301
 /strc-below-par         /the-strc-mechanism    301
+
+# ── SHORT LINKS (2026-11-07 slate, built 2026-11-09) ─────────────────────────
+# Easy addresses to say out loud on a podcast or show on screen. Each one lands
+# on the page and tags the visit so GA4 can tell which short link brought it:
+#   utm_source=shortlink · utm_medium=spoken · utm_campaign=<the code>
+# 302 (not 301) so a code can be re-pointed later without browsers caching the
+# old target. Codes are lower-case and short; never reuse a code for a
+# different page. Full list and how to add a show-specific link:
+# SITE_GUIDE "Short links".
+/retire   /the-bitcoin-retirement?utm_source=shortlink&utm_medium=spoken&utm_campaign=retire   302
+/ev       /bitcoin-escape-velocity?utm_source=shortlink&utm_medium=spoken&utm_campaign=ev       302
+/pl       /the-power-law?utm_source=shortlink&utm_medium=spoken&utm_campaign=pl                 302
+/hmb      /how-much-bitcoin?utm_source=shortlink&utm_medium=spoken&utm_campaign=hmb             302
+/ladder   /the-doubling-ladder?utm_source=shortlink&utm_medium=spoken&utm_campaign=ladder       302
+/wait     /wait-or-deploy-now?utm_source=shortlink&utm_medium=spoken&utm_campaign=wait         302
+/floor    /the-bitcoin-floor?utm_source=shortlink&utm_medium=spoken&utm_campaign=floor          302
+/stocks   /bitcoin-vs-the-stock-market?utm_source=shortlink&utm_medium=spoken&utm_campaign=stocks 302
+/house    /bitcoin-vs-real-estate?utm_source=shortlink&utm_medium=spoken&utm_campaign=house     302
+/lenders  /bitcoin-lenders?utm_source=shortlink&utm_medium=spoken&utm_campaign=lenders          302
+/strc     /the-strc-mechanism?utm_source=shortlink&utm_medium=spoken&utm_campaign=strc          302
+/dash     /dashboard?utm_source=shortlink&utm_medium=spoken&utm_campaign=dash                   302
+/start    /start-here?utm_source=shortlink&utm_medium=spoken&utm_campaign=start                 302
+
+# For hosts, not listeners: no tagging.
+/hosts    /for-hosts    302

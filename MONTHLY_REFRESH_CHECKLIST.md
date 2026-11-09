@@ -61,6 +61,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | How Much Bitcoin? risk-free rate (move it at ±50bp) | `how-much-bitcoin.njk` / `.js` | FRED `DTB3` | §3 |
 | Bitcoin as Collateral loan table and its "as of" | `bitcoin-as-collateral.njk` | lender pages | §3, §8.6 |
 | Cross-page agreement: Strategy's BTC count, the STRC rate, reserve figures | BFI, STRC page, rental page | 8-K | §0.7 |
+| For Podcast Hosts: the three dated facts (copied from Horizon, Heatmap, BvSM) | `for-hosts.njk` | those pages | §3 |
 | The live price loads | `/dashboard` | — | §5 step 7 |
 | Product-forward OG cards | `scripts/build-og-images.py` | — | §6 |
 | Search Console sweep; GA4 notes | — | — | §9.5, §9.6 |
