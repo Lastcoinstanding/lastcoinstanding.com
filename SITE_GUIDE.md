@@ -3806,6 +3806,8 @@ The page predates this guide's page sections; this records the 2026-10-04 rebuil
 
 **Console.** `hrQA()`. **OG.** Product-forward (`build-og-images.py`, card `bitcoin-hash-rate`).
 
+**Equal steps in age (2026-11-12).** After Stephen Perrenod's reply to outreach (LinkedIn): a power law's clock is age and it treats each tripling of age alike, so calendar windows (four years = ages 1-5 in 2014, ages 13.8-17.8 in 2026) see less and less of the curve. New subsection under the rolling chart: fits over ages 1-3, 3-9 and 9-27 (the last still filling; the reading reports its share of the log span), and a two-segment fit with one break at minimum total squared log residual (at least 52 weeks a side, from age 1). Data to Oct 27, 2026: 15.4 / 15.0 / 5.7 (62% through); break Jan 2014, 11.4 then 8.2, combined R² 0.99 against 0.97 for one law at 11.4. The windowed exponents are higher than the whole-record fits because each window has its own intercept; the reading says so. The fits reading and the rolling chart's subtitle now warn that later windows lean on the latest swing. Perrenod is credited for the log-age idea and the hardware mechanism, and in Method; the chart he shared privately is not quoted. `hrQA()` returns `ageFits` and `seg`.
+
 **Carousel slide (2026-10-18).** Row 16 in §13: dark dice in a misted hall, one lit, the winning roll; Numbers, not Featured.
 
 ## 65. Video card (`components/video-card.njk`, 2026-10-19)
