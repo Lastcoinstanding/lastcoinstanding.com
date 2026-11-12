@@ -207,3 +207,7 @@
   .takeaways li::before { content: "\2192"; position: absolute; left: 0; color: var(--orange); }
   .takeaways li strong { color: var(--text-bright); font-weight: 600; }
   .takeaways li em { color: var(--orange); font-style: normal; }
+/* Quoted correspondence (2026-11-12) */
+.hmb-quote{border-left:2px solid var(--orange);padding:6px 0 6px 22px;margin:28px 0;font-style:italic;color:var(--text-bright);font-size:1.08rem;line-height:1.6}
+.hmb-quote cite{display:block;font-style:normal;font-size:.85rem;color:var(--text-dim);margin-top:10px;line-height:1.55}
+.hmb-quote cite a{color:var(--orange)}
