@@ -14,6 +14,9 @@
    - Price against hash rate: each PL_DATA sample against the hash rate of
      its week (interpolated), OLS of log10(price) on log10(hash), from 2011
      and from 2016.
+   - Log-age windows (ages 1-3, 3-9, 9-27; added 2026-11-12 after a
+     suggestion from Stephen Perrenod) and a two-segment fit with one break
+     chosen by minimum total squared log residual, from age 1.
    - Which moves first: the year-over-year change in log price and in log
      hash rate on a monthly grid from 2014, correlated at leads and lags of
      up to twelve months.
@@ -32,6 +35,7 @@
   var WINDOW_YEARS = 4;
 
   function dateOf(day) { return new Date(GENESIS_MS + day * DAY_MS); }
+  function isoOfDay(day) { return dateOf(day).toISOString().slice(0, 10); }
   function dayOf(iso) { return (Date.parse(iso + 'T00:00:00Z') - GENESIS_MS) / DAY_MS; }
   function yearFrac(day) { var d = dateOf(day), y0 = Date.UTC(d.getUTCFullYear(), 0, 1); return d.getUTCFullYear() + (d - y0) / (365.25 * DAY_MS); }
   function monthLabel(day) { var d = dateOf(day); return MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
@@ -56,7 +60,7 @@
     for (i = 0; i < n; i++) { X = Math.log10(xs[i]); Y = Math.log10(ys[i]); sx += X; sy += Y; sxx += X * X; sxy += X * Y; }
     var b = (n * sxy - sx * sy) / (n * sxx - sx * sx), a = (sy - b * sx) / n, my = sy / n, ssr = 0, sst = 0;
     for (i = 0; i < n; i++) { X = Math.log10(xs[i]); Y = Math.log10(ys[i]); ssr += Math.pow(Y - (a + b * X), 2); sst += Math.pow(Y - my, 2); }
-    return { a: a, b: b, r2: 1 - ssr / sst, at: function (x) { return Math.pow(10, a + b * Math.log10(x)); } };
+    return { a: a, b: b, r2: 1 - ssr / sst, ssr: ssr, sst: sst, at: function (x) { return Math.pow(10, a + b * Math.log10(x)); } };
   }
   // Doubling time (days) from the slope of log2(y) on x (days).
   function doublingDays(xs, ys) {
@@ -99,6 +103,27 @@
       var f = fitLogLog(xs, ys);
       ROLL.push({ end: endDay, b: f.b, r2: f.r2, dbl: doublingDays(xs, ys) });
     }
+  })();
+
+  // Log-age windows (2026-11-12, after Stephen Perrenod): a power law is scale-
+  // invariant in age, so compare equal RATIOS of age (1-3, 3-9, 9-27 years),
+  // not equal stretches of calendar time. The last window is still filling.
+  var AGE_WINDOWS = [[1, 3], [3, 9], [9, 27]];
+  var AGEFITS = AGE_WINDOWS.map(function (w) {
+    var S = sel(isoOfDay(w[0] * 365.25), isoOfDay(w[1] * 365.25));
+    var f = fitLogLog(S.xs, S.ys); f.lo = w[0]; f.hi = w[1]; f.n = S.xs.length;
+    f.toAge = S.xs[S.xs.length - 1] / 365.25; f.done = f.toAge >= w[1] - 0.05; return f;
+  });
+  // Two segments, one break, chosen by minimum total squared log residual,
+  // at least a year of weeks in each, from age 1 (the method Perrenod uses).
+  var SEG = (function () {
+    var S = sel(isoOfDay(365.25)), best = null;
+    for (var k = 52; k <= S.xs.length - 52; k++) {
+      var f1 = fitLogLog(S.xs.slice(0, k), S.ys.slice(0, k)), f2 = fitLogLog(S.xs.slice(k), S.ys.slice(k));
+      var s = f1.ssr + f2.ssr; if (!best || s < best.s) best = { s: s, f1: f1, f2: f2, breakDay: S.xs[k] };
+    }
+    var one = fitLogLog(S.xs, S.ys);
+    best.one = one; best.r2 = 1 - best.s / one.sst; return best;
   })();
 
   // Price against hash rate.
@@ -314,7 +339,23 @@
     var lowest = ROLL.filter(function (r) { return dateOf(r.end).getUTCFullYear() >= 2018; }).reduce(function (m, r) { return r.b < m.b ? r : m; });
     setText('hrFitRead', 'Each later start gives a smaller exponent: ' + FITS.map(function (f) { return f.b.toFixed(1) + ' from ' + f.from.slice(0, 4); }).join(', ') +
       '. A single power law would give the same exponent from any start. Over rolling four-year windows the exponent peaked at ' + peak.b.toFixed(1) + ' (the four years to ' + monthLabel(peak.end) + '), fell as low as ' + lowest.b.toFixed(1) + ' (to ' + monthLabel(lowest.end) + ') and stands at ' + last.b.toFixed(1) + ' now' +
-      (last.b > lowest.b * 1.15 ? ', a little up from that low.' : '.'));
+      (last.b > lowest.b * 1.15 ? ', a little up from that low.' : '.') +
+      ' Treat the later figures with care: as bitcoin ages, a fit from ' + STARTS[STARTS.length - 1].slice(0, 4) + ' or a four-year window covers a smaller and smaller share of its life, so it leans more on the latest swing.');
+  }
+  function renderAgeTable() {
+    var body = document.getElementById('hrAgeBody'); if (!body) return;
+    body.innerHTML = AGEFITS.map(function (f) {
+      var y0 = 2009 + f.lo, y1 = 2009 + f.hi;
+      var span = f.done ? (y0 + '\u2013' + y1) : (y0 + '\u2013now');
+      var ages = f.lo + '\u2013' + (f.done ? f.hi : f.toAge.toFixed(1) + ' so far (of ' + f.hi + ')');
+      return '<tr><td>' + ages + '</td><td>' + span + '</td><td class="num">' + f.b.toFixed(2) + '</td><td class="num">' + f.r2.toFixed(2) + '</td></tr>';
+    }).join('');
+    var a = AGEFITS, last = a[a.length - 1];
+    var share = Math.log(last.toAge / last.lo) / Math.log(last.hi / last.lo);
+    setText('hrAgeRead', 'Measured this way, the first two windows give nearly the same exponent (' + a[0].b.toFixed(1) + ' and ' + a[1].b.toFixed(1) + '). Those figures are higher than the whole-record fits above because each window is fitted on its own line; what matters is how the windows compare. The third gives ' + last.b.toFixed(1) +
+      ', but it is only ' + Math.round(share * 100) + '% of the way through its span of age, so it says less than the first two, and it will take years more data to settle. The slowdown is real; how far it goes is not yet known.');
+    var b = new Date(GENESIS_MS + SEG.breakDay * DAY_MS);
+    setText('hrSegRead', 'Let the data choose a single break instead, at the point that leaves the smallest total misfit, and it picks ' + MONTHS[b.getUTCMonth()] + ' ' + b.getUTCFullYear() + ', when bitcoin was ' + (SEG.breakDay / 365.25).toFixed(1) + ' years old. Before it the exponent is ' + SEG.f1.b.toFixed(1) + ' (R\u00b2 ' + SEG.f1.r2.toFixed(2) + '); after it, ' + SEG.f2.b.toFixed(1) + ' (R\u00b2 ' + SEG.f2.r2.toFixed(2) + '). Together the two segments fit with R\u00b2 ' + SEG.r2.toFixed(2) + ', against ' + SEG.one.r2.toFixed(2) + ' for one power law over the whole record (exponent ' + SEG.one.b.toFixed(1) + '). The break falls as purpose-built mining chips were taking over, and it sits inside the second window above, which is why that window, spanning both sides of it, fits a little less tightly.');
   }
   function renderCompare() {
     var body = document.getElementById('hrCompareBody'); if (!body) return;
@@ -348,7 +389,7 @@
     setText('hrLagRead', txt);
   }
 
-  function renderAll() { renderReadout(); renderHashChart(); renderRollChart(); renderFitTable(); renderCompare(); renderPriceChart(); renderPriceRead(); renderLagChart(); renderLagRead(); }
+  function renderAll() { renderReadout(); renderHashChart(); renderRollChart(); renderFitTable(); renderAgeTable(); renderCompare(); renderPriceChart(); renderPriceRead(); renderLagChart(); renderLagRead(); }
 
   function wireChips() {
     document.querySelectorAll('.hr-chip').forEach(function (b) {
@@ -363,7 +404,7 @@
   }
 
   window.hrQA = function () {
-    return { weeks: HASH_WEEKLY.length, fits: FITS.map(function (f) { return { from: f.from, b: f.b, r2: f.r2 }; }), roll: { first: ROLL[0], last: ROLL[ROLL.length - 1], n: ROLL.length },
+    return { weeks: HASH_WEEKLY.length, ageFits: AGEFITS.map(function (f) { return { ages: f.lo + '-' + f.hi, b: f.b, r2: f.r2, toAge: f.toAge, n: f.n }; }), seg: { break: isoOfDay(SEG.breakDay), b1: SEG.f1.b, b2: SEG.f2.b, r2: SEG.r2, one: SEG.one.b }, fits: FITS.map(function (f) { return { from: f.from, b: f.b, r2: f.r2 }; }), roll: { first: ROLL[0], last: ROLL[ROLL.length - 1], n: ROLL.length },
              price: PF.map(function (f) { return { from: f.from, b: f.b, r2: f.r2 }; }), lag: { best: BEST, all: LAG.map(function (r) { return [r.lag, +r.c.toFixed(3)]; }) }, today: TODAY };
   };
 
