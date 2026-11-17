@@ -3,6 +3,12 @@
   "nextCheck": "2026-12-01",
   "nextCheckLabel": "1 Dec 2026",
   "entries": [
+    {"date": "2026-11-17", "kind": "lender", "type": "availability", "lender": "coinbase",
+      "text": "Coinbase’s loans opened to New York residents, the last US state without them, after approval from the state’s financial regulator. In New York only variable-rate loans against bitcoin, ether or solana are offered: no fixed-rate loans yet. Everything else on the card stands: the bitcoin still becomes cbBTC in a Morpho contract, and is sold at 86% without a margin call. (Press: The Block, quoting Coinbase; the other lines were last read on 5 November.)",
+      "source": "https://www.theblock.co/news/business/2026-11-17-coinbase-borrow-new-york-morpho-442842",
+      "changes": [
+        { "field": "where", "was": "US except New York" }
+      ] },
     {"date": "2026-11-05", "kind": "check", "read": 20, "changed": 12,
       "text": "Monthly re-read: all twenty cards checked line by line against each lender’s own pages (Ledn’s state list and Coinbase’s help pages in a desktop browser); twelve cards changed. Strike’s volatility-proof loan reached Washington and its credit line fell to 11.25%; APX moved to 1–5 year terms; Firefish published default interest of 15%; Aave raised how much you can borrow against bitcoin to 81%, with liquidation at 85%. Unchanged: Ledn, Figure, SALT, both Kraken products, Nexo, Unchained and Better." },
     {"date": "2026-10-05", "kind": "lender", "type": "availability", "lender": "strike",
