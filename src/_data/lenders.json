@@ -1088,10 +1088,10 @@
       "coins": "Your bitcoin leaves your Coinbase account and becomes cbBTC, Coinbase’s token standing for bitcoin it holds, locked in a Morpho lending contract on the Base network; Coinbase says it has no access to it there",
       "terms": "Variable loans: no term and no due dates. Fixed loans: repaid in full at maturity, and repaying early doesn’t reduce the interest. The 2% fee is charged again every time you draw more",
       "minimum": "Not published; up to 5,000,000 USDC against bitcoin",
-      "where": "US except New York; limited access in the UK",
+      "where": "All 50 US states: New York was added on 17 November 2026, with variable-rate loans against bitcoin, ether or solana only (no fixed-rate loans there yet; press: The Block, quoting Coinbase); limited access in the UK",
       "distinguishing": "The biggest brand on the page, and a loan that is really a position on a public lending protocol, with an 86% line and no margin call",
       "catch": "Interest is added to the loan, there is no margin call, and the collateral is a token on a protocol Coinbase doesn’t control; the 2% fee recurs",
-      "track": "Launched January 2025 (bitcoin only, $100,000 cap), since widened; the earlier “Coinbase Borrow” dollar loans stopped in May 2023; no lending incidents published",
+      "track": "Launched January 2025 (bitcoin only, $100,000 cap), since widened; New York, the last state, added 17 November 2026 after approval from the state’s financial regulator (press: The Block); the earlier “Coinbase Borrow” dollar loans stopped in May 2023; no lending incidents published",
       "filters": {
         "bitcoinOnly": false,
         "noRehyp": true,
@@ -1100,21 +1100,20 @@
         "under5k": false
       },
       "states": {
-        "type": "exclude",
-        "list": [
-          "NY"
-        ]
+        "type": "all",
+        "note": "New York added 17 Nov 2026 (variable-rate loans only), per Coinbase’s announcement"
       },
       "depth": {
         "label": "DeFi via wrapped BTC",
         "href": "/borrowing-against-your-stack#defi-wrapped"
       },
-      "sourcesLabel": "coinbase.com/borrow, help center loan articles",
+      "sourcesLabel": "coinbase.com/borrow, help center loan articles; press: The Block 17 Nov 2026 on New York",
       "sources": [
         "https://www.coinbase.com/borrow",
         "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/loan-health",
         "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/fee",
-        "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/collateral"
+        "https://help.coinbase.com/en/coinbase/trading-and-funding/loan/collateral",
+        "https://www.theblock.co/news/business/2026-11-17-coinbase-borrow-new-york-morpho-442842"
       ],
       "asOf": "2026-11-05",
       "site": "https://www.coinbase.com/borrow",
