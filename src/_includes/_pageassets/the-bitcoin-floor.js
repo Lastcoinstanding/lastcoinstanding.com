@@ -237,6 +237,115 @@
   var channelChart = null;
   var activeEpisode = null;
 
+  // ═══════════════════════════════════════════════════════════
+  // DAILY CLOSES — what the tripwire is judged on (2026-11-19)
+  // ═══════════════════════════════════════════════════════════
+  // The tripwire's published test is on DAILY closes. Until 2026-11-19 the
+  // day count below was read from PL_DATA, a ~12-day grid that is refreshed
+  // monthly, so it could not see a daily close and sat at 0 while price closed
+  // under the 10% line on 2026-11-19. The count now comes from daily candles
+  // (UTC close), fetched on load. First source that answers wins; both send
+  // CORS headers this origin accepts (tested from lastcoinstanding.com on
+  // 2026-11-19). No storage: one request per page load, nothing remembered.
+  //   Coinbase Exchange — [start, low, high, open, close, volume], newest first
+  //   Kraken            — [start, open, high, low, close, vwap, volume, count], oldest first
+  // The candle still in progress is dropped: only completed days count.
+  var DAILY_SOURCES = [
+    { id: 'coinbase', name: 'Coinbase',
+      url: 'https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=86400',
+      rows: function (d) {
+        if (!Array.isArray(d)) return null;
+        return d.map(function (c) { return [c[0], parseFloat(c[4])]; });
+      } },
+    { id: 'kraken', name: 'Kraken',
+      url: 'https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440',
+      rows: function (d) {
+        if (!d || (d.error && d.error.length) || !d.result) return null;
+        for (var k in d.result) {
+          if (k !== 'last' && Array.isArray(d.result[k])) {
+            return d.result[k].map(function (c) { return [c[0], parseFloat(c[4])]; });
+          }
+        }
+        return null;
+      } }
+  ];
+  var DAILY_MIN_ROWS = 35;          // enough to see a full 30-day run
+  var DAILY_MAX_AGE_D = 3;          // newest completed close must be this recent
+  var daily = { status: 'loading', rows: null, provider: '' };
+
+  // Raw [startTs, close] pairs → completed days, oldest first. Each row carries
+  // the bitcoin age at its CLOSE (start + 1 day), which is the age the floor is
+  // computed at, so a close is always compared with that day's own floor.
+  function normaliseDaily(raw, nowTs) {
+    if (!raw) return null;
+    var rows = [];
+    for (var i = 0; i < raw.length; i++) {
+      var start = +raw[i][0], close = +raw[i][1];
+      if (!isFinite(start) || !isFinite(close) || close <= 0) continue;
+      var closeTs = start + 86400;
+      if (closeTs > nowTs) continue;                       // still in progress
+      rows.push({
+        iso: new Date(start * 1000).toISOString().slice(0, 10),
+        day: (closeTs - GENESIS_TS) / 86400,
+        close: close
+      });
+    }
+    rows.sort(function (a, b) { return a.day - b.day; });
+    if (rows.length < DAILY_MIN_ROWS) return null;
+    var newestCloseTs = GENESIS_TS + rows[rows.length - 1].day * 86400;
+    if (nowTs - newestCloseTs > DAILY_MAX_AGE_D * 86400) return null;
+    return rows;
+  }
+
+  function loadDailyCloses(done) {
+    if (typeof lcsFetchJson !== 'function') { daily.status = 'failed'; done(); return; }
+    var nowTs = Date.now() / 1000;
+    (function tryNext(i) {
+      if (i >= DAILY_SOURCES.length) { daily.status = 'failed'; done(); return; }
+      var src = DAILY_SOURCES[i];
+      lcsFetchJson(src.url, 6000).then(function (d) {
+        var rows = null;
+        try { rows = normaliseDaily(src.rows(d), nowTs); } catch (e) { rows = null; }
+        if (!rows) { tryNext(i + 1); return; }
+        daily = { status: 'ok', rows: rows, provider: src.name };
+        done();
+      }, function () { tryNext(i + 1); });
+    })(0);
+  }
+
+  // The two current runs, counted back from the newest completed close:
+  // closes below the 10% line (the tripwire's clock) and closes below the
+  // floor itself (the open episode). null until the daily closes have loaded.
+  function dailyRead() {
+    if (daily.status !== 'ok') return null;
+    var rows = daily.rows, depth = 1 - TRIPWIRE.depthPct / 100, i, f;
+    var depthRun = 0, floorRun = 0, deepest = null;
+    for (i = rows.length - 1; i >= 0; i--) {
+      if (rows[i].close < floorAt(rows[i].day) * depth) depthRun++; else break;
+    }
+    for (i = rows.length - 1; i >= 0; i--) {
+      f = floorAt(rows[i].day);
+      if (rows[i].close < f) {
+        floorRun++;
+        var pct = (1 - rows[i].close / f) * 100;
+        if (!deepest || pct > deepest.pct) deepest = { pct: pct, iso: rows[i].iso };
+      } else break;
+    }
+    return {
+      depthRun: depthRun,
+      depthSince: depthRun ? rows[rows.length - depthRun].iso : null,
+      floorRun: floorRun,
+      floorSince: floorRun ? rows[rows.length - floorRun].iso : null,
+      deepest: deepest,
+      lastIso: rows[rows.length - 1].iso,
+      // The run reaches the start of the window, so its true length is longer.
+      windowed: floorRun === rows.length
+    };
+  }
+  function dayDate(s) {
+    return new Date(s + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  }
+
   function todayDays() { return TODAY_DAYS; }
 
   // ═══════════════════════════════════════════════════════════
@@ -1357,16 +1466,10 @@
     var vsFloorPct = (spot / fl - 1) * 100;
     var threshold = PL_FLOOR * (1 - TRIPWIRE.depthPct / 100);   // ×-trend at 10% below floor
 
-    // Consecutive elapsed days in the CURRENT run of samples below the
-    // threshold. Measured in elapsed days, never in sample counts — the
-    // series is a ~12-day grid (module header; MONTHLY_REFRESH_CHECKLIST §1).
-    var runDays = 0;
-    for (var i = PL_DATA.length - 1; i >= 0; i--) {
-      var xt = PL_DATA[i][1] / trendAt(PL_DATA[i][0]);
-      if (xt < threshold) runDays = PL_DATA[PL_DATA.length - 1][0] - PL_DATA[i][0];
-      else break;
-    }
-    // Has it ever fired since 2011? (i.e. excluding the 2010 infancy break)
+    // Has it ever fired since 2011 in the SAMPLED record? (excluding the 2010
+    // infancy break). Elapsed days, never sample counts — PL_DATA is a ~12-day
+    // grid (module header; MONTHLY_REFRESH_CHECKLIST §1). This is the history;
+    // the live clock is the daily-close run below.
     var firedModern = false, modernStart = dayOfIso('2011-01-01');
     var run = 0, prevDay = null;
     for (var k = 0; k < PL_DATA.length; k++) {
@@ -1375,29 +1478,107 @@
       else { run = 0; prevDay = null; }
       if (day >= modernStart && run > TRIPWIRE.days) firedModern = true;
     }
+
+    // The live clock: consecutive completed DAILY closes more than 10% below
+    // that day's floor. null while the daily closes are loading or unavailable;
+    // the status line then says so rather than printing a count it cannot know.
+    var dr = dailyRead();
+    var daysBelow = dr ? dr.depthRun : null;
+    var fired = !!dr && dr.depthRun > TRIPWIRE.days;
     return {
       vsFloorPct: +vsFloorPct.toFixed(2),
       thresholdXt: +threshold.toFixed(4),
       thresholdPrice: threshold * trendAt(d),
-      daysBelow: runDays,
-      armed: vsFloorPct < -TRIPWIRE.depthPct,
-      firedModern: firedModern
+      dailyStatus: daily.status,
+      dailyProvider: daily.provider,
+      daily: dr,
+      daysBelow: daysBelow,
+      armed: !!dr && dr.depthRun > 0 && !fired,
+      fired: fired,
+      firedModern: firedModern || fired
     };
   }
 
-  function renderTripwire() {
-    var t = tripwireState();
+  // Enumerated by state, not interpolated (STYLE_GUIDE §12): loading, daily
+  // closes unavailable, not armed, armed, fired. "Arms" and "fires" are
+  // different events and the wording keeps them apart: a daily close below the
+  // depth line ARMS the clock; only depth sustained for the full duration
+  // FIRES the tripwire. The criteria are conjunctive.
+  function tripwireStatusHtml(t) {
     var where = t.vsFloorPct >= 0
       ? '<strong>' + t.vsFloorPct.toFixed(1) + '% above the floor</strong>'
       : '<strong>' + Math.abs(t.vsFloorPct).toFixed(1) + '% below the floor</strong>';
-    // "Arms" and "fires" are different events and the wording keeps them apart:
-    // price closing below the depth line ARMS the clock; only depth sustained for
-    // the full duration FIRES the tripwire. The criteria are conjunctive.
-    $('flTripwireStatusV').innerHTML =
-      where + ' &middot; ' +
-      '<strong>' + Math.round(t.daysBelow) + ' of ' + TRIPWIRE.days + '</strong> consecutive days below the ' + TRIPWIRE.depthPct + '% line &middot; ' +
-      'the tripwire has ' + (t.firedModern ? '<strong>fired</strong>' : 'never fired') + ' in the modern era (2011&ndash;). ' +
-      'It would arm at ' + usd(t.thresholdPrice) + ' today.';
+    var line = usd(t.thresholdPrice), N = TRIPWIRE.days, D = TRIPWIRE.depthPct;
+    var never = 'The tripwire has never fired in the modern era (2011&ndash;).';
+    if (t.dailyStatus === 'loading') {
+      return where + ' &middot; reading daily closes&hellip;';
+    }
+    if (t.dailyStatus !== 'ok' || !t.daily) {
+      return where + ' &middot; the daily closes did not load, so the day count cannot be shown. Reload the page to try again. ' +
+        'The ' + D + '% line is at ' + line + ' today.';
+    }
+    var dr = t.daily, n = dr.depthRun;
+    var src = ' <span class="fl-tripwire-src">Daily closes: ' + t.dailyProvider + ' BTC-USD, UTC, through ' + dayDate(dr.lastIso) + '.</span>';
+    if (t.fired) {
+      return where + ' &middot; <strong>The tripwire has fired.</strong> The last ' + n + ' daily closes, since ' + dayDate(dr.depthSince) +
+        ', were each more than ' + D + '% below the floor. By the test published on this page, the Power Law model is failing.' + src;
+    }
+    if (n > 0) {
+      return where + ' &middot; <strong>Armed: day ' + n + ' of ' + N + '.</strong> ' +
+        (n === 1 ? 'The last daily close, on ' + dayDate(dr.depthSince) + ', was'
+                 : 'The last ' + n + ' daily closes, since ' + dayDate(dr.depthSince) + ', were each') +
+        ' more than ' + D + '% below the floor. The tripwire fires if the run passes ' + N + ' days; one daily close back above the ' + D +
+        '% line (' + line + ' today) resets the count. ' + never + src;
+    }
+    return where + ' &middot; <strong>0 of ' + N + '</strong> consecutive daily closes below the ' + D + '% line. ' +
+      (dr.floorRun > 0
+        ? 'Price has closed below the floor itself on each of the last ' + dr.floorRun + ' day' + (dr.floorRun === 1 ? '' : 's') +
+          (dr.windowed ? '' : ', since ' + dayDate(dr.floorSince)) + '. '
+        : '') +
+      'The clock starts on a daily close below ' + line + ' (today&rsquo;s level). ' + never + src;
+  }
+
+  function renderTripwire() {
+    $('flTripwireStatusV').innerHTML = tripwireStatusHtml(tripwireState());
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // OPEN EPISODE — the note under the hero, and the hero subtitle
+  // ═══════════════════════════════════════════════════════════
+  // Shown only while daily closes are below the floor. Everything in it is
+  // computed, so it appears and clears on its own. The deepest reading in the
+  // sampled modern record is the 2015 episode's (EPISODES, 5.1%).
+  var RECORD_DEEPEST_MODERN_PCT = 5.1;
+  function renderOpenNote() {
+    var el = $('flOpenNote');
+    if (!el) return;
+    var dr = dailyRead();
+    var sub = $('flHeroSub');
+    var below = dr ? dr.floorRun > 0 : (spot < floorAt(todayDays()) * 0.99);
+    if (sub) {
+      sub.innerHTML = below
+        ? 'A line under fifteen years of price history that price has rarely closed beneath. It is beneath it now, and this page reports the test every day.'
+        : sub.getAttribute('data-default');
+    }
+    if (!dr || !dr.floorRun) { el.hidden = true; el.innerHTML = ''; return; }
+    var lastSampleDay = PL_DATA[PL_DATA.length - 1][0];
+    var seriesHasIt = lastSampleDay >= dayOfIso(dr.floorSince);
+    var html = '<strong>' + longDate(dr.floorSince) + ': price is below the floor.</strong> ' +
+      (dr.windowed
+        ? 'It has closed under the line on every one of the last ' + dr.floorRun + ' days. '
+        : 'It has closed under the line every day since ' + dayDate(dr.floorSince) + ' (' + dr.floorRun + ' daily close' + (dr.floorRun === 1 ? '' : 's') + '). ') +
+      'The deepest close so far was ' + dr.deepest.pct.toFixed(1) + '% below, on ' + dayDate(dr.deepest.iso) + '. ' +
+      (dr.deepest.pct > RECORD_DEEPEST_MODERN_PCT
+        ? 'Before this, the deepest modern reading in this page&rsquo;s sampled record was ' + RECORD_DEEPEST_MODERN_PCT + '%, in 2015. '
+        : '') +
+      (dr.depthRun > TRIPWIRE.days
+        ? 'The <a href="#the-tripwire">break test</a> further down this page has fired.'
+        : 'The <a href="#the-tripwire">break test</a> further down this page is running.') +
+      (seriesHasIt ? '' :
+        ' The history here (the chart, the four approaches, the entry measurements) ends at the last series sample, ' +
+        dayDate(isoOf(lastSampleDay)) + ', and does not yet include this episode. It will be added as a fifth approach at the next data refresh.');
+    el.innerHTML = html;
+    el.hidden = false;
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -1422,6 +1603,10 @@
        spotSource === 'live'
          ? ('Live' + (todayPriceProviderName() ? ', from ' + todayPriceProviderName() : '') + ', fetched within the last 10 minutes.')
          : 'The live price did not load; the ' + lastSampleDateLong() + ' price, the most recent in the series, is standing in, and every figure that depends on it is labelled accordingly.'],
+      ['Daily closes',
+       daily.status === 'ok'
+         ? ('The tripwire&rsquo;s day count and the note under the header read completed daily candles (UTC close) for BTC-USD from ' + daily.provider + ', ' + daily.rows.length + ' days through ' + dayDate(daily.rows[daily.rows.length - 1].iso) + ', fetched when this page loaded. Each close is compared with the floor for its own day. The day in progress is not counted.')
+         : (daily.status === 'loading' ? 'Loading.' : 'The daily candles did not load (Coinbase, then Kraken, were tried), so the tripwire&rsquo;s day count is not shown.')],
       ['The four episodes',
        'Static, from <code>analysis/2026-08-20-power-law-floor.md</code> §2 &mdash; historical facts that do not refresh. <code>floorParityQA()</code> recomputes them from the series on every load and fails loudly if they no longer match.'],
       ['Quantile fits',
@@ -1478,6 +1663,7 @@
     renderHero();
     renderParity();
     renderTripwire();
+    renderOpenNote();
     renderVerify();
   }
 
@@ -1496,6 +1682,10 @@
         });
       } catch (e) { /* offline / blocked — the seeded read stands */ }
     }
+
+    // Daily closes for the tripwire and the open-episode note. Independent of
+    // the spot fetch above: either can fail without blanking the other.
+    loadDailyCloses(function () { renderTripwire(); renderOpenNote(); renderVerify(); });
 
     // Build-time assertion, per the design doc: assert, don't assume.
     var qa = floorParityQA();

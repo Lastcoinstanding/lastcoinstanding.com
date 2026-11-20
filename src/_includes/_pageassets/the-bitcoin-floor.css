@@ -214,6 +214,13 @@ body { background: var(--bg); color: var(--text); }
 .fl-tripwire-status-k { font-family: var(--font-b); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.45rem; }
 .fl-tripwire-status-v { font-family: var(--font-b); font-size: 0.95rem; line-height: 1.7; color: var(--text); }
 .fl-tripwire-status-v strong { color: var(--ink-bright); }
+.fl-tripwire-src { display: block; margin-top: 0.45rem; font-size: 0.84rem; color: var(--text-muted); }
+/* Open-episode note under the hero. Neutral on purpose: no colour state changes
+   with distance to the floor (SITE_GUIDE §50). */
+.fl-open-note { max-width: 760px; margin: 1.4rem auto 0; padding: 0.95rem 1.15rem; text-align: left; font-family: var(--font-b); font-size: 0.95rem; line-height: 1.7; color: var(--text); border: 1px solid var(--border-strong); border-radius: 10px; box-sizing: border-box; }
+.fl-open-note strong { color: var(--ink-bright); }
+.fl-open-note a { color: var(--amber); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+.fl-open-note[hidden] { display: none; }
 .fl-tripwire-commit { font-family: var(--font-d); font-style: italic; font-size: 1.12rem; color: var(--amber); margin: 0; padding-top: 1.1rem; border-top: 1px solid var(--border); }
 
 /* ── Other side ─────────────────────────────────────────── */

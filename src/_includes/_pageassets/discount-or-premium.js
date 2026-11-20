@@ -199,6 +199,10 @@
       // must not claim. Only the subject changes.
       var fl = floorNote.querySelector('.dp-floor-subj');
       if (fl) fl.textContent = hypothetical() ? 'This position sits' : 'Bitcoin is currently';
+      // Below-floor state (STYLE_GUIDE §12): "at the bottom" is false once the
+      // position is under the floor line itself.
+      var wh = floorNote.querySelector('.dp-floor-where');
+      if (wh) wh.textContent = (m < PL_FLOOR * 0.99) ? 'below the floor of its historical channel' : 'at the bottom of its historical channel';
     }
   }
 
