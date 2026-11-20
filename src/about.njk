@@ -20,44 +20,27 @@ eleventyComputed:
     <p class="lead-text">Last Coin Standing is a one-person project: I choose what to build, do the research, write the words and check the numbers.</p>
   </section>
 
-  <!-- WHO I AM (first since 2026-11-07) -->
+  <!-- WHO I AM (first since 2026-11-07). The two roles sit under the name
+       (JM 2026-11-20); each project has its own section below, with its own
+       interviews, so the bio stays about the person. -->
   <section class="about-section">
     <div class="section-label">Who I Am</div>
 
     <div class="bio-header">
-      <img src="profile.jpg" alt="John McCabe" class="bio-photo">
+      <img src="/profile-portrait.jpg" alt="John McCabe" class="bio-photo" width="180" height="180">
       <div class="bio-text">
         <div class="bio-name">John McCabe</div>
         <div class="bio-handle">@lastcoinstandng</div>
+        <ul class="bio-roles">
+          <li>Founder, <a href="#last-coin-standing">Last Coin Standing</a></li>
+          <li>Co-founder, <a href="#saturday-bitcoin">Saturday Bitcoin</a></li>
+        </ul>
         <p>I'm a Bitcoin Maximalist, putting in my few thousand hours since 2017. I have a degree in Economics and Business from Trinity College Dublin, Ireland, and an MBA from the Kellogg School of Management at Northwestern University. I've spent 25 years working in Product Management in Silicon Valley, including long stints at Yahoo and Mastercard - the latter focused specifically on merchant loyalty.</p>
       </div>
     </div>
 
-    <p>I'm also a co-founder of <a href="https://www.saturdaybitcoin.com" target="_blank" rel="noopener">Saturday Bitcoin</a>, a directory of places around the world to spend bitcoin. There I'm drawing on my years managing merchant loyalty programs to help bitcoin grow as a medium of exchange, not only a store of value.</p>
-
     <p>I've been published in Bitcoin Magazine and have been a guest on a number of Bitcoin podcasts. Bitcoin is the most important of my interests and I devote a significant amount of my time - professional and personal - to better understanding it and helping others understand it, to the extent that I can.</p>
 
-    {% set vc_body = 'A walk through The Bitcoin Retirement on camera: how much bitcoin a retirement needs, the power law behind the model, and how it fared out of sample.' %}
-    {% include 'components/video-card.njk' %}
-
-    <ul class="published-list">
-      <li>
-        <span class="pub-source">The Robin Seyr Podcast · September 2026</span><br>
-        <a href="https://www.youtube.com/watch?v=aQhk4KKqMss" target="_blank" rel="noopener">Every 0.2 Bitcoin Retires You 3 Years Faster</a>
-      </li>
-      <li>
-        <span class="pub-source">Bitcoin Magazine</span><br>
-        <a href="https://bitcoinmagazine.com/business/merchant-loyalty-competitive-advantage-reimagined-through-bitcoin" target="_blank" rel="noopener">Merchant Loyalty Competitive Advantage — Reimagined Through Bitcoin</a>
-      </li>
-      <li>
-        <span class="pub-source">Once Bitten! A Bitcoin Podcast · Episode #480</span><br>
-        <a href="https://overcast.fm/+Xf9H0x50I" target="_blank" rel="noopener">Working On Bitcoin</a>
-      </li>
-      <li>
-        <span class="pub-source">Bitcoin for Millennials · with Bram Kanstein</span><br>
-        <a href="https://www.youtube.com/watch?v=PH6C9AncQEo" target="_blank" rel="noopener">Video Interview</a>
-      </li>
-    </ul>
     <!-- Work With Me, prominent (JM 2026-11-07): directly under the bio, so a
          reader who has just learned who I am sees how to work with me. -->
     <a class="wwm-cta" href="/work-with-me">
@@ -65,6 +48,87 @@ eleventyComputed:
       <span class="wwm-cta-text">A one-on-one conversation about a bitcoin decision, a collaboration with an advisor, firm or platform, or an appearance on your show.</span>
       <span class="wwm-cta-arrow" aria-hidden="true">&rarr;</span>
     </a>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- LAST COIN STANDING (JM 2026-11-20): this site, as one of the two
+       projects, with the interviews about it. Same shape as the Saturday
+       Bitcoin section that follows: label and mark, one line, video card,
+       then earlier pieces. -->
+  <section class="about-section" id="last-coin-standing">
+    <div class="section-label proj-label"><img class="lcs-mark-inline" src="/lcs-mark.svg" alt="" width="130" height="70" decoding="async">Last Coin Standing</div>
+    <p>I founded Last Coin Standing, this site, to build tools that help people see bitcoin clearly.</p>
+
+    {% set vc_url = 'https://www.youtube.com/watch?v=aQhk4KKqMss' %}
+    {% set vc_still = '/interview-robin-seyr.jpg' %}
+    {% set vc_alt = 'A frame from the interview: John McCabe and Robin Seyr, with a Last Coin Standing power-law page on screen' %}
+    {% set vc_kicker = 'Watch John on The Robin Seyr Podcast · September 2026' %}
+    {% set vc_title = 'Every 0.2 Bitcoin Retires You 3 Years Faster' %}
+    {% set vc_body = 'A walk through The Bitcoin Retirement on camera: how much bitcoin a retirement needs, the power law behind the model, and how it fared out of sample.' %}
+    {% include 'components/video-card.njk' %}
+    {% set vc_css_done = true %}
+
+    <div class="pub-label">Earlier</div>
+    <ul class="published-list">
+      <li>
+        <span class="pub-source">Bitcoin for Millennials · with Bram Kanstein · May 2024</span><br>
+        <a href="https://www.youtube.com/watch?v=PH6C9AncQEo" target="_blank" rel="noopener">Is Bitcoin really the world&rsquo;s new money standard?</a>
+      </li>
+    </ul>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SATURDAY BITCOIN (JM 2026-11-20): the second project, with the
+       interviews about it. The stills are real frames, not the shows'
+       thumbnails (SITE_GUIDE, Video card). The sun mark is Saturday Bitcoin's
+       own, inlined (no third-party request). -->
+  {% set sb_mark = '<svg class="sb-mark" viewBox="8 8 84 84" aria-hidden="true" focusable="false"><path d="M50 8A42 42 0 0 0 9.208 60H90.792A42 42 0 0 0 50 8ZM10.77 65A42 42 0 0 0 13.627 71H86.373A42 42 0 0 0 89.23 65ZM17.015 76A42 42 0 0 0 21.663 81H78.337A42 42 0 0 0 82.985 76ZM28.367 86A42 42 0 0 0 50 92A42 42 0 0 0 71.633 86Z"/></svg>' %}
+  <section class="about-section" id="saturday-bitcoin">
+    <div class="section-label proj-label">{{ sb_mark | safe }}Saturday Bitcoin</div>
+    <p>I'm a co-founder of <a href="https://saturdaybitcoin.com" target="_blank" rel="noopener">Saturday Bitcoin</a>, a directory of places around the world to spend bitcoin. There I'm drawing on my years managing merchant loyalty programs to help bitcoin grow as a medium of exchange, not only a store of value.</p>
+    <p>I talked about this work on two shows in November 2026.</p>
+
+    <div class="sb-videos">
+      {% set vc_url = 'https://www.youtube.com/watch?v=gXbOe-Kb0aY' %}
+      {% set vc_still = '/interview-walker-america.jpg' %}
+      {% set vc_alt = 'A frame from the interview: John McCabe, beside the show’s on-screen graphic, “Single-issue shoppers”' %}
+      {% set vc_kicker = 'Watch John on THE Bitcoin Podcast · November 2026' %}
+      {% set vc_title = 'What Would Actually Get You to Spend Bitcoin?' %}
+      {% set vc_body = 'What keeps Bitcoiners from spending, and how merchants could win them over with loyalty rewards and instant cashback in sats.' %}
+      {# The show's on-screen graphic sits at the right edge of the frame; keep it in when the still is cropped. #}
+      {% set vc_focus = '100% 50%' %}
+      {% include 'components/video-card.njk' %}
+      {% set vc_focus = false %}
+      <!-- Audio edition (JM 2026-11-20): the conversation has no visuals, so it
+           works as audio. The audio platforms carry the show's other title. -->
+      <p class="vc-listen">Prefer to listen? The audio edition, <em>What Bitcoin Should Steal From Mastercard</em>, is on <a href="https://podcasts.apple.com/us/podcast/what-bitcoin-should-steal-from-mastercard-john-mccabe/id1694392423?i=1000803068091" target="_blank" rel="noopener">Apple Podcasts</a>, <a href="https://open.spotify.com/episode/0Q9c8eW4evnvpIZCnsPYc3" target="_blank" rel="noopener">Spotify</a> and <a href="https://fountain.fm/episode/JFUlsBfXn8IPoYsVbswq" target="_blank" rel="noopener">Fountain</a>.</p>
+
+      {% set vc_url = 'https://www.youtube.com/watch?v=Jx9GIVV0HVg' %}
+      {% set vc_still = '/interview-bitcoin-news.jpg' %}
+      {% set vc_alt = 'A frame from the live show: the Saturday Bitcoin Rally page, shared on screen' %}
+      {% set vc_kicker = 'Watch John on Bitcoin News · November 2026' %}
+      {% set vc_title = 'Can Bitcoin Survive?' %}
+      {% set vc_body = 'A merchant&rsquo;s-eye view of adoption, with Kyle Huber: why Bitcoiners are customers worth winning, and what Steak &rsquo;n Shake got right.' %}
+      {% include 'components/video-card.njk' %}
+    </div>
+
+    <div class="pub-label">Earlier</div>
+    <ul class="published-list">
+      <li>
+        <span class="pub-source">Bitcoin Magazine · July 2024</span><br>
+        <a href="https://bitcoinmagazine.com/business/merchant-loyalty-competitive-advantage-reimagined-through-bitcoin" target="_blank" rel="noopener">Merchant Loyalty Competitive Advantage — Reimagined Through Bitcoin</a>
+      </li>
+      <li>
+        <span class="pub-source">Once Bitten! A Bitcoin Podcast · Episode #480 · July 2024</span><br>
+        <a href="https://overcast.fm/+Xf9H0x50I" target="_blank" rel="noopener">Leaving Mastercard to Work on Bitcoin</a>
+      </li>
+    </ul>
+
+    <div class="connect-links">
+      <a href="https://saturdaybitcoin.com" target="_blank" rel="noopener" class="connect-link connect-link-primary">{{ sb_mark | safe }}Visit Saturday Bitcoin &#8599;</a>
+    </div>
   </section>
 
   <hr class="section-divider">

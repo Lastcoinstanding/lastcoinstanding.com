@@ -248,6 +248,57 @@
       color: var(--btc-orange);
     }
 
+    /* ── ROLES UNDER THE NAME (2026-11-20) ── */
+    .bio-roles {
+      list-style: none;
+      padding: 0;
+      margin: -6px 0 16px;
+    }
+    .bio-roles li {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* ── PROJECT SECTIONS: Last Coin Standing, Saturday Bitcoin (2026-11-20) ── */
+    .proj-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-mark {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      fill: currentColor;
+    }
+    .lcs-mark-inline {
+      height: 20px;
+      width: auto;
+      flex: none;
+    }
+    /* Two video cards in a row: tighter than the component's default gap. */
+    .sb-videos .vc-wrap {
+      margin: 1.1rem 0;
+    }
+    .about-section p.vc-listen {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin: -0.35rem 0 1.5rem;
+    }
+    .pub-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 28px;
+    }
+    .pub-label + .published-list {
+      margin-top: 10px;
+    }
+
     /* ── CLOSING QUOTE ── */
     .closing-section p {
       font-size: 1.1rem;
@@ -302,7 +353,7 @@
         min-width: 160px;
         height: 160px;
       }
-      .bio-name, .bio-handle {
+      .bio-name, .bio-handle, .bio-roles {
         text-align: center;
       }
       .bio-text p {

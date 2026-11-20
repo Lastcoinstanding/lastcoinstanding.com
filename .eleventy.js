@@ -10,7 +10,12 @@ module.exports = function (eleventyConfig) {
     'hero-bg.jpg',
     'hero-bg.webp',
     'profile.jpg',
+    // About Me bio photo since 2026-11-20 (from THE Bitcoin Podcast's episode art, text removed).
+    'profile-portrait.jpg',
     'interview-robin-seyr.jpg',
+    // Saturday Bitcoin interview stills on About Me (2026-11-20): real frames, SITE_GUIDE §65.
+    'interview-walker-america.jpg',
+    'interview-bitcoin-news.jpg',
     // Static chart images (scripts/build-chart-images.py, 2026-10-20): crawlable
     // copies of live charts, shown on their pages to save or share.
     'bitcoin-vs-house-prices.png',
