@@ -10,51 +10,55 @@ _For runnable procedures, two checklists at repo root: **`NEW_PAGE_CHECKLIST.md`
 
 ## 0. How work moves to production (standing workflow — do not re-negotiate)
 
-This site is built across two kinds of Claude session. They have fixed,
-non-overlapping roles. Every page follows the same path; there is nothing to
-decide fresh each time. (Mechanical build steps live in `NEW_PAGE_CHECKLIST`;
-this section governs WHO does WHAT and HOW handoff happens.)
+Updated 2026-11-19 (JM ruling). One Claude session now does the whole job: it
+researches, drafts, changes the repo on a branch and opens the pull request. JM
+reviews the PR and approves the merge. The older two-session handoff (a drafting
+chat writing a prompt for a separate Claude Code tab) is the fallback, not the
+default. (Mechanical build steps live in `NEW_PAGE_CHECKLIST`; this section
+governs WHO does WHAT.)
 
-### The two roles
+### The default: one session, research to pull request
 
-**1. The research/drafting chat (claude.ai, with project knowledge + web + tools).**
-Does everything that does NOT touch the repo: research, data pulls, fact-checking
-and primary-source verification, drafting page content, building the design/
-interactive as a standalone HTML mockup, writing the verified-claims register and
-source ledger, and producing the **Code-tab build prompt** (below). It CANNOT push
-to the repo, click inside GitHub/Cloudflare, or place binary files — and does not
-try to. It hands off via a prompt + draft files.
+A Claude session with this repository attached does all of it:
 
-**2. The Claude Code tab (local clone, authenticated to GitHub).**
-Does everything that DOES touch the repo: porting the mockup into the `.njk` +
-`_pageassets` template structure, running `NEW_PAGE_CHECKLIST`, committing on a
-branch, opening the PR, merging to main. JM is authenticated here; this is the
-only path that can push. Cloudflare auto-deploys on merge to main.
+- research, data pulls, fact-checking and primary-source verification;
+- drafting the content, and a mockup first where the design is new;
+- the repo work: a branch, the `.njk` + `_pageassets` changes, `NEW_PAGE_CHECKLIST`
+  for a new page, the records (`updates.json`, `MONTHLY_REFRESH_CHECKLIST`,
+  `TECH_DEBT`, `DATA_AUDIT`, this guide), a local `npm run build`, the push, and
+  the pull request.
 
-### The handoff artifact
+The session attaches the repo when JM asks for repo work. If the attach is
+refused, it says so and asks JM to request it in so many words; it does not look
+for another route in.
 
-The drafting chat produces a **Code-tab build prompt** — a single pasteable block
-instructing Claude Code to build and ship the page per `NEW_PAGE_CHECKLIST` and the
-relevant sibling-page conventions. JM pastes it into the Code tab; Claude Code
-executes; JM reviews the PR and merges. This prompt-handoff is the standard
-mechanism for EVERY page. (Do not invent per-conversation alternatives like
-browser automation, GitHub-API-from-chat, or asking JM to hand-edit — those are
-the legacy/hot-fix exceptions documented in `NEW_PAGE_CHECKLIST`, not the default.)
+**What the session does not do:** merge without JM's approval, push to `main`,
+or treat a green build as review. The PR description is the handoff: what
+changed, what was checked and how, what was not checked, and every item that
+needs JM's ruling.
 
-### JM's role at the boundary
+### JM's role
 
-JM is the bridge: pastes the prompt into the Code tab, screenshots Code-tab output
-back to the drafting chat if verification is needed there, performs the authenticated
-push/merge, and does the ~2-minute live verification (OG card curl, page load,
-social-card validator) after deploy. The drafting chat verifies results by reading
-the public repo (`raw.githubusercontent.com`) and the live URL — it does not need
-to see inside the Code tab except via JM's screenshots.
+JM reviews the PR and its Cloudflare Pages preview, rules on the flagged items,
+and approves the merge. The merge rule below applies whoever presses the button.
+After deploy JM does the short live check (page load, OG card, social-card
+validator) or asks the session to do it by reading the live URL.
+
+### The fallback: a prompt for a separate Claude Code session
+
+When a session cannot attach the repo (no access on that surface, or JM prefers
+to run the build himself), it writes a **build prompt**: one pasteable block
+telling a Claude Code session what to build, per `NEW_PAGE_CHECKLIST` and the
+sibling-page conventions. JM pastes it; that session builds and opens the PR.
+Prompts written this way are saved to the project as `claude/*_PROMPT_*.md`.
+This was the only route until November 2026, and older docs describe it as the
+standard one.
 
 ### One-line summary
 
-**Drafting chat researches, verifies, drafts, and writes the build prompt → JM
-pastes it into Claude Code → Claude Code builds, PRs, and (on merge) deploys → JM
-verifies live.** Every page. No renegotiation.
+**One session researches, verifies, drafts, builds on a branch and opens the PR →
+JM reviews and approves → Cloudflare deploys on merge → live check.** A build
+prompt for a second session is the fallback when the repo cannot be attached.
 
 ### The merge rule: Cloudflare Pages must pass (JM ruling, 2026-10-06)
 
@@ -3257,6 +3261,36 @@ Fourth page of the Power Law family (**Bitcoin and The Power Law** · **The Bitc
 
 **Register guards.** "Cheapest" appears nowhere; "at the floor" is a location, never an adjective of value. Models and pages are not actors (`STYLE_GUIDE §10.4`). Vintage and endpoint caveats ride in the same card as their numbers, never as footnotes. No colour state changes with distance to the floor — no green far above, no red near it; distance is reported in text and position, never in alarm styling.
 
+
+### Below the floor, November 2026: the daily-close tripwire and the open-episode note (2026-11-19)
+
+Price closed under the floor on 2026-11-13 (UTC, Coinbase daily close) and under
+the 10% line on 2026-11-19. Three things changed on this page and they are canon:
+
+- **The tripwire's day count reads daily closes.** Until this pass `tripwireState()`
+  counted elapsed days across `PL_DATA` samples, a ~12-day grid refreshed monthly,
+  while the copy said "judged on daily closes, live". With the series ending
+  2026-11-04 the count read 0 through six daily closes below the floor and one below
+  the 10% line. It now fetches completed daily candles (UTC close) on load, Coinbase
+  Exchange first, Kraken second, and counts consecutive closes more than 10% below
+  **that day's own floor**. The day in progress never counts. No storage, in keeping
+  with this page's no-stored-state rule. If neither source answers, the status says
+  the count cannot be shown; it never prints 0 for "unknown".
+- **Status states are enumerated** (STYLE_GUIDE §12): loading, daily closes
+  unavailable, not armed, armed (day N of 30), fired. The fired wording repeats the
+  criteria sentence: "By the test published on this page, the Power Law model is
+  failing." The criteria themselves (10%, 30 days, conjunctive) are unchanged.
+- **The open-episode note** under the hero (`#flOpenNote`) and the below-floor hero
+  subtitle are computed from the same daily closes, so they appear when closes go
+  under the floor and clear when they come back. No colour state.
+
+**Deliberately not done here:** no `PL_DATA` sample added, no fifth episode card, no
+parity-fixture change. The chart, the four cards and the entry set still end at the
+last sample; the note says so. That is the December refresh (TECH_DEBT).
+
+**Known gap between the two instruments.** The sampled record's "5.1% in 2015" is a
+12-day-grid reading and a lower bound; daily closes in 2015 may have gone deeper. Any
+sentence comparing today's daily-close depth with the record says "sampled record".
 
 ## 51. Work With Me (`/work-with-me.html`)
 

@@ -719,8 +719,8 @@
     var floorNote = lowMult < PL_FLOOR
       ? ' On this path the crash&rsquo;s low is <strong>' + lowMult.toFixed(2) + '&times; trend</strong>, under the Power Law floor (0.42&times;): ' +
         (lowMult < RECORD_LOW - 0.005
-          ? 'deeper than any low in the record, whose deepest was 5.1% under the floor (2015).'
-          : 'about as deep as the deepest low in the record, 5.1% under the floor (2015).')
+          ? 'deeper than any low in the sampled record before November 2026, whose deepest was 5.1% under the floor (2015).'
+          : 'about as deep as the deepest low in the sampled record before November 2026, 5.1% under the floor (2015).')
       : '';
     el.innerHTML = 'Recovery assumed: <strong>' + rec.label + '</strong> (' + rec.note + '). Bitcoin&rsquo;s price: <strong>' + pathWords(BASIS).name.toLowerCase() + '</strong>' + (BASIS === 'floor' ? ' (a stress test)' : '') +
       ', inflation <strong>' + inflationLabel() + '</strong> (shared with the Retirement page). Past recoveries were reliable; the future is not guaranteed.' + floorNote;
