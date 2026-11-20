@@ -61,6 +61,11 @@ eleventyComputed:
   {% include 'components/tool-framing.njk' %}
 
   {# Video card (2026-10-19): the interview walks through this page. #}
+  {% set vc_url = 'https://www.youtube.com/watch?v=aQhk4KKqMss' %}
+  {% set vc_still = '/interview-robin-seyr.jpg' %}
+  {% set vc_alt = 'A frame from the interview: John McCabe and Robin Seyr, with a Last Coin Standing power-law page on screen' %}
+  {% set vc_kicker = 'Watch John on The Robin Seyr Podcast · September 2026' %}
+  {% set vc_title = 'Every 0.2 Bitcoin Retires You 3 Years Faster' %}
   {% set vc_body = 'A walk through this calculator on camera: how much bitcoin a retirement needs, and how that changes with the year you start. The figures are the model&rsquo;s, under its assumptions; set your own below.' %}
   {% include 'components/video-card.njk' %}
 

@@ -87,4 +87,4 @@ Data-driven analyses with interactive calculators. Backed by historical price da
 
 ## About
 
-- [About](https://lastcoinstanding.com/about): About the site and its author. Long Coin Standing is an independent editorial project; it accepts no advertising and offers no financial advice.
+- [About](https://lastcoinstanding.com/about): About the site and its author, John McCabe. Last Coin Standing is an independent editorial project; it accepts no advertising and offers no financial advice. The page also covers Saturday Bitcoin, the directory of places to spend bitcoin that he co-founded, and lists his interviews.

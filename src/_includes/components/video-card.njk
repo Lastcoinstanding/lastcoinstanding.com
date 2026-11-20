@@ -1,5 +1,6 @@
 {#
-  Video card — a house-styled link to a video interview (2026-10-19, JM).
+  Video card — a house-styled link to a video interview (2026-10-19, JM;
+  generalised 2026-11-20 for the Saturday Bitcoin interviews on About Me).
 
   A still from the interview (self-hosted) with a play mark, the episode title in the
   site's type, and a one-line note; the whole card links out to YouTube.
@@ -7,10 +8,26 @@
   Get Updates block's no-embed rule. JM chose a house card over the show's
   own thumbnail, whose headline reads as a promise the site never makes.
 
-  Set before including:
-    vc_body  — one or two sentences for this page (required)
-  Copy canon and placements: SITE_GUIDE (Video card section).
+  Set ALL SIX before every include. Nunjucks `set` lasts for the rest of the
+  page, so a card that skips one silently inherits the previous card's value.
+    vc_url     the episode's YouTube URL
+    vc_still   the self-hosted still, 800×450: a real frame, not the show's thumbnail
+    vc_alt     alt text for the still
+    vc_kicker  "Watch John on <show> · <Month YYYY>" (JM: his name up front)
+    vc_title   the episode's own title
+               (kicker, title and alt are escaped: write plain text and the
+               literal · character, not entities)
+    vc_body    one or two sentences for this page; no link (the card is one)
+  Optional, for a still whose subject sits off-centre:
+    vc_focus   CSS object-position, e.g. '100% 50%'. Where the text runs taller
+               than 16:9 (About's narrow column) the still is cropped at the
+               sides; this keeps its subject in frame. Reset it after the include
+               ({% set vc_focus = false %}) so the next card doesn't inherit it.
+  On a page with more than one card, `{% set vc_css_done = true %}` after the
+  first include so the style block is written once.
+  Copy canon, stills and placements: SITE_GUIDE (Video card section).
 #}
+{% if not vc_css_done %}
 <style>
 .vc-wrap { max-width: 880px; margin: 1.4rem auto 1.8rem; font-family: 'Inter', -apple-system, sans-serif; }
 .vc-card {
@@ -39,15 +56,16 @@
   .vc-still { flex-basis: auto; width: 100%; }
 }
 </style>
+{% endif %}
 <div class="vc-wrap">
-  <a class="vc-card" href="https://www.youtube.com/watch?v=aQhk4KKqMss" target="_blank" rel="noopener">
+  <a class="vc-card" href="{{ vc_url }}" target="_blank" rel="noopener">
     <div class="vc-still">
-      <img src="/interview-robin-seyr.jpg" alt="A frame from the interview: John McCabe and Robin Seyr, with a Last Coin Standing power-law page on screen" width="800" height="450" loading="lazy" decoding="async">
+      <img src="{{ vc_still }}" alt="{{ vc_alt | e }}" width="800" height="450" loading="lazy" decoding="async"{% if vc_focus %} style="object-position: {{ vc_focus }}"{% endif %}>
       <span class="vc-play" aria-hidden="true"></span>
     </div>
     <div class="vc-text">
-      <p class="vc-kicker">Watch John on The Robin Seyr Podcast &middot; September 2026</p>
-      <p class="vc-title">Every 0.2 Bitcoin Retires You 3 Years Faster</p>
+      <p class="vc-kicker">{{ vc_kicker | e }}</p>
+      <p class="vc-title">{{ vc_title | e }}</p>
       <p class="vc-body">{{ vc_body | safe }}</p>
       <span class="vc-cta">Watch on YouTube &#8599;</span>
     </div>

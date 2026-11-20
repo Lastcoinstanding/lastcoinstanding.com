@@ -248,6 +248,23 @@
       color: var(--btc-orange);
     }
 
+    /* ── SATURDAY BITCOIN (2026-11-20) ── */
+    .sb-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-mark {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      fill: currentColor;
+    }
+    /* Two video cards in a row: tighter than the component's default gap. */
+    .sb-videos .vc-wrap {
+      margin: 1.1rem 0;
+    }
+
     /* ── CLOSING QUOTE ── */
     .closing-section p {
       font-size: 1.1rem;
