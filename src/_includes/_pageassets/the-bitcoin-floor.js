@@ -1487,6 +1487,9 @@
     var fired = !!dr && dr.depthRun > TRIPWIRE.days;
     return {
       vsFloorPct: +vsFloorPct.toFixed(2),
+      // Unrounded, for display: rounding twice (2dp, then 1dp) could show 9.7%
+      // here beside the hero's 9.6% for the same spot.
+      vsFloorRaw: vsFloorPct,
       thresholdXt: +threshold.toFixed(4),
       thresholdPrice: threshold * trendAt(d),
       dailyStatus: daily.status,
@@ -1505,9 +1508,9 @@
   // depth line ARMS the clock; only depth sustained for the full duration
   // FIRES the tripwire. The criteria are conjunctive.
   function tripwireStatusHtml(t) {
-    var where = t.vsFloorPct >= 0
-      ? '<strong>' + t.vsFloorPct.toFixed(1) + '% above the floor</strong>'
-      : '<strong>' + Math.abs(t.vsFloorPct).toFixed(1) + '% below the floor</strong>';
+    var where = t.vsFloorRaw >= 0
+      ? '<strong>' + t.vsFloorRaw.toFixed(1) + '% above the floor</strong>'
+      : '<strong>' + Math.abs(t.vsFloorRaw).toFixed(1) + '% below the floor</strong>';
     var line = usd(t.thresholdPrice), N = TRIPWIRE.days, D = TRIPWIRE.depthPct;
     var never = 'The tripwire has never fired in the modern era (2011&ndash;).';
     if (t.dailyStatus === 'loading') {
