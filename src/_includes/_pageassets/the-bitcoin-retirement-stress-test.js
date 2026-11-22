@@ -130,7 +130,7 @@
   function pathKey() { return BASIS; }
   function pathWords(b) {
     var PC = window.PriceCases, m = window.RetirementEngine.currentRatio();
-    return b === 'floor' ? { title: PC.FLOOR_FALL.title, name: PC.FLOOR_FALL.name } : { title: PC.titles(m)[b], name: PC.names(m)[b] };
+    return b === 'floor' ? { title: PC.floorFall(m).title, name: PC.floorFall(m).name } : { title: PC.titles(m)[b], name: PC.names(m)[b] };
   }
 
   // ════════ CRASH MODEL — timed price-path multiplier (shared module) ════════
@@ -722,7 +722,7 @@
           ? 'deeper than any low in the sampled record before November 2026, whose deepest was 5.1% under the floor (2015).'
           : 'about as deep as the deepest low in the sampled record before November 2026, 5.1% under the floor (2015).')
       : '';
-    el.innerHTML = 'Recovery assumed: <strong>' + rec.label + '</strong> (' + rec.note + '). Bitcoin&rsquo;s price: <strong>' + pathWords(BASIS).name.toLowerCase() + '</strong>' + (BASIS === 'floor' ? ' (a stress test)' : '') +
+    el.innerHTML = 'Recovery assumed: <strong>' + rec.label + '</strong> (' + rec.note + '). Bitcoin&rsquo;s price: <strong>' + pathWords(BASIS).name.toLowerCase() + '</strong>' + (BASIS === 'floor' ? window.PriceCases.floorFall(window.RetirementEngine.currentRatio()).tag : '') +
       ', inflation <strong>' + inflationLabel() + '</strong> (shared with the Retirement page). Past recoveries were reliable; the future is not guaranteed.' + floorNote;
   }
 
@@ -738,7 +738,7 @@
     PC.renderSwitch(el, {
       mult: RE.currentRatio(), selected: BASIS,
       plan: { months: n * 12, phrase: 'the whole plan, to ' + end, words: 'the ' + n + ' years to ' + end },
-      other: (BASIS === 'floor' ? 'Showing the stress test. ' : '') + '<strong>' + pathWords(otherKey).title + '</strong>, with the same crash' + (FLEX > 0 ? ' and cut' : '') + ': the plan ' +
+      other: (BASIS === 'floor' ? window.PriceCases.floorFall(window.RetirementEngine.currentRatio()).showing : '') + '<strong>' + pathWords(otherKey).title + '</strong>, with the same crash' + (FLEX > 0 ? ' and cut' : '') + ': the plan ' +
         (o.depletionYear ? 'runs out in <strong>' + o.depletionYear + '</strong>.' : 'lasts the full ' + yearsWord(SCENARIO.yearsInRetirement) + '.')
     });
   }

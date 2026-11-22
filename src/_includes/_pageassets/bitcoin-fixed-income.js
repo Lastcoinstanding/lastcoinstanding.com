@@ -569,7 +569,7 @@
         msg += ', with a ' + (state.stressDrawdown * 100).toFixed(0) + '% drawdown over ' + state.stressDurationMonths + ' months';
       }
       msg += '.';
-      if (state.btcScenario !== 'floor') msg += ' The faint line is the same path if bitcoin drifts to the floor.';
+      if (state.btcScenario !== 'floor') msg += ' The faint line is the same path if bitcoin ' + window.PriceCases.floorVerb(currentMultiple()).toLowerCase() + ' to the floor.';
       captionEl.textContent = msg;
     }
   }
@@ -690,6 +690,8 @@
     chart.data.datasets[0].data = result.realIncomePath;
     chart.data.datasets[1].data = result.realBtcPath;
     chart.data.datasets[2].data = result.realFloorPath || [];
+    // Below the floor the faint line rises to it (PriceCases.floorVerb, 2026-11-22).
+    chart.data.datasets[2].label = 'Bitcoin, if it ' + window.PriceCases.floorVerb(currentMultiple()).toLowerCase() + ' to the floor (real USD)';
     chart.update('none');
   }
 

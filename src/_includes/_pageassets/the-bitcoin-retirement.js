@@ -369,9 +369,10 @@
   // The words, from PriceCases (one source; STYLE_GUIDE §10.14), plus the
   // retirement family's floor stress test.
   function rtWords() {
-    var m = rtCurrentRatio(), T = PC.titles(m), N = PC.names(m);
-    return { title: { stay: T.stay, trend: T.trend, floor: PC.FLOOR_FALL.title },
-             name: { stay: N.stay, trend: N.trend, floor: PC.FLOOR_FALL.name } };
+    // The floor's words by state (PriceCases.floorFall): below the floor it rises.
+    var m = rtCurrentRatio(), T = PC.titles(m), N = PC.names(m), F = PC.floorFall(m);
+    return { title: { stay: T.stay, trend: T.trend, floor: F.title },
+             name: { stay: N.stay, trend: N.trend, floor: F.name } };
   }
   function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
   // The plan, for the block's notes and tags: today to the end of the horizon.
@@ -973,7 +974,7 @@
     lines.push('# Years in retirement,' + s.yearsInRetirement);
     lines.push('# Monthly DCA,' + s.monthlyDcaUSD);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price path,' + rtWords().title[RT_BASIS] + (RT_BASIS === 'floor' ? ' (a stress test)' : ''));
+    lines.push('# Price path,' + rtWords().title[RT_BASIS] + (RT_BASIS === 'floor' ? PC.floorFall(rtCurrentRatio()).tag : ''));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? "real (today's dollars, " + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
@@ -1287,7 +1288,7 @@
     // The legend's two stack rows name their paths (the chart rebuilds its
     // datasets on every render; the legend is HTML).
     var lgSel = document.getElementById('rtLegendSel'), lgOther = document.getElementById('rtLegendOther');
-    if (lgSel) lgSel.textContent = 'Your stack, ' + lowerFirst(W.title[RT_BASIS]) + (RT_BASIS === 'floor' ? ' (stress test)' : '');
+    if (lgSel) lgSel.textContent = 'Your stack, ' + lowerFirst(W.title[RT_BASIS]) + (RT_BASIS === 'floor' ? PC.floorFall(rtCurrentRatio()).tagShort : '');
     if (lgOther) lgOther.textContent = 'Your stack, ' + lowerFirst(W.title[otherKey]);
 
     // Compute explicit y-axis bounds from actual data. Chart.js's log-scale
@@ -1778,7 +1779,7 @@
     var showing = W.title[RT_BASIS] + ': bitcoin goes from ' + formatBtcPrice(liveBtcPrice) + ' today to about ' +
       formatCurrencyShort(selRow ? selRow.price : 0) + ' in ' + SCENARIO.retirementYear + ' (prices before inflation), and the plan ' +
       (verdict.state === 'escape' ? 'reaches escape velocity' : verdict.state === 'shrink' ? 'lasts to ' + verdict.horizonYear + ' but shrinks' : 'runs out in ' + verdict.depletionYear) + '.' +
-      (RT_BASIS === 'floor' ? ' A stress test: 0.42× is the channel’s floor, which price has gone below by 5.1% at most since 2011, in 2015.' : '');
+      (RT_BASIS === 'floor' ? ' ' + PC.floorFall(rtCurrentRatio()).note : '');
     PC.render(document.getElementById('pcRt'), {
       mult: m, selected: RT_BASIS, drives: 'the verdict, the chart and the tables',
       plan: rtPlan(), values: { stay: half('stay'), trend: half('trend') }, showing: showing

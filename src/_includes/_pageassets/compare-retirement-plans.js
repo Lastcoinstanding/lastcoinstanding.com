@@ -64,7 +64,7 @@
   function syncDefault() { if (!PICKED) BASIS = PC.defaultFor(E.currentRatio()); }
   function basisWords(b) {
     var m = E.currentRatio();
-    return b === 'floor' ? { title: PC.FLOOR_FALL.title, name: PC.FLOOR_FALL.name }
+    return b === 'floor' ? { title: PC.floorFall(m).title, name: PC.floorFall(m).name }
                          : { title: PC.titles(m)[b], name: PC.names(m)[b] };
   }
   function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
@@ -715,7 +715,7 @@
       sm.innerHTML = '<strong>' + formatBtc(c.scn.btcStack) + ' BTC</strong>, retiring <strong>' + c.scn.retirementYear +
         '</strong>, drawing <strong>' + formatUsdFull(c.scn.targetIncomeUSD) + '</strong> a year ' + (c.scn.incomeBasis === 'fixed' ? 'fixed in future dollars' : 'in today&rsquo;s dollars') + ' over ' +
         yearsWord(c.scn.yearsInRetirement) + '. Inflation ' + MA.get('inflation').value + '%, ' +
-        lowerFirst(basisWords(BASIS).title) + (BASIS === 'floor' ? ' (a stress test)' : '') + (BEAR ? ', with the bear-market test on' : '') + '.';
+        lowerFirst(basisWords(BASIS).title) + (BASIS === 'floor' ? PC.floorFall(E.currentRatio()).tag : '') + (BEAR ? ', with the bear-market test on' : '') + '.';
     }
     var lk = document.getElementById(linkId);
     if (lk) lk.setAttribute('href', flagshipHref(c.scn));
@@ -991,7 +991,7 @@
       PC.renderSwitch(document.getElementById('pcsCrp'), {
         mult: E.currentRatio(), selected: BASIS,
         plan: { months: n * 12, phrase: 'both plans, to ' + end, words: 'the ' + n + ' years to ' + end },
-        other: (BASIS === 'floor' ? 'Showing the stress test. ' : '') + '<strong>' + basisWords(otherKey).title + '</strong>' + (BEAR ? ', with the same bear market' : '') +
+        other: (BASIS === 'floor' ? PC.floorFall(E.currentRatio()).showing : '') + '<strong>' + basisWords(otherKey).title + '</strong>' + (BEAR ? ', with the same bear market' : '') +
           ': Plan A ' + shortV(PLANS.a) + '; Plan B ' + shortV(PLANS.b) + '.'
       });
     })();
@@ -1013,7 +1013,7 @@
       // The price path in the family's words (2026-10-11; was a fixed
       // "Power Law trend · reverts to trend", coherence F6(a), which also read
       // "Power Law trend" under the old Floor setting: DEFAULTS_POLICY bug 9).
-      sm.textContent = basisWords(BASIS).name + (BASIS === 'floor' ? ' (stress test)' : '') + ' · inflation ' + MA.get('inflation').value + '% · ' +
+      sm.textContent = basisWords(BASIS).name + (BASIS === 'floor' ? PC.floorFall(E.currentRatio()).tagShort : '') + ' · inflation ' + MA.get('inflation').value + '% · ' +
         yearsWord(PLANS.a.yearsInRetirement) + ' horizon' +
         (PLANS.a.incomeBasis === 'fixed' ? ' · withdrawal fixed in future $' : '') +
         (BEAR ? ' · bear-market test on' : '');

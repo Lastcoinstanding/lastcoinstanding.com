@@ -130,7 +130,7 @@
   // parenthesised provenance note such as " (as of Sep 30)".
   function parts(d, opts) {
     opts = opts || {};
-    var m = d.m, T = PC.titles(m), N = PC.names(m), F = PC.FLOOR_FALL;
+    var m = d.m, T = PC.titles(m), N = PC.names(m), F = PC.floorFall(m);
     var G = PC.tags(m, ((d.rows[0].year - d.now.getFullYear()) + YEARS_IN_RETIREMENT) * 12);
     var lead = d.lead, other = lead === 'stay' ? 'trend' : 'stay';
     var near = PC.side(m) === 'near', gap0 = Math.round(Math.abs(1 - m) * 100) === 0;
@@ -201,8 +201,12 @@
           (d.cross ? ' in ' + d.cross : '') + ', before these plans end, so no stack size reaches escape velocity. ' +
           'A large enough stack can still last the ' + YEARS_IN_RETIREMENT + ' years.</li>' : '') +
       (floorTests ? '' :
-        '<li><strong>No floor stress test.</strong> Bitcoin is at or below its floor (' + PL_FLOOR.toFixed(2) +
-          '&times; its trend, within 1%), so a fall to the floor would test little or nothing, and the column is left out.</li>');
+        (m < PL_FLOOR
+          // Below the floor (2026-11-22): the floor case is a rise, not a test.
+          ? '<li><strong>No floor stress test.</strong> Bitcoin is below its floor (' + PL_FLOOR.toFixed(2) +
+            '&times; its trend) today, so a path to the floor would be a rise rather than a test, and the column is left out. Bitcoin staying where it is against trend is the lower case.</li>'
+          : '<li><strong>No floor stress test.</strong> Bitcoin is at its floor (' + PL_FLOOR.toFixed(2) +
+            '&times; its trend, within 1%), so a fall to the floor would test little or nothing, and the column is left out.</li>'));
 
     var asof = 'Figures as of ' + longDate(d.now) + ', with bitcoin at ' + usd(d.price) + (opts.priceNote || '') +
       ', ' + m.toFixed(2) + '&times; its <a href="/the-power-law">Power Law</a> trend.';

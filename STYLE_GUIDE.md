@@ -1092,6 +1092,8 @@ Background is `linear-gradient(135deg, #0a0908 0%, #15130f 100%)` with a subtle 
 
 **Regeneration discipline.** Product-forward OGs embed live chart data. When the underlying data refreshes (BTC weekly prices, comparator returns), the OGs go stale. Plan to run `npm run build-ogs` after each data refresh — see `MONTHLY_REFRESH_CHECKLIST.md` §6. Brand-forward OGs (§6.15.1) don't have this dependency.
 
+**A card that prints live figures carries their date (2026-11-22).** The Dashboard's card (`build-og-dashboard.py`) prints the live multiple, zone and tile figures, so it says "Figures as of ⟨date⟩" in its footer rather than "live-computed": the image is a snapshot however live the page is. Its geometry is read from the page's own layout, never re-derived, so the card cannot draw the position somewhere the page does not.
+
 ### 6.15.3 OG staticAsset registration (applies to both patterns)
 
 Eleventy's repo-root passthrough is opt-in per file (the folder-level passthrough only covers `videos/`). Every new OG image must be added to the `staticAssets` array in `.eleventy.js`:

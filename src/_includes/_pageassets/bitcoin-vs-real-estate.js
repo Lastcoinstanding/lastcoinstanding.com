@@ -92,7 +92,9 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         { style: 'btc', label: 'Bitcoin', data: series(B) },
         { style: 'diff', label: 'Difference: bitcoin minus the house', data: series(function(p){ return B(p) - H(p); }) }
       ];
-      if (floorPts) s.splice(2, 0, { style: 'floor', label: 'Bitcoin, drifts to the floor', data: series(B, floorPts) });
+      // "Rises" below the floor (PriceCases.floorVerb, 2026-11-22): from 0.36x the line to 0.42x climbs.
+      var fv = (window.PriceCases && typeof TODAY_PRICE === 'number') ? window.PriceCases.floorVerb(TODAY_PRICE / plPrice(TODAY_DAYS)).toLowerCase() : 'drifts';
+      if (floorPts) s.splice(2, 0, { style: 'floor', label: 'Bitcoin, ' + fv + ' to the floor', data: series(B, floorPts) });
       var fr = document.getElementById(prefix + 'ChartFrame');
       if (fr) fr.textContent = '(' + (sold ? 'if sold that year, after tax' : 'held, before any sale') + (o.real ? (_reFrameReal() ? '; real, today\u2019s $' : '; nominal, future $') : '; nominal') + ')';
       window.RealEstateChart.render(prefix, { labels: labels.slice(0, n + 1), series: s, fmt: fmtFn });
