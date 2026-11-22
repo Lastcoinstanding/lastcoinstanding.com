@@ -1408,6 +1408,8 @@ A bordered callout that surfaces a time-sensitive data point (e.g., *"bitcoin is
 
 **Update discipline.** The date string is hardcoded; refresh monthly in lockstep with `TODAY_DAYS` / `TODAY_PRICE` (see `MONTHLY_REFRESH_CHECKLIST.md §3`). When you update the constants, grep the page for `AS OF` and update every callout to the current month.
 
+**Live variant (preferred where the figure is a live position).** A callout whose figures come from the live price is written from that price by script, enumerated by state (§12), and dated with the day of the price it uses (today's when the fetch is live, the sample's otherwise); its no-JS text carries no figure. BvSM §3 has worked this way since 2026-10-14 and BvSM §1 since 2026-11-21, after its hand-dated "As of November 19" read 0.38× two days later with 0.36× live one screen up. A monthly date cannot keep up with a position that moves 5% in two days.
+
 ### 6.22 Chart time-range toggle (`chart-range-toggle`)
 
 A segmented button group placed above a chart to switch between viewing windows (e.g., *All-time* vs *Recent 2y*). Introduced on the BvSM §1 Power Law chart to let the reader either see the full nine-orders-of-magnitude sweep or zoom into recent cycles for entry-quality context.

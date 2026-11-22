@@ -321,6 +321,36 @@
     out.forEach(function (v) { v.modern = v.firstD >= MODERN_D; });
     return out;
   }
+  /* THE LIVE APPROACH (2026-11-21). PL_DATA is a ~12-day grid appended
+     monthly, so live spot can be inside a floor approach the series does not
+     contain yet. On 2026-11-21 the series ended on 2026-11-04 at 0.50×, live
+     spot was 0.36×, 13% under the floor, and this page said "None is open",
+     "Price is at the floor" and "latest began July 2026 · closed". The page's
+     fence is unchanged (no new data, §54): the live approach is read from the
+     series and the live multiple only.
+       null        live spot is not in an approach, or the series' own last
+                   approach is still open (the case the module always handled)
+       'reopened'  live spot is back in an approach within EPISODE_D of the last
+                   approach's last in-band sample: by the 100-day rule it is
+                   that approach, open again
+       'new'       more than EPISODE_D after it: a new approach, open, which
+                   began after the series' last sample (afterD) */
+  function liveApproach(visits, liveMult) {
+    if (!inApproach(positionState(liveMult))) return null;
+    var modern = visits.filter(function (v) { return v.modern; });
+    var last = modern.length ? modern[modern.length - 1] : null;
+    if (last && last.open) return null;
+    var afterD = S[N - 1].d;
+    if (last && TODAY_DAYS - last.lastD <= EPISODE_D) return { kind: 'reopened', v: last, afterD: afterD };
+    return { kind: 'new', afterD: afterD };
+  }
+  // When a 'new' live approach began, as far as the series can say: after its
+  // last sample and on or before today. One month when both fall in it.
+  function liveStartPhrase(la) {
+    if (la.kind === 'reopened') return fmtMonth(la.v.firstD);
+    return fmtMonth(la.afterD + 1) === fmtMonth(TODAY_DAYS) ? fmtMonth(TODAY_DAYS) : 'after ' + fmtDay(la.afterD);
+  }
+  function fmtDay(day) { return dayToDate(day).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
   // Days from a visit's entry until price next closed at or above trend.
   function backToTrend(v) {
     for (var i = 0; i < N; i++) {
@@ -378,7 +408,13 @@
     /* The COUNT leads; the date is the sub-line. Still state-aware — the
        reader needs to know whether the latest approach is the one they are
        standing in — but the open/closed SPLIT is deliberately not here. */
-    if (!last) {
+    var la = liveApproach(visits, mult);
+    if (la) {
+      // Live spot is in an approach the series has not recorded as open: count
+      // it, and say when it began as far as the series can tell.
+      setHTML('rdHdrFloor', String(modern.length + (la.kind === 'new' ? 1 : 0)));
+      setHTML('rdHdrFloorSub', 'latest began ' + liveStartPhrase(la) + ' &middot; <span class="rd-hdr-state is-open">in one now</span>');
+    } else if (!last) {
       setHTML('rdHdrFloor', '0');
       setText('rdHdrFloorSub', 'none in the modern record');
     } else {
@@ -396,9 +432,14 @@
 
     // ── The mini-bar (B5): larger labels, clearance, and today's value on
     //    the marker so the bar is readable without the cards.
+    //    The drawn range is shared with the Dashboard's hero bar
+    //    (channelBarRange, shared/power-law-data.js). It was fixed here at
+    //    -0.08 → 1.0, which pinned any position under about 0.36× to the left
+    //    end; it now widens to hold the marker, so the two sister pages draw
+    //    one price in one place.
     var trendPos = (Math.log(1.0) - Math.log(PL_FLOOR)) / (Math.log(PL_CEIL) - Math.log(PL_FLOOR));
-    var MIN = -0.08, MAX = 1.0, RANGE = MAX - MIN;
-    function place(p) { return ((Math.max(MIN, Math.min(MAX, p)) - MIN) / RANGE * 100) + '%'; }
+    var BR = channelBarRange(pos);
+    function place(p) { return (channelBarFrac(p, BR) * 100) + '%'; }
     var tf = document.getElementById('rdTickFloor'), tt = document.getElementById('rdTickTrend'), mk = document.getElementById('rdBarMarker');
     if (tf) tf.style.left = place(0);
     if (tt) tt.style.left = place(trendPos);
@@ -406,10 +447,14 @@
     setHTML('rdBarMarkerLbl', 'today &middot; ' + mult.toFixed(2) + '&times;');
     // Pull the marker label inside the track when it would hang off an end.
     if (mk) {
-      var frac = (Math.max(MIN, Math.min(MAX, pos)) - MIN) / RANGE;
+      var frac = channelBarFrac(pos, BR);
       mk.classList.toggle('is-nearleft', frac < 0.12);
       mk.classList.toggle('is-nearright', frac > 0.88);
     }
+    // The bar's accessible name says where the marker is, below the floor included.
+    var barEl = document.querySelector('.rd-bar');
+    if (barEl) barEl.setAttribute('aria-label', 'Where price sits against the channel floor and the trend line: today ' +
+      mult.toFixed(2) + '× trend, ' + positionLabel(pos));
 
     // B1: the provenance line routes to the model and carries the §6.13 tip.
     // The date replaces "Today" for the same reason it does in the standfirst:
@@ -433,7 +478,6 @@
   function renderFloorApproach(visits, liveMult) {
     setHTML('rdA3Register', 'Historical, at this position &mdash; not a prediction.');
     setHTML('rdA3Route', '<a class="rd-route" href="/the-bitcoin-floor">The Bitcoin Floor &rarr;</a>');
-    setHTML('rdA3Sources', '<strong>Method.</strong> The approach definition is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s, and that page is its canonical home: an episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new one. This timeline is an echo of the set that page narrates in full &mdash; same rule, same episodes, same count. A fourth episode, in the autumn of 2010, is left out here for the reason it gives: no mature exchange, negligible liquidity, a price in cents. Durations are lower bounds &mdash; the price series is a roughly 12-day grid, not a daily close.');
     var modern = visits.filter(function (v) { return v.modern; });
     var open = modern.length && modern[modern.length - 1].open ? modern[modern.length - 1] : null;
     var closed = modern.filter(function (v) { return !v.open; });
@@ -441,27 +485,61 @@
     /* The record and live spot can disagree, and the sentence must say which
        it is describing. PL_DATA is a ~12-day grid with monthly appends, so
        spot can be weeks ahead of the last sample — price can walk off the
-       floor while the newest sample is still sitting on it. A static "price is
-       at the floor" would go silently false the day that happens. */
+       floor while the newest sample is still sitting on it, or walk into an
+       approach the series has not reached yet (the live approach, above). A
+       static "price is at the floor" would go silently false either way. */
     var state = positionState(liveMult);
     var atFloor = inApproach(state);
+    var la = liveApproach(visits, liveMult);
+    // A reopened approach is the series' last one, open again: from here on it
+    // is treated as the open approach. A new one is counted on top of the series.
+    if (la && la.kind === 'reopened') {
+      open = la.v;
+      closed = closed.filter(function (v) { return v !== la.v; });
+    }
+    var liveNew = !!(la && la.kind === 'new');
+    var nAll = modern.length + (liveNew ? 1 : 0);
+    var belowPct = Math.round((1 - liveMult / PL_FLOOR) * 100);
+    var whereNow = state === 'below-floor'
+      ? '<strong>' + belowPct + '% below the floor</strong>'
+      : 'at the floor';
+
+    var lastIso = fmtDay(S[N - 1].d);
+    setHTML('rdA3Sources', '<strong>Method.</strong> The approach definition is <a href="/the-bitcoin-floor">The Bitcoin Floor</a>&rsquo;s, and that page is its canonical home: an episode in which price came within 1% of the 0.42&times; floor or below it, with a gap of more than about 100 days starting a new one. This timeline is an echo of the set that page narrates in full &mdash; same rule, same episodes, same count. A fourth episode, in the autumn of 2010, is left out here for the reason it gives: no mature exchange, negligible liquidity, a price in cents. Durations are lower bounds &mdash; the price series is a roughly 12-day grid, not a daily close.' +
+      (la
+        ? ' The price series ends on ' + lastIso + ', before today&rsquo;s approach ' + (liveNew ? 'began' : 'reopened') + ', so that approach is placed here from today&rsquo;s price; The Bitcoin Floor counts it by daily close until the series is refreshed.'
+        : ''));
 
     /* A4 (C20): the question line carries the live multiple, so "here" is a
        number rather than a gesture. It is set from the script for the same
        reason the standfirst is — a static "here" cannot be checked. */
     // Round two: historical tense, never a forward claim, and stated as the
     // question the module answers rather than as a reading of the ticker.
-    setHTML('rdA3Q', 'Price is at the floor. When has it been here before?');
+    // Enumerated by state (2026-11-21): under the line, "at the floor" is false.
+    setHTML('rdA3Q', state === 'below-floor'
+      ? 'Price is below the floor. When has it been here before?'
+      : 'Price is at the floor. When has it been here before?');
 
-    var v = 'Price has come to the floor <strong>' +
-            (modern.length === 3 ? 'three times' : modern.length + ' times') + '</strong> since 2014. ';
-    if (open) {
+    var NUM = ['no times', 'once', 'twice', 'three times', 'four times', 'five times', 'six times'];
+    var v = 'Price has come to the floor <strong>' + (NUM[nAll] || nAll + ' times') + '</strong> since 2014. ';
+    if (liveNew) {
+      v += 'The most recent is open now. It began after the last sample in the series (' + lastIso + '), and price today is at <strong>' +
+           liveMult.toFixed(2) + '&times;</strong> trend, ' + whereNow + '.';
+    } else if (la) {
+      v += 'The most recent, which began in <strong>' + fmtMonth(open.firstD) + '</strong>, is open again: price came back to the floor within about 100 days of that approach&rsquo;s last sample, and is at <strong>' +
+           liveMult.toFixed(2) + '&times;</strong> trend today, ' + whereNow + '.';
+    } else if (open) {
       v += 'The most recent began in <strong>' + fmtMonth(open.firstD) + '</strong> and is still the last sample in the record' +
            (atFloor
-             ? ', with price there now at ' + liveMult.toFixed(2) + '× trend.'
+             ? ', with price there now at ' + liveMult.toFixed(2) + '× trend, ' + whereNow + '.'
              : ' — though price has since moved up to ' + liveMult.toFixed(2) + '× trend.');
     } else if (closed.length) {
       v += 'None is open: the newest sample sits above the band, and price today is at ' + liveMult.toFixed(2) + '× trend.';
+    }
+    // Deeper than every closed approach: say so, with the deepest for scale.
+    var deepestClosed = closed.length ? Math.min.apply(null, closed.map(function (c) { return c.lowM; })) : null;
+    if (atFloor && (open || liveNew) && deepestClosed != null && liveMult < deepestClosed) {
+      v += ' That is deeper than any closed approach on record; the deepest of them reached ' + deepestClosed.toFixed(2) + '&times;.';
     }
     /* B6 (C21): "why are we talking about the floor at 0.52×?" — because the
        floor is where this module's record is, and the honest answer is to say
@@ -486,8 +564,14 @@
          header, this card now carries ONLY the split, which is the part the
          header deliberately gave up and which has to live somewhere. */
       { k: 'Completed approaches', v: String(closed.length),
-        sub: open ? 'one still open' : 'all closed' },
-      { k: 'Deepest of them', v: Math.min.apply(null, modern.map(function (v) { return v.lowM; })).toFixed(3) + '×', sub: 'of trend' },
+        sub: (open || liveNew) ? 'one still open' : 'all closed' },
+      /* With an approach open, this card is the deepest CLOSED one, and says
+         when today is deeper (2026-11-21: it read 0.398× while price was 0.36×).
+         With none open it is the deepest of all, as before. */
+      (open || liveNew) && deepestClosed != null
+        ? { k: 'Deepest closed approach', v: deepestClosed.toFixed(3) + '×',
+            sub: liveMult < deepestClosed ? 'of trend · today is deeper, at ' + liveMult.toFixed(2) + '×' : 'of trend' }
+        : { k: 'Deepest of them', v: Math.min.apply(null, modern.map(function (v) { return v.lowM; })).toFixed(3) + '×', sub: 'of trend' },
       { k: 'Slowest return to trend', v: slowest ? slowest.toFixed(1) + ' yrs' : '—', sub: 'from that entry' }
     ]));
 
@@ -527,10 +611,14 @@
 
     // 1 · build the label set, merging any episode coincident with today
     var labels = [], mergedWith = null;
+    /* Only the OPEN approach merges with today: it is where we are. A closed
+       one near the right edge is not (2026-11-21: the closed July 2026
+       approach merged into "Jul 2026 · today, 0.42× → 0.36×" while price was
+       in a new approach), so it keeps its own label and tiers if it must. */
     modern.forEach(function (v) {
       var xa = xOf(v.firstD), xb = Math.max(xOf(v.lastD), xa + 3);
       var cx = (xa + xb) / 2;
-      if (mergedWith === null && Math.abs(xt - cx) <= MERGE_X) {
+      if (mergedWith === null && v === open && Math.abs(xt - cx) <= MERGE_X) {
         mergedWith = v;
         var moved = Math.abs(liveMult - v.lowM) >= 0.005;
         labels.push({
@@ -539,7 +627,7 @@
           sub: moved ? v.lowM.toFixed(2) + '× → ' + liveMult.toFixed(2) + '×' : liveMult.toFixed(2) + '×'
         });
       } else {
-        labels.push({ cx: cx, open: !!v.open, main: fmtMonthShort(v.firstD), sub: v.lowM.toFixed(2) + '×' });
+        labels.push({ cx: cx, open: v === open, main: fmtMonthShort(v.firstD), sub: v.lowM.toFixed(2) + '×' });
       }
     });
     if (mergedWith === null) {
@@ -579,7 +667,7 @@
     }
     modern.forEach(function (v) {
       var xa = xOf(v.firstD), xb = Math.max(xOf(v.lastD), xa + 3);
-      s += '<rect class="rd-ep' + (v.open ? ' rd-ep-open' : '') + '" x="' + xa + '" y="' + (AXY - 20) + '" width="' + (xb - xa) + '" height="20" rx="2"/>';
+      s += '<rect class="rd-ep' + (v === open ? ' rd-ep-open' : '') + '" x="' + xa + '" y="' + (AXY - 20) + '" width="' + (xb - xa) + '" height="20" rx="2"/>';
     });
     s += '<line class="rd-today" x1="' + xt + '" y1="' + (AXY - 28) + '" x2="' + xt + '" y2="' + (AXY + 3) + '"/>';
     labels.forEach(function (L) {
@@ -603,8 +691,14 @@
        off the series, not the clock, like every other duration on this page. */
     var unscored = closed.filter(function (v) { return S[N - 1].d - v.lowD < 2 * YEAR_D; });
     var note;
-    if (open) {
+    if (open || liveNew) {
       note = 'The open approach is described, not scored &mdash; it has no outcome yet.';
+      if (unscored.length) {
+        var due0 = unscored[unscored.length - 1];
+        note += ' Nor ' + (unscored.length === 1 ? 'is the most recent closed one' : 'are the ' + unscored.length + ' most recent closed ones') +
+                ': an outcome is read 24 months after the deepest close, and for the ' + fmtMonth(due0.firstD) +
+                ' approach that falls in <strong>' + fmtMonth(due0.lowD + 2 * YEAR_D) + '</strong>.';
+      }
     } else if (unscored.length) {
       var due = unscored[unscored.length - 1];
       note = 'Every approach shown is closed, but ' +

@@ -1516,10 +1516,24 @@
   var open = cur; if(cur) runs.push(cur);
   var longest = runs.reduce(function(w, r){ return (!w || (r.b-r.a) > (w.b-w.a)) ? r : w; }, null);
   var floorBroken = runs.some(function(r){ return (r.b - r.a) > FLOOR_RUN_DAYS; });
-  setTest('floor', !floorBroken,
-    !longest ? 'No sample since 2016 has closed below the floor.' :
-    'Longest stretch below the floor since 2016: ' + (longest.n===1 ? 'a single sample, ' + dateStr(longest.a) : longest.n + ' samples over ' + Math.round((longest.b-longest.a)/30.44) + ' months, from ' + dateStr(longest.a)) +
-    ' (lowest ' + longest.min.toFixed(3) + '&times;).' + (open ? ' <strong>Price is below the floor now</strong>, since ' + dateStr(open.a) + '.' : ''));
+  /* Live price too (2026-11-21). The series ends at its last monthly append, so
+     price can be under the floor while every sample in it is above: on
+     2026-11-21 this line read "a single sample, Jan 6, 2023" with price nine
+     daily closes below the floor. The status stays the series' (six months is
+     the rule); the sentence adds what live price shows and where it is counted. */
+  function renderFloorTest(){
+    var px = (typeof TODAY_PRICE !== 'undefined') ? TODAY_PRICE : PL_DATA[PL_DATA.length-1][1];
+    var dNow = (typeof TODAY_DAYS !== 'undefined') ? TODAY_DAYS : LAST, mNow = px / canon(dNow);
+    var liveBelow = !open && mNow < FLOOR;
+    setTest('floor', !floorBroken,
+      (!longest ? 'No sample since 2016 has closed below the floor.' :
+      'Longest stretch below the floor since 2016: ' + (longest.n===1 ? 'a single sample, ' + dateStr(longest.a) : longest.n + ' samples over ' + Math.round((longest.b-longest.a)/30.44) + ' months, from ' + dateStr(longest.a)) +
+      ' (lowest ' + longest.min.toFixed(3) + '&times;).' + (open ? ' <strong>Price is below the floor now</strong>, since ' + dateStr(open.a) + '.' : '')) +
+      (liveBelow ? ' <strong>Price is below the floor today</strong>, at ' + mNow.toFixed(2) + '&times; trend, after the last sample in this series (' + dateStr(LAST) +
+        '); <a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> counts that run in daily closes.' : ''));
+  }
+  renderFloorTest();
+  if(typeof fetchTodayPrice === 'function'){ fetchTodayPrice(function(){ renderFloorTest(); }); }
   // (2) the full-record refit
   var full = fit(LAST), fullX = (full.a*Math.pow(LAST, full.b))/canon(LAST);
   setTest('refit', fullX >= BAND_LO && fullX <= BAND_HI,
@@ -1577,6 +1591,19 @@
       var parts = lows.map(function(l){ return l.m.toFixed(2) + '\u00d7 ' + (l.open ? 'so far ' : '') + '(' + l.y + ')'; });
       lowsEl.textContent = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
     }
+    /* Live clause (2026-11-21). The lows come from the ~12-day series, which
+       ends at its last monthly append, so on 2026-11-21 this list read "0.42×
+       so far (2026)" with price at 0.36×. When today's price is under every
+       low in the list, the sentence says so; the clause clears itself when it
+       stops being true. The series catches up at the monthly refresh. */
+    var minLow = Math.min.apply(null, ms);
+    var liveLows = function(){
+      var el = document.getElementById('plVcLowsLive'); if (!el) return;
+      var m = (typeof TODAY_PRICE === 'number' && typeof TODAY_DAYS === 'number') ? TODAY_PRICE / plPrice(TODAY_DAYS) : NaN;
+      el.innerHTML = (m < minLow) ? ' Price is below all of them today, at ' + m.toFixed(2) + '&times; trend, so this cycle&rsquo;s low is already under that zone.' : '';
+    };
+    liveLows();
+    if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function(){ liveLows(); });
   }
   var above = document.getElementById('plBandAbovePct');
   if (above && typeof PL_CEIL === 'number') {

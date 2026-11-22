@@ -388,6 +388,44 @@
         zoneEl.textContent = '\u00b7 ' + positionLabelForMultiple(mult);
       }
       if (trendEl) trendEl.textContent = fmtUsdShort(trendNow);
+      renderAsOfCallout(price, source);
+    }
+    // §1's as-of callout (2026-11-21), written from the same price as the
+    // caption above it, as §3's callout has been since 2026-10-14. It was
+    // hand-dated and read 0.38× two days after it was written, with 0.36× live
+    // one screen up. Enumerated by state (STYLE_GUIDE §12). The label carries
+    // the date of the price used: today's when live, the sample's otherwise.
+    // The bottoms range (0.41–0.66×) is the prose's, dated through October 2026.
+    function renderAsOfCallout(price, source) {
+      var lbl = document.getElementById('bvsmPosAsOf'), body = document.getElementById('bvsmPosCallout');
+      if (!lbl || !body || !(price > 0)) return;
+      var trendNow = plPrice(TODAY_DAYS), m = price / trendNow, floorNow = trendNow * PL_FLOOR;
+      var live = (typeof todayPriceIsLive === 'function') ? todayPriceIsLive(source) : source === 'live';
+      var when = '';
+      if (live) { try { when = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) {} }
+      else if (typeof lastSampleDateLong === 'function') when = lastSampleDateLong();
+      lbl.textContent = when ? 'As of ' + when : 'As of the latest price';
+      var gap = Math.round(Math.abs(1 - m) * 100);
+      var lead = 'Bitcoin sits at <strong>' + m.toFixed(2) + '&times; Power Law trend</strong>, ' +
+        (gap === 0 ? 'at the trend value. ' : 'roughly ' + gap + '% ' + (m < 1 ? 'below' : 'above') + ' the trend value. ');
+      var floorTxt = '&asymp;$' + Math.round(floorNow / 1000) + 'K today';
+      var RANGE = 'the range past cycle bottoms registered in (0.41&ndash;0.66&times;)';
+      var html;
+      if (m < PL_FLOOR) {
+        html = lead + 'That is ' + (m < 0.41 ? 'under ' : 'at the bottom of ') + RANGE + ' and about ' +
+          Math.max(1, Math.round((1 - m / PL_FLOOR) * 100)) + '% below the 0.42&times; floor line itself (' + floorTxt + '). ' +
+          'The episode is open, and <a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> reports the test that would count as a break.';
+      } else if (m <= PL_FLOOR * 1.01) {
+        html = lead + 'That is on the 0.42&times; floor line itself (' + floorTxt + '), at the bottom of ' + RANGE + '.';
+      } else if (m <= 0.66) {
+        html = lead + 'That is inside ' + RANGE + ', about ' + Math.round((m / PL_FLOOR - 1) * 100) +
+          '% above the 0.42&times; floor line (' + floorTxt + ').';
+      } else if (m < 1 && gap > 0) {
+        html = lead + 'That is above ' + RANGE + ', and below trend.';
+      } else {
+        html = lead + 'That is well clear of ' + RANGE + '.';
+      }
+      body.innerHTML = html;
     }
     updateBvsmTodayCaption(TODAY_PRICE);
 

@@ -79,6 +79,34 @@ function positionLabelForMultiple(mult){
   return positionLabel((Math.log(mult) - lo) / (hi - lo));
 }
 
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550 CHANNEL BAR RANGE (2026-11-21) \u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// The Dashboard's hero bar and the Rundown's mini-bar draw the same thing: a
+// channel position on a track, in the log-space units above (0 = floor, 1 =
+// upper band). Each page fixed its own drawn range, so a position outside it
+// was pinned to the end of the track while the multiple printed beside it was
+// exact. On 2026-11-21 the Dashboard (range floor \u2192 upper band) drew 0.37\u00d7 on
+// top of the 0.42\u00d7 floor, and the Rundown (from just below the floor) would
+// have done the same under ~0.36\u00d7.
+// The DECISION is shared here so the two cannot draw one price in two places;
+// the drawing stays on each page (SITE_GUIDE \u00a755). The default range is the
+// Rundown's, a little below the floor (-0.08, about 0.36\u00d7) to the upper band,
+// and it widens so the position always sits at least CHANNEL_BAR_PAD inside
+// either end. Nothing is clamped while the multiple is shown exactly.
+var CHANNEL_BAR_LO = -0.08, CHANNEL_BAR_HI = 1.0, CHANNEL_BAR_PAD = 0.045;
+function channelBarRange(pos){
+  var lo = CHANNEL_BAR_LO, hi = CHANNEL_BAR_HI;
+  if (typeof pos === 'number' && isFinite(pos)) {
+    lo = Math.min(lo, pos - CHANNEL_BAR_PAD);
+    hi = Math.max(hi, pos + CHANNEL_BAR_PAD);
+  }
+  return { lo: lo, hi: hi };
+}
+// Where on the track (0 = left end, 1 = right end) a channel position falls.
+function channelBarFrac(pos, range){
+  var f = (pos - range.lo) / (range.hi - range.lo);
+  return Math.max(0, Math.min(1, f));
+}
+
 // ═══════ PRICE DATA ═══════
 // [days_since_genesis, price_usd] pairs on the ~12-day grid described in the
 // header (trailing points are monthly appends). The last pair is the freshest.

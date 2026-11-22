@@ -311,8 +311,16 @@
             ? 'about <strong>' + signPct0(trTotal) + ' in total</strong> over this window, a pace that itself slows as bitcoin matures (see below). '
             : 'about <strong>' + signPct0(tr) + '/yr</strong> annualized over this horizon, a rate that itself declines as bitcoin matures (see below). ')
         + 'That is the assumption-free case. '
-        + 'The multiple can also <em>fall further</em>: the ' + PL_FLOOR.toFixed(2)
-        + '× floor has held for the length of the record, which is evidence, not a guarantee.';
+        /* Enumerated by state (2026-11-21). "The floor has held for the length
+           of the record" went false in November 2026, when price fell below it;
+           the record is dated instead, and under the floor the sentence says the
+           position is already there. */
+        + (m < PL_FLOOR
+            ? 'The multiple can also <em>fall further</em>. This position is already below the ' + PL_FLOOR.toFixed(2)
+              + '× floor, which through October 2026 price went beneath only briefly; '
+              + '<a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> reports the test that would count as a break.'
+            : 'The multiple can also <em>fall further</em>: through October 2026 price went beneath the ' + PL_FLOOR.toFixed(2)
+              + '× floor only briefly, which is evidence, not a guarantee.');
     }
 
     updateChart();
