@@ -59,13 +59,22 @@ eleventyComputed:
         <span class="dash-hero-unit">&times; trend</span>
       </div>
       <div class="dash-hero-zone" id="dashZone">&mdash;</div>
-      <div class="dash-posbar">
-        <div class="dash-posbar-track">
+      {#- The track's range is shared with the Rundown's mini-bar
+          (channelBarRange in shared/power-law-data.js): it starts a little
+          below the floor and widens when price goes further, so a position
+          under the floor is drawn under it. Until 2026-11-21 this track ran
+          floor → upper band and pinned 0.37× onto the floor. The script places
+          the ticks, labels, marker and the channel shading; the defaults below
+          are the default range's positions, for first paint. -#}
+      <div class="dash-posbar" id="dashPosBar" role="img" aria-label="Today&rsquo;s position in the channel: floor at 0.42&times; trend, trend at 1&times;, upper band at 3&times;">
+        <div class="dash-posbar-track" id="dashPosTrack">
+          <span class="dash-posbar-tick dash-posbar-floor" id="dashPosFloorTick"></span>
           <span class="dash-posbar-tick dash-posbar-trend" id="dashPosTrendTick"></span>
+          <span class="dash-posbar-tick dash-posbar-upper" id="dashPosUpperTick"></span>
           <span class="dash-posbar-marker" id="dashPosMarker"></span>
         </div>
-        <div class="dash-posbar-labels">
-          <span>Floor&nbsp;0.42&times;</span><span class="dash-posbar-lab-trend">Trend&nbsp;1&times;</span><span>Upper&nbsp;3&times;</span>
+        <div class="dash-posbar-labels" aria-hidden="true">
+          <span class="dash-posbar-lab dash-posbar-lab-floor" id="dashPosFloorLab">Floor&nbsp;0.42&times;</span><span class="dash-posbar-lab dash-posbar-lab-trend" id="dashPosTrendLab">Trend&nbsp;1&times;</span><span class="dash-posbar-lab dash-posbar-lab-upper" id="dashPosUpperLab">Upper&nbsp;3&times;</span>
         </div>
       </div>
       <p class="dash-tile-note">Today&rsquo;s price divided by the trend price. Below 1&times; is below trend; floor and upper band are the channel&rsquo;s historical edges<span class="help-tip" tabindex="0">?<span class="tip-content">The Power&nbsp;Law channel is bitcoin&rsquo;s long-run trend line and the floor (0.42&times;) and upper band (3&times;) it has historically stayed between. New here? See <a href="/the-power-law">The Power&nbsp;Law</a>.</span></span>.</p>

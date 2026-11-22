@@ -423,6 +423,15 @@
     if (liveTodayPos == null) { m.classList.remove('is-visible'); return; }
     m.style.left = (Math.max(0, Math.min(1, liveTodayPos)) * 100) + '%';
     m.classList.add('is-visible');
+    /* The slider runs floor → upper band, so below the floor today's marker sits
+       at its left end and the readout says 0.42× (2026-11-21, with today at
+       0.36×). The caption says where today actually is. */
+    var cap = document.getElementById('lslTodayCaption');
+    if (cap) {
+      cap.innerHTML = liveTodayPos < 0
+        ? 'Today is below the floor, at ' + ratioOf(liveTodayPos).toFixed(2) + '&times; trend. The slider starts at the floor, the closest position it covers. Drag to explore other points.'
+        : 'Current position today is here &mdash; drag to explore other points.';
+    }
   }
   // One lede + two boxes, BOTH describing the winning tactic, flipping together as one unit.
   function updateBoxes() {

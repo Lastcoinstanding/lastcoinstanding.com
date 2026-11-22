@@ -3107,6 +3107,13 @@ Not advice (facts-not-signals; no "you should"), not a single-security/MSTR anal
 
 **Open enhancements.** Optional macro tiles (idle-$17T, fiscal-canary, MMF flows — explicitly OUT of scope; each carries its own refresh tail). *Closed:* the channel-position chip (rescoped to the ribbon repoint, v2); companion reciprocal back-links (added v2); the OG card + staticAssets registration (landed 2026-08-10, `897fa46`).
 
+**The bar below the floor (2026-11-21, PR `fix/below-floor-round-2`).** The v3 edge branch above ("below-floor: marker clamps to the track start") was written when no reading had gone under the floor. On 2026-11-21, at 0.37×, it drew price sitting on the 0.42× floor while the Rundown's mini-bar, one tab over, drew it below; JM caught it from the two screenshots side by side. The hero bar now draws on `channelBarRange()` (§55.6), the range the Rundown's mini-bar uses: a little below the floor by default (−0.08, about 0.36×), widening to keep the marker inside either end, so it is never pinned while the multiple above it is exact. What changed on the bar:
+- **The floor is a tick inside the track**, with its label under it, not the track's left end. The upper band gets a tick only when the range runs past it.
+- **The channel carries the shading, floor to upper band; the stretch outside it is neutral.** The red-to-gold gradient used to start at the left end; it now starts at the floor tick, so nothing deepens in colour with distance below the floor (§50's register guard).
+- **Labels are centred under their ticks and kept inside the track** (measured on resize and after fonts load), checked at 1280px and 375px.
+- **The bar's accessible name carries today's multiple and zone**, so a screen reader hears "0.36× trend, below the floor" rather than nothing.
+The OG card still bakes in August's 0.42× (TECH_DEBT, below-floor follow-ups).
+
 ---
 
 ## 48. Bitcoin as Collateral (`/bitcoin-as-collateral.html`)
@@ -3291,6 +3298,8 @@ last sample; the note says so. That is the December refresh (TECH_DEBT).
 **Known gap between the two instruments.** The sampled record's "5.1% in 2015" is a
 12-day-grid reading and a lower bound; daily closes in 2015 may have gone deeper. Any
 sentence comparing today's daily-close depth with the record says "sampled record".
+
+**Round two, 2026-11-21 (`fix/below-floor-round-2`).** Price went further under the line (deepest close 0.357×, 14.9% under, on 2026-11-20), and two things on this page followed. The open-episode note now gives the deepest close as a multiple too, "(0.36× trend)", because readers carry the episode in the unit the ribbon and Dashboard print; it is the same close, converted, not a second figure. And the "What the floor is" lead, which still said price "has held" the line, is dated like the FAQ answer: "held ... through October 2026", then the November episode. The rest of the page was already live and current.
 
 ## 51. Work With Me (`/work-with-me.html`)
 
@@ -3490,6 +3499,17 @@ Hero (static H1 → **sister-tabs control** → **live standfirst** carrying the
 - **Durations are lower bounds and the page says why** — a ~12-day sampling grid cannot resolve an episode more finely than its own interval.
 - **No card in any state duplicates the header** (JM's rule, register round two). Two duplications found under it were removed: the at-trend third card, replaced by the longest episode away from trend on record, and the floor identity's count card, now carrying only the completed/open split.
 
+### The live approach (2026-11-21)
+
+`PL_DATA` ends at its last monthly append, so live spot can be inside a floor approach the series has not reached. On 2026-11-21 the series ended on 2026-11-04 at 0.50× and spot was 0.36×, 13% under the floor, and the position module said **"Price is at the floor"** and **"None is open"**, the header card said **"latest began July 2026 · closed"**, the deepest card said 0.398× with nothing about today, and the timeline merged the closed July approach into today's label (**"Jul 2026 · today, 0.42× → 0.36×"**). Each was true of the series and false to the reader's own number one card away.
+
+`liveApproach()` reads the series and the live multiple only, so §1's fence holds (no new data, no new dependency):
+- **`null`**: spot is not in an approach, or the series' own last approach is still open (the case the module always handled).
+- **`'reopened'`**: spot is back in an approach within ~100 days of the last approach's last in-band sample; by the episode rule it is that approach, open again, and is treated as the open one.
+- **`'new'`**: more than ~100 days after it; a new approach, counted on top of the series. It began after the series' last sample, and the header names the month when that and today share one ("November 2026"), otherwise "after ⟨date⟩".
+
+What renders from it: the question is enumerated by state ("Price is below the floor" / "at the floor"); the verdict counts the live approach, says where today is against the floor, and says when today is deeper than every closed approach; the deepest card becomes **"Deepest closed approach"** with "today is deeper, at 0.36×" when it is; only the **open** approach merges with today on the timeline; the note and the method line say the live approach is placed from today's price and counted day by day on The Bitcoin Floor until the series is refreshed. All four states (new, reopened, series-open, at the floor) were forced and read in headless Chrome against the branch build. The mini-bar moved to the shared range at the same time (§55.6).
+
 ### Register
 
 No colour on this page encodes an action or a verdict — no green below trend, no red above it, no alarm state near the floor. The one semantic colour marks a **closed** episode versus an **open** one, which is a fact about whether an outcome exists yet. Banned-word sweep run against STYLE_GUIDE §11 plus the page-specific list in `RUNDOWN_DESIGN §9` ("signal", "buy zone", "opportunity", "time to", "should" at the reader): clean. Imperative grep: clean. Second-person uses are the ratified premise-gate copy, the setup panel, and route notes that put the tool "under your own hand" — the reader as decider, which is the register working.
@@ -3599,6 +3619,12 @@ One engine and one set of components for §14 and §14.1, so the two pages can't
 **Done:** every forward calculator on the site now follows the rule.
 
 ---
+
+### 55.6 `channelBarRange()` — the position bar's drawn range (2026-11-21)
+
+In `power-law-data.js`, beside `positionLabel()`. `channelBarRange(pos)` returns `{lo, hi}` in channel-position units (0 = floor, 1 = upper band) and `channelBarFrac(pos, range)` the fraction of the track a position falls at. Default range −0.08 → 1.0 (the Rundown's mini-bar as it was); it widens so the position sits at least `CHANNEL_BAR_PAD` (0.045) inside either end. **Read by the Dashboard's hero bar and the Rundown's mini-bar**, which had each fixed their own range: the Dashboard's ran floor → upper band and pinned 0.37× onto the floor on 2026-11-21, and the Rundown's would have pinned anything under ~0.36×. The decision (what range, never clamp while the multiple is printed) is the module's; each page still draws its own ticks, labels and shading.
+
+**Not read by** Lump Sum or Ladder In's scrubber or Wait-or-Deploy's slider: those are inputs whose ranges are part of their engines (the slider starts at the floor because `ChannelEntries` folds sub-floor positions onto it), so they keep their ranges and say so in words when today is under them (LSLI's today caption, 2026-11-21).
 
 ## 56. The brand mark, the icon cascade, and the footer's Elsewhere column
 

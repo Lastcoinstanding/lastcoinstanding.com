@@ -291,7 +291,13 @@
     var cap = document.getElementById('dpRetroCaveat');
     if (cap) {
       cap.innerHTML = idx.length
-        ? 'Across <strong>' + idx.length + '</strong> historical entries near today&rsquo;s position (' + posDisplay(matchPos()) + ') &mdash; <strong>' + mature8 + '</strong> with a full eight-year history &mdash; each held the listed number of years. <em>Each column uses the entries old enough for that hold, so the long-hold columns rest on the older near-floor entries, which cluster in 2015&ndash;2016 (the last time Bitcoin sat this low with room for a full eight-year record). 2014 traded well above the floor, working down from the 2013 peak &mdash; an absence, not a cut; earlier near-floor entries in 2010&ndash;2013 are set aside as the pre-$15 curiosity era, prices too small to represent returns a buyer today could replicate. Illustrative, not statistical.</em>'
+        /* Below the floor, entries are matched at the floor (matchPos clamps),
+           so "near today's position (0.42× · near the floor)" named the clamp
+           as today's position (2026-11-21, with today at 0.36×). Say both. */
+        ? 'Across <strong>' + idx.length + '</strong> historical entries ' +
+          (livePos() < 0
+            ? 'at the floor (' + ratioOf(matchPos()).toFixed(2) + '× trend), the closest the record comes to today&rsquo;s position (' + posDisplay(livePos()) + ')'
+            : 'near today&rsquo;s position (' + posDisplay(matchPos()) + ')') + ' &mdash; <strong>' + mature8 + '</strong> with a full eight-year history &mdash; each held the listed number of years. <em>Each column uses the entries old enough for that hold, so the long-hold columns rest on the older near-floor entries, which cluster in 2015&ndash;2016 (the last time Bitcoin sat this low with room for a full eight-year record). 2014 traded well above the floor, working down from the 2013 peak &mdash; an absence, not a cut; earlier near-floor entries in 2010&ndash;2013 are set aside as the pre-$15 curiosity era, prices too small to represent returns a buyer today could replicate. Illustrative, not statistical.</em>'
         : 'Bitcoin has too few historical entries near today&rsquo;s position to follow &mdash; switch to <strong>Projection</strong> for the forward view.';
     }
     var dct = document.getElementById('dpDotCountTotal'); if (dct) dct.textContent = idx.length;

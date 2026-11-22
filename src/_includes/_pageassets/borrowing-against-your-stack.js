@@ -309,7 +309,7 @@
     }
     if (liqRatio < 1.0) {
       return { label: 'Between floor and trend', cls: 'bas-zone-warn',
-               hint:  'Floor has held historically; some buffer but less than the conservative case.' };
+               hint:  'Price went beneath the floor only briefly through October 2026; some buffer but less than the conservative case.' };
     }
     if (liqRatio < PL_CEIL) {
       return { label: 'In upper channel', cls: 'bas-zone-bad',
@@ -510,13 +510,13 @@
       checks.push({
         status: 'good',
         title: 'Liquidation price below channel floor',
-        detail: 'Bitcoin would need to break the long-term structural support that has held across every cycle of the last fifteen years for your position to liquidate.'
+        detail: 'Bitcoin would need to fall below the long-term floor, which price went beneath only briefly from 2011 to October 2026, for your position to liquidate.'
       });
     } else if (s.liqRatio < 1.0) {
       checks.push({
         status: 'warn',
         title: 'Liquidation price between floor and trend',
-        detail: 'Floor has held historically; some buffer, but a typical bear-market drawdown brings price close to your liquidation.'
+        detail: 'Price went beneath the floor only briefly through October 2026; some buffer, but a typical bear-market drawdown brings price close to your liquidation.'
       });
     } else if (s.liqRatio < PL_CEIL) {
       checks.push({

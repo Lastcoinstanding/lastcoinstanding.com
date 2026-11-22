@@ -4,7 +4,8 @@
    Reads the shared power-law-data.js globals (loaded immediately
    before this file in page_scripts): PL_A/PL_B/PL_FLOOR/PL_CEIL,
    GENESIS_TS, TODAY_DAYS, TODAY_PRICE, PL_DATA, plPrice,
-   positionLabel, fetchTodayPrice, todayPriceIsLive/Label/Note.
+   positionLabel, channelBarRange/channelBarFrac (the bar's range,
+   shared with the Rundown), fetchTodayPrice, todayPriceIsLive/Label/Note.
 
    Fence (v1–v3): ZERO new data sources. Every number is derived
    from PL_DATA + spot at runtime; nothing is hardcoded.
@@ -29,7 +30,6 @@
   function setHTML(id, html) { var el = $(id); if (el) el.innerHTML = html; }
   function usd0(x) { return (isFinite(x) && x > 0) ? '$' + Math.round(x).toLocaleString('en-US') : '$—'; }
   function usdK(x) { return (isFinite(x) && x > 0) ? '$' + (Math.round(x / 1000) * 1000).toLocaleString('en-US') : '$—'; }
-  function clamp01(x) { return Math.max(0, Math.min(1, x)); }
   function fmtPct(x) { var p = x * 100; var r = (Math.abs(p) >= 1000) ? Math.round(p / 100) * 100 : Math.round(p); return r.toLocaleString('en-US') + '%'; }
   var YEAR_D = 365.25, MONTH_D = 30.4375, DOP_MONTH = 30.44; // DOP_MONTH matches /discount-or-premium's YEARS_MO
   function fmtMonthYear(days) {
@@ -131,10 +131,50 @@
       + fmtMonthYear(endDay) + '</strong> — when the trend line will sit near ' + usdK(plPrice(endDay)) + '.');
   })();
 
-  // ── position bar: trend tick + its label at the true 1.0× position ──
-  var posTrendPct = clamp01(posFromMult(1)) * 100;
-  var trendTick = $('dashPosTrendTick'); if (trendTick) trendTick.style.left = posTrendPct + '%';
-  var trendLab = document.querySelector('.dash-posbar-lab-trend'); if (trendLab) trendLab.style.left = posTrendPct + '%';
+  // ── POSITION BAR — drawn on the range shared with the Rundown's mini-bar ──
+  /* The range comes from channelBarRange() in shared/power-law-data.js: a
+     little below the floor by default, widening when price goes further, so
+     the marker is never pinned to an end of the track while the multiple above
+     it is exact. Until 2026-11-21 this track ran floor → upper band and clamped
+     the marker to it, so at 0.37× it drew price sitting on the 0.42× floor
+     while the Rundown, one tab over, drew it below. Ticks, labels, the channel
+     shading and the marker are all placed from the one range. */
+  var barPos = null;
+  function isNum(x) { return typeof x === 'number' && isFinite(x); }
+  function pctOf(f) { return (f * 100).toFixed(2) + '%'; }
+  // Centre a label under its tick, but never past either end of the track.
+  function placeLabel(el, f, trackW) {
+    if (!el) return;
+    var w = el.offsetWidth;
+    el.style.left = Math.max(0, Math.min(trackW - w, f * trackW - w / 2)) + 'px';
+    el.style.right = 'auto'; el.style.transform = 'none';
+  }
+  function drawBar(pos) {
+    if (typeof channelBarRange !== 'function') return;
+    var R = channelBarRange(isNum(pos) ? pos : NaN);
+    var fF = channelBarFrac(0, R), fT = channelBarFrac(posFromMult(1), R), fU = channelBarFrac(1, R);
+    var track = $('dashPosTrack'), el;
+    if (track) {
+      // Shading spans the channel, floor to upper band; outside it is neutral.
+      var OUT = 'rgba(122,115,103,0.16)';
+      track.style.background = 'linear-gradient(90deg, ' + OUT + ' 0%, ' + OUT + ' ' + pctOf(fF) +
+        ', rgba(192,57,43,0.30) ' + pctOf(fF) + ', rgba(224,148,34,0.28) ' + pctOf(fT) +
+        ', rgba(212,168,67,0.30) ' + pctOf(fU) + (fU < 0.999 ? ', ' + OUT + ' ' + pctOf(fU) + ', ' + OUT + ' 100%' : '') + ')';
+    }
+    if ((el = $('dashPosFloorTick'))) el.style.left = pctOf(fF);
+    if ((el = $('dashPosTrendTick'))) el.style.left = pctOf(fT);
+    if ((el = $('dashPosUpperTick'))) { el.style.left = pctOf(fU); el.style.display = fU < 0.999 ? 'block' : 'none'; }
+    if ((el = $('dashPosMarker')) && isNum(pos)) el.style.left = pctOf(channelBarFrac(pos, R));
+    var W = track ? track.clientWidth : 0;
+    if (W > 0) {
+      placeLabel($('dashPosFloorLab'), fF, W);
+      placeLabel($('dashPosTrendLab'), fT, W);
+      placeLabel($('dashPosUpperLab'), fU, W);
+    }
+  }
+  drawBar(NaN);   // first paint on the default range; render() redraws with today's position
+  window.addEventListener('resize', function () { drawBar(barPos); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawBar(barPos); });
 
   // Last PL_DATA sample date — the fallback provenance for the price tile. In
   // UTC, from the shared helper: the day index counts UTC days, so a local-time
@@ -339,14 +379,19 @@
       renderReversion(price);
     }
 
-    // CHANNEL POSITION — multiple + shared zone word + bar marker (below-floor: marker clamps to
-    // track start, positionLabel returns a below-floor word, multiple still shows exactly)
+    // CHANNEL POSITION — multiple + shared zone word + bar marker. Below the floor
+    // the marker is drawn below the floor tick (the shared range widens to hold it),
+    // positionLabel returns a below-floor word, and the multiple shows exactly.
     if (trend > 0 && price > 0) {
       var mult = price / trend;
       var pos = posFromMult(mult);
+      var zone = (typeof positionLabel === 'function') ? positionLabel(pos) : '';
       setText('dashMult', mult.toFixed(2));
-      if (typeof positionLabel === 'function') setText('dashZone', positionLabel(pos));
-      var marker = $('dashPosMarker'); if (marker) marker.style.left = (clamp01(pos) * 100) + '%';
+      if (zone) setText('dashZone', zone);
+      barPos = pos; drawBar(pos);
+      var bar = $('dashPosBar');
+      if (bar) bar.setAttribute('aria-label', 'Today’s position in the channel: ' + mult.toFixed(2) + '× trend' + (zone ? ', ' + zone : '') +
+        '. Floor at 0.42× trend, trend at 1×, upper band at 3×.');
       setText('dashPosProv', (live ? 'live price' : lastSampleShort + ' price') + ' ÷ trend');
       var posTile = $('dashPosTile'); if (posTile) posTile.classList.toggle('is-live', !!live);
       carryPos(pos);

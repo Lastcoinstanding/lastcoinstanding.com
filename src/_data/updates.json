@@ -1,5 +1,17 @@
 [
   {
+    "display": "11/21/26",
+    "date": "2026-11-21",
+    "page": "/dashboard",
+    "summary": "The Dashboard: the channel bar now draws price below the floor when it is below it. At 0.37x it had pinned the marker onto the 0.42x floor; it now shares the Rundown's range, which widens as price goes further."
+  },
+  {
+    "display": "11/21/26",
+    "date": "2026-11-21",
+    "page": "/the-rundown",
+    "summary": "Corrections as price went further below the floor: The Rundown now counts the open approach (it said none was open); Bitcoin vs. The Stock Market's position callout is computed from the live price; and The Bitcoin Floor, Discount or Premium, The Power Law, The Bitcoin Horizon, Your Deployment Plan, Lump Sum or Ladder In, The Bitcoin Hurdle Rate, What Daily Conviction Bought, Borrowing Against Your Stack, The STRC Mechanism and the homepage no longer describe the floor as holding or today's price as sitting on it."
+  },
+  {
     "display": "11/19/26",
     "date": "2026-11-19",
     "page": "/the-bitcoin-floor",

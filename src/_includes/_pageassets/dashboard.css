@@ -83,9 +83,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 
 /* Channel position bar: floor(0%) → trend(computed tick) → upper(100%) */
 .dash-posbar { max-width: 100%; }   /* v3: track runs the full content width of the hero tile */
-.dash-posbar-track { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(192,57,43,0.30) 0%, rgba(224,148,34,0.28) 44%, rgba(212,168,67,0.30) 100%); border: 1px solid var(--border-lt); }
+/* The range is shared with the Rundown's mini-bar (channelBarRange, shared/
+   power-law-data.js) and starts a little below the floor, so the floor is a tick
+   inside the track rather than its left end. The channel itself, floor to upper
+   band, carries the shading; the stretch below the floor is outside the channel
+   and stays neutral, with no colour that deepens with distance (SITE_GUIDE §50).
+   The script rewrites these stops, the tick and label positions from the live
+   range; the values here are the default range's (floor 7.4%, trend 48.3%). */
+.dash-posbar-track { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(122,115,103,0.16) 0%, rgba(122,115,103,0.16) 7.4%, rgba(192,57,43,0.30) 7.4%, rgba(224,148,34,0.28) 48.3%, rgba(212,168,67,0.30) 100%); border: 1px solid var(--border-lt); }
 .dash-posbar-tick { position: absolute; top: -3px; width: 1px; height: 14px; background: var(--line-muted); }
-.dash-posbar-trend { background: var(--text-dim); }
+.dash-posbar-floor { left: 7.4%; background: var(--text-dim); }
+.dash-posbar-trend { left: 48.3%; background: var(--text-dim); }
+.dash-posbar-upper { left: 100%; display: none; }   /* shown only when the range runs past the upper band */
 .dash-posbar-marker { position: absolute; top: 50%; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--amber); border: 2px solid #14110d; transform: translate(-50%, -50%); transition: left 0.5s cubic-bezier(.4,0,.2,1); box-shadow: 0 0 10px rgba(224,148,34,0.5); }
 /* Freshness (v2): the position marker gets the ribbon dot's live pulse/glow — the
    canonical two-ring lcsRibbonPulseRing treatment (base.njk ribbon), copied here per
@@ -100,8 +109,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dash-tile.is-live .dash-posbar-marker::after { animation-delay: 1.3s; }  /* half-period stagger → always one ring mid-travel */
 @keyframes lcsRibbonPulseRing { 0% { transform: scale(1); opacity: 0.72; } 100% { transform: scale(4); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .dash-tile.is-live .dash-posbar-marker::before, .dash-tile.is-live .dash-posbar-marker::after { animation: none; opacity: 0; } }
-.dash-posbar-labels { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.68rem; color: var(--text-muted); position: relative; }
-.dash-posbar-lab-trend { position: absolute; left: 44%; transform: translateX(-50%); color: var(--text-dim); }
+/* Each label sits under its tick; the script centres it there and keeps it
+   inside the track at narrow widths. First-paint defaults: */
+.dash-posbar-labels { position: relative; height: 1.5em; margin-top: 0.5rem; font-size: 0.68rem; color: var(--text-muted); }
+.dash-posbar-lab { position: absolute; top: 0; white-space: nowrap; }
+.dash-posbar-lab-floor { left: 0; color: var(--text-dim); }
+.dash-posbar-lab-trend { left: 48.3%; transform: translateX(-50%); color: var(--text-dim); }
+.dash-posbar-lab-upper { right: 0; }
 
 /* ── Context rows (trend tile) ── */
 .dash-context { display: flex; gap: 1.8rem; margin-top: 0.9rem; }

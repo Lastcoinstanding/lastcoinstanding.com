@@ -86,9 +86,14 @@ eleventyComputed:
 
             <p class="prose"><strong>Second, floors have stayed structurally stable.</strong> Across four different cycles spanning a 90&times; range of absolute prices, the cycle bottoms through October 2026 all registered between 0.41&times; and 0.66&times; trend &mdash; a tight band. The downside reference hasn&rsquo;t moved while the upside has compressed toward it. The within-cycle entry-price spread has gone from 22&times; (2013 top vs. 2015 floor) to 1.7&times; (2024 March top vs. 2024 August dip). Timing matters less now than it used to; the boundaries are tighter on both sides.</p>
 
+            {#- Live since 2026-11-21, like §3's callout: it was hand-dated and went
+                stale within two days of the November 19 rewrite (0.38x against a
+                live 0.36x one screen up). Written from the live price by
+                renderAsOfCallout(); enumerated by state. The no-JS text carries
+                no figure, so it cannot go stale. -#}
             <aside class="bvsm-as-of-callout" aria-label="Current market position">
-                <div class="bvsm-as-of-callout-label">As of November 19, 2026</div>
-                <p class="bvsm-as-of-callout-body">Bitcoin sits at <strong>0.38&times; Power Law trend</strong>, roughly 62% below the trend value. That is under the range past cycle bottoms registered in (0.41&ndash;0.66&times;) and about 10% below the 0.42&times; floor line itself (&asymp;$69K today). The episode is open, and <a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> reports the test that would count as a break.</p>
+                <div class="bvsm-as-of-callout-label" id="bvsmPosAsOf">As of the latest price</div>
+                <p class="bvsm-as-of-callout-body" id="bvsmPosCallout">Where bitcoin sits against its Power Law trend, and against the range past cycle bottoms registered in (0.41&ndash;0.66&times;), is computed here from the live price. <a href="/the-bitcoin-floor#the-tripwire">The Bitcoin Floor</a> reports the test that would count as a break of the 0.42&times; floor.</p>
             </aside>
 
             <p class="prose">By the framework&rsquo;s own logic, low-channel readings have historically been structurally favorable entry territory: bitcoin&rsquo;s trend-relative discount tends to compress over multi-year horizons (mean reversion plus continued absolute trend growth). The October 2025 all-time high only managed 12% above trend, and bitcoin has spent more &ldquo;distance&rdquo; below trend than above it in this cycle. <em>The relationship inverts when bitcoin trades above trend</em> &mdash; at upper-channel positions the prudent read is the same framework running in the opposite direction.</p>

@@ -644,7 +644,7 @@
         'the same thing: bitcoin recovering',
         'nothing — independent of bitcoin'],
       ['If bitcoin doesn’t recover',
-        'the ' + PL_FLOOR.toFixed(2) + '× floor has held for the record&rsquo;s length — bitcoin&rsquo;s growth continuing while price sits at the lower bound of the trend',
+        'the ' + PL_FLOOR.toFixed(2) + '× floor, which price went beneath only briefly through October 2026 — bitcoin&rsquo;s growth continuing while price sits at the lower bound of the trend',
         'dividend at risk (see the cost accounting); no floor demonstrated ($71.25 low)',
         'unaffected — par at maturity, rate risk only'],
       ['Mark-to-market in a bitcoin drawdown',

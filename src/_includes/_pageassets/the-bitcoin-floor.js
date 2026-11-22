@@ -1570,7 +1570,10 @@
       (dr.windowed
         ? 'It has closed under the line on every one of the last ' + dr.floorRun + ' days. '
         : 'It has closed under the line every day since ' + dayDate(dr.floorSince) + ' (' + dr.floorRun + ' daily close' + (dr.floorRun === 1 ? '' : 's') + '). ') +
-      'The deepest close so far was ' + dr.deepest.pct.toFixed(1) + '% below, on ' + dayDate(dr.deepest.iso) + '. ' +
+      // The multiple too (2026-11-21): readers carry the episode as "0.36×", the
+      // unit the ribbon and Dashboard print, so the note gives both. Same close.
+      'The deepest close so far was ' + dr.deepest.pct.toFixed(1) + '% below, on ' + dayDate(dr.deepest.iso) +
+      ' (' + (PL_FLOOR * (1 - dr.deepest.pct / 100)).toFixed(2) + '&times; trend). ' +
       (dr.deepest.pct > RECORD_DEEPEST_MODERN_PCT
         ? 'Before this, the deepest modern reading in this page&rsquo;s sampled record was ' + RECORD_DEEPEST_MODERN_PCT + '%, in 2015. '
         : '') +

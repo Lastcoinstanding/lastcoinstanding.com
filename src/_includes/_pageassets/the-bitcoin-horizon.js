@@ -632,5 +632,18 @@ setPreset('2021-11');
   if (lows.length) {
     var ms = lows.map(function (l) { return l.m; });
     set('hzLowRange', Math.min.apply(null, ms).toFixed(2) + '\u00d7 and ' + Math.max.apply(null, ms).toFixed(2) + '\u00d7');
+    /* Live clause (2026-11-21), as on The Power Law. The range is read from the
+       ~12-day series, which ends at its last monthly append; when today's
+       price is under the whole range, the sentence says so, and the clause
+       clears itself when that stops being true. */
+    var minLow = Math.min.apply(null, ms);
+    var liveLows = function () {
+      var el = document.getElementById('hzLowsLive');
+      if (!el) return;
+      var m = (typeof TODAY_PRICE === 'number' && typeof TODAY_DAYS === 'number') ? TODAY_PRICE / plPrice(TODAY_DAYS) : NaN;
+      el.innerHTML = (m < minLow) ? ' Price is below that range today, at ' + m.toFixed(2) + '&times; trend, so this cycle&rsquo;s low is already under it.' : '';
+    };
+    liveLows();
+    if (typeof fetchTodayPrice === 'function') fetchTodayPrice(function () { liveLows(); });
   }
 })();
