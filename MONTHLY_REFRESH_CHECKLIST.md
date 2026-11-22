@@ -110,9 +110,9 @@ When one of these happens, run its list in §12: a **new all-time high**; the **
 - Bitcoin vs. The Stock Market: the §1 "As of" callout is live since 2026-11-21 (`renderAsOfCallout`), so there is nothing to rewrite; check it reads the same multiple as the caption under the chart. Its bottoms range (0.41–0.66×) is the §1 prose's, dated through October 2026: if this episode's low is added to that prose, update both.
 - Live-price clauses that exist only while price is below the record (added 2026-11-21): The Rundown's position module and its "Times at the floor" card count the open approach from live price until `PL_DATA` contains it; The Power Law's test 1 adds a "below the floor today" line; the cycle-low sentences on The Power Law and The Bitcoin Horizon add "price is below all of them today". When the November samples land, check the Rundown's count now comes from the series (it should not change) and that the Floor page's fifth card agrees with it.
 - The episode's depth is a daily-close fact the ~12-day grid may miss: the deepest close was 0.357× (14.9% under the floor) on 2026-11-20, a day the grid does not sample. After the refresh, check what the series' 2026 cycle low reads on The Power Law, the Horizon and Bitcoin's Spikes record table, and say "in the sampled series" wherever it reads shallower than the Floor page's note.
-- Month-end closes that can falsify standing claims while price is this low (added 2026-11-21): the Horizon's "sixty-four months" headline fails if a month closes below the March 2021 close ($58,918.83 in `BTC_MONTHLY`), which would make Mar 2021 → that month a losing window of more than 64 months; Bull & Bear Cycles' "no five-year holder has lost money" fails on a close below the November 2021 close ($57,005.43) at the November 2026 month-end, or below the matching month five years earlier after that. The Nov 20 daily close was $58,815. Check both against the month-end close before refreshing `BTC_MONTHLY`, and rewrite the Horizon §2 H2, lead, `midMark`, its "longest losing window" sentence, For Podcast Hosts' copy of the line and the homepage card if it moves.
+- Month-end closes that can falsify standing claims while price is this low (added 2026-11-21): the Horizon's "sixty-four months" headline fails if a month closes below the March 2021 close ($58,918.83 in `BTC_MONTHLY`), which would make Mar 2021 → that month a losing window of more than 64 months; Bull & Bear Cycles' "no five-year holder has lost money" fails on a close below the November 2021 close ($57,005.43) at the November 2026 month-end, or below the matching month five years earlier after that. The Nov 20 daily close was $58,815. Check both against the month-end close before refreshing `BTC_MONTHLY` (JM confirmed this check, 2026-11-22), and rewrite the Horizon §2 H2, lead, `midMark`, its "longest losing window" sentence, For Podcast Hosts' copy of the line and the homepage card if it moves.
 - Lump Sum or Ladder In: "above the 0.42x floor about 97% of the time" (njk ~221) is a sampled-series figure; recompute when samples below the floor are added.
-- When the episode closes or the tripwire fires: add the fifth episode card and its samples (§5.1), update `floorParityQA()` expectations for the episode list only, and regenerate the Dashboard OG card if the baked-in multiple has moved (§6).
+- When the episode closes or the tripwire fires: add the fifth episode card and its samples (§5.1), update `floorParityQA()` expectations for the episode list only, and regenerate the Dashboard OG card with `build-og-dashboard.py` (§6).
 
 ### 0.6 Nothing to refresh (computed at load)
 
@@ -703,15 +703,15 @@ WMHTB, Half-Life, Money Trees, Synthesis, Migration, Trilemma, etc.)
 do NOT need this. Their composition is conceptual / atmospheric and
 has no data dependency. Leave them alone during refresh.
 
-**Dashboard OG card (`og-dashboard.jpg`) — a manual check, not a script regen.**
-The card bakes in a *position multiple* (currently **0.42×**) and its zone word,
-which drift as price moves — but it is not produced by the product-forward script
-above (it came from the drafting chat, `SITE_GUIDE §47`). Each refresh: eyeball the
-baked multiple against live `/dashboard`. **If the multiple has moved materially or
-the zone word has changed** (e.g. floor → below trend), request a regenerated card
-from the drafting chat, re-commit at the repo root, and re-verify
-`curl -I https://lastcoinstanding.com/og-dashboard.jpg` returns `image/jpeg`. If the
-position is essentially unchanged, leave it.
+**Dashboard OG card (`og-dashboard.jpg`) — `python3 build-og-dashboard.py` (since 2026-11-22).**
+The card prints live figures and their date (JM ruling 2026-11-22, `SITE_GUIDE §47`).
+Run the script from the repo root at every refresh, and whenever the zone word changes
+(e.g. below the floor → near the floor): it reads the live Dashboard, refuses to build
+from a fallback price, writes the card and bumps `?v=` on `og:image`/`twitter:image` in
+`dashboard-head.html`. Commit both files, then verify
+`curl -I "https://lastcoinstanding.com/og-dashboard.jpg?v=⟨stamp⟩"` returns `image/jpeg`.
+It needs Playwright with a Chromium it can launch (`CHROME=/path/to/chrome` to use an
+installed one); the drafting chat's sandbox has both.
 
 **Static chart images (2026-10-20) — not OG cards, and annual, not monthly.**
 `scripts/build-chart-images.py` writes crawlable PNG copies of live charts,

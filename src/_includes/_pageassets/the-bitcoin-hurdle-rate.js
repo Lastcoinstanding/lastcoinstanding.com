@@ -503,6 +503,18 @@
       el.hrSpotNote.innerHTML = 'Bitcoin is currently about <strong>' + chanK().toFixed(2) +
         '×</strong> its trend' + todayPriceNote(spotSource) + ', which sets where the band sits.';
     }
+    // The floor case by state (2026-11-22, JM ruling). Below the floor the band
+    // sits ABOVE the curve, because reaching the floor is a rise from here, and
+    // the curve itself (today's distance from trend held) is the conservative
+    // reading. Above the floor the caption is the one this page shipped with.
+    var under = chanK() < PL_FLOOR, w;
+    if ((w = document.getElementById('hrBandWhere'))) w.textContent = under ? 'above' : 'beneath';
+    if ((w = document.getElementById('hrBandWhat'))) w.textContent = under
+      ? 'climbs back to its historical floor by your horizon, a rise from where it is today'
+      : 'only reaches its historical floor at your horizon rather than trend';
+    if ((w = document.getElementById('hrFloorRead'))) w.textContent = under
+      ? 'From below the floor the curve itself is the conservative reading: holding today’s distance from trend returns the trend’s own growth.'
+      : 'Reading the hurdle off the floor is the most conservative version of the model that still assumes the power law holds.';
     // Position-view caption spot note — carries the live/fallback provenance so the
     // position figures are never silently rendered as live (build §1.3).
     if (el.hrSpotNotePos){

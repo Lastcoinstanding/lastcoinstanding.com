@@ -179,11 +179,11 @@
   // title ("If bitcoin stays 47% below trend") and the short name.
   function basisTitle(basis) {
     var b = RE.normBasis(basis);
-    return b === 'floor' ? PC.FLOOR_FALL.title : PC.titles(currentRatio())[b];
+    return b === 'floor' ? PC.floorFall(currentRatio()).title : PC.titles(currentRatio())[b];
   }
   function basisName(basis) {
     var b = RE.normBasis(basis);
-    return b === 'floor' ? PC.FLOOR_FALL.name : PC.names(currentRatio())[b];
+    return b === 'floor' ? PC.floorFall(currentRatio()).name : PC.names(currentRatio())[b];
   }
   function basisLabel(basis) {   // in running text: "if bitcoin stays 47% below trend"
     var t = basisTitle(basis);
@@ -364,7 +364,7 @@
       + '</strong> — your ' + SCENARIO.retirementYear + ' retirement plus the '
       + SCENARIO.yearsInRetirement + '-year horizon (set under Assumptions) — '
       + dollarWord() + ', against the <a href="/the-power-law">Power Law</a> trend, '
-      + basisLabel(basis) + (RE.normBasis(basis) === 'floor' ? ' (a stress test)' : '') + '.' + POWER_LAW_TIP + '</span>';
+      + basisLabel(basis) + (RE.normBasis(basis) === 'floor' ? PC.floorFall(currentRatio()).tag : '') + '.' + POWER_LAW_TIP + '</span>';
 
     if (v.state === 'escape') {
       return 'On these inputs, the stack’s growth permanently exceeds spending from <strong>'
@@ -1167,7 +1167,7 @@
     lines.push('# Annual withdrawal,' + s.targetIncomeUSD);
     lines.push('# Years in retirement,' + s.yearsInRetirement);
     lines.push('# Inflation,' + inflation.value + '%');
-    lines.push('# Price path,' + basisTitle(PRICE_BASIS) + (PRICE_BASIS === 'floor' ? ' (a stress test)' : ''));
+    lines.push('# Price path,' + basisTitle(PRICE_BASIS) + (PRICE_BASIS === 'floor' ? PC.floorFall(currentRatio()).tag : ''));
     lines.push('# Dollar basis,' + (RT_DOLLARS === 'real' ? 'real (today’s dollars, ' + inflation.value + '% inflation)' : 'nominal (future dollars)'));
     lines.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
     lines.push('# Live scenario URL,' + window.location.href);
@@ -1417,7 +1417,7 @@
       plan: { months: n * 12, phrase: 'the whole plan, to ' + end, words: 'the ' + n + ' years to ' + end },
       values: { stay: half('stay'), trend: half('trend') },
       showing: basisTitle(PRICE_BASIS) + ': the plan ' + statePhrase(vs) + '.' +
-        (PRICE_BASIS === 'floor' ? ' A stress test: 0.42× is the channel’s floor, which price has gone below by 5.1% at most since 2011, in 2015.' : '')
+        (PRICE_BASIS === 'floor' ? ' ' + PC.floorFall(currentRatio()).note : '')
     });
   }
 

@@ -940,13 +940,23 @@
     } else if (state === 'near-trend') {
       lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + yrs + '. Buying at roughly today&rsquo;s price is buying at roughly that bar; ' +
         'the floor case &mdash; price ending at 0.42&times; trend by then &mdash; returns ' + pct1(r.floor * 100) + '.';
+    } else if (state === 'below-floor') {
+      /* Below the floor (2026-11-22, JM ruling): ending at the floor is a RISE
+         from here, so it is not the conservative version. The trend's own
+         growth is: it is what price returns if it only keeps today's distance
+         from trend. The arithmetic is untouched; only which case is called
+         conservative changes. */
+      lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + yrs + '. From below the floor that bar is also the conservative case: it is what price returns if it only keeps today&rsquo;s distance from trend. Ending at the channel floor by then would be a rise from here, and returns ' +
+        pct1(r.floor * 100) + ' a year.';
     } else {
       lead = 'Bitcoin&rsquo;s trend sets a bar of <strong>' + pct1(r.trend * 100) + '</strong> a year over ' + yrs + '. The conservative version &mdash; capital deployed at today&rsquo;s price and only <em>ending</em> at the channel floor by then &mdash; still clears ' +
         pct1(r.floor * 100) + '.';
     }
     setHTML('rdA4Verdict', lead);
     setHTML('rdA4Cards', cards([
-      { k: 'If price ends at the floor' + tip('Capital deployed at today&rsquo;s price, with price sitting at the 0.42&times; channel floor on the horizon date. The conservative case &mdash; not a forecast that it gets there.'),
+      { k: 'If price ends at the floor' + tip(state === 'below-floor'
+          ? 'Capital deployed at today&rsquo;s price, with price sitting at the 0.42&times; channel floor on the horizon date. From below the floor that is a rise; keeping today&rsquo;s distance from trend instead returns the trend&rsquo;s own growth, the next card. Not a forecast either way.'
+          : 'Capital deployed at today&rsquo;s price, with price sitting at the 0.42&times; channel floor on the horizon date. The conservative case &mdash; not a forecast that it gets there.'),
         v: pct1(r.floor * 100), sub: 'a year over ' + yrs },
       // Relabelled round two: "If you had bought at trend" invited the reader
       // to wonder WHEN they had bought. The card is about today's trend price.
@@ -1365,7 +1375,9 @@
     var N = PC ? PC.names(m) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' };
     var G = PC ? PC.tags(m, plan.months) : { stay: { text: '' }, trend: { text: '' } };
     var NT = PC ? PC.notes(m, plan) : { stay: '', trend: '' };
-    var FF = PC ? PC.FLOOR_FALL : { chip: 'Falls to the floor (0.42×) and stays', name: 'Falls to the floor and stays' };
+    // The floor case's words by state (PriceCases.floorFall, 2026-11-22): below
+    // the floor it is a rise, not a stress test, and is labelled so.
+    var FF = PC ? PC.floorFall(m) : { chip: 'Falls to the floor (0.42×) and stays', name: 'Falls to the floor and stays', stress: true, note: '' };
     var lead = PC ? PC.defaultFor(m) : 'stay', other = lead === 'stay' ? 'trend' : 'stay';
     function cond(k, it) { var t = T[k].charAt(0).toLowerCase() + T[k].slice(1); return it ? t.replace(/^if bitcoin /, 'if it ') : t; }
     function needs(v) { return v == null ? 'more than the engine’s range holds' : 'about <strong>' + btc(v) + ' BTC</strong>'; }
@@ -1379,7 +1391,10 @@
     var cs = [
       { k: T[lead] + tip(NT[lead]), v: val(need[lead]), sub: G[lead].text },
       { k: T[other] + tip(NT[other]), v: val(need[other]), sub: G[other].text },
-      { k: FF.chip + tip('A stress test, not a scenario: price falls in a straight line to 0.42&times; the trend over 3 years and stays there for the whole plan. Bitcoin has never held its floor for long; Escape Velocity runs the same test.'), v: val(floor), sub: 'stress test' }
+      { k: FF.chip + tip(FF.stress
+          ? 'A stress test, not a scenario: price falls in a straight line to 0.42&times; the trend over 3 years and stays there for the whole plan. Bitcoin has never held its floor for long; Escape Velocity runs the same test.'
+          : 'Not a stress test from here: bitcoin is below its floor today, so this path rises in a straight line to 0.42&times; the trend over 3 years and stays there. Staying where it is against trend is the lower case; Escape Velocity runs the same path.'),
+        v: val(floor), sub: FF.stress ? 'stress test' : 'a rise from here' }
     ];
     if (stackBTC && need[lead] != null) {
       var gap = stackBTC - need[lead];
@@ -1388,7 +1403,7 @@
     }
     setHTML('rdP1Cards', cards(cs));
 
-    var rows = [[N[lead], need[lead], 'rd-bar-trend'], [N[other], need[other], 'rd-bar-open'], [FF.name + ' (stress test)', floor, 'rd-bar-floor']];
+    var rows = [[N[lead], need[lead], 'rd-bar-trend'], [N[other], need[other], 'rd-bar-open'], [FF.name + (FF.stress ? ' (stress test)' : ''), floor, 'rd-bar-floor']];
     if (stackBTC) rows.push(['Your stack today', stackBTC, 'rd-bar-you']);
     var W = 700, PADL = 236, PADR = 76, TOP = 22, BH = 28, GAP = 24, H = TOP + rows.length * (BH + GAP) + 6;
     var maxv = Math.max.apply(null, rows.map(function (r) { return r[1] || 0; })) * 1.2 || 1;

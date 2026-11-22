@@ -75,7 +75,7 @@
   var TITLE_TREND = 'If bitcoin returns to trend over ' + REVERT_YEARS + ' years';
   // Full titles for the block; short names for legends, rows and ledgers.
   function titles(m) {
-    return { stay: titleStay(m), trend: TITLE_TREND, floor: 'Drifts to the floor (0.42×)', upper: 'Peaks at 2.5× trend' };
+    return { stay: titleStay(m), trend: TITLE_TREND, floor: floorVerb(m) + ' to the floor (0.42×)', upper: 'Peaks at 2.5× trend' };
   }
   // The retirement family's floor stress test (PR B, 2026-10-11) is a
   // different shape from the real-estate pages' (a straight line to 0.42x by
@@ -88,10 +88,35 @@
     title: 'If bitcoin falls to its floor (0.42×) over ' + REVERT_YEARS + ' years and stays there',
     name: 'Falls to the floor and stays'
   };
+  /* BELOW THE FLOOR THE FLOOR CASE IS A RISE (2026-11-22, JM ruling on the
+     PR #260 question). From 0.36x, "falls to the floor" is a 16% climb, so it
+     is neither a fall, a stress test nor the conservative case: holding
+     today's multiple (the stay scenario) is lower. Enumerated by state
+     (STYLE_GUIDE §12) and kept here, one source for every page's words:
+     floorVerb() for the real-estate family's straight line ("Drifts" /
+     "Rises"), floorFall() for the retirement family's fall-and-stay, with the
+     suffixes and the one-line note the pages print beside it. The paths
+     themselves do not change: target('floor') is 0.42x in either state. */
+  function belowFloor(m) { return m < PL_FLOOR; }
+  function floorVerb(m) { return belowFloor(m) ? 'Rises' : 'Drifts'; }
+  function floorFall(m) {
+    if (belowFloor(m)) return {
+      chip: 'Rises to the floor (0.42×) and stays',
+      title: 'If bitcoin rises to its floor (0.42×) over ' + REVERT_YEARS + ' years and stays there',
+      name: 'Rises to the floor and stays',
+      stress: false, tag: '', tagShort: '', showing: 'Showing a rise to the floor. ',
+      note: 'Not a stress test from here: bitcoin is below its floor today, so this path rises to 0.42× its trend and stays there. Staying where it is would be lower.'
+    };
+    return {
+      chip: FLOOR_FALL.chip, title: FLOOR_FALL.title, name: FLOOR_FALL.name,
+      stress: true, tag: ' (a stress test)', tagShort: ' (stress test)', showing: 'Showing the stress test. ',
+      note: 'A stress test: 0.42× is the channel’s floor, which price went beneath only briefly before November 2026.'
+    };
+  }
   function names(m) {
     var g = gapPct(m);
     return { stay: g === 0 ? 'Stays on trend' : 'Stays ' + g + '% ' + (m < 1 ? 'below' : 'above') + ' trend',
-             trend: 'Returns to trend over ' + REVERT_YEARS + ' years', floor: 'Drifts to the floor', upper: 'Peaks at 2.5× trend' };
+             trend: 'Returns to trend over ' + REVERT_YEARS + ' years', floor: floorVerb(m) + ' to the floor', upper: 'Peaks at 2.5× trend' };
   }
   function tags(m, planMonths) {
     var stay;
@@ -169,13 +194,16 @@
       c.classList.toggle('active', on);
       c.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
+    floorWords(el, '.pc-chip', '.pc-stress-lbl', m);
     q(el, '[data-pc="foot"]').textContent = foot(m, o.plan);
     // Anything picked that is not one of the two scenarios is a stress test
     // (floor, upper, or a page's own chip, such as How Much Bitcoin?'s
     // hostile case). Nothing picked (a page's custom inputs) shows neither
     // half selected; `showingLabel` lets the page name that state.
     var stress = !!o.selected && o.selected !== 'stay' && o.selected !== 'trend';
-    q(el, '[data-pc="showingLbl"]').textContent = o.showingLabel || (stress ? 'Showing a ' + (o.stressWord || 'stress test') : 'Showing');
+    var riseToFloor = o.selected === 'floor' && belowFloor(m);
+    q(el, '[data-pc="showingLbl"]').textContent = o.showingLabel ||
+      (riseToFloor ? 'Showing a rise to the floor' : stress ? 'Showing a ' + (o.stressWord || 'stress test') : 'Showing');
     q(el, '[data-pc="showing"]').innerHTML = o.showing || '';
   }
   // ── The compact switch (components/price-cases-switch.njk; PR B) ──
@@ -202,12 +230,35 @@
       c.classList.toggle('active', on);
       c.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
+    floorWords(el, '.pcs-chip', '.pcs-stress-lbl', m);
     var ld = q(el, '[data-pcs="lead"]');
     if (ld) ld.innerHTML = s === 'near'
       ? 'Bitcoin is within 5% of its Power Law trend today (' + m.toFixed(2) + '×), so the two scenarios land close together. Neither is a forecast.'
       : 'Bitcoin trades <strong>' + gapPct(m) + '% ' + s + '</strong> its Power Law trend today (' + m.toFixed(2) + '×). Neither scenario is a forecast.';
     var ot = q(el, '[data-pcs="other"]'); if (ot) { ot.innerHTML = o.other || ''; ot.hidden = !o.other; }
     var ft = q(el, '[data-pcs="foot"]'); if (ft) ft.textContent = foot(m, o.plan);
+  }
+
+  // The floor chip's words and the stress row's label, by state. The chip's
+  // kind is read once from its first text (the retirement family's "... and
+  // stays", or the real-estate family's straight line) and kept on the element,
+  // as is the row's own label, so the above-floor words come back unchanged.
+  // Below the floor a row labelled "Stress test(s)" whose chips include the
+  // floor says "Another path" / "Other paths" instead.
+  function floorWords(el, chipSel, lblSel, m) {
+    var hasFloor = false, chips = el.querySelectorAll(chipSel);
+    chips.forEach(function (c) {
+      if (c.getAttribute('data-scenario') !== 'floor') return;
+      hasFloor = true;
+      if (!c.hasAttribute('data-pc-floor')) c.setAttribute('data-pc-floor', /and stays/.test(c.textContent) ? 'fall' : 'line');
+      c.textContent = c.getAttribute('data-pc-floor') === 'fall' ? floorFall(m).chip : titles(m).floor;
+    });
+    var lbl = q(el, lblSel);
+    if (!lbl) return;
+    if (!lbl.hasAttribute('data-pc-label')) lbl.setAttribute('data-pc-label', lbl.textContent);
+    var own = lbl.getAttribute('data-pc-label');
+    lbl.textContent = (hasFloor && belowFloor(m) && /^Stress test/.test(own))
+      ? (chips.length > 1 ? 'Other paths' : 'Another path') : own;
   }
 
   // Clicks on any option in the block (the two halves and the stress chips).
@@ -224,7 +275,7 @@
   }
 
   window.PriceCases = {
-    REVERT_YEARS: REVERT_YEARS, UPPER: UPPER, FLOOR_FALL: FLOOR_FALL,
+    REVERT_YEARS: REVERT_YEARS, UPPER: UPPER, FLOOR_FALL: FLOOR_FALL, floorFall: floorFall, floorVerb: floorVerb,
     target: target, multipleAt: multipleAt,
     multipleOf: multipleOf, side: side, defaultFor: defaultFor,
     titles: titles, names: names, tags: tags, lead: lead, notes: notes, foot: foot,
