@@ -14,6 +14,16 @@
      final    { cols: ['House', 'Bitcoin'], rows: [{ label, values: [a, b] }] }
               (values in dollars, or null for a blank cell)
      csv      { filename, meta: [[label, value], ...] }
+   The clarity pilot (2026-11-25; CHECK_THE_WORK_AUDIT). All optional: a
+   spec without them renders, and exports, exactly as before.
+     inputs   [{ label, value }]: "What went in", above the note and in
+              the CSV header as "# Input:" lines. Build it from the object
+              the engine ran with, never from the DOM.
+     columns[].how   one sentence on how the column is made; listed under
+              the table ("How each column is worked out") and in the CSV.
+     final.rows[].card   words naming the result card that shows this
+              row's figure; marks the row. final.rows[].how as columns'.
+   A "side by side" view is an ordinary tab the page builds.
    The disclosure's open state and the chosen tab survive a re-render.
    RealEstateLedger.toCsv(spec) returns the CSV text (rePairQA hashes it).
    ============================================================ */
@@ -34,19 +44,39 @@
   }
   function head(c){ return c.label + (c.unit ? ' (' + c.unit + ')' : ''); }
   function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  // The pilot's "#" lines: a label and a value are two cells; a sentence
+  // is one quoted cell, so its commas stay commas in a spreadsheet.
+  function q(s){ s = String(s).replace(/\s+/g, ' '); return /[",]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+  function line(s){ return '"' + String(s).replace(/\s+/g, ' ').replace(/"/g, '""') + '"'; }
+  function hasHow(list){ return (list || []).some(function(x){ return !!x.how; }); }
+  function howBlock(title, list, attrs){
+    if (!hasHow(list)) return '';
+    return '<details class="re-ledger-how"' + attrs + '><summary>' + title + '</summary><ul>' +
+      list.map(function(x){ return x.how ? '<li><strong>' + esc(x.label) + ':</strong> ' + esc(x.how) + '</li>' : ''; }).join('') + '</ul></details>';
+  }
 
   function toCsv(spec){
     var L = [];
     (spec.csv && spec.csv.meta || []).forEach(function(m){ L.push('# ' + m[0] + ',' + String(m[1]).replace(/,/g, ';')); });
+    (spec.inputs || []).forEach(function(m){ L.push(q('# Input: ' + m.label) + ',' + q(m.value)); });
     spec.tabs.forEach(function(t){
       L.push(''); L.push('# ' + t.label);
       L.push(t.columns.map(function(c){ return '"' + head(c).replace(/"/g, '""') + '"'; }).join(','));
       t.rows.forEach(function(r){ L.push(t.columns.map(function(c){ return csvCell(c.get(r), c.fmt); }).join(',')); });
+      if (hasHow(t.columns)) {
+        L.push('# How each column is worked out');
+        t.columns.forEach(function(c){ if (c.how) L.push(line('# ' + c.label + ': ' + c.how)); });
+      }
     });
     if (spec.final) {
       L.push(''); L.push('# If sold at the end (USD, nominal)');
       L.push(['Step'].concat(spec.final.cols).join(','));
       spec.final.rows.forEach(function(r){ L.push(['"' + r.label + '"'].concat(r.values.map(function(v){ return csvCell(v, 'usd'); })).join(',')); });
+      spec.final.rows.forEach(function(r){ if (r.card) L.push(line('# Headline: ' + r.label + ' = ' + r.card)); });
+      if (hasHow(spec.final.rows)) {
+        L.push('# How the sale at the end is worked out');
+        spec.final.rows.forEach(function(r){ if (r.how) L.push(line('# ' + r.label + ': ' + r.how)); });
+      }
     }
     return L.join('\n') + '\n';
   }
@@ -55,6 +85,7 @@
     if (!el) return;
     var prev = el.querySelector('details.re-ledger');
     var open = prev ? prev.open : false;
+    var howOpen = el.getAttribute('data-how') === '1';
     var active = el.getAttribute('data-tab') || spec.tabs[0].id;
     if (!spec.tabs.some(function(t){ return t.id === active; })) active = spec.tabs[0].id;
     var tabs = spec.tabs.map(function(t){
@@ -65,14 +96,17 @@
         t.columns.map(function(c){ return '<th>' + esc(c.label) + (c.unit ? '<span class="re-ledger-unit">' + esc(c.unit) + '</span>' : '') + '</th>'; }).join('') +
         '</tr></thead><tbody>' +
         t.rows.map(function(r){ return '<tr>' + t.columns.map(function(c){ return '<td>' + fmt(c.get(r), c.fmt) + '</td>'; }).join('') + '</tr>'; }).join('') +
-        '</tbody></table></div>';
+        '</tbody></table></div>' +
+        howBlock('How each column is worked out', t.columns, ' data-panel="' + t.id + '"' + (t.id === active ? '' : ' hidden') + (howOpen ? ' open' : ''));
     }).join('');
+    var inputs = (spec.inputs && spec.inputs.length) ? ('<div class="re-ledger-inputs"><div class="re-ledger-sub">What went in</div><dl>' +
+      spec.inputs.map(function(m){ return '<div><dt>' + esc(m.label) + '</dt><dd>' + esc(m.value) + '</dd></div>'; }).join('') + '</dl></div>') : '';
     var final = spec.final ? ('<div class="re-ledger-scroll"><table class="re-ledger-table re-ledger-final"><thead><tr><th>If sold at the end</th>' +
       spec.final.cols.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      spec.final.rows.map(function(r){ return '<tr' + (r.strong ? ' class="re-ledger-strong"' : '') + '><td>' + esc(r.label) + '</td>' + r.values.map(function(v){ return '<td>' + fmt(v, 'usd') + '</td>'; }).join('') + '</tr>'; }).join('') +
-      '</tbody></table></div>') : '';
+      spec.final.rows.map(function(r){ return '<tr' + (r.strong ? ' class="re-ledger-strong"' : '') + '><td>' + esc(r.label) + (r.card ? '<span class="re-ledger-mark">' + esc(r.card) + '</span>' : '') + '</td>' + r.values.map(function(v){ return '<td>' + fmt(v, 'usd') + '</td>'; }).join('') + '</tr>'; }).join('') +
+      '</tbody></table></div>' + howBlock('How the sale at the end is worked out', spec.final.rows, howOpen ? ' open' : '')) : '';
     el.innerHTML = '<details class="re-ledger"' + (open ? ' open' : '') + '><summary>Show the calculation <span class="re-ledger-hint">year by year, and the sale at the end</span></summary>' +
-      '<div class="re-ledger-body"><p class="re-ledger-note">' + (spec.note || '') + '</p>' +
+      '<div class="re-ledger-body">' + inputs + '<p class="re-ledger-note">' + (spec.note || '') + '</p>' +
       '<div class="re-ledger-tabs" role="group" aria-label="Ledger">' + tabs + '</div>' + tables + final +
       '<button type="button" class="re-ledger-csv">Download CSV</button></div></details>';
     el.setAttribute('data-tab', active);
@@ -82,6 +116,13 @@
         el.setAttribute('data-tab', id);
         el.querySelectorAll('.re-ledger-tab').forEach(function(x){ var on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
         el.querySelectorAll('[data-panel]').forEach(function(p){ p.hidden = p.getAttribute('data-panel') !== id; });
+      });
+    });
+    el.querySelectorAll('details.re-ledger-how').forEach(function(d){
+      d.addEventListener('toggle', function(){
+        if (d.hidden) return;
+        el.setAttribute('data-how', d.open ? '1' : '0');
+        el.querySelectorAll('details.re-ledger-how').forEach(function(x){ if (x !== d && x.open !== d.open) x.open = d.open; });
       });
     });
     var btn = el.querySelector('.re-ledger-csv');

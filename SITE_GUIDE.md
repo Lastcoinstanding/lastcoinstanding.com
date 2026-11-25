@@ -3580,6 +3580,8 @@ One engine and one set of components for §14 and §14.1, so the two pages can't
 | `real-estate-carry.js` | `RealEstateCarry` | The pair's URL vocabulary and the carrying links (§46, §53.2) |
 | `real-estate-qa.js` (served at `/qa/`, loaded by `real-estate-qa-loader.js` on `?qa` only) | `rePairQA` | The tripwire: `run()` (byte-identity vectors), `parityCheck()`, `taxParityCheck()`, `booksCheck()`, `ledgerCheck()`, `all()` |
 
+**The ledger's clarity pilot (2026-11-25, a pilot).** On Bitcoin vs. Real Estate (both ledgers) and Bitcoin vs. Rental Property, "Show the calculation" now opens with *What went in*, marks the row the cards show, explains each column in a sentence, and adds a *Side by side* tab that follows the chart's basis. The other two ledger pages are unchanged. Rules: STYLE_GUIDE §6.49; what comes next: TECH_DEBT §1.x; the audit behind it: `CHECK_THE_WORK_AUDIT_2026-11-24.md` (project side). QA: `rePairQA.clarityCheck()`.
+
 ### 55.5 The two scenarios: `price-cases.js` and its block (2026-10-11)
 
 **The rule** (DEFAULTS_POLICY, JM, 2026-10-11; `claude/DEFAULTS_POLICY_2026-10-11.md` in the project): every calculator that projects bitcoin's price for the reader's plan shows **two scenarios, both on screen** — *If bitcoin stays 47% below trend* (`stay`: today's multiple for the whole plan) and *If bitcoin returns to trend over 3 years* (`trend`: a straight line in the multiple to 1× over 36 months, then the trend) — and **defaults to the lower of the two**: Stay below trend, Trend at or above it, decided from the price the page uses, until the reader picks. Floor and Upper are **stress tests, not scenarios**, and keep M3's horizon-long line. Tags describe, never grade (STYLE_GUIDE §10.14).

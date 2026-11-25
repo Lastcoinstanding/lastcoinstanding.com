@@ -63,13 +63,94 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         { label: 'Before tax', values: [o.houseIfSold, o.btcIfSold] },
         { label: 'Tax on the sale', values: [-o.homeTax.tax, -o.btcTax.tax] },
         { label: 'After tax', values: [o.houseAfterTax, o.btcAfterTax], strong: true }] };
+      // The clarity pilot (2026-11-25): how each column is made, the two
+      // sides in one view, and the row the cards show. Each sentence is
+      // written from RealEstateModel.bvreRetro / bvreProjection.
+      var retro = !!opts.retro, invest = opts.invest !== false;
+      var HOW = {
+        'house|Home value': retro ? 'The purchase price moved by the Case-Shiller National index from the start month to that December. The last row uses the latest month published.'
+                                  : 'The purchase price grown by your home appreciation rate, to the end of that year.',
+        'house|Mortgage balance': 'The loan still owed at the end of that year: last year\u2019s balance minus this year\u2019s principal.',
+        'house|Principal': 'The part of the year\u2019s fixed monthly payments that paid down the loan.',
+        'house|Interest': 'Each month\u2019s balance times the monthly mortgage rate, added up over the year.',
+        'house|Property tax': retro ? 'The property tax rate times the home\u2019s value each July, charged monthly.' : 'The property tax rate times the home\u2019s value at the start of that year, charged monthly.',
+        'house|Insurance': retro ? 'The annual premium, scaled to the home\u2019s value each July, charged monthly.' : 'The first year\u2019s premium, grown with the home\u2019s value, charged monthly.',
+        'house|Maintenance': retro ? 'The maintenance rate times the home\u2019s value each July, charged monthly.' : 'The maintenance rate times the home\u2019s value at the start of that year, charged monthly.',
+        'house|Equity': 'Home value minus the mortgage balance. Selling costs and tax come off in the last rows, not here.',
+        'house|Cumulative cash out': 'The down payment and closing costs, plus every mortgage payment, property tax, insurance and maintenance bill to date' + (opts.deduction ? ', less the tax saved by deducting mortgage interest.' : '.'),
+        'btc|Bitcoin price': retro ? 'Bitcoin\u2019s month-end price that December. The last row uses today\u2019s price.' : 'The price your bitcoin scenario gives at the end of that year.',
+        'btc|Rent paid': retro ? 'The starting rent, reset each July with Zillow\u2019s rent index, added up over the year.' : 'The starting rent, raised by the rent growth rate each year, added up over the year.',
+        'btc|Invested': invest ? 'In each month that owning cost more than renting: the difference, put into bitcoin.' : 'Zero: with the toggle off, only the up-front sum goes into bitcoin.',
+        'btc|Sold for rent': invest ? 'In each month that rent cost more than owning: the bitcoin sold to cover the difference.' : 'Zero: with the toggle off, no bitcoin is sold to pay rent.',
+        'btc|BTC bought': 'The dollars invested, less the trading cost, divided by ' + (retro ? 'the price that month opened at.' : 'that month\u2019s price on your scenario.'),
+        'btc|BTC sold': 'The dollars needed, plus the trading cost, divided by ' + (retro ? 'the price that month opened at.' : 'that month\u2019s price on your scenario.'),
+        'btc|BTC held': 'The coins bought with the up-front sum, plus coins bought since, minus coins sold since.',
+        'btc|Bitcoin value': 'BTC held times the bitcoin price in the same row.',
+        'btc|Cumulative cash out': invest ? 'The same up-front sum as the owner, then each month\u2019s rent plus bitcoin purchases, which together equal the owner\u2019s costs.'
+                                         : 'The same up-front sum as the owner, then rent only.'
+      };
+      [house, btc].forEach(function(t){ t.columns.forEach(function(c){ var h = HOW[t.id + '|' + c.label]; if (h) c.how = h; }); });
+      var FH = {
+        'Market value': 'The house: the last row\u2019s home value. Bitcoin: the last row\u2019s BTC held times its price.',
+        'Selling costs': 'The house: your selling-cost rate times its value. Bitcoin: the trading cost on its value.',
+        'Mortgage repaid': 'The loan balance still owed at the end.',
+        'Before tax': 'Market value minus selling costs and the loan repaid.',
+        'Tax on the sale': 'Under the tax settings above. The house: tax on its gain after any home-sale exclusion. Bitcoin: tax on its gain over what was paid for it, including the gain on coins sold along the way.',
+        'After tax': 'Before tax minus the tax on the sale.'
+      };
+      final.rows.forEach(function(r){ if (FH[r.label]) r.how = FH[r.label]; if (r.strong && opts.card) r.card = opts.card; });
+      // Side by side: the chart's lines as a table, on the chart's basis.
+      var sold = opts.sold !== false, bu = sold ? 'if sold that year, after tax' : 'held, before any sale';
+      var sideRows = o.rows.map(function(r, k){ var p = o.points[k + 1]; var h = sold ? p.houseAfter : p.houseHeld, b = sold ? p.btcAfter : p.btcHeld; return { r: r, h: h, b: b, d: b - h }; });
+      var side = { id: 'side', label: 'Side by side', rows: sideRows, columns: [
+        { label: yr.label, fmt: 'text', get: function(x){ return yr.get(x.r); } },
+        { label: 'The house', unit: bu, get: function(x){ return x.h; }, how: sold ? 'That year\u2019s home value, less selling costs, the loan and the tax on a sale: what the owner would keep if they sold then.' : 'That year\u2019s equity: home value minus the mortgage balance.' },
+        { label: 'Bitcoin', unit: bu, get: function(x){ return x.b; }, how: sold ? 'That year\u2019s bitcoin value, less the trading cost and the tax on a sale: what the renter would keep if they sold then.' : 'That year\u2019s bitcoin value: BTC held times the price.' },
+        { label: 'Difference', unit: 'bitcoin minus the house', get: function(x){ return x.d; }, how: 'Bitcoin minus the house, in the same row. The chart\u2019s difference line.' },
+        { label: 'Ahead', fmt: 'text', get: function(x){ return Math.abs(x.d) < 0.5 ? 'level' : x.d > 0 ? 'bitcoin' : 'the house'; } },
+        { label: 'Cash out, owner', unit: 'to date, ' + $, get: function(x){ return x.r.cumCashOutOwner; } },
+        { label: 'Cash out, renter', unit: 'to date, ' + $, get: function(x){ return x.r.cumCashOutRenter; } }] };
       return {
+        inputs: opts.inputs || null,
         note: 'Every amount is in nominal dollars, as paid' + (opts.realNote ? '; ' + opts.realNote : '') + '. The last rows sell both at the end, as the cards do. Cumulative cash out is the same on both tabs when the renter invests the difference.',
-        tabs: [house, btc], final: final,
+        tabs: [house, btc, side], final: final,
         csv: { filename: opts.filename, meta: [['Last Coin Standing', 'Bitcoin vs. Real Estate: ' + opts.calc]].concat(opts.meta || [])
                .concat([['Tax', o.taxProfile.taxRegime + ' / ' + o.taxProfile.filing + ' / ' + o.taxProfile.federalBracketPct + '% / ' + o.taxProfile.stateCode],
                         ['Amounts', 'nominal USD, as paid'], ['Live scenario URL', window.location.href]]) }
       };
+    }
+    // "What went in" (the clarity pilot, 2026-11-25): the inputs the engine
+    // ran with (i) and the figures it resolved from them (o), in the order
+    // the reader sets them. Never read from the DOM. head and extra are
+    // the calculator's own lines, before and after the shared ones.
+    function reLedgerInputs(o, i, head, extra){
+      function u(v){ return '$' + Math.round(v).toLocaleString('en-US'); }
+      function pc(v){ return (Math.round(v * 100) / 100) + '%'; }
+      var cash = i.method === 'cash', tp = o.taxProfile || {};
+      var ins = (i.insurance !== null && i.insurance !== undefined) ? u(i.insurance) + ' in the first year'
+              : (i.insurancePer400K ? u(i.insurancePer400K) + ' a year per $400,000 of value' : u(o.insuranceDefault) + ' in the first year');
+      var L = (head || []).concat([
+        ['Home price', u(o.homePrice !== undefined ? o.homePrice : i.homePrice)],
+        ['Bought with', cash ? 'cash' : 'a 30-year mortgage'],
+        ['Down payment', cash ? u(o.down) + ' (the full price)' : u(o.down) + ' (' + pc(i.dpf * 100) + ')'],
+        ['Closing costs', u(o.closing) + ' (' + pc(i.closingPct) + ')']]);
+      if (!cash) L.push(['Loan', u(o.loan) + ' at ' + pc(i.mortRate)], ['Monthly principal and interest', u(o.monthlyPI)]);
+      var rent0 = (i.rent === null || i.rent === undefined) ? o.rentDefault : i.rent;
+      L.push(['First month\u2019s rent', u(rent0) + ((i.rent === null || i.rent === undefined) ? ' (the default for this price)' : ' (yours)')],
+        ['Property tax', pc(i.propTaxPct) + ' of value a year'], ['Insurance', ins], ['Maintenance', pc(i.maintPct) + ' of value a year'],
+        ['Selling costs on the house', pc(i.sellPct) + ' of its value'], ['Trading cost on bitcoin', pc(i.btcTxPct) + ' each way'],
+        ['Renter invests the difference', i.investDiff === false ? 'no' : 'yes']);
+      L = L.concat(extra || []);
+      L.push(['Tax on a sale', tp.taxRegime === 'none' ? 'no capital-gains tax' : tp.taxRegime === 'custom' ? 'your own rates'
+        : 'US rules, ' + (tp.filing === 'single' ? 'single filer' : tp.filing === 'mfj' ? 'married filing jointly' : tp.filing) + ', ' + tp.federalBracketPct + '% bracket, state: ' + (tp.stateCode === 'OTHER' ? 'other' : tp.stateCode)]);
+      if (i.btcAccount && i.btcAccount !== 'taxable') L.push(['Bitcoin held in', 'a tax-advantaged account']);
+      if (i.mortgageDeduction) L.push(['Mortgage interest', 'deducted']);
+      return L.map(function(m){ return { label: m[0], value: m[1] }; });
+    }
+    function reScenarioName(sc, price){
+      var PC = window.PriceCases;
+      try { var n = PC && PC.names(PC.multipleOf(price)); if (n && n[sc]) return String(n[sc]).replace(/<[^>]+>/g, ''); } catch (e) {}
+      return sc;
     }
     // ── The chart (PR 6c; rulings M3, M7, P4, P7) ──
     // o.points: the purchase, then one point per year (engine). conv(v, k)
@@ -423,10 +504,11 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         const _investEl = document.getElementById('calcInvestDiff');
         const invest = _investEl ? _investEl.checked : true;
         // ── ENGINE: shared/real-estate-model.js (PR 4e) ──
-        const R = RealEstateModel.bvreRetro(Object.assign({ sy: sy, method: cash ? 'cash' : 'mortgage', homePrice: hs, mortRate: rate, dpf: dpf,
+        const _rIn = Object.assign({ sy: sy, method: cash ? 'cash' : 'mortgage', homePrice: hs, mortRate: rate, dpf: dpf,
             rent: _rentValid ? _rentNum : null, investDiff: invest, btcToday: TODAY_PRICE, nowMs: Date.now(),
             closingPct: D.closingPct, propTaxPct: D.propTaxPct, insurancePer400K: D.insurancePer400K,
-            maintPct: D.maintPct, sellPct: D.sellPct, btcTxPct: D.btcTxPct }, reTaxInputs()));
+            maintPct: D.maintPct, sellPct: D.sellPct, btcTxPct: D.btcTxPct }, reTaxInputs());
+        const R = RealEstateModel.bvreRetro(_rIn);
         // Placeholders name the defaults a blank field falls back to (also
         // when an unoffered year fell back to 2017 above).
         var _cpPh=document.getElementById('customHomePrice');if(_cpPh&&medianHs)_cpPh.placeholder=rFmt(medianHs)+' ('+sy+' median)';
@@ -542,7 +624,10 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
             function(v){ return v; }, rFmt, null, runCalculator);
         if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('calcLedger'), reLedgerSpec(R, {
             retro: true, calc: 'the look-back', filename: 'bitcoin-vs-real-estate-lookback.csv',
-            meta: [['Start', startLabel], ['End', endLabel + ' (house value to ' + houseLabel + ')'], ['Home price', Math.round(hs)], ['Bitcoin today', Math.round(R.btcToday)]] }));
+            invest: invest, deduction: !!_rIn.mortgageDeduction, sold: !reCharts.calc || reCharts.calc.basis() !== 'held',
+            card: 'The \u201cif sold today, after tax\u201d figures on the two cards above',
+            inputs: reLedgerInputs(R, _rIn, [['Start', startLabel], ['End', endLabel + ' (house value to ' + houseLabel + ')']],
+                                   [['Bitcoin\u2019s first purchase price', rFmt(R.entryPrice) + ' (the ' + sy + ' average)'], ['Bitcoin today', rFmt(R.btcToday)]]) }));
     }
     window.runRetroCalc = runCalculator;
 
@@ -980,8 +1065,14 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
     }
     if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
       retro: false, calc: 'the projection', filename: 'bitcoin-vs-real-estate-projection.csv',
+      invest: invest, deduction: !!_pIn.mortgageDeduction, sold: !reCharts.fwd || reCharts.fwd.basis() !== 'held',
+      card: _mode === 'real' ? 'The cards above show these two figures divided by ' + P.deflator.toFixed(2) + ', for the Real view'
+                             : 'The \u201cif sold, after tax\u201d figures on the two cards above',
+      inputs: reLedgerInputs(P, _pIn, [['Horizon', horizonYrs + ' years']],
+        [['Bitcoin scenario', reScenarioName(scenario, btcNow)], ['Bitcoin now', fmt(btcNow)], ['Home appreciation', homeApprNominal + '% a year, nominal'],
+         ['Rent growth', (Math.round(P.rentGrowthPct * 100) / 100) + '% a year'], ['Inflation (the Real view)', inflRate + '% a year']]),
       realNote: _mode === 'real' ? 'the Real view on the cards divides the end values by ' + P.deflator.toFixed(2) + ' (' + (window.RealEstateBaseline ? window.RealEstateBaseline.deflatorPhrase() : 'the deflator') + ')' : '',
-      meta: [['Horizon', horizonYrs + ' years'], ['Home price', Math.round(homePrice)], ['Bitcoin now', Math.round(btcNow)], ['Scenario', scenario], ['Home appreciation', homeApprNominal + '% nominal']] }));
+      meta: [] }));
   }
 
   // ── Event listeners ──
