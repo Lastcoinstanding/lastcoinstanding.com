@@ -738,6 +738,7 @@
     $('dr2CycBody').innerHTML = html;
     $('dr2WorthNote').textContent = priceNote();
     renderFailBox(fails, S.start);
+    renderLedger(T, a11, a14);
 
     updateChart1(T); updateChart2(T);
     renderAhead();
@@ -1421,6 +1422,211 @@
       sellHits2: '2021,2017,2013,2011', buyHits045: '2026,2023,2015'
     }
   };
+  // ════════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ════════
+  // Added 2026-11-26. The trade log behind the cycle table and the headline
+  // results: every sale and buy back from the cycle table's start, the round
+  // trips they make (all of them: the cycle table shows the first sale of each
+  // cycle), then the two headline runs. Built from the engine's own events
+  // (RuleEngine.run) as render() ran them; nothing here changes a figure.
+  var ledgerEl = $('drLedger');
+  function dayText(d){ return new Date(GENESIS_TS * 1000 + d * 864e5).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
+  function plainText(html){ var t = document.createElement('div'); t.innerHTML = html; return t.textContent; }
+  function cycName(d){ var y = RE.ym(d); for (var i = 0; i < RE.CYC.length; i++) if (y >= RE.CYC[i][1] && y <= RE.CYC[i][2]) return RE.CYC[i][0]; return ''; }
+  function pctTxt(v){ return String(parseFloat(v.toFixed(1))) + '%'; }
+  // The record is ~12 days apart, then roughly monthly from the first gap over 25 days.
+  var SPARSE_FROM = (function(){ for (var j = 1; j < PL_DATA.length; j++) if (PL_DATA[j][0] - PL_DATA[j - 1][0] > 25) return PL_DATA[j - 1][0]; return null; })();
+  // Every trade in order, scaled to the reader's stack (the engine runs on 1 BTC).
+  function tradeRows(T, k){
+    var rows = [{ kind: 'start', d: T.start.d, p: T.start.p, r: T.start.r, after: k }], held = k, n = 0;
+    T.ev.forEach(function(e){
+      if (e.t === 'sell') {
+        n++;
+        rows.push({ kind: 'sell', n: n, e: e, d: e.d, p: e.p, r: e.r, before: e.before * k, sold: e.amt * k, tax: e.tax * k, cash: (e.amt * e.p - e.tax) * k, after: (e.before - e.amt) * k });
+        held = (e.before - e.amt) * k;
+      } else {
+        var bought = e.after * k - held;
+        rows.push({ kind: e.why === 'fallback' ? 'deadline' : 'level', n: n, e: e, d: e.d, p: e.p, r: e.r, before: held, bought: bought, cash: bought * e.p, after: e.after * k });
+        held = e.after * k;
+      }
+    });
+    rows.push({ kind: 'end', d: T.last.d, p: T.last.p, r: T.last.r, before: held, after: T.end * k, inCash: T.inCash });
+    return rows;
+  }
+  // One row per sale. An open sale (no buy back yet) is valued as the engine
+  // values it at the end: its cash, with any interest, at the last sample's price.
+  function tripRows(T, k){
+    var out = [], firsts = T.cyc.map(function(c){ return c.sell; }).filter(Boolean);
+    T.ev.forEach(function(e, i){
+      if (e.t !== 'sell') return;
+      var b = T.ev[i + 1] && T.ev[i + 1].t === 'buy' ? T.ev[i + 1] : null;
+      var before = e.before * k, after = b ? b.after * k : T.end * k;
+      out.push({ s: e, b: b, cyc: cycName(e.d), share: e.amt / e.before, before: before, after: after, m: after / before, inTable: firsts.indexOf(e) >= 0 });
+    });
+    return out;
+  }
+  function runSummary(a){
+    var sells = 0, lvl = 0, dl = 0;
+    a.ev.forEach(function(e){ if (e.t === 'sell') sells++; else if (e.why === 'fallback') dl++; else lvl++; });
+    return { sells: sells, lvl: lvl, dl: dl, inCash: a.inCash, end: a.end };
+  }
+  function ledgerSpec(T, a11, a14){
+    var k = S.stack, O = S.O, R = S.R, trades = tradeRows(T, k), trips = tripRows(T, k);
+    var rt = plainText(ruleText(R)), cut = rt.indexOf(' Buy back'), sellTxt = rt.slice(0, cut).trim(), buyTxt = rt.slice(cut).trim();
+    var st = stateRate(O.state), lt = O.fed + (O.niit ? 3.8 : 0) + st, sh = RE.ST_RATE + (O.niit ? 3.8 : 0) + st;
+    var taxHow = O.acct === 'ira' ? 'None: the account is an IRA.'
+      : 'The gain on the bitcoin sold, lot by lot (' + (O.lots === 'hifo' ? 'highest cost first' : 'oldest first') + '): ' + pctTxt(lt) + ' on a lot held a year or more, ' + pctTxt(sh) + ' on one held less (' + RE.ST_RATE + '% federal' + (O.niit ? ' + 3.8% NIIT' : '') + (st ? ' + ' + pctTxt(st) + ' state' : '') + '); never below zero across the lots sold. Your stack starts as one lot at the start price; each buy back is a new lot at its price.';
+    var cadence = 'about 12 days apart' + (SPARSE_FROM != null ? ' (about a month apart since ' + my(SPARSE_FROM) + ')' : '');
+    var startName = S.start.slice(0, 4);
+    var tableStack = k * trips.reduce(function(a, r){ return a * (r.inTable ? r.m : 1); }, 1);
+    var hidden = trips.filter(function(r){ return !r.inTable; }).length;
+    var hiddenNote = hidden ? ' Here ' + (hidden === 1 ? 'one sale is' : hidden + ' sales are') + ' not in the cycle table, so its Your stack column ends at ' + btcf(tableStack) + ' where the rules ended at ' + btcf(T.end * k) + '.' : '';
+    var tradeCols = [
+      { label: 'Date', unit: '', fmt: 'text', get: function(r){ return dayText(r.d); },
+        how: 'The sample on which it happened. The record is one sample ' + cadence + ', and a rule fires on the first sample past its level.' },
+      { label: 'Trade', unit: '', fmt: 'text', get: function(r){ return r.kind === 'start' ? 'Start: your stack' : r.kind === 'sell' ? 'Sell ' + r.n : r.kind === 'level' ? 'Buy back ' + r.n + ', your level' : r.kind === 'deadline' ? 'Buy back ' + r.n + ', deadline' : (r.inCash ? 'End: cash valued here' : 'End of the record'); },
+        how: 'The sell rule: ' + sellTxt + ' The buy-back rule: ' + buyTxt + ' One sale is open at a time, and a buy back spends all the cash.' },
+      { label: 'Price', unit: '$', fmt: 'price', get: function(r){ return r.p; }, how: 'Bitcoin’s price in the record that day.' },
+      { label: 'Against trend', unit: '×', fmt: 'mult', get: function(r){ return r.r; }, how: 'That price divided by the Power Law trend: the scale the rule’s levels are set on.' },
+      { label: 'Sold', unit: '₿', fmt: 'btc', get: function(r){ return r.kind === 'sell' ? r.sold : null; }, how: R.f + '% of the bitcoin held at that moment.' },
+      { label: 'Tax', unit: '$', fmt: 'price', get: function(r){ return r.kind === 'sell' ? r.tax : null; }, how: taxHow },
+      { label: 'Cash', unit: '$', fmt: 'price', get: function(r){ return r.kind === 'sell' || r.kind === 'level' || r.kind === 'deadline' ? r.cash : null; },
+        how: 'At a sale: the bitcoin sold times the price, less the tax. At a buy back: the cash spent, which is all of it' + (O.yield ? ', after earning ' + O.yield + '% a year, compounded between samples' : '; it earns nothing while it waits') + '.' },
+      { label: 'Bought', unit: '₿', fmt: 'btc', get: function(r){ return r.kind === 'level' || r.kind === 'deadline' ? r.bought : null; }, how: 'The cash divided by the price.' },
+      { label: 'Bitcoin after', unit: '₿', fmt: 'btc', get: function(r){ return r.after; },
+        how: 'Your stack after the trade. The End row is the result: the bitcoin held' + (T.inCash ? ', plus the cash at this last sample’s price' : '') + '.' }];
+    var tripCols = [
+      { label: 'Sale', unit: '', fmt: 'text', get: function(r){ return dayText(r.s.d); }, how: 'Each Sell row of the Every trade tab.' },
+      { label: 'Cycle', unit: '', fmt: 'text', get: function(r){ return r.cyc; }, how: 'The cycle the sale falls in, by date, as in the cycle table.' },
+      { label: 'Share sold', unit: '%', fmt: 'pct', get: function(r){ return r.share; }, how: 'The share of the stack sold.' },
+      { label: 'Bought back', unit: '', fmt: 'text', get: function(r){ return r.b ? dayText(r.b.d) + (r.b.why === 'fallback' ? ', deadline' : ', your level') : 'Not yet: still in cash'; },
+        how: 'When the cash went back into bitcoin: at your level, or at the deadline.' + (T.inCash ? ' A sale still in cash is valued at the last sample’s price.' : '') },
+      { label: 'Stack before', unit: '₿', fmt: 'btc', get: function(r){ return r.before; }, how: 'The bitcoin held just before the sale.' },
+      { label: 'Stack after', unit: '₿', fmt: 'btc', get: function(r){ return r.after; }, how: 'The bitcoin held after the buy back.' },
+      { label: 'Round trip', unit: '×', fmt: 'mult', get: function(r){ return r.m; }, how: 'Stack after divided by stack before: the cycle table’s Round trip. Multiplied together, the round trips give the result.' },
+      { label: 'In the cycle table', unit: '', fmt: 'text', get: function(r){ return r.inTable ? 'Yes' : 'No: a later sale in this cycle'; },
+        how: 'The cycle table shows each cycle’s first sale. A rule that sells again in the same cycle has those round trips here only, and the cycle table’s Your stack column multiplies only the round trips it shows.' + hiddenNote }];
+    var runs = [['Since 2011', a11], ['Since 2014', a14]];
+    if (S.start === '2017-01') runs.push(['From 2017', T]);
+    var sums = runs.map(function(x){ return runSummary(x[1]); });
+    var col = function(fn){ return sums.map(fn); };
+    var fin = [
+      { label: 'Sales', fmt: 'text', values: col(function(s){ return String(s.sells); }), how: 'The times the sell rule fired from that start: the Sell rows of the Every trade tab when the cycle table starts there.' },
+      { label: 'Bought back at your level', fmt: 'text', values: col(function(s){ return String(s.lvl); }), how: 'Buy backs when price fell through your buy-back level.' },
+      { label: 'Bought back at the deadline', fmt: 'text', values: col(function(s){ return String(s.dl); }), how: R.cap ? 'Buy backs at market, ' + R.cap + ' months after the sale, when the level hadn’t come.' : 'None: your rules have no deadline.' },
+      { label: 'Still in cash at the end', fmt: 'text', values: col(function(s){ return s.inCash ? 'Yes' : 'No'; }), how: 'Yes when the last sale has had no buy back. Its cash counts at the last sample’s price (' + dayText(T.last.d) + ', ' + price(T.last.p) + ').' },
+      { label: 'Your stack at the end', fmt: 'btc', values: col(function(s){ return s.end * k; }), how: 'Your stack times the engine’s result: the Every trade tab’s End row when the cycle table starts there.' },
+      { label: 'Against HODL', fmt: 'mult', values: col(function(s){ return s.end; }), card: 'The two headline results above, since 2011 and since 2014',
+        how: 'The stack at the end divided by the stack you started with. HODL is 1.00×.' },
+      { label: 'Bitcoin gained or lost', fmt: 'btc', values: col(function(s){ return (s.end - 1) * k; }), how: 'The stack at the end minus the stack you started with: the headline’s BTC line.' },
+      { label: 'Worth at today’s price', fmt: 'usd', values: col(function(s){ return (s.end - 1) * k * liveBtcPrice; }),
+        how: 'That difference at ' + price(liveBtcPrice) + ' (' + priceNote() + '). Before tax in a taxable account.' }];
+    var inputs = [
+      ['Sell rule', sellTxt],
+      ['Buy-back rule', buyTxt],
+      ['Account', O.acct === 'ira' ? 'IRA: no tax on sales' : settingSummary()],
+      ['Cash while waiting', O.yield ? 'earns ' + O.yield + '% a year' : 'earns nothing'],
+      ['Your stack', stackText()],
+      ['Cycle table starts', startName + ': ' + dayText(T.start.d) + ', at ' + price(T.start.p)],
+      ['Headline results', 'since 2011 and since 2014, on the same rules'],
+      ['Price record', 'to ' + dayText(T.last.d) + ', one sample ' + cadence],
+      ['Today’s price', price(liveBtcPrice) + ' (' + priceNote() + ')'],
+      ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    return {
+      hint: 'every sale and buy back, and the round trips they make',
+      inputs: inputs.map(function(m){ return { label: m[0], value: m[1] }; }),
+      note: 'Every trade from ' + startName + ', the cycle table’s start, for your stack of ' + stackText() + '; hypothetical, on the recorded prices, before trading costs. The last table is the headline results' + (runs.length > 2 ? ' and the run from 2017' : '') + '.',
+      tabs: [{ id: 'trades', label: 'Every trade', columns: tradeCols, rows: trades, strong: function(r){ return r.kind === 'end'; } },
+             { id: 'trips', label: 'Round trips', columns: tripCols, rows: trips }],
+      final: { title: 'Your rules, start to end', csvTitle: 'Your rules, start to end (your stack; dollars at today’s price)', howTitle: 'How these figures are worked out', cols: runs.map(function(x){ return x[0]; }), rows: fin },
+      csv: { filename: 'disciplined-rebalancing.csv', meta: [
+        ['Last Coin Standing', 'Disciplined Rebalancing'],
+        ['Amounts', 'bitcoin for your stack; prices and cash in dollars of the day; hypothetical'],
+        ['Rules link', function(){ return scenarioUrl(); }]] }
+    };
+  }
+  function renderLedger(T, a11, a14){
+    if (!ledgerEl || !window.Ledger) return;
+    window.Ledger.render(ledgerEl, ledgerSpec(T, a11, a14));
+  }
+
+  // ── QA (console: drLedgerQA()) ──
+  // The trade log rebuilt step by step and against the engine, the round
+  // trips against the result and the cycle table, the last table against the
+  // headline results, the CSV's shape; then a sweep of rules, accounts,
+  // stacks and starts through render(), restoring the reader's settings after.
+  // (drQA() is the page's fixture test and runs on load; this one is separate.)
+  window.drLedgerQA = function(){
+    var near = function(x, y){ return typeof x === 'number' && typeof y === 'number' && Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function holds(){
+      var sp = ledgerEl && ledgerEl._ledgerSpec, why = [];
+      if (!sp) return { ok: false, why: ['no ledger'] };
+      if (!window.Ledger.check(ledgerEl, { side: false })) why.push('Ledger.check');
+      var k = S.stack, T = RE.run(S.R, engineOpts(S.O, S.start)), tr = sp.tabs[0], tp = sp.tabs[1], fin = sp.final.rows, C = tr.columns;
+      var rows = tr.rows, ev = rows.slice(1, -1);
+      if (ev.length !== T.ev.length || ev.some(function(r, i){ var e = T.ev[i]; return (r.kind === 'sell') !== (e.t === 'sell') || r.d !== e.d || r.p !== e.p; })) why.push('events');
+      if (!near(C[8].get(rows[0]), k) || !near(C[8].get(rows[rows.length - 1]), T.end * k)) why.push('start or end');
+      for (var i = 1; i < rows.length; i++) {
+        var r = rows[i], prev = C[8].get(rows[i - 1]);
+        if (r.kind === 'sell') {
+          if (!near(r.before, prev) || !near(C[8].get(r), r.before - C[4].get(r)) || !near(C[6].get(r), C[4].get(r) * r.p - C[5].get(r)) || C[5].get(r) < 0 || (S.O.acct === 'ira' && C[5].get(r) !== 0) || !near(C[4].get(r) / r.before, S.R.f / 100)) why.push('sell ' + r.n);
+        } else if (r.kind === 'level' || r.kind === 'deadline') {
+          if (!near(r.before, prev) || !near(C[7].get(r), C[6].get(r) / r.p) || !near(C[8].get(r), r.before + C[7].get(r))) why.push('buy ' + r.n);
+          if ((r.kind === 'level') !== (r.e.why === 'level')) why.push('buy kind ' + r.n);
+        } else if (r.kind === 'end' && !r.inCash && !near(C[8].get(r), prev)) why.push('end');
+      }
+      var prod = tp.rows.reduce(function(a, x){ return a * x.m; }, 1);
+      if (tp.rows.length !== T.ev.filter(function(e){ return e.t === 'sell'; }).length || (tp.rows.length && !near(prod * k, T.end * k))) why.push('round trips to the result');
+      tp.rows.forEach(function(x){
+        if (x.b && !near(x.m, tripOf(x.s, x.b, T.last.p).m)) why.push('round trip ' + x.cyc);
+        if (x.inTable) {
+          var tr2 = Array.prototype.filter.call(document.querySelectorAll('#dr2CycBody tr'), function(row){ return row.children[0].textContent.indexOf(x.cyc) === 0; })[0];
+          var cell = tr2 && tr2.querySelector('td.mult');
+          if (!cell || cell.textContent.indexOf(mult(x.m)) !== 0) why.push('cycle table ' + x.cyc);
+        }
+      });
+      var withSale = T.cyc.filter(function(c){ return c.covered && c.sell; }).length;
+      if (tp.rows.filter(function(x){ return x.inTable; }).length !== withSale) why.push('cycle table count');
+      var a11 = RE.run(S.R, engineOpts(S.O, '2011-01')), a14 = RE.run(S.R, engineOpts(S.O, '2014-01'));
+      [[a11, 'dr2R11'], [a14, 'dr2R14']].forEach(function(x, j){
+        var a = x[0], s = runSummary(a);
+        if (!near(fin[5].values[j], a.end) || !near(fin[4].values[j], a.end * k) || fin[0].values[j] !== String(s.sells) || fin[1].values[j] !== String(s.lvl) || fin[2].values[j] !== String(s.dl)) why.push('final ' + x[1]);
+        if ($(x[1]).textContent.indexOf(mult(a.end)) !== 0 || $(x[1] + 'b').textContent.indexOf(btcf(a.end * k)) < 0) why.push('headline ' + x[1]);
+      });
+      var csv = window.Ledger.toCsv(sp);
+      if (!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 2 && csv.indexOf('# Your rules, start to end') > 0)) why.push('csv shape');
+      return { ok: !why.length, why: why };
+    }
+    var out = [], live = holds();
+    out.push(['live panel: trade log step by step, round trips, cycle table, headline results, CSV', live.ok, live.why.slice(0, 6).join('; ')]);
+    var saved = { R: copy(S.R), O: copy(S.O), stack: S.stack, start: S.start, szFollows: S.szFollows }, was = interacted;
+    var IRA = copy(DEF_O), TAX = { acct: 'tax', fed: 20, niit: true, state: 'WAHI', lots: 'hifo', yield: 4 }, TAXF = { acct: 'tax', fed: 15, niit: false, state: 'NONE', lots: 'fifo', yield: 0 };
+    var V = [
+      ['the starting rules, from 2011', copy(DEF_R), IRA, 1, '2011-01'],
+      ['Balanced, from 2014', copy(PRESETS.balanced), IRA, 1, '2014-01'],
+      ['Adventurous, from 2017', copy(PRESETS.adventurous), IRA, 1, '2017-01'],
+      ['up through 1.2x, no deadline (sells twice a cycle)', { timing: 'up', sx: 1.2, sz: 1.2, f: 50, rx: 0.9, cap: 0 }, IRA, 1, '2011-01'],
+      ['up through 1.1x, 12-month deadline', { timing: 'up', sx: 1.1, sz: 1.1, f: 50, rx: 1.0, cap: 12 }, IRA, 2, '2014-01'],
+      ['fade 2.5x below 2x, taxable, highest cost first, 4% cash, 3 BTC', { timing: 'fade', sx: 2.5, sz: 2, f: 40, rx: 0.8, cap: 18 }, TAX, 3, '2011-01'],
+      ['the starting rules, taxable FIFO, 0.5 BTC, from 2014', copy(DEF_R), TAXF, 0.5, '2014-01'],
+      ['up through 4x (never sells)', { timing: 'up', sx: 4, sz: 4, f: 25, rx: 1.0, cap: 24 }, IRA, 1, '2011-01']];
+    try {
+      interacted = false;
+      V.forEach(function(v){
+        S.R = v[1]; S.O = copy(v[2]); S.stack = v[3]; S.start = v[4];
+        render();
+        var r = holds();
+        out.push(['sweep: ' + v[0], r.ok, r.why.slice(0, 6).join('; ')]);
+      });
+    } finally {
+      S.R = saved.R; S.O = saved.O; S.stack = saved.stack; S.start = saved.start; S.szFollows = saved.szFollows;
+      render(); interacted = was;
+    }
+    var ok = out.every(function(x){ return x[1]; });
+    if (window.console) console.table(out.map(function(x){ return { check: x[0], pass: x[1], why: x[2] }; }));
+    return { ok: ok, checks: out };
+  };
+
   function drQA(){
     var f = [];
     function near(label, got, want, tol){ if (got == null || !(Math.abs(got - want) <= tol)) f.push(label + ' ' + (got == null ? 'none' : +got.toFixed(3)) + ' vs ' + want + ' (±' + tol + ')'); }
