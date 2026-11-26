@@ -877,7 +877,33 @@
     var L = RE.rentalLedger(s), $ = 'nominal $';
     var pathName = ['', 'Sell + Spot Bitcoin', 'HELOC + Bitcoin', 'Partial Sale + Yield', 'Sell + Yield Portfolio'][s.path];
     var yr = { label: 'Year', fmt: 'text', get: function(r){ return String(r.year); } };
-    function col(label, key, fmt, unit){ return { label: label, unit: unit === undefined ? $ : unit, fmt: fmt, get: function(r){ return r[key]; } }; }
+    // The clarity pilot (2026-11-25): each column's sentence is written
+    // from RealEstateModel.rentalYears / yieldYears / rentalLedger.
+    var many = s.path === 3;
+    var HOW = {
+      value: (many ? 'All ' + s.numProperties + ' properties: their' : 'The property\u2019s') + ' value today, grown by the home appreciation rate each year.',
+      balance: 'The existing mortgage still owed at the end of that year.',
+      noi: 'The value today times the net rental yield. The same every year: rent is not grown.',
+      depreciation: 'That year\u2019s depreciation deduction. It lowers the tax, not the cash.',
+      interest: 'The interest part of that year\u2019s mortgage payments.',
+      debtService: 'That year\u2019s mortgage payments: principal and interest.',
+      tax: 'Net operating income minus depreciation and mortgage interest, never below zero, times your ordinary income tax rate.',
+      cash: 'Net operating income minus debt service and income tax.',
+      cumCash: 'Cash after tax, added up to date.',
+      equity: 'Property value minus the mortgage balance.',
+      held: 'Equity plus cumulative cash. The chart\u2019s Held line for that year.',
+      btcPrice: 'Today\u2019s price, moved along your bitcoin scenario to the end of that year.',
+      btcValue: (s.path === 1 ? 'The sale\u2019s proceeds after repaying the mortgage' : s.path === 2 ? 'The HELOC draw' : 'The portfolio\u2019s spot-bitcoin share') + ', put into bitcoin less the trading cost, at that year\u2019s price.',
+      heloc: 'The amount borrowed: the HELOC limit on the property\u2019s value, less the existing mortgage. Interest-only, so it does not fall.',
+      helocInterest: 'The HELOC balance times its rate, times the years so far.',
+      par: 'The portfolio\u2019s shares in STRC, SATA and stablecoin lending, at what was paid for them.',
+      dist: 'Each of those shares times its yield, for the year.',
+      distTax: 'Lending income at your ordinary rate. The preferreds\u2019 distributions count as return of capital until the basis runs out, then as gains.',
+      basisLeft: 'What is left of the amount paid for the preferreds after the distributions counted as return of capital.'
+    };
+    var PATH_HOW = { cash: 'Distributions minus the tax on them.', cumCash: 'Cash after tax, added up to date.',
+                     held: 'Everything the path holds that year before any sale, with the cash collected to date. The chart\u2019s Held line.' };
+    function col(label, key, fmt, unit){ return { label: label, unit: unit === undefined ? $ : unit, fmt: fmt, get: function(r){ return r[key]; }, how: HOW[key] }; }
     var rental = { id: 'rental', label: s.path === 3 ? 'Keep all ' + s.numProperties + ' rentals' : 'Keep the rental', rows: L.rental, columns: [yr,
       col('Property value', 'value'), col('Mortgage balance', 'balance'), col('Net operating income', 'noi'), col('Depreciation', 'depreciation'),
       col('Mortgage interest', 'interest'), col('Debt service', 'debtService'), col('Income tax', 'tax'), col('Cash after tax', 'cash'),
@@ -887,17 +913,50 @@
     if (s.path === 3 || s.path === 4) pc = pc.concat([col('Preferreds and lending, at par', 'par'), col('Distributions', 'dist'), col('Tax on them', 'distTax'),
       col('Cash after tax', 'cash'), col('Cumulative cash', 'cumCash'), col('ROC basis left', 'basisLeft')]);
     pc.push(col(s.path === 2 || s.path === 3 ? 'Total held (with the kept rental' + (s.path === 3 ? 's' : '') + ')' : 'Total held', 'held'));
+    pc.forEach(function(c, n){ var k = ['cash', 'cumCash', 'held'].filter(function(x){ return c.how === HOW[x]; })[0]; if (k) c.how = PATH_HOW[k]; });
     var k = results.keep, p = results.path;
     var final = { cols: ['Keep rental', pathName], rows: [
       { label: 'Total held', values: [k.totalWealth, p.totalWealth] },
       { label: 'Selling costs', values: [k.ifSold.preTax - k.totalWealth, p.ifSold.preTax - p.totalWealth] },
       { label: 'Before tax', values: [k.ifSold.preTax, p.ifSold.preTax] },
       { label: 'Tax on the sale', values: [-k.ifSold.tax, -p.ifSold.tax] },
-      { label: 'After tax', values: [k.ifSold.afterTax, p.ifSold.afterTax], strong: true }] };
+      { label: 'After tax', values: [k.ifSold.afterTax, p.ifSold.afterTax], strong: true,
+        card: isReal() ? 'The table above shows these two figures divided by ' + RE.deflator(inflPct(), s.holdingYears).toFixed(2) + ', for the Real view'
+                       : 'The \u201cIf sold, after tax\u201d row of the table above' }] };
+    var FH = { 'Total held': 'Each side\u2019s Total held in the last row of its tab.',
+               'Selling costs': 'What selling costs: the gap between the total held and the proceeds before tax.',
+               'Before tax': 'Total held minus selling costs.',
+               'Tax on the sale': 'Under your tax settings, on each side\u2019s gain.',
+               'After tax': 'Before tax minus the tax on the sale.' };
+    final.rows.forEach(function(r){ r.how = FH[r.label]; });
+    // Side by side: the chart's two lines for your scenario, on the chart's basis.
+    var soldB = chartBasis !== 'held';
+    var tj = soldB ? RE.calcIfSoldTrajectory(s, s.btcScenario).map(function(r){ return { year: r.year, wealthKeep: r.keep, wealthPath: r.path }; }) : calcWealthTrajectory(s, s.btcScenario);
+    var bu = soldB ? 'if sold that year, after tax' : 'held, before any sale';
+    var sideRows = tj.filter(function(r, n){ return (r.year !== undefined ? r.year : n) >= 1; }).map(function(r, n){ return { year: r.year !== undefined ? r.year : n + 1, k: r.wealthKeep, p: r.wealthPath, d: r.wealthPath - r.wealthKeep }; });
+    var side = { id: 'side', label: 'Side by side', rows: sideRows, columns: [
+      { label: 'Year', fmt: 'text', get: function(x){ return String(x.year); } },
+      { label: rental.label, unit: bu, get: function(x){ return x.k; }, how: soldB ? 'What keeping the rental would leave if it were sold that year, after selling costs, the mortgage and tax, with the cash collected to date.' : 'The rental tab\u2019s Total held for that year.' },
+      { label: pathName, unit: bu, get: function(x){ return x.p; }, how: soldB ? 'What the path would leave if it were sold that year, after costs and tax, with the cash collected to date.' : 'The path tab\u2019s Total held for that year.' },
+      { label: 'Difference', unit: 'the path minus the rental', get: function(x){ return x.d; }, how: 'The path minus keeping the rental, in the same row.' },
+      { label: 'Ahead', fmt: 'text', get: function(x){ return Math.abs(x.d) < 0.5 ? 'level' : x.d > 0 ? 'the path' : 'the rental'; } }] };
+    function u(v){ return '$' + Math.round(v).toLocaleString('en-US'); }
+    var IN = [['Path', pathName], ['Property value', u(s.propertyValue) + (many ? ' each, ' + s.numProperties + ' properties' : '')]];
+    if (many) IN.push(['Rentals kept', s.propertiesRetained + ' of ' + s.numProperties]);
+    IN.push(['Existing mortgage', s.existingMortgage > 0 ? u(s.existingMortgage) + ' at ' + s.mortgageRatePct + '%, ' + s.mortgageYearsLeft + ' years left' : 'none'],
+      ['Net rental yield', s.netRentalYield + '% of value a year'], ['Home appreciation', s.appreciationPct + '% a year, nominal'],
+      ['Holding period', s.holdingYears + ' years'], ['Tax basis in the property', s.adjustedBasisPct + '% of value, owned ' + s.yearsAlreadyHeld + ' years'],
+      ['Selling costs on the property', s.sellCostPct + '% of its value'], ['Trading cost on bitcoin', s.btcTxPct + '%'],
+      ['Bitcoin scenario', (window.PriceCases && typeof TODAY_PRICE === 'number' && window.PriceCases.names(window.PriceCases.multipleOf(TODAY_PRICE))[s.btcScenario]) || s.btcScenario]);
+    if (s.path === 2) IN.push(['HELOC', 'up to ' + s.helocLtv + '% of value, at ' + s.helocRatePct + '%']);
+    if (s.path === 3 || s.path === 4) IN.push(['Yield portfolio', 'STRC ' + s.portfolio.strc + '%, SATA ' + s.portfolio.sata + '%, lending ' + s.portfolio.lend + '%, spot bitcoin ' + s.portfolio.spot + '%']);
+    IN.push(['Tax', (s.taxRegime || 'us') === 'none' ? 'no capital-gains tax' : 'US rules, ' + s.federalBracketPct + '% bracket, state: ' + (s.stateCode === 'OTHER' ? 'other' : s.stateCode)]);
+    if (isReal()) IN.push(['Inflation (the Real view)', inflPct() + '% a year']);
     RealEstateLedger.render(document.getElementById('calc-ledger'), {
       note: 'Every amount is in nominal dollars, as paid' + (isReal() ? '; the Real view above divides the year-' + s.holdingYears + ' totals by ' + RE.deflator(inflPct(), s.holdingYears).toFixed(2) : '') +
             '. <em>Total held</em> is the chart\u2019s line for that year; the last rows sell both at year ' + s.holdingYears + ', as the table does.',
-      tabs: [rental, { id: 'path', label: pathName, rows: L.path, columns: pc }], final: final,
+      inputs: IN.map(function(m){ return { label: m[0], value: m[1] }; }),
+      tabs: [rental, { id: 'path', label: pathName, rows: L.path, columns: pc }, side], final: final,
       csv: { filename: 'bitcoin-vs-rental-property.csv', meta: [['Last Coin Standing', 'Bitcoin vs. Rental Property: ' + pathName],
         ['Property value', s.propertyValue], ['Net rental yield', s.netRentalYield + '%'], ['Holding period', s.holdingYears + ' years'],
         ['Bitcoin scenario', s.btcScenario], ['Tax', (s.taxRegime || 'us') + ' / ' + s.federalBracketPct + '% / ' + s.stateCode],
@@ -1031,6 +1090,7 @@
         });
         if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
         renderFrameUI(); renderChart(state); renderChartLegend();
+        try { renderLedger(computeAll(state), state); } catch (e) {}   // the ledger's Side by side tab follows the chart's basis
       });
     });
   }

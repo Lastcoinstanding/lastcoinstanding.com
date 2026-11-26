@@ -805,17 +805,52 @@
   }
 
   // Everything, in one call: the byte-identity vectors, then every identity.
+  // The clarity pilot (2026-11-25): on each ledger as it stands on the
+  // page, "What went in" is present, one final row is marked as the cards'
+  // figure, every tab explains its columns, and the Side by side tab's last
+  // row equals the ledger: the After tax row when the chart is on If sold,
+  // the two tabs' held figures when it is on Held. Run it on either basis.
+  function clarityCheck(){
+    function near(a, b){ return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b)); }
+    var out = [], fails = [];
+    ['calcLedger', 'fwdLedger', 'calc-ledger'].forEach(function(id){
+      var n = el(id), sp = n && n._ledgerSpec; if (!sp) return;
+      var side = sp.tabs.filter(function(t){ return t.id === 'side'; })[0];
+      var fin = sp.final.rows.filter(function(r){ return r.strong; })[0];
+      var c = { inputs: !!(sp.inputs && sp.inputs.length > 5), marked: !!(fin && fin.card) && sp.final.rows.filter(function(r){ return r.card; }).length === 1,
+                how: sp.tabs.every(function(t){ return t.columns.some(function(x){ return !!x.how; }); }) && sp.final.rows.every(function(r){ return !!r.how; }), side: !!side };
+      if (side) {
+        var last = side.rows[side.rows.length - 1], a = side.columns[1].get(last), b = side.columns[2].get(last);
+        var sold = /if sold/.test(side.columns[1].unit);
+        c.basis = sold ? 'ifsold' : 'held';
+        c.difference = near(side.columns[3].get(last), b - a);
+        c.rows = side.rows.length === sp.tabs[0].rows.length;
+        if (sold) c.lastRow = near(a, fin.values[0]) && near(b, fin.values[1]);
+        else {
+          var held = function(t, alt){ var col = t.columns.filter(function(x){ return /^Total held/.test(x.label); })[0] || t.columns.filter(function(x){ return x.label === alt; })[0]; return col.get(t.rows[t.rows.length - 1]); };
+          c.lastRow = near(a, held(sp.tabs[0], 'Equity')) && near(b, held(sp.tabs[1], 'Bitcoin value'));
+        }
+      }
+      var ok = Object.keys(c).every(function(k){ return k === 'basis' || c[k] === true; });
+      if (!ok) fails.push(id);
+      out.push(Object.assign({ id: id, ok: ok }, c));
+    });
+    if (typeof console !== 'undefined' && console.table) console.table(out);
+    return { pass: out.length > 0 && !fails.length, fails: fails, rows: out };
+  }
+
   async function all(opts){
     var p = page(), r = { run: await run(opts), parity: parityCheck(), tax: taxParityCheck(), books: await booksCheck(opts) };
     if (p === 'bvre') r.ledger = ledgerCheck();
-    var ok = r.parity && r.parity.pass && r.tax && r.tax.pass && r.books && r.books.pass && (p !== 'bvre' || (r.ledger && r.ledger.pass)) && (!opts || !opts.expect || r.run.pass);
+    r.clarity = clarityCheck();
+    var ok = r.clarity.pass && r.parity && r.parity.pass && r.tax && r.tax.pass && r.books && r.books.pass && (p !== 'bvre' || (r.ledger && r.ledger.pass)) && (!opts || !opts.expect || r.run.pass);
     if (ok) console.log('%crePairQA.all PASS', 'color:#7fc47f;font-weight:bold', '— digest ' + r.run.digest);
     else console.error('rePairQA.all FAIL');
     r.pass = !!ok;
     return r;
   }
 
-  window.rePairQA = { run: run, all: all, ledgerCheck: ledgerCheck, parityCheck: parityCheck, taxParityCheck: taxParityCheck, booksCheck: booksCheck,
+  window.rePairQA = { run: run, all: all, clarityCheck: clarityCheck, ledgerCheck: ledgerCheck, parityCheck: parityCheck, taxParityCheck: taxParityCheck, booksCheck: booksCheck,
                       vectors: { retro: RETRO, projection: PROJ, rental: RP, parity: PARITY, tax: TAX,
                                  books: { retro: BOOKS_RETRO, projection: BOOKS_BVRE, rental: BOOKS_RP } } };
 })();

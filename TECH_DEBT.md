@@ -150,6 +150,15 @@ Krueger / *Bitcoin One Million* popularizer credit in §A).
 
 - [ ] **Site-wide Chart.js legend audit — `usePointStyle: true` hides `borderDash`.** A Chart.js legend configured with `usePointStyle: true` renders point-style markers that drop the dataset's `borderDash`, so a dashed line (e.g. a mitigation / cut line) is indistinguishable from a solid one in the legend. The fix is a custom `generateLabels` that reconstructs the dash — but it must also set `fontColor`, or the legend text loses its themed colour. Needs a site-wide sweep of every chart that pairs dashed datasets with a `usePointStyle` legend. Surfaced during the stress-test / get-updates work; **moved here from the OPEN_ITEMS next-steps queue on 2026-08-08** — a real open item shouldn't live only in a queue.
 
+### 1.x The calculation ledger: generalize after the pilot (2026-11-25)
+
+`shared/real-estate-ledger.js` carries a clarity pilot on the real-estate pair (STYLE_GUIDE §6.49): what went in, the marked row, how each column is worked out, a Side by side tab. Once JM has judged it on the preview and in use:
+- Rename the component to a neutral shared ledger and move the two other real-estate pages (Paying Down the Mortgage, Compare Housing Plans) onto the four additions.
+- Bring the retirement family onto it: The Bitcoin Retirement, Escape Velocity and Compare Retirement Plans show year-by-year figures with no download; the Stress Test, Bitcoin Portfolio Allocation and How Much Cash each have a hand-built CSV.
+- Then the ten calculators with no ledger at all: Borrowing Against Your Stack, Bitcoin-Backed Mortgages, Your Deployment Plan, Lump Sum or Ladder In, Disciplined Rebalancing (a download for its trade log), What Daily Conviction Bought, Living on Bitcoin, Bitcoin and Fixed Income, the Hurdle Rate, Wait or Deploy Now.
+- Open: the sitewide name ("Show the calculation" or "Check the work"); whether "What went in" opens folded.
+- The pilot's CSV changes re-based four rePairQA vectors (E30, E31, P27, P28), which hash the CSV text. No figure moved.
+
 ## 2. Type system compliance
 
 - [x] **Coordinated §5.2 sweep across calculator/explorer-tier pages.** Multiple selectors per page violate STYLE_GUIDE §5.2 ("Cormorant at <1.3rem with weight ≥600"). The prescribed fix is mechanical — drop weight from 600 → 500 — but the surface area is large enough that it warrants a single coordinated pass with screenshot review. Status by page:
