@@ -559,7 +559,144 @@
     renderScenarioOptions(both);
     renderOutputs(result);
     renderChart(result);
+    renderLedger(both);
   }
+
+  // ════════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ════════
+  // Added 2026-11-26. The chart's lines year by year with the friction that
+  // separates them, then both scenarios' figures. Built from calculate() and
+  // scenarioEndPrice() as render() ran them; nothing here changes a figure.
+  var ledgerEl = document.getElementById('lobLedger');
+  function usd0(v){ return (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-US'); }
+  function ledgerSpec(both){
+    var sc = growthScenario, R = both[sc], h = R.h, B = R.B, M = R.M;
+    var f = parseFloat(feeSlider.value), g = parseFloat(capGainsSlider.value), m0 = todayMultiple();
+    var T = PC ? PC.titles(m0) : { stay: 'If bitcoin stays where it is against trend', trend: 'If bitcoin returns to trend over 3 years' };
+    var fees1 = 2 * 12 * M * (f / 100), taxable1 = R.deMinimisActive ? 0 : M * R.r, tax1 = taxable1 * (g / 100);
+    var nowYear = new Date().getUTCFullYear();
+    var rows = [];
+    for (var i = 0; i <= h; i++) rows.push({ i: i, smooth: liveBtcPrice * Math.pow(1 + R.r, i), path: scenarioEndPrice(sc, i), gross: R.lobGrossSeries[i], fees: fees1 * i, taxes: tax1 * i, net: R.lobNetSeries[i], dd: R.drawdownSeries[i] });
+    var ddWord = R.ddYear < h ? ' After the drop the line climbs back at one steady rate to meet Living on bitcoin at year ' + h + ', so the end state is the same as without it.' : ' The drop comes in the last year, so the end state takes it in full.';
+    var cols = [
+      { label: 'Year', unit: '', fmt: 'text', get: function(x){ return x.i === 0 ? 'Today' : 'Year ' + x.i; }, how: 'Today, then the end of each year of the horizon.' },
+      { label: 'Price, smoothed', unit: '$', fmt: 'usd', get: function(x){ return x.smooth; },
+        how: 'Today’s price (' + usd0(liveBtcPrice) + ') grown at the implied rate, ' + (R.r * 100).toFixed(1) + '% a year: the one rate that takes today’s price to the scenario’s price at year ' + h + '.' },
+      { label: 'Price on the scenario', unit: '$', fmt: 'usd', get: function(x){ return x.path; },
+        how: 'The Power Law trend at that date times the scenario’s multiple: ' + (sc === 'trend' ? 'today’s ' + m0.toFixed(2) + '× moving in a straight line to 1.0 over 3 years, then 1.0' : 'today’s ' + m0.toFixed(2) + '×, kept') + '. It meets the smoothed price at year ' + h + '; between, the calculator uses the smoothed one.' },
+      { label: 'Cash baseline', unit: '$', fmt: 'usd', get: function(){ return B; }, how: 'The float held in dollars, earning nothing: flat.' },
+      { label: 'Float in bitcoin', unit: '$', fmt: 'usd', get: function(x){ return x.gross; }, how: 'The float bought as bitcoin today, valued at the smoothed price: ' + usd0(B) + ' times the price over today’s. The coins stay the same because each month’s bills are sold and refilled in equal dollars.' },
+      { label: 'Fees to date', unit: '$', fmt: 'usd', get: function(x){ return x.fees; },
+        how: usd0(fees1) + ' a year: two conversions of ' + usd0(M) + ' a month (a sale to pay the bills, a buy from the paycheck), 12 months, ' + f.toFixed(1) + '% each, paid from income rather than the float.' },
+      { label: 'Taxes to date', unit: '$', fmt: 'usd', get: function(x){ return x.taxes; },
+        how: R.deMinimisActive ? 'None: the de-minimis toggle is on and each of the 12 monthly bills (' + usd0(M / 12) + ') is under $200.'
+          : usd0(tax1) + ' a year: the gain on a year of sales, ' + usd0(M) + ' a month of bitcoin held about a month, taken as ' + usd0(M) + ' × 12 × the rate ÷ 12 = ' + usd0(taxable1) + ', taxed at ' + g + '%.' },
+      { label: 'Living on bitcoin', unit: '$', fmt: 'usd', get: function(x){ return x.net; }, how: 'Float in bitcoin less fees and taxes to date: the chart’s orange line.' },
+      { label: 'Difference', unit: '$', fmt: 'usd', get: function(x){ return x.net - B; }, how: 'Living on bitcoin minus the cash baseline. The last row is the result.' },
+      { label: 'With the drawdown', unit: '$', fmt: 'usd', get: function(x){ return x.dd; },
+        how: 'The chart’s red line: the same as Living on bitcoin until year ' + R.ddYear + ', where the float’s value is halved before fees and taxes.' + ddWord }];
+    var keys = ['stay', 'trend'], col = function(fn){ return keys.map(function(k){ return fn(both[k], k); }); };
+    var fin = [
+      { label: 'Bitcoin’s price in ' + (nowYear + h), fmt: 'usd', values: col(function(x, k){ return scenarioEndPrice(k, h); }), how: 'The scenario’s price at the end of the horizon.' },
+      { label: 'Implied rate a year', fmt: 'pct', values: col(function(x){ return x.r; }), how: 'That price over today’s, to the power one over the years, minus one: each radio’s “about N% a year”.' },
+      { label: 'Gross appreciation', fmt: 'usd', values: col(function(x){ return x.grossAppreciation; }), how: 'The float’s value at the end minus the float: before fees and taxes.' },
+      { label: 'Conversion fees', fmt: 'usd', values: col(function(x){ return x.cumulativeFees; }), how: 'Fees to date at the last year.' },
+      { label: 'Taxes on conversions', fmt: 'usd', values: col(function(x){ return x.cumulativeTaxes; }), how: 'Taxes to date at the last year.' },
+      { label: 'Net differential', fmt: 'usd', values: col(function(x){ return x.differential; }), card: 'The result above for your scenario, and each scenario’s “nets” figure on its radio',
+        how: 'Gross appreciation less fees and taxes: what the practice nets against holding the float in dollars.' },
+      { label: 'Float at the drawdown’s bottom', fmt: 'usd', values: col(function(x){ return x.shockValueAtDdYear; }), how: 'With the drawdown, at year ' + R.ddYear + ': the callout’s “drops to” figure.' },
+      { label: 'Below the path then', fmt: 'usd', values: col(function(x){ return x.shockMagnitude; }), how: 'Living on bitcoin minus that, at year ' + R.ddYear + ': half the float’s value then.' },
+      { label: 'End state with the drawdown, against cash', fmt: 'usd', values: col(function(x){ return x.drawdownDelta; }), how: 'With the drawdown at year ' + h + ' minus the cash baseline.' + (R.ddYear < h ? ' The same as the net differential, because the line recovers to the path. The Math tab’s formula instead carries the 50% loss to the end (half the gross); the calculator doesn’t.' : '') }];
+    var dm = deMinimisToggle.checked ? (R.deMinimisActive ? 'on: each bill (' + usd0(M / 12) + ') is under $200, so no tax' : 'on, but each bill (' + usd0(M / 12) + ') is $200 or more, so tax applies') : 'off';
+    var inputs = [
+      ['Cash float', usd0(B)], ['Bills paid from bitcoin', usd0(M) + ' a month, as 12 bills'], ['Horizon', h + (h === 1 ? ' year' : ' years')],
+      ['Conversion fee', f.toFixed(1) + '% each way'], ['Capital gains rate', g + '%'], ['De-minimis', dm],
+      ['Bitcoin’s price', T[sc]], ['Today’s price', usd0(liveBtcPrice) + ' (' + m0.toFixed(2) + '× trend' + (liveBtcSource === 'live' ? ', live' : ', the latest sample') + ')'],
+      ['Drawdown stress', '−50% at the end of year ' + R.ddYear], ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    return {
+      hint: 'year by year, and both scenarios',
+      inputs: inputs.map(function(m){ return { label: m[0], value: m[1] }; }),
+      note: 'The chart’s three lines as a table, on the scenario picked, with the friction between them. The last table is the result and the radios’ figures, both scenarios.',
+      tabs: [{ id: 'years', label: 'Year by year', columns: cols, rows: rows, strong: function(x){ return x.i === h; } }],
+      final: { title: 'Over ' + h + (h === 1 ? ' year' : ' years'), csvTitle: 'Over ' + h + (h === 1 ? ' year' : ' years') + ', both scenarios', howTitle: 'How these figures are worked out', cols: [T.stay, T.trend], rows: fin },
+      csv: { filename: 'living-on-bitcoin.csv', meta: [
+        ['Last Coin Standing', 'Living on Bitcoin'],
+        ['Amounts', 'dollars before inflation'],
+        ['Page', function(){ return window.location.origin + window.location.pathname; }]] }
+    };
+  }
+  var LAST_BOTH = null;   // what render() last ran: the panel, the page and the QA read the same figures
+  function renderLedger(both){
+    LAST_BOTH = both;
+    if (!ledgerEl || !window.Ledger) return;
+    window.Ledger.render(ledgerEl, ledgerSpec(both));
+  }
+
+  // ── QA (console: lobQA()) ──
+  // The year rows rebuilt from the Math tab's formulas and against calculate(),
+  // the last table against both scenarios and the page's text, the CSV's
+  // shape; then a sweep of settings and both scenarios through render(),
+  // restoring the reader's settings after.
+  window.lobQA = function(){
+    var near = function(x, y){ return typeof x === 'number' && typeof y === 'number' && Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function holds(){
+      var sp = ledgerEl && ledgerEl._ledgerSpec, why = [];
+      if (!sp) return { ok: false, why: ['no ledger'] };
+      if (!window.Ledger.check(ledgerEl, { side: false })) why.push('Ledger.check');
+      // The figures render() ran with (the rate moves with the clock, a part in a
+      // billion a few seconds later), then a fresh run to show the drift is that small.
+      var R = LAST_BOTH[growthScenario], S2 = LAST_BOTH.stay, T2 = LAST_BOTH.trend, C = sp.tabs[0].columns, rows = sp.tabs[0].rows;
+      var fresh = calculate();
+      if (Math.abs(fresh.differential - R.differential) > 1e-6 * Math.max(1, Math.abs(R.differential))) why.push('a fresh run moved more than a part in a million');
+      var f = parseFloat(feeSlider.value), g = parseFloat(capGainsSlider.value), tax1 = (R.deMinimisActive ? 0 : R.M * R.r) * g / 100;
+      if (rows.length !== R.h + 1) why.push('rows');
+      rows.forEach(function(x){
+        var i = x.i;
+        if (!near(C[4].get(x), R.B * Math.pow(1 + R.r, i)) || !near(C[5].get(x), 0.24 * R.M * f * i) || !near(C[6].get(x), tax1 * i)
+          || !near(C[7].get(x), C[4].get(x) - C[5].get(x) - C[6].get(x)) || !near(C[7].get(x), R.lobNetSeries[i]) || !near(C[8].get(x), C[7].get(x) - R.B) || !near(C[9].get(x), R.drawdownSeries[i])
+          || !near(C[1].get(x) / liveBtcPrice, C[4].get(x) / R.B)) why.push('year ' + i);
+      });
+      var L = rows[rows.length - 1];
+      if (!near(C[1].get(L), C[2].get(L))) why.push('smoothed price meets the scenario at the end');
+      var fin = sp.final.rows;
+      [S2, T2].forEach(function(x, j){
+        if (!near(fin[1].values[j], x.r) || !near(fin[2].values[j], x.grossAppreciation) || !near(fin[3].values[j], x.cumulativeFees) || !near(fin[4].values[j], x.cumulativeTaxes) || !near(fin[5].values[j], x.differential) || !near(fin[6].values[j], x.shockValueAtDdYear) || !near(fin[8].values[j], x.drawdownDelta)) why.push('final column ' + (j + 1));
+        var help = document.querySelector('.projection-scenario-option[data-scenario="' + (j ? 'trend' : 'stay') + '"] [data-lob="help"]');
+        if (help && help.textContent.indexOf(fmtSignedCurrency(x.differential)) < 0) why.push('radio figure ' + (j + 1));
+      });
+      if (!near(C[8].get(L), R.differential)) why.push('last row against the result');
+      var t = function(id){ var e = document.getElementById(id); return e ? e.textContent : null; };
+      if (t('lobSummaryDifferential') !== fmtSignedCurrency(R.differential) || t('lobFeesTotal') !== fmtCurrencyFull(R.cumulativeFees) || t('lobTaxesTotal') !== fmtCurrencyFull(R.cumulativeTaxes)
+        || t('lobGrossAppreciation') !== fmtSignedCurrency(R.grossAppreciation) || t('lobDrawdownShockValue') !== fmtCurrencyFull(R.shockValueAtDdYear) || t('lobDrawdownShockMagnitude') !== fmtCurrencyFull(R.shockMagnitude)) why.push('page text');
+      var csv = window.Ledger.toCsv(sp);
+      if (!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 1 && csv.indexOf('# Over ') > 0)) why.push('csv shape');
+      return { ok: !why.length, why: why };
+    }
+    var out = [], live = holds();
+    out.push(['live panel: year rows from the formulas, both scenarios, the page text, CSV', live.ok, live.why.slice(0, 6).join('; ')]);
+    var els = [floatSlider, monthlyBills, horizonSlider, feeSlider, capGainsSlider, drawdownSlider];
+    var saved = { v: els.map(function(e){ return e.value; }), dm: deMinimisToggle.checked, sc: growthScenario, picked: scenarioPicked };
+    var V = [
+      [[5000, 2000, 5, 1.0, 22, 3], false, 'stay'], [[5000, 2000, 5, 1.0, 22, 3], false, 'trend'],
+      [[50000, 10000, 10, 3.0, 37, 10], false, 'trend'], [[1000, 0, 1, 0.4, 0, 1], false, 'stay'],
+      [[20000, 1500, 7, 0.8, 24, 2], true, 'trend'], [[20000, 3000, 7, 0.8, 24, 7], true, 'stay']];
+    try {
+      V.forEach(function(v){
+        els.forEach(function(e, k){ e.value = String(v[0][k]); });
+        deMinimisToggle.checked = v[1]; growthScenario = v[2]; scenarioPicked = true;
+        render();
+        var r = holds();
+        out.push(['sweep: $' + v[0][0] + ' float, $' + v[0][1] + ' a month, ' + v[0][2] + ' years, ' + v[0][3] + '% fee, ' + v[0][4] + '% tax, drawdown year ' + v[0][5] + (v[1] ? ', de-minimis' : '') + ', ' + v[2], r.ok, r.why.slice(0, 6).join('; ')]);
+      });
+    } finally {
+      els.forEach(function(e, k){ e.value = saved.v[k]; });
+      deMinimisToggle.checked = saved.dm; growthScenario = saved.sc; scenarioPicked = saved.picked;
+      render();
+    }
+    var ok = out.every(function(x){ return x[1]; });
+    if (window.console) console.table(out.map(function(x){ return { check: x[0], pass: x[1], why: x[2] }; }));
+    return { ok: ok, checks: out };
+  };
 
   // ─── Wire all sliders ───
   [floatSlider, monthlyBills, horizonSlider, feeSlider, capGainsSlider,

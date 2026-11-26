@@ -14,8 +14,8 @@ related:
     desc: "The growth model the Calculator on this page relies on for the BTC appreciation assumption. Sets the baseline for what 'compounding bitcoin' means quantitatively."
 companion: []
 eleventyComputed:
-  page_styles: "{% include '_pageassets/living-on-bitcoin.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/living-on-bitcoin.js' %}"
+  page_styles: "{% include '_pageassets/living-on-bitcoin.css' %}\n{% include '_pageassets/shared/ledger.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/ledger.js' %}\n{% include '_pageassets/living-on-bitcoin.js' %}"
   head_extras: "{% include '_pageassets/living-on-bitcoin-head.html' %}"
 ---
 <section class="hero">
@@ -400,6 +400,12 @@ eleventyComputed:
                 <strong>If bitcoin drops 50% at end of year <span id="lobDrawdownYearText">3</span>:</strong> your bitcoin float drops to <span id="lobDrawdownShockValue">$0</span> at the bottom &mdash; about <span id="lobDrawdownShockMagnitude">$0</span> below where the trajectory was just before the shock. Under Power Law assumptions the path recovers to trendline by year <span id="lobDrawdownHorizonYear">10</span>, so the end-state delta is small. The real cost lives in the recovery period: selling bitcoin at depressed prices to pay monthly bills while the trajectory rebuilds.
             </div>
         </div>
+
+        <!-- CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js), 2026-11-26.
+             The chart's lines year by year with the friction between them,
+             then both scenarios' figures. Rendered by renderLedger() from
+             render() in living-on-bitcoin.js. -->
+        <div class="lob-ledger" id="lobLedger"></div>
 
     </div>
 
