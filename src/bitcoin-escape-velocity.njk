@@ -24,8 +24,8 @@ faq:
     a: "Because nominal figures flatter the result. Part of any nominal escape is the dollar shrinking rather than the stack growing, so a real-dollar test is the harder one to pass. You can switch to nominal under &quot;Assumptions &mdash; change&quot; below the year-by-year strip; the verdict relabels itself and says what the switch changes."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-escape-velocity-head.html' %}"
-  page_styles: "{% include '_pageassets/bitcoin-escape-velocity.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/bitcoin-escape-velocity.js' %}"
+  page_styles: "{% include '_pageassets/bitcoin-escape-velocity.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/check-the-work.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/bitcoin-escape-velocity.js' %}"
 companion:
   - url: https://www.youtube.com/watch?v=aQhk4KKqMss&t=1549s
     title: "Every 0.2 Bitcoin Retires You 3 Years Faster — The Robin Seyr Podcast"
@@ -437,20 +437,13 @@ companion:
        copy. Its assumption controls are deliberately NOT repeated here: the
        section reads the page's single assumptions state and the summary line
        states it. -->
-  <section class="ev-section" id="verify" aria-label="Verify the math">
+  <section class="ev-section" id="verify" aria-label="Check the work">
     <div class="rt-accordion-item">
       <button type="button" class="rt-toggle" id="evVerifyToggle" aria-expanded="false" aria-controls="evVerifyBody">
-        <span class="rt-caret" aria-hidden="true">&#9656;</span> Verify the math &mdash; year by year
+        <span class="rt-caret" aria-hidden="true">&#9656;</span> Check the work <span class="ctw-hint">year by year</span>
       </button>
       <div class="rt-body" id="evVerifyBody" hidden>
-        <p class="rt-scenario-summary" id="evVerifySummary"></p>
-        <div class="rt-verify-head">
-          <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. All dollar columns &mdash; BTC price, stack value, withdrawal &mdash; follow the dollar basis on the assumptions card, so the identities above hold in either mode. Same projection that draws everything above.</p>
-          <div class="rt-csv-group">
-            <button type="button" class="rt-csv-btn" id="evCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
-            <button type="button" class="rt-csv-btn" id="evCsvDl"><span aria-hidden="true">&#8595;</span> Download CSV</button>
-          </div>
-        </div>
+        <div id="evVerifySummary"></div>
         <p class="rt-note rt-income-note" id="evIncomeNote"></p>
         <div class="rt-scroll">
           <table class="rt-table rt-verify-table">
@@ -459,6 +452,15 @@ companion:
             </thead>
             <tbody id="evVerifyRows"><!-- JS-populated --></tbody>
           </table>
+        </div>
+        <details class="re-ledger-how">
+          <summary>How each column is worked out</summary>
+          <p>Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. All dollar columns &mdash; BTC price, stack value, withdrawal &mdash; follow the dollar basis on the assumptions card, so the identities above hold in either mode. Same projection that draws everything above.</p>
+          <ul><li><strong>Phase:</strong> Before retirement, the retirement year, or drawing on the stack.</li><li><strong>BTC price:</strong> Bitcoin’s price that year on the price path chosen, in the dollars chosen above the table.</li><li><strong>Starting BTC:</strong> The BTC left at the end of the year before.</li><li><strong>Stack value:</strong> BTC price times BTC left.</li><li><strong>Withdrawal:</strong> Your annual withdrawal for that year: raised with inflation each year, or the same dollars every year, as you set it.</li><li><strong>BTC sold:</strong> Withdrawal divided by BTC price.</li><li><strong>BTC left:</strong> Starting BTC minus BTC sold.</li></ul>
+        </details>
+        <div class="ctw-actions">
+          <button type="button" class="rt-csv-btn" id="evCsvDl">Download CSV</button>
+          <button type="button" class="rt-csv-btn" id="evCsvBtn">Copy as CSV</button>
         </div>
         <p class="rt-note"><a href="/the-bitcoin-retirement" id="evFlagshipLink">Open this scenario in the full retirement calculator &rarr;</a> &mdash; that page is the audit surface, with the price chart, the accumulation phase, and the comparison columns this one leaves out.</p>
       </div>

@@ -27,8 +27,8 @@ faq:
     a: "Yes. Both plans, the bear toggle and a price scenario you picked are written into the address bar as you edit, along with a horizon or withdrawal basis that differs from the defaults, so copying the URL carries the exact comparison you are looking at. The reset link strips every parameter and returns both columns to their defaults."
 eleventyComputed:
   head_extras: "{% include '_pageassets/compare-retirement-plans-head.html' %}"
-  page_styles: "{% include '_pageassets/compare-retirement-plans.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/compare-retirement-plans.js' %}"
+  page_styles: "{% include '_pageassets/compare-retirement-plans.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/check-the-work.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/compare-retirement-plans.js' %}"
 ---
 
 <section class="hero">
@@ -230,18 +230,17 @@ eleventyComputed:
   <!-- ════════ VERIFY THE MATH (design §4.6) ════════
        The flagship's audit renderer, one collapsible per column, same
        reproduce-any-row identity. -->
-  <section class="crp-section" id="verify" aria-label="Verify the math">
+  <section class="crp-section" id="verify" aria-label="Check the work">
     <p class="crp-eyebrow">The arithmetic</p>
-    <h2 class="crp-h2">Verify the math</h2>
-    <p class="crp-lead">Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. Same projection that draws everything above, one table per plan.</p>
-    <p class="crp-csv-row"><button type="button" class="rt-csv-btn" id="crpCsvDl"><span aria-hidden="true">&#8595;</span> Download CSV, both plans</button></p>
+    <h2 class="crp-h2">Check the work</h2>
+    <p class="crp-lead">The same projection that draws everything above, one table per plan.</p>
 
     <div class="rt-accordion-item">
       <button type="button" class="rt-toggle" id="crpVerifyToggleA" aria-expanded="false" aria-controls="crpVerifyBodyA">
-        <span class="rt-caret" aria-hidden="true">&#9656;</span> Verify the math &mdash; Plan A
+        <span class="rt-caret" aria-hidden="true">&#9656;</span> Check the work <span class="ctw-hint">Plan A, year by year</span>
       </button>
       <div class="rt-body" id="crpVerifyBodyA" hidden>
-        <p class="rt-scenario-summary" id="crpVerifySummaryA"></p>
+        <div id="crpVerifySummaryA"></div>
         <div class="rt-scroll">
           <table class="rt-table rt-verify-table">
             <thead>
@@ -250,16 +249,21 @@ eleventyComputed:
             <tbody id="crpVerifyRowsA"></tbody>
           </table>
         </div>
+        <details class="re-ledger-how">
+          <summary>How each column is worked out</summary>
+          <p>Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>.</p>
+          <ul><li><strong>Phase:</strong> Before retirement, the retirement year, or drawing on the stack.</li><li><strong>BTC price:</strong> Bitcoin’s price that year on the price path chosen, in future dollars.</li><li><strong>Starting BTC:</strong> The BTC left at the end of the year before.</li><li><strong>Stack value:</strong> BTC price times BTC left.</li><li><strong>Withdrawal:</strong> The plan’s annual withdrawal for that year: raised with inflation each year, or the same dollars every year, as the plan sets it.</li><li><strong>BTC sold:</strong> Withdrawal divided by BTC price.</li><li><strong>BTC left:</strong> Starting BTC minus BTC sold.</li></ul>
+        </details>
         <p class="rt-note"><a href="/the-bitcoin-retirement" id="crpFlagshipLinkA">Open Plan A in the full retirement calculator &rarr;</a></p>
       </div>
     </div>
 
     <div class="rt-accordion-item">
       <button type="button" class="rt-toggle" id="crpVerifyToggleB" aria-expanded="false" aria-controls="crpVerifyBodyB">
-        <span class="rt-caret" aria-hidden="true">&#9656;</span> Verify the math &mdash; Plan B
+        <span class="rt-caret" aria-hidden="true">&#9656;</span> Check the work <span class="ctw-hint">Plan B, year by year</span>
       </button>
       <div class="rt-body" id="crpVerifyBodyB" hidden>
-        <p class="rt-scenario-summary" id="crpVerifySummaryB"></p>
+        <div id="crpVerifySummaryB"></div>
         <div class="rt-scroll">
           <table class="rt-table rt-verify-table">
             <thead>
@@ -268,8 +272,18 @@ eleventyComputed:
             <tbody id="crpVerifyRowsB"></tbody>
           </table>
         </div>
+        <details class="re-ledger-how">
+          <summary>How each column is worked out</summary>
+          <p>Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>.</p>
+          <ul><li><strong>Phase:</strong> Before retirement, the retirement year, or drawing on the stack.</li><li><strong>BTC price:</strong> Bitcoin’s price that year on the price path chosen, in future dollars.</li><li><strong>Starting BTC:</strong> The BTC left at the end of the year before.</li><li><strong>Stack value:</strong> BTC price times BTC left.</li><li><strong>Withdrawal:</strong> The plan’s annual withdrawal for that year: raised with inflation each year, or the same dollars every year, as the plan sets it.</li><li><strong>BTC sold:</strong> Withdrawal divided by BTC price.</li><li><strong>BTC left:</strong> Starting BTC minus BTC sold.</li></ul>
+        </details>
         <p class="rt-note"><a href="/the-bitcoin-retirement" id="crpFlagshipLinkB">Open Plan B in the full retirement calculator &rarr;</a></p>
       </div>
+    </div>
+    <div class="ctw-actions">
+      <button type="button" class="rt-csv-btn" id="crpCsvDl">Download CSV</button>
+      <button type="button" class="rt-csv-btn" id="crpCsvCopy">Copy as CSV</button>
+      <span class="ctw-hint">Both plans in one file.</span>
     </div>
   </section>
 

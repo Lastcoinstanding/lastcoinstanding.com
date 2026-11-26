@@ -29,8 +29,8 @@ faq:
     a: "The spending cut reduces withdrawals while the market sits below its pre-crash level, instead of selling a fixed amount into the low. The verdict states what the cut buys, extra years or a larger final stack, and what it costs in forgone spending. It is a real lever but not a free one: the arithmetic is years of living on less, and whether that is livable is a question the page cannot answer."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-stress-test-head.html' %}"
-  page_styles: "{% include '_pageassets/the-bitcoin-retirement-stress-test.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement-stress-test.js' %}"
+  page_styles: "{% include '_pageassets/the-bitcoin-retirement-stress-test.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/check-the-work.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/the-bitcoin-retirement-stress-test.js' %}"
 ---
 
 <section class="hero">
@@ -257,13 +257,11 @@ eleventyComputed:
   <!-- ════════ 6. AUDIT VIEW ════════ -->
   <section class="st-section" id="audit">
     <button class="st-audit-toggle" id="stAuditToggle" aria-expanded="false">
-      <span class="st-audit-label">Verify the math</span>
+      <span class="st-audit-label">Check the work</span>
       <span class="st-audit-hint">year-by-year, crashed path. The crash years show the depressed price and the extra BTC sold.</span>
     </button>
-    <div id="stAuditBody2" hidden>
-      <div class="st-audit-actions">
-        <button type="button" class="st-csv-btn" id="stCsvBtn"><span class="st-csv-label">Download CSV</span></button>
-      </div>
+    <div id="stAuditBody2" class="ctw-body" hidden>
+      <div id="stAuditInputs"></div>
       <div class="st-table-scroll">
         <table class="st-table st-audit-table">
           <thead><tr><th>Year</th><th class="st-num">BTC price</th><th class="st-num">Withdrawal</th><th class="st-num">BTC sold</th><th class="st-num">BTC left</th><th class="st-num">Stack USD</th></tr></thead>
@@ -272,6 +270,14 @@ eleventyComputed:
       </div>
       <p class="st-flex-summary" id="stFlexSummary" hidden></p>
       <p class="st-chart-caption"><span class="st-dot">▼</span> marks years the crash has depressed the price below trend. Notice the <strong>BTC sold</strong> column rise in those years: the same withdrawal now costs more sats. That is the mechanism, sequence risk made concrete. <span class="st-cut">✂</span> marks years the Spending cut lever reduced the withdrawal.</p>
+      <details class="re-ledger-how">
+        <summary>How each column is worked out</summary>
+        <ul><li><strong>BTC price:</strong> Bitcoin’s price that year on the crashed path: the trend, pushed down by the crash and its recovery.</li><li><strong>Withdrawal:</strong> Your annual withdrawal for that year, less the spending cut in the years it applies.</li><li><strong>BTC sold:</strong> Withdrawal divided by BTC price.</li><li><strong>BTC left:</strong> The BTC left the year before, plus any DCA before retirement, minus BTC sold.</li><li><strong>Stack USD:</strong> BTC price times BTC left.</li></ul>
+      </details>
+      <div class="ctw-actions">
+        <button type="button" class="st-csv-btn" id="stCsvBtn"><span class="st-csv-label">Download CSV</span></button>
+        <button type="button" class="st-csv-btn" id="stCsvCopy">Copy as CSV</button>
+      </div>
     </div>
   </section>
 

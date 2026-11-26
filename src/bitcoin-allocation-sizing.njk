@@ -23,7 +23,7 @@ faq:
     a: "That is a real decision with real tradeoffs — trimming after surges caps both risk and upside, and in a taxable account each trim is a taxable event. The sibling page <a href='/disciplined-rebalancing'>Disciplined Rebalancing</a> treats it fully."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-allocation-sizing-head.html' %}"
-  page_styles: "{% include '_pageassets/bitcoin-allocation-sizing.css' %}"
+  page_styles: "{% include '_pageassets/bitcoin-allocation-sizing.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
   page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/bitcoin-allocation-sizing.js' %}"
 ---
 
@@ -281,10 +281,10 @@ eleventyComputed:
   <!-- ════════ AUDIT ════════ -->
   <section class="as-section" id="audit">
     <button class="as-audit-toggle" id="asAuditToggle" aria-expanded="false">
-      <span class="as-audit-label">Verify the math</span>
+      <span class="as-audit-label">Check the work</span>
       <span class="as-audit-hint">extra return, drawdown, and portfolio influence for each allocation, computed from the stated assumptions.</span>
     </button>
-    <div id="asAuditBody2" hidden>
+    <div id="asAuditBody2" class="ctw-body" hidden>
       <div class="as-audit-actions">
         <button type="button" class="as-csv-btn" id="asCsvBtn"><span class="as-csv-label">Download CSV</span></button>
       </div>

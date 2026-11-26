@@ -44,8 +44,8 @@ faq:
     a: "No. It is an educational tool: you choose the assumptions, the math runs live, and you can export the full projection to CSV and check every number in your own spreadsheet. What you decide is yours; what we owe you is arithmetic you can verify."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-retirement-head.html' %}"
-  page_styles: "{% include '_pageassets/the-bitcoin-retirement.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/shared/retirement-quick-answer.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
+  page_styles: "{% include '_pageassets/the-bitcoin-retirement.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/check-the-work.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/retirement-engine.js' %}\n{% include '_pageassets/shared/retirement-quick-answer.js' %}\n{% include '_pageassets/the-bitcoin-retirement.js' %}"
 ---
 <div class="page">
 
@@ -245,17 +245,10 @@ eleventyComputed:
         <!-- View A: Verify the math -->
         <div class="rt-accordion-item">
           <button type="button" class="rt-toggle" id="rtVerifyToggle" aria-expanded="false" aria-controls="rtVerifyBody">
-            <span class="rt-caret" aria-hidden="true">&#9656;</span> Verify the math &mdash; year by year
+            <span class="rt-caret" aria-hidden="true">&#9656;</span> Check the work <span class="ctw-hint">year by year</span>
           </button>
           <div class="rt-body" id="rtVerifyBody" hidden>
-            <p class="rt-scenario-summary" id="rtVerifySummary"></p>
-            <div class="rt-verify-head">
-              <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold + any DCA added = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. The withdrawal grows with inflation each year. All dollar columns &mdash; BTC price, stack value, withdrawal &mdash; follow the nominal/real toggle, so the identities above hold in either mode. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
-              <div class="rt-csv-group">
-                <button type="button" class="rt-csv-btn" id="rtCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
-                <button type="button" class="rt-csv-btn" id="rtCsvDl"><span aria-hidden="true">&#8595;</span> Download CSV</button>
-              </div>
-            </div>
+            <div id="rtVerifySummary"></div>
             <p class="rt-note rt-income-note" id="rtIncomeNote"></p>
             <div class="rt-toggle-row">
               <span class="rt-basis-label">Bitcoin&rsquo;s price:</span>
@@ -285,6 +278,15 @@ eleventyComputed:
                 </thead>
                 <tbody id="rtVerifyRows"><!-- JS-populated --></tbody>
               </table>
+            </div>
+            <details class="re-ledger-how">
+              <summary>How each column is worked out</summary>
+              <p>Reproduce any row: <strong>Starting BTC &minus; BTC sold + any DCA added = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. The withdrawal grows with inflation each year. All dollar columns &mdash; BTC price, stack value, withdrawal &mdash; follow the nominal/real toggle, so the identities above hold in either mode. Same projection that draws the chart. <span class="rt-note-caveat">Pre-retirement DCA is approximated once per year at that year&rsquo;s trend price, so accumulation rows may not reconcile to the exact month.</span></p>
+              <ul><li><strong>Phase:</strong> Before retirement, the retirement year, or drawing on the stack.</li><li><strong>BTC price:</strong> Bitcoin’s price that year on the price path chosen, in the dollars chosen above the table.</li><li><strong>Starting BTC:</strong> The BTC left at the end of the year before, plus any DCA added during the year.</li><li><strong>Stack value:</strong> BTC price times BTC left.</li><li><strong>Withdrawal:</strong> Your annual withdrawal for that year: raised with inflation each year, or the same dollars every year, as you set it.</li><li><strong>BTC sold:</strong> Withdrawal divided by BTC price.</li><li><strong>BTC left:</strong> Starting BTC minus BTC sold.</li></ul>
+            </details>
+            <div class="ctw-actions">
+              <button type="button" class="rt-csv-btn" id="rtCsvDl">Download CSV</button>
+              <button type="button" class="rt-csv-btn" id="rtCsvBtn">Copy as CSV</button>
             </div>
           </div>
         </div>

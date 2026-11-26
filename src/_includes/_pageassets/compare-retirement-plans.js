@@ -711,11 +711,14 @@
     tb.innerHTML = html;
 
     var sm = document.getElementById(summaryId);
-    if (sm) {
-      sm.innerHTML = '<strong>' + formatBtc(c.scn.btcStack) + ' BTC</strong>, retiring <strong>' + c.scn.retirementYear +
-        '</strong>, drawing <strong>' + formatUsdFull(c.scn.targetIncomeUSD) + '</strong> a year ' + (c.scn.incomeBasis === 'fixed' ? 'fixed in future dollars' : 'in today&rsquo;s dollars') + ' over ' +
-        yearsWord(c.scn.yearsInRetirement) + '. Inflation ' + MA.get('inflation').value + '%, ' +
-        lowerFirst(basisWords(BASIS).title) + (BASIS === 'floor' ? PC.floorFall(E.currentRatio()).tag : '') + (BEAR ? ', with the bear-market test on' : '') + '.';
+    if (sm && window.CheckTheWork) {
+      // "What went in" (Check the work): the settings the CSV lists for this plan.
+      sm.innerHTML = window.CheckTheWork.inputsHtml([
+        ['Bitcoin stack at retirement', formatBtc(c.scn.btcStack) + ' BTC'], ['Retirement year', String(c.scn.retirementYear)],
+        ['Annual withdrawal', formatUsdFull(c.scn.targetIncomeUSD) + (c.scn.incomeBasis === 'fixed' ? ', the same every year' : ', rising with inflation')],
+        ['Years in retirement', String(c.scn.yearsInRetirement)], ['Inflation', MA.get('inflation').value + '% a year'],
+        ['Bitcoin\u2019s price', basisWords(BASIS).title + (BASIS === 'floor' ? PC.floorFall(E.currentRatio()).tag : '')],
+        ['Bear-market test', BEAR ? 'on' : 'off'], ['Dollars shown', 'future (nominal)']]);
     }
     var lk = document.getElementById(linkId);
     if (lk) lk.setAttribute('href', flagshipHref(c.scn));
@@ -756,14 +759,9 @@
   function wireCsv() {
     var dl = document.getElementById('crpCsvDl');
     if (!dl) return;
-    dl.addEventListener('click', function () {
-      if (!LAST_COLS) return;
-      var blob = new Blob([buildCsv(LAST_COLS)], { type: 'text/csv' });
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'compare-retirement-plans.csv';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    });
+    dl.addEventListener('click', function () { if (LAST_COLS) window.CheckTheWork.download(buildCsv(LAST_COLS), 'compare-retirement-plans.csv'); });
+    var cp = document.getElementById('crpCsvCopy');
+    if (cp) cp.addEventListener('click', function () { if (LAST_COLS) window.CheckTheWork.copy(buildCsv(LAST_COLS), cp); });
   }
   window.crpCsvQA = function () { return LAST_COLS ? buildCsv(LAST_COLS) : null; };
 
