@@ -3010,6 +3010,17 @@ A daily dollar-cost-averaging backtest. Pick a start date and a daily amount; th
 - **BTC-bought copy (v1.2)** reframed as the second-decade insight (the first decade's ~11.3 BTC vs ~0.24 on the trend path next; the floor path gathers more than twice the trend's coins).
 - **Consistency:** the FAQ "is this a prediction?" answer and the closing prose read "retrospective at its core, with one forward band-scenario element — a range, not a forecast" (v1.2 prose sweep: "a range, never a number" / "two paths and a history of brief spikes above them"). Parity gate P1 figures unchanged (the forward block and IRR do not touch the retrospective sim). No new external data → DATA_AUDIT unchanged.
 
+### Check the work (2026-11-26)
+
+Under the forward block (`#dcLedger`), on the shared ledger (STYLE_GUIDE §6.49).
+
+- **What went in:** the daily amount, the start, the last sample the habit runs to, the days, how a day's price is read (log-linear between samples, and their spacing), the price the current value uses (live or the last sample's), the forward scenario, the date.
+- **By month / By year:** `simulate()`'s daily loop, in its order, totalled: days, invested, bitcoin bought, average price paid, bitcoin held, invested to date, the price and value on the last day bought, and the multiple. The last row (bold) is the stack: its bitcoin and invested are the cards; its value is at the last sample's price, as the chart's end is.
+- **If the habit continued:** `forwardBands()` cut at each year end: bought, held, price and value on the floor path and the trend path; Year 10 (bold) is the two cards. The sentence says the forward buys start tomorrow, so the days between the record's last sample and today are in neither.
+- **Your habit:** every card (days, invested, bitcoin, *Current value* marked, multiple, the money-weighted return and the day-one CAGR the tooltip quotes, peak value, deepest drawdown, longest underwater, first $1,000,000) and both forward cards, with the dates in the sentences.
+- **CSV:** `what-daily-conviction-bought.csv`: the page with its `?amt=` and `start=`, the inputs, the three tables with their sentences, and the cards.
+- **QA: `dcQA()`** (console). `Ledger.check(el, { side: false })`; every month and year row (invested is days times the amount, average price, the bitcoin chain, the day's price from `interp()`, value and multiple) and both tables' totals against `simulate()`; the forward rows against `forwardBands()`; the last table against `simulate()`, `annualReturns()` and the cards' text, the first-million sentence and the underwater card; the CSV's shape; and seven starts and amounts through `render()` ($1 from the first sample to $1,000 from the latest start), restoring the reader's settings and link after. No figure changed: every card and its line, the lead sentence, the forward cards and sentence, the handoff link and the chart's data compared identical with `main` in seven states.
+
 ### Deferred (still, after v1.1)
 Worst-day / cycle-top start presets remain consciously deferred by JM — no cycle-top framing anywhere; only neutral convenience presets (Jan 2017 / 5 years ago / 1 year ago). The v1.1 candidate in PAGE_IDEAS_BACKLOG.
 
@@ -3619,7 +3630,7 @@ One engine and one set of components for §14 and §14.1, so the two pages can't
 |---|---|---|
 | `real-estate-model.js` | `RealEstateModel` | Every calculation on both pages (PR 3 extracted it byte-identical, then PRs 4–7 built on it): `PAIR_DEFAULTS`, `RENTAL_DEFAULTS`, `YIELD_RATES`; the scenarios (M3); the deflator; the tax functions; `bvreRetro`, `bvreProjection`, `ledgerRetro`; `computeAll`, the trajectories and `rentalLedger` for the rental page |
 | `real-estate-baseline.js` (+ `components/real-estate-baseline.njk`) | `RealEstateBaseline` | The shared Baseline assumptions (appreciation and deflator), their presets, the frame line; the njk holds the pair's shared tooltips and option lists (§14, PR 4f) |
-| `ledger.js` / `ledger.css` (until 2026-11-26 `real-estate-ledger.js` / `.css`) | `Ledger` (was `RealEstateLedger`) | *Check the work*: What went in, tabs, the final rows, the sentences, the CSV (STYLE_GUIDE §6.49). Shared beyond housing since Borrowing Against Your Stack (§21); also Bitcoin-Backed Mortgages (§21), Your Deployment Plan (§33), Lump Sum or Ladder In (§32) and Disciplined Rebalancing (§62) |
+| `ledger.js` / `ledger.css` (until 2026-11-26 `real-estate-ledger.js` / `.css`) | `Ledger` (was `RealEstateLedger`) | *Check the work*: What went in, tabs, the final rows, the sentences, the CSV (STYLE_GUIDE §6.49). Shared beyond housing since Borrowing Against Your Stack (§21); also Bitcoin-Backed Mortgages (§21), Your Deployment Plan (§33), Lump Sum or Ladder In (§32), Disciplined Rebalancing (§62) and What Daily Conviction Bought (§43) |
 | `real-estate-chart.js` (+ `real-estate-chart.css`, which also styles the grid) | `RealEstateChart` | The tenant page's wealth charts (the rental page draws its own, in the same colours and line styles) |
 | `real-estate-grid.js` | `RealEstateGrid` | The sensitivity grid, built so the retirement flagship can adopt it (STYLE_GUIDE §6.49) |
 | `real-estate-carry.js` | `RealEstateCarry` | The pair's URL vocabulary and the carrying links (§46, §53.2) |
