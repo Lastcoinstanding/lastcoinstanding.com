@@ -38,8 +38,8 @@ faq:
 companion: []
 eleventyComputed:
   head_extras: "{% include '_pageassets/disciplined-rebalancing-head.html' %}"
-  page_styles: "{% include '_pageassets/disciplined-rebalancing.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/spike-record.js' %}\n{% include '_pageassets/shared/rule-engine.js' %}\n{% include '_pageassets/disciplined-rebalancing.js' %}"
+  page_styles: "{% include '_pageassets/disciplined-rebalancing.css' %}\n{% include '_pageassets/shared/ledger.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/spike-record.js' %}\n{% include '_pageassets/shared/rule-engine.js' %}\n{% include '_pageassets/shared/ledger.js' %}\n{% include '_pageassets/disciplined-rebalancing.js' %}"
   body_chrome: "{% include '_pageassets/bitcoin-vs-real-estate-chrome.html' %}"
 ---
 {% import 'components/real-estate-baseline.njk' as reb %}
@@ -306,6 +306,13 @@ eleventyComputed:
           <p class="dr2-small">&ldquo;Round trip&rdquo; is the bitcoin held after buying back, as a multiple of what you held before the sale. &ldquo;Your stack&rdquo; carries every earlier cycle forward, with this cycle&rsquo;s change below it. &ldquo;vs HODL&rdquo; is the bitcoin you hold after the cycle minus the bitcoin you started with, and &ldquo;Worth today&rdquo; is that difference <span id="dr2WorthNote">at today&rsquo;s price</span>, before tax in a taxable account. Prices are the site&rsquo;s ~12-day series, so a rule fires on the first sample past its level.</p>
           <div class="dr2-fail" id="dr2FailBox"></div>
         </section>
+
+        <!-- CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js), 2026-11-26.
+             The trade log behind the cycle table and the headline results:
+             every sale and buy back, the round trips they make, then both
+             headline runs, with a CSV. Rendered by renderLedger() from
+             render() in disciplined-rebalancing.js. -->
+        <div class="dr-ledger" id="drLedger"></div>
 
         <!-- 4. CHARTS -->
         <section class="dr2-card" aria-labelledby="dr2HCh">
