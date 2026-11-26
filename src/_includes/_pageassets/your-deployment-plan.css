@@ -169,22 +169,7 @@ body[data-dp-view="retrospective"] #dpSumRow { display: none; }
 .dp-style button:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 .dp-style .help-tip .tip-content { font-weight: 400; text-align: left; }
 
-/* Expandable "show all entries" evidence table under the median headline */
-.dp-detail { margin: 1rem 0 0; }
-.dp-detail-toggle { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(224,148,34,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 0.5rem 0.95rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
-.dp-detail-toggle:hover { background: rgba(224,148,34,0.1); color: var(--text); }
-.dp-detail-caret { display: inline-block; font-size: 0.7rem; color: var(--amber); transition: transform 0.18s; }
-.dp-detail-toggle[aria-expanded="true"] .dp-detail-caret { transform: rotate(90deg); }
-.dp-detail-body { margin: 0.9rem 0 0; }
-.dp-detail-body[hidden] { display: none; }
-.dp-detail-note { font-family: 'Inter', sans-serif; font-size: 0.78rem; line-height: 1.6; color: var(--text-muted); margin: 0 0 0.6rem; }
-.dp-detail-note strong { color: var(--text-dim); font-weight: 600; }
-.dp-detail-table { font-size: 0.82rem; }
-.dp-detail-table tbody tr.dp-detail-median { border-bottom: 2px solid rgba(224,148,34,0.35); }
-.dp-detail-table tbody tr.dp-detail-median th { color: var(--amber); font-weight: 700; }
-.dp-detail-table tbody tr.dp-detail-median td { color: var(--text); font-weight: 600; }
-.dp-detail-table .dp-detail-xt { color: var(--text-muted); }
-.dp-detail-table .dp-detail-blank { color: var(--text-muted); opacity: 0.5; }
+/* The "show all entries" table moved into Check the work (shared/ledger.js), 2026-11-26. */
 
 /* Position-aware cross-link to the timing page */
 .dp-timing-link { max-width: 1100px; margin: 2.4rem auto 0; font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.65; border-radius: 10px; padding: 1rem 1.3rem; }

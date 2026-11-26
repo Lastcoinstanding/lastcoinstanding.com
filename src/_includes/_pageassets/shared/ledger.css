@@ -16,3 +16,5 @@
 .re-ledger-unit { display: block; font-weight: 400; font-size: 0.66rem; opacity: 0.8; }
 .re-ledger-final { min-width: 22rem; }
 .re-ledger-final .re-ledger-strong td { font-weight: 700; color: var(--text, var(--ink, #ccc6b8)); }
+/* A tab's own strong row (tabs[].strong), e.g. the median above the entries. */
+.re-ledger-table tbody tr.re-ledger-strong td { font-weight: 700; color: var(--text, var(--ink, #ccc6b8)); }
