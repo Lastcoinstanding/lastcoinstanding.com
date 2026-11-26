@@ -1757,6 +1757,16 @@ Under the Borrow vs. Sell vs. HODL tab's three cards and caveat, outside the sec
 - **QA: `basQA()`** (console). The panel's order and clarity additions (`Ledger.check(el, { side: false })`); the marked row and Side by side's last row against the cards and the block; the Today row against Loan Health (LTV, liquidation price, fall, multiple of trend) and Year 1's interest against its annual interest; every row's arithmetic; the CSV's shape; and six vectors through the engine (both scenarios, 1 to 15 years, a gain to tax, a price above trend, each path infeasible). With no loan, the cards show none and the panel isn't drawn; `basQA()` says so.
 - **Two things the table makes visible, both existing behaviour:** (1) on a falling path (a price above trend returning to it) LTV can rise past the liquidation LTV; the comparison doesn't liquidate, as the caveat under the cards says, and the LTV sentence says so too. (2) The cost basis auto-fills from the seed price before the live price arrives, so by default it can differ from today's price (in a local run on 26 Nov: the 4 Nov sample's $80,400 against a live $60,400); the sell path then shows no gain to tax. Recorded, not changed.
 
+### Bitcoin-Backed Mortgages: Check the work (2026-11-26)
+
+The mortgage page has no section of its own here; its Check the work is recorded beside its parent's. Under the calculator's box (outside it, for the column's full width on a phone), on the shared ledger:
+
+- **What went in:** home price, down payment (% and dollars), years, pay-off year, bitcoin price today, today's trend and multiple, cost basis, standard rate, premium, tax rate, the scenario's short name, the date. From the values `compute()` ran with.
+- **Three tabs, Today to the horizon:** *Pledge path* (base-rate interest to date, premium to date, their sum, the bitcoin pledged); *Sell path* (bitcoin price on the scenario, the bitcoin sold and its tax today, the forgone value each year); *Side by side* (the chart's two lines, Sell minus pledge, which is cheaper). The tables read the engine's own yearly series (`pathFor()`, which already fed the chart), so the last row is the cards.
+- **The two paths at the horizon:** the cards' rows, *Cost at year N* marked.
+- **QA: `bbmQA()`** (console). `Ledger.check(el)` in full (the Side by side tab is housing-shaped); the marked row against the cards' figures and text; the difference against the verdict and the block; every row's arithmetic and price path; the crossover falling between the rows where *Cheaper* changes; the CSV's shape; and six settings run through the page itself (3 to 30 years, both scenarios, a gain to tax, an early pay-off, a large home at the top rate and premium, a price above trend), restoring the reader's settings after. No figure changed: every output and the chart's data compared identical with `main` in eight states.
+- **What it shows about the model:** the pledge path's cost leaves out the second-lien loan (TECH_DEBT §1.x, awaiting JM's ruling); the sentences say so, and the Side by side tab's Today row makes it plain (pledge $0, sell the down payment).
+
 ### The Math tab — CAGR-vs-rates chart
 
 `cagrVsRatesChart` displays two stories simultaneously:
