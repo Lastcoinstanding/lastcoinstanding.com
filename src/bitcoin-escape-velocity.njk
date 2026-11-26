@@ -446,7 +446,10 @@ companion:
         <p class="rt-scenario-summary" id="evVerifySummary"></p>
         <div class="rt-verify-head">
           <p class="rt-note">Reproduce any row: <strong>Starting BTC &minus; BTC sold = BTC left</strong>; <strong>price &times; BTC left = stack value</strong>; <strong>withdrawal &divide; price = BTC sold</strong>. All dollar columns &mdash; BTC price, stack value, withdrawal &mdash; follow the dollar basis on the assumptions card, so the identities above hold in either mode. Same projection that draws everything above.</p>
-          <button type="button" class="rt-csv-btn" id="evCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
+          <div class="rt-csv-group">
+            <button type="button" class="rt-csv-btn" id="evCsvBtn"><span aria-hidden="true">&#8595;</span> Copy as CSV</button>
+            <button type="button" class="rt-csv-btn" id="evCsvDl"><span aria-hidden="true">&#8595;</span> Download CSV</button>
+          </div>
         </div>
         <p class="rt-note rt-income-note" id="evIncomeNote"></p>
         <div class="rt-scroll">

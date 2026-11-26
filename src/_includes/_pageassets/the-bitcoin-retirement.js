@@ -1105,7 +1105,20 @@
     }
   }
 
+
+  // Download the same CSV as a file (the ledger rollout, 2026-11-26;
+  // CHECK_THE_WORK_AUDIT). One builder, two ways out: copy, or a file.
+  function downloadCsvFile(text, filename) {
+    var blob = new Blob([text], { type: 'text/csv' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
   function wireRtCsv() {
+    var dl = document.getElementById('rtCsvDl');
+    if (dl) dl.addEventListener('click', function () { if (LAST_STACK) downloadCsvFile(buildRtCsv(LAST_STACK), 'the-bitcoin-retirement.csv'); });
     var btn = document.getElementById('rtCsvBtn');
     if (!btn) return;
     var originalHtml = btn.innerHTML;

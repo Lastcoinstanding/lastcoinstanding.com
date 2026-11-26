@@ -1204,6 +1204,17 @@
     document.body.removeChild(ta);
   }
 
+
+  // Download the same CSV as a file (the ledger rollout, 2026-11-26;
+  // CHECK_THE_WORK_AUDIT). One builder, two ways out: copy, or a file.
+  function downloadCsvFile(text, filename) {
+    var blob = new Blob([text], { type: 'text/csv' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
   function wireVerify() {
     var btn = document.getElementById('evVerifyToggle');
     var body = document.getElementById('evVerifyBody');
@@ -1214,6 +1225,8 @@
         body.hidden = open;
       });
     }
+    var dl = document.getElementById('evCsvDl');
+    if (dl) dl.addEventListener('click', function () { if (LAST_PROJ) downloadCsvFile(buildCsv(LAST_PROJ), 'bitcoin-escape-velocity.csv'); });
     var csv = document.getElementById('evCsvBtn');
     if (!csv) return;
     var originalHtml = csv.innerHTML;

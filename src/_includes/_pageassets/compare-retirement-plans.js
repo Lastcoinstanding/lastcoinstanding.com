@@ -721,6 +721,52 @@
     if (lk) lk.setAttribute('href', flagshipHref(c.scn));
   }
 
+  // CSV of both plans (the ledger rollout, 2026-11-26; CHECK_THE_WORK_AUDIT).
+  // The flagship's export, one block per plan: the settings that produced
+  // the tables, then the Verify-the-math rows as shown (future dollars).
+  function buildCsv(cols) {
+    var L = ['# Last Coin Standing \u2014 Compare Retirement Plans'];
+    L.push('# Inflation,' + MA.get('inflation').value + '%');
+    L.push('# Price path,' + basisWords(BASIS).title + (BASIS === 'floor' ? PC.floorFall(E.currentRatio()).tag : ''));
+    L.push('# Bear-market test,' + (BEAR ? 'on' : 'off'));
+    L.push('# Dollar basis,nominal (future dollars)');
+    L.push('# Live scenario URL,' + window.location.href);
+    cols.forEach(function (c, n) {
+      var s = c.scn, name = 'Plan ' + (n === 0 ? 'A' : 'B');
+      L.push('');
+      L.push('# ' + name);
+      L.push('# Bitcoin stack,' + s.btcStack + ' BTC');
+      L.push('# Retirement year,' + s.retirementYear);
+      L.push('# Annual withdrawal,' + Math.round(s.targetIncomeUSD));
+      L.push('# Years in retirement,' + s.yearsInRetirement);
+      L.push('# Withdrawal basis,' + (s.incomeBasis === 'fixed' ? 'same every year' : 'rises with inflation'));
+      L.push('Year,Phase,BTC price (nominal),Starting BTC,Stack value USD,Withdrawal USD,BTC sold,BTC left');
+      (c.proj.btcPoints || []).forEach(function (r) {
+        L.push([r.x, r.phase,
+          r.price != null ? Math.round(r.price) : '',
+          r.btc != null ? (r.btc + (r.btcSold || 0)).toFixed(4) : '',
+          r.usd != null ? Math.round(r.usd) : '',
+          r.income != null ? Math.round(r.income) : '',
+          r.btcSold != null ? r.btcSold.toFixed(6) : '',
+          r.btc != null ? r.btc.toFixed(4) : ''].join(','));
+      });
+    });
+    return L.join('\n');
+  }
+  function wireCsv() {
+    var dl = document.getElementById('crpCsvDl');
+    if (!dl) return;
+    dl.addEventListener('click', function () {
+      if (!LAST_COLS) return;
+      var blob = new Blob([buildCsv(LAST_COLS)], { type: 'text/csv' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'compare-retirement-plans.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    });
+  }
+  window.crpCsvQA = function () { return LAST_COLS ? buildCsv(LAST_COLS) : null; };
+
   /* ═══════════════════════════════════════════════════════════
      CARRY (design §6). Senders speak the receiver's vocabulary — the
      retirement family's existing param names, verified against the
@@ -1197,6 +1243,7 @@
   }
 
   function init() {
+    wireCsv();
     readUrl();
     var bear = document.getElementById('crpBearToggle');
     if (bear) bear.checked = BEAR;
