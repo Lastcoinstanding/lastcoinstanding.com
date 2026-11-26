@@ -906,20 +906,35 @@
     });
     body.innerHTML = rows;
     _lastC = c;
+    var inp = document.getElementById('hcAuditInputs');
+    if (inp && window.CheckTheWork) inp.innerHTML = window.CheckTheWork.inputsHtml(auditInputs(c));
   }
-  function csv() {
-    var c = _lastC; if (!c) return;
+  // Check the work, "What went in": from the one compute(state) result, never the DOM (STYLE_GUIDE 6.49).
+  function auditInputs(c) {
+    var it = [
+      ['Your position', c.mult.toFixed(2) + '\u00d7 trend' + (c.isToday ? ' (today)' : '')],
+      ['Price at that position', usdFull(c.P)],
+      ['Share you would sell', c.share + '%'],
+      ['Tax on the sale', c.tax + '%'],
+      ['Rebuy target', c.atCap ? 'The first lower position against trend, within two years' : ratioOf(c.rebuyTargetPos).toFixed(2) + '\u00d7 trend'],
+      ['Historical entries used', String(c.n)],
+      ['Neighborhood', c.half <= 0.08 ? '\u00b1' + c.half.toFixed(2) + ' of this position' : 'Widened to keep a workable sample'],
+      ['Record', 'Since 2014, full two-year forward record']
+    ];
+    if (c.stack != null && isFinite(c.stack) && c.stack > 0) it.splice(2, 0, ['Your stack', stackFmt(c.stack) + ' BTC']);
+    return it;
+  }
+  function csvText() {
+    var c = _lastC; if (!c) return '';
     var lines = ['entry_date,position_x_trend,entry_price_usd,rebuy_date,rebuy_price_usd,dip_arrived,discount_pct,after_tax_bitcoin_multiple'];
     c.outcomes.forEach(function (o) {
       lines.push([monthYear(o.d0), ratioOf(o.P).toFixed(3), Math.round(o.p0),
         o.arrived ? monthYear(o.waitDay) : 'no-dip-2y', Math.round(o.waitPrice),
         o.arrived ? 'yes' : 'no', (o.disc * 100).toFixed(1), o.rt.toFixed(4)].join(','));
     });
-    var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'how-much-cash.csv'; a.click();
-    URL.revokeObjectURL(a.href);
+    return lines.join('\n');
   }
+  function csv() { var t = csvText(); if (t && window.CheckTheWork) window.CheckTheWork.download(t, 'how-much-cash.csv'); }
 
   // ── Mirrored share control (§6.35: two representations, one state) ──
   function syncShare(from) {
@@ -1052,6 +1067,7 @@
       if (b && b.hidden) { b.hidden = false; if (t) t.setAttribute('aria-expanded', 'true'); }
     });
     on('hcCsvBtn', 'click', csv);
+    on('hcCsvCopy', 'click', function () { var t = csvText(); if (t && window.CheckTheWork) window.CheckTheWork.copy(t, this); });
     initControls();
   }
 

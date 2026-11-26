@@ -2238,7 +2238,7 @@ Grow the hit area of an inline text link with **vertical padding** (`padding: 0.
 - **Name:** *Check the work*. Retired: "Show the calculation", "Verify the math". A muted hint may follow it ("year by year", "Plan A, year by year").
 - **Entry point:** a boxed row with a caret (the retirement family's accordion row). Open, it is the head of an amber-bordered panel.
 - **Order inside, always:** *What went in* (the settings, as a grid) → the table or tables → *How each column is worked out* (folded; one sentence per column, with the reproduce-any-row identity as its lead where the page has one) → **Download CSV**, then **Copy as CSV**. Both buttons, those labels, that order, last.
-- **Where it stands:** the four real-estate ledgers and the four retirement pages carry the full treatment. Bitcoin Portfolio Allocation and How Much Cash carry the name and the entry row only; their insides are still their own (TECH_DEBT §1.x).
+- **Where it stands:** the four real-estate ledgers, the four retirement pages, Bitcoin Portfolio Allocation and How Much Cash carry the full treatment (the last two since 2026-11-26, on their own tables via `shared/check-the-work.js`). How Much Cash keeps its two closing notes (the identity, the two limits) between the column sentences and the buttons. Its CSV carries no settings header yet (TECH_DEBT §1.x).
 - A page keeps its own table and engine. What is shared is the presentation around it. New pages use `RealEstateLedger` (it renders the whole treatment) unless they already have an audit table.
 
 Two components built for the real-estate pair (SITE_GUIDE §55.4) are now house components: a calculator page that needs either uses the module, not a copy.

@@ -197,9 +197,6 @@ body { background: var(--bg); color: var(--text); }
 .as-audit-toggle[aria-expanded="true"]::before { content: '\2212'; }
 .as-audit-label { font-family: var(--font-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); }
 .as-audit-hint { font-family: var(--font-b); font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
-.as-audit-actions { display: flex; justify-content: flex-end; margin: 1rem 0 0.4rem; }
-.as-csv-btn { font-family: var(--font-b); font-size: 0.78rem; color: var(--text-dim); background: rgba(224,148,34,0.05); border: 1px solid rgba(224,148,34,0.2); border-radius: 999px; padding: 0.45rem 0.95rem; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
-.as-csv-btn:hover { background: rgba(224,148,34,0.12); color: var(--amber); border-color: rgba(224,148,34,0.4); }
 
 /* ══════════ YOUR PORTFOLIO, YEAR BY YEAR (drift chart) ══════════ */
 .as-drift-sub { margin-bottom: 1.1rem; }

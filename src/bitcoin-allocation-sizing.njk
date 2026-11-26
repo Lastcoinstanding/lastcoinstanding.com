@@ -24,7 +24,7 @@ faq:
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-allocation-sizing-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-allocation-sizing.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
-  page_scripts: "{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/bitcoin-allocation-sizing.js' %}"
+  page_scripts: "{% include '_pageassets/shared/check-the-work.js' %}\n{% include '_pageassets/shared/modeling-assumptions.js' %}\n{% include '_pageassets/shared/calculator-helpers.js' %}\n{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/crash-model.js' %}\n{% include '_pageassets/bitcoin-allocation-sizing.js' %}"
 ---
 
 <section class="hero">
@@ -285,16 +285,24 @@ eleventyComputed:
       <span class="as-audit-hint">extra return, drawdown, and portfolio influence for each allocation, computed from the stated assumptions.</span>
     </button>
     <div id="asAuditBody2" class="ctw-body" hidden>
-      <div class="as-audit-actions">
-        <button type="button" class="as-csv-btn" id="asCsvBtn"><span class="as-csv-label">Download CSV</span></button>
-      </div>
+      <div id="asAuditInputs"></div>
       <div class="as-tablewrap">
         <table class="as-table">
           <thead id="asAuditHead"><tr><th>Allocation</th><th class="as-num">Portfolio upside</th><th class="as-num">Extra return</th><th class="as-num">Drawdown</th><th class="as-num">Influence</th></tr></thead>
           <tbody id="asAuditBody"></tbody>
         </table>
       </div>
-      <p class="as-chart-caption">Portfolio upside is the weighted single-hold multiple from the horizon, the sleeve rate, and bitcoin&rsquo;s Power Law projection. Extra return is that against the no-bitcoin multiple. Drawdown is the allocation times the crash depth. Portfolio influence is bitcoin&rsquo;s share of total portfolio variance, given bitcoin volatility 45%, the sleeve 12%, and a 0.50 correlation, and matches the published reference points (a 10% position drives about a quarter of the movement).</p>
+      <details class="re-ledger-how">
+        <summary>How each column is worked out</summary>
+        <p>Any row can be rebuilt from the settings above: take the allocation as a fraction, then follow the four columns.</p>
+        <ul>
+          <li><strong>Portfolio upside:</strong> the allocation times bitcoin&rsquo;s multiple over the hold, plus the rest times the traditional sleeve&rsquo;s multiple. Bitcoin&rsquo;s multiple comes from the Power Law projection showing; the sleeve&rsquo;s is its yearly rate compounded over the horizon.</li>
+          <li><strong>Extra return:</strong> portfolio upside divided by the no-bitcoin multiple (the traditional sleeve alone), minus one.</li>
+          <li><strong>Drawdown:</strong> the allocation times the crash depth. It is the fall in the whole portfolio if bitcoin drops that far and the rest holds still.</li>
+          <li><strong>Influence:</strong> bitcoin&rsquo;s share of total portfolio variance, given bitcoin volatility 45%, the sleeve 12%, and a 0.50 correlation. It matches the published reference points (a 10% position drives about a quarter of the movement).</li>
+          <li><strong>Drawdown $:</strong> shown when you set a portfolio. The drawdown times your total.</li>
+        </ul>
+      </details>
 
       <h3 class="as-audit-subhead">Your portfolio, year by year</h3>
       <div class="as-tablewrap">
@@ -303,7 +311,22 @@ eleventyComputed:
           <tbody id="asPathBody"></tbody>
         </table>
       </div>
-      <p class="as-chart-caption">The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from its neighbour: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve. On the <strong>return-to-trend</strong> scenario the gap to trend closes in a straight line over 3 years and the path follows the trend after that &mdash; so you can see how the gap closes, not just that it does. With a crash active, <strong>underwater</strong> means the portfolio total below its level the year the crash lands (before the drop) &mdash; measured on the total, not the bitcoin sleeve. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
+      <details class="re-ledger-how">
+        <summary>How each column is worked out</summary>
+        <p>The year-by-year path behind the chart, for your current allocation and strategy. Each row reproduces from the one above it: last year&rsquo;s sleeve times its growth factor is this year&rsquo;s sleeve. Values follow the chart&rsquo;s basis (dollars if you set a portfolio, otherwise growth of 100).</p>
+        <ul>
+          <li><strong>BTC sleeve:</strong> last year&rsquo;s bitcoin sleeve times bitcoin&rsquo;s growth for the year. On the <strong>return-to-trend</strong> scenario the gap to trend closes in a straight line over 3 years and the path follows the trend after that, so you can see how the gap closes, not just that it does.</li>
+          <li><strong>Traditional:</strong> last year&rsquo;s traditional sleeve times one plus the sleeve rate.</li>
+          <li><strong>Total:</strong> the two sleeves added. If you rebalance annually, the total is then split back to your allocation before the next year starts.</li>
+          <li><strong>Rebalanced total / Let-it-ride total:</strong> shown with the comparison open. The same walk under the other strategy.</li>
+          <li><strong>BTC trimmed (cum.):</strong> shown with the comparison open. The running sum of what rebalancing moved out of the bitcoin sleeve.</li>
+        </ul>
+        <p>With a crash active, <strong>underwater</strong> on the chart means the portfolio total below its level the year the crash lands (before the drop), measured on the total, not the bitcoin sleeve.</p>
+      </details>
+      <div class="ctw-actions">
+        <button type="button" class="re-ledger-csv" id="asCsvBtn">Download CSV</button>
+        <button type="button" class="re-ledger-csv" id="asCsvCopy">Copy as CSV</button>
+      </div>
     </div>
   </section>
 
