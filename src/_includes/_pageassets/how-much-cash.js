@@ -926,7 +926,15 @@
   }
   function csvText() {
     var c = _lastC; if (!c) return '';
-    var lines = ['entry_date,position_x_trend,entry_price_usd,rebuy_date,rebuy_price_usd,dip_arrived,discount_pct,after_tax_bitcoin_multiple'];
+    // Settings lines first (2026-11-26, JM): the file alone says what produced it, in the
+    // shared ledger's "# Input:" form. Text cells are quoted so a comma cannot split them.
+    var q = function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; };
+    var lines = ['# Last Coin Standing: How Much Cash? Every historical entry near your position'];
+    auditInputs(c).forEach(function (m) { lines.push(q('# Input: ' + m[0]) + ',' + q(m[1])); });
+    if (isFinite(c.medianRT)) lines.push(q('# Headline: bitcoin back per bitcoin sold, after tax (the median of the last column) = ' + c.medianRT.toFixed(2) + '\u00d7'));
+    lines.push(q('# How to rebuild a row: after_tax_bitcoin_multiple = (1 - tax rate) x entry_price_usd / rebuy_price_usd. Prices here are rounded to the dollar, so a rebuilt figure can differ by a few thousandths.'));
+    lines.push('');
+    lines.push('entry_date,position_x_trend,entry_price_usd,rebuy_date,rebuy_price_usd,dip_arrived,discount_pct,after_tax_bitcoin_multiple');
     c.outcomes.forEach(function (o) {
       lines.push([monthYear(o.d0), ratioOf(o.P).toFixed(3), Math.round(o.p0),
         o.arrived ? monthYear(o.waitDay) : 'no-dip-2y', Math.round(o.waitPrice),
