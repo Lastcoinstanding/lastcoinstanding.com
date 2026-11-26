@@ -622,7 +622,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         }
         reRenderChart('calc', R, [retroMonth(R.startKey).replace(/^(\w{3})\w*/, '$1')].concat(R.rows.map(function(r){ return r.toDate ? 'to date' : 'Dec ' + r.year; })),
             function(v){ return v; }, rFmt, null, runCalculator);
-        if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('calcLedger'), reLedgerSpec(R, {
+        if (window.Ledger) window.Ledger.render(document.getElementById('calcLedger'), reLedgerSpec(R, {
             retro: true, calc: 'the look-back', filename: 'bitcoin-vs-real-estate-lookback.csv',
             invest: invest, deduction: !!_rIn.mortgageDeduction, sold: !reCharts.calc || reCharts.calc.basis() !== 'held',
             card: 'The \u201cif sold today, after tax\u201d figures on the two cards above',
@@ -1063,7 +1063,7 @@ const mortgageRates={2013:3.98,2014:4.17,2015:3.85,2016:3.65,2017:3.99,2018:4.54
         note: 'Each cell: the bitcoin minus the house, both sold at the end, after tax. A map of how the answer moves with two assumptions, not a probability distribution. The outlined cell is yours. <em>Peaks at 2.5&times; trend</em> isn&rsquo;t in the grid: it is a stress test, not a scenario to plan on.'
       });
     }
-    if (window.RealEstateLedger) window.RealEstateLedger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
+    if (window.Ledger) window.Ledger.render(document.getElementById('fwdLedger'), reLedgerSpec(P, {
       retro: false, calc: 'the projection', filename: 'bitcoin-vs-real-estate-projection.csv',
       invest: invest, deduction: !!_pIn.mortgageDeduction, sold: !reCharts.fwd || reCharts.fwd.basis() !== 'held',
       card: _mode === 'real' ? 'The cards above show these two figures divided by ' + P.deflator.toFixed(2) + ', for the Real view'

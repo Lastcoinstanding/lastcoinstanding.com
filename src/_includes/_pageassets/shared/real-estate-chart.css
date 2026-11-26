@@ -1,20 +1,7 @@
-/* PR 6a: "Show the calculation", both real-estate pages (shared/real-estate-ledger.js).
+/* The real-estate pages' shared chart and sensitivity grid. Until 2026-11-26 this
+   file was shared/real-estate-ledger.css and also held the ledger's table rules,
+   which moved to shared/ledger.css when the ledger took a neutral name.
    Colours come from each page's own tokens, with fallbacks. */
-/* The entry row, the panel, What went in, How each column is worked out and the
-   export buttons are the sitewide Check the work treatment: shared/check-the-work.css. */
-.re-ledger-body p.re-ledger-note { font-size: 0.78rem; line-height: 1.5; color: var(--text-dim, var(--ink-dim, #968b7a)); margin: 0 0 0.7rem; }
-.re-ledger-tabs { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.6rem; }
-.re-ledger-tab { font: inherit; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(224,148,34,0.2); background: transparent; color: var(--text-dim, var(--ink-dim, #968b7a)); cursor: pointer; }
-.re-ledger-tab.active { background: rgba(224,148,34,0.14); color: var(--amber, #e09422); font-weight: 600; }
-.re-ledger-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 0.8rem; max-width: 100%; }
-.re-ledger-scroll[hidden] { display: none; }
-.re-ledger-table { border-collapse: collapse; font-size: 0.74rem; font-variant-numeric: tabular-nums; width: 100%; min-width: 36rem; }
-.re-ledger-table th, .re-ledger-table td { padding: 0.35rem 0.55rem; text-align: right; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.re-ledger-table th:first-child, .re-ledger-table td:first-child { text-align: left; }
-.re-ledger-table th { font-weight: 600; color: var(--text-dim, var(--ink-dim, #968b7a)); vertical-align: bottom; }
-.re-ledger-unit { display: block; font-weight: 400; font-size: 0.66rem; opacity: 0.8; }
-.re-ledger-final { min-width: 22rem; }
-.re-ledger-final .re-ledger-strong td { font-weight: 700; color: var(--text, var(--ink, #ccc6b8)); }
 
 /* PR 6c: Bitcoin vs. Real Estate's wealth chart (shared/real-estate-chart.js). */
 .re-chart-block { margin: 1.4rem 0 0.4rem; }
