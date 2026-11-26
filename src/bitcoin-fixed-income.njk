@@ -645,19 +645,19 @@ related:
           <div class="stress-chips-label">Stress overlay</div>
           <div class="stress-chips-row">
             <button class="stress-chip active" data-preset="base">
-              <span class="stress-chip-name">Base<span class="help-tip" tabindex="0">?<span class="tip-content">No additional stress applied. Bitcoin follows the growth scenario you selected; the preferred path runs at its par-anchored yield with ROC tax treatment.</span></span></span>
+              <span class="stress-chip-name">Base<span class="help-tip" tabindex="0">?<span class="tip-content">No additional stress applied. Bitcoin follows the growth scenario you selected; the income path runs at its par-anchored yield. The stress presets bend bitcoin&rsquo;s price only.</span></span></span>
               <span class="stress-chip-sub">no stress</span>
             </button>
             <button class="stress-chip" data-preset="mild">
-              <span class="stress-chip-name">Mild stress<span class="help-tip" tabindex="0">?<span class="tip-content">A 30% bitcoin drawdown lasting 12 months overlaid on the chosen growth scenario. Realistic mid-cycle correction — the kind that has happened roughly every 2–3 years in bitcoin's history.</span></span></span>
+              <span class="stress-chip-name">Mild stress<span class="help-tip" tabindex="0">?<span class="tip-content">A 30% bitcoin drawdown lasting 12 months overlaid on the chosen growth scenario. Realistic mid-cycle correction — the kind that has happened roughly every 2–3 years in bitcoin's history. Bitcoin&rsquo;s price only: the income path is not stressed.</span></span></span>
               <span class="stress-chip-sub">30% / 12 months</span>
             </button>
             <button class="stress-chip" data-preset="mreit">
-              <span class="stress-chip-name">2008 mREIT-style<span class="help-tip" tabindex="0">?<span class="tip-content">A 50% drawdown lasting 24 months — the kind of stress that broke mortgage REITs in 2008 when funding markets froze. Tests whether the preferred mechanism holds when the structural stress lasts longer than typical recoveries.</span></span></span>
+              <span class="stress-chip-name">2008 mREIT-style<span class="help-tip" tabindex="0">?<span class="tip-content">A 50% drawdown in bitcoin&rsquo;s price lasting 24 months — the length of stress that broke mortgage REITs in 2008 when funding markets froze. It tests the bitcoin path only: the income path keeps its par-anchored yield, so a preferred&rsquo;s own failure under stress isn&rsquo;t modelled here (The Risks tab takes that up).</span></span></span>
               <span class="stress-chip-sub">50% / 24 months</span>
             </button>
             <button class="stress-chip" data-preset="winter">
-              <span class="stress-chip-name">Bitcoin winter<span class="help-tip" tabindex="0">?<span class="tip-content">A 70% drawdown lasting 48 months — the deepest stress scenario, matching the 2014–2015 and 2018 bitcoin winters. Pushes the preferred mechanism toward the structural failure conditions documented in The Risks.</span></span></span>
+              <span class="stress-chip-name">Bitcoin winter<span class="help-tip" tabindex="0">?<span class="tip-content">A 70% drawdown in bitcoin&rsquo;s price lasting 48 months — the deepest stress scenario, matching the 2014–2015 and 2018 bitcoin winters. It tests the bitcoin path only: the income path keeps its par-anchored yield. A winter this deep is also the condition under which a bitcoin-backed preferred would be under most strain (The Risks tab), which the calculator doesn&rsquo;t model.</span></span></span>
               <span class="stress-chip-sub">70% / 48 months</span>
             </button>
           </div>
@@ -670,7 +670,7 @@ related:
             <div class="output-unit">years</div>
           </div>
           <div class="output-item">
-            <div class="output-label">Real after-tax IRR (income path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Internal rate of return on the income path, net of tax and inflation. Computes the cash-flow stream end-to-end through eventual sale or redemption of the instrument.</span></span></div>
+            <div class="output-label">Real after-tax IRR (income path)<span class="help-tip tip-right" tabindex="0">?<span class="tip-content">Internal rate of return on the income path, net of tax and inflation: the rate that discounts the real cashflows (the position today, the income paid each year, the position redeemed at the horizon) to zero.</span></span></div>
             <div class="output-value output-value-income" id="incomeIRR">—</div>
             <div class="output-unit">% per year</div>
           </div>
@@ -732,6 +732,10 @@ related:
       <h2 class="section-title">What the calculator does not do</h2>
 
       <p class="prose">It does not predict bitcoin's price. It does not predict whether STRC will re-anchor to par or whether SATA's daily-dividend mechanism will hold its band. It does not predict whether issuer management will maintain par-anchoring under sustained stress. It does not predict tax-code changes that could compromise the ROC treatment.</p>
+
+      <p class="prose">Two small simplifications, each worth about a percent or two of end wealth at most: the extra bitcoin sold to pay a year&rsquo;s tax has a gain of its own, which isn&rsquo;t taxed (about 1.8% of the bitcoin path&rsquo;s end wealth at the defaults); and return-of-capital dividends use up the return-of-capital allowance but don&rsquo;t lower the cost basis used to tax a later draw from principal. Prices are read once a year, so a drawdown is felt at year ends, not month by month. If a path&rsquo;s money runs out, it stops at zero and the need goes unmet from then; the chart caption says when.</p>
+
+      <p class="prose"><em>Changed November 26, 2026:</em> the <strong>Real after-tax IRR</strong> card is now the true internal rate of return on the income path&rsquo;s real cashflows, as its tooltip says (4.69% at the defaults; it had shown a yield-minus-tax-minus-inflation shortcut, 3.90%). Both paths now stop at zero instead of running below it, and the stress presets say they bend bitcoin&rsquo;s price only.</p>
 
       <p class="prose">What it does is compute <em>consequences given assumptions</em>. The reader provides assumptions appropriate to their situation; the calculator shows what the math implies. The decision is yours.</p>
     </div>
