@@ -189,8 +189,121 @@
     var sample = document.getElementById('wdSampleNote');
     if (sample) sample.innerHTML = 'Drawn from <strong>' + m.n + '</strong> historical entries within ' + (m.half <= 0.08 ? '±' + m.half.toFixed(2) : 'a widened band') + ' of this position (post-2014, each with a full two-year forward record).';
 
+    renderLedger(m);
     updateChart();
   }
+
+  // ════════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ════════
+  // Added 2026-11-26. Every historical entry behind the result band (the
+  // waiter's rule run on each), then the band's figures. Built from
+  // ChannelEntries.bandMetrics at the slider's position, as renderComparator()
+  // ran it; nothing here changes a figure.
+  var ledgerEl = document.getElementById('wdLedger');
+  function dayText(d) { return new Date(GENESIS_TS * 1000 + d * 86400 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
+  function ledgerSpec(m) {
+    var dropPct = Math.round((1 - Math.exp(-DROP * SPAN)) * 100), P = state.pos, mp = matchPos(P), lo = ratioOf(mp - m.half), hi = ratioOf(mp + m.half), rows = m.metrics.slice();
+    var nPaid = rows.filter(function (x) { return x.paid; }).length, nDD = rows.filter(function (x) { return x.hadDD; }).length;
+    var below = P < 0 ? ' (entries are matched at the floor, ' + ratioOf(0).toFixed(2) + '\u00d7)' : '';
+    var cols = [
+      { label: 'Entry', unit: '', fmt: 'text', get: function (x) { return x.summary ? 'All ' + m.n + ' entries' : dayText(x.d0); },
+        how: 'A date in the record from 2014 on, with two full years of record after it, when bitcoin was between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× its trend: within ' + m.half.toFixed(3) + ' of the position on the channel scale (0 at the floor, 1 at the upper band; the band starts at 0.075 and widens by 0.03 until it holds 8 entries). The first row sums them up.' },
+      { label: 'Against trend', unit: '×', fmt: 'mult', get: function (x) { return x.summary ? null : x.p0 / plPrice(x.d0); }, how: 'The entry’s price over the Power Law trend that day.' },
+      { label: 'Price', unit: '$', fmt: 'price', get: function (x) { return x.summary ? null : x.p0; }, how: 'What deploying now paid.' },
+      { label: 'A lower entry came', unit: '', fmt: 'text', get: function (x) { return x.summary ? m.nArrived + ' of ' + m.n : (x.arrived ? dayText(x.waitDay) : 'No'); },
+        how: 'The waiter’s rule: wait for the first sample, within two years, at least ' + DROP + ' lower than the entry on the channel scale (0 at the floor, 1 at the upper band, evenly spaced in the logarithm of the multiple), which is a multiple of trend about ' + dropPct + '% lower than the entry’s.' },
+      { label: 'Wait', unit: 'months', fmt: 'text', get: function (x) { return x.summary ? (m.waitLen != null ? 'median ' + (m.waitLen / MONTH_D).toFixed(1) : '') : (x.arrived ? (x.waitLen / MONTH_D).toFixed(1) : ''); }, how: 'From the entry to that lower entry. The first row is the median over the entries where one came (with an even count, the higher of the two middle values).' },
+      { label: 'Price the waiter paid', unit: '$', fmt: 'price', get: function (x) { return x.summary ? null : x.waitPrice; }, how: 'The lower entry’s price; if none came, the price two years on (read between samples, in a straight line), when the waiter deploys anyway.' },
+      { label: 'Coins, waiting ÷ now', unit: '×', fmt: 'mult', get: function (x) { return x.summary ? null : x.ratio; }, how: 'The entry’s price over the waiter’s: how many times the coins waiting bought, for the same dollars.' },
+      { label: 'Waiting paid', unit: '', fmt: 'text', get: function (x) { return x.summary ? nPaid + ' of ' + m.n : (x.paid ? 'Yes' : 'No'); }, how: 'Yes when waiting bought more coins (the ratio above 1), whether or not a lower entry came.' },
+      { label: 'Worst dip below entry', unit: '%', fmt: 'pct', get: function (x) { return x.summary ? m.ddDepth / 100 : x.depth; }, how: 'The lowest sample price in the two years over the entry price, minus one; zero if it never went below. The first row is the median (with an even count, the higher of the two middle values).' },
+      { label: 'Fell 20% or more', unit: '', fmt: 'text', get: function (x) { return x.summary ? nDD + ' of ' + m.n : (x.hadDD ? 'Yes' : 'No'); }, how: 'Whether that dip reached ' + Math.round(DD_THRESH * 100) + '% below the entry price.' },
+      { label: 'Leg', unit: '', fmt: 'text', get: function (x) { return x.summary ? '' : x.leg; }, how: 'Falling if the channel position was lower than ' + CE.LEG_W + ' days before; rising otherwise. The leg sentence under the result compares the two when they differ by more than 20 points with at least 10 entries each.' }];
+    var L = m.legs;
+    var fin = [
+      { label: 'Entries', fmt: 'text', values: [String(m.n)], how: 'The Entries tab’s rows: the sample note’s count.' },
+      { label: 'Waiting paid', fmt: 'pct', values: [m.paid / 100], card: 'The large percentage above, rounded to a whole percent there', how: nPaid + ' of ' + m.n + ' entries where waiting bought more coins.' },
+      { label: 'When a lower entry came, median', fmt: 'mult', values: [m.condRatio], how: m.nArrived + ' entries had one; the median of their coins column (with an even count, the higher of the two middle values): the figure in the line under the result.' },
+      { label: 'No lower entry within two years', fmt: 'pct', values: [m.never / 100], how: 'The share of entries where none came: the counterweight line’s percentage.' },
+      { label: 'Typical wait when one came', fmt: 'text', values: [m.waitLen != null ? fmtWait(m.waitLen) : '—'], how: 'The median wait over those entries (with an even count, the higher of the two middle values), as the page writes it.' },
+      { label: 'A dip of 20% or more', fmt: 'pct', values: [m.ddProb / 100], how: nDD + ' of ' + m.n + ': the likelihood box.' },
+      { label: 'Median worst dip below entry', fmt: 'pct', values: [m.ddDepth / 100], how: 'The median of the dip column (with an even count, the higher of the two middle values): the depth box, which shows words when it rounds to zero.' },
+      { label: 'Never fell below the entry', fmt: 'pct', values: [m.neverFell / 100], how: 'The share whose worst dip was zero.' },
+      { label: 'Waiting paid, falling leg', fmt: 'pct', values: [L.falling.n ? L.falling.paid / 100 : null], how: L.falling.n + ' entries across ' + L.falling.cycles + ' halving cycles.' + (L.differs ? ' The legs differ, so the leg sentence shows.' : ' Within 20 points of the other leg (or too few), so the page shows no leg sentence.') },
+      { label: 'Waiting paid, rising leg', fmt: 'pct', values: [L.rising.n ? L.rising.paid / 100 : null], how: L.rising.n + ' entries across ' + L.rising.cycles + ' halving cycles.' }];
+    var tp = livePos(), gapDays = median(S.slice(1).map(function (s, k) { return s.d - S[k].d; }));
+    var inputs = [
+      ['Position you’re testing', ratioOf(P).toFixed(2) + '× trend · ' + posLabel(P) + below],
+      ['Entries matched', 'between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× trend, from 2014, each with two years of record after it'],
+      ['The waiter’s rule', 'wait for a multiple of trend about ' + dropPct + '% below the entry’s, up to two years; if none comes, deploy at the two-year price'],
+      ['What counts as a dip', Math.round(DD_THRESH * 100) + '% or more below the entry price within two years'],
+      ['Price record', monthYear(S[0].d) + ' to ' + monthYear(S[N - 1].d) + ', ' + N + ' samples, about every ' + Math.round(gapDays) + ' days'],
+      ['Today’s position', ratioOf(tp).toFixed(2) + '× trend · ' + posLabel(tp)],
+      ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    return {
+      hint: 'every entry behind the result, and the waiter’s rule on each',
+      inputs: inputs.map(function (x) { return { label: x[0], value: x[1] }; }),
+      note: 'Each historical entry near this position, deployed now or held for a lower entry. Coins, not dollars: the sum doesn’t matter. The last table is the result band.',
+      tabs: [{ id: 'entries', label: 'Entries here', columns: cols, rows: [{ summary: true }].concat(rows), strong: function (x) { return !!x.summary; } }],
+      final: { title: 'At this position', csvTitle: 'At this position (the result band)', howTitle: 'How these figures are worked out', cols: ['At the slider'], rows: fin },
+      csv: { filename: 'wait-or-deploy-now.csv', meta: [
+        ['Last Coin Standing', 'Wait or Deploy Now?'],
+        ['Amounts', 'coins as a ratio; prices in dollars of the day'],
+        ['Page', function () { return window.location.origin + window.location.pathname + window.location.search; }]] }
+    };
+  }
+  function renderLedger(m) {
+    if (!ledgerEl || !window.Ledger || !m) return;
+    window.Ledger.render(ledgerEl, ledgerSpec(m));
+  }
+
+  // ── QA (console: wdQA()) ──
+  // Every entry re-run from the record with the waiter's rule written out
+  // again here, the band's figures against them and the page's text, the
+  // CSV's shape; then a sweep of positions, restoring the slider after.
+  window.wdQA = function () {
+    var near = function (x, y) { return typeof x === 'number' && typeof y === 'number' && Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function holds() {
+      var sp = ledgerEl && ledgerEl._ledgerSpec, why = [];
+      if (!sp) return { ok: false, why: ['no ledger'] };
+      if (!window.Ledger.check(ledgerEl, { side: false })) why.push('Ledger.check');
+      var m = bandMetrics(matchPos(state.pos)), rows = sp.tabs[0].rows.slice(1), C = sp.tabs[0].columns, fin = sp.final.rows;
+      var mp = matchPos(state.pos), within = function (h) { return elig.filter(function (i) { return Math.abs(S[i].pos - mp) <= h; }); };
+      var mine = within(m.half), narrower = m.half > 0.075 + 1e-9 ? within(m.half - 0.03) : null;
+      if (rows.length !== m.n || rows.length !== mine.length || rows.some(function (x, k) { return x.i !== mine[k]; }) || (mine.length < 8 && m.half < 0.27) || (narrower && narrower.length >= 8)) why.push('entry set');
+      rows.forEach(function (x) {
+        var i = x.i, d0 = S[i].d, p0 = S[i].p, thr = S[i].pos - DROP, end = d0 + WAIT_CAP, wp = null, wd = null, lowP = p0, j;
+        if (Math.abs(S[i].pos - matchPos(state.pos)) > m.half + 1e-12 || d0 < TABLE_CUT || d0 > LAST_D - WAIT_CAP) why.push('membership ' + i);
+        for (j = i + 1; j < N && S[j].d <= end; j++) { if (wp == null && S[j].pos <= thr) { wp = S[j].p; wd = S[j].d; } if (S[j].p < lowP) lowP = S[j].p; }
+        var arrived = wp != null; if (!arrived) wp = realPriceAt(end);
+        if (arrived !== x.arrived || !near(C[5].get(x), wp) || !near(C[6].get(x), p0 / wp) || (C[7].get(x) === 'Yes') !== (p0 / wp > 1) || !near(C[8].get(x), lowP / p0 - 1) || (C[9].get(x) === 'Yes') !== (lowP / p0 - 1 <= -DD_THRESH)) why.push('entry ' + i);
+      });
+      var paid = rows.filter(function (x) { return x.paid; }).length;
+      if (!near(fin[1].values[0], paid / m.n) || !near(fin[3].values[0], rows.filter(function (x) { return !x.arrived; }).length / m.n)
+        || !near(fin[5].values[0], rows.filter(function (x) { return x.hadDD; }).length / m.n) || !near(fin[6].values[0], median(rows.map(function (x) { return x.depth; })))) why.push('band figures');
+      var came = rows.filter(function (x) { return x.arrived; }), upper = function (a) { a = a.slice().sort(function (p, q) { return p - q; }); return a.length ? a[Math.floor(a.length / 2)] : null; };
+      var cr = upper(came.map(function (x) { return x.ratio; })), wl = upper(came.map(function (x) { return x.waitDay - x.d0; }));
+      if (!(cr == null ? fin[2].values[0] == null : near(fin[2].values[0], cr)) || !(wl == null ? m.waitLen == null : near(m.waitLen, wl)) || !near(fin[7].values[0], rows.filter(function (x) { return x.depth >= 0; }).length / m.n)) why.push('conditional figures');
+      ['falling', 'rising'].forEach(function (g, k) { var s = rows.filter(function (x) { return x.leg === g; }), v = fin[8 + k].values[0];
+        if (s.length ? !near(v, s.filter(function (x) { return x.paid; }).length / s.length) : v != null) why.push('leg ' + g); });
+      var t = function (id) { var e = document.getElementById(id); return e ? e.textContent : ''; };
+      if (t('wdHeroNum') !== Math.round(m.paid) + '%' || t('wdDdProb') !== Math.round(m.ddProb) + '%' || t('wdSampleNote').indexOf(String(m.n)) < 0) why.push('page text');
+      if (m.never >= 15 && t('wdCounter').indexOf(Math.round(m.never) + '%') < 0) why.push('counterweight');
+      if (m.condRatio != null && t('wdCounter').indexOf(fmtRatio(m.condRatio)) < 0) why.push('dip ratio');
+      var csv = window.Ledger.toCsv(sp);
+      if (!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 1 && csv.indexOf('# At this position') > 0)) why.push('csv shape');
+      return { ok: !why.length, why: why };
+    }
+    var out = [], live = holds();
+    out.push(['live panel: every entry re-run, the band, the page text, CSV', live.ok, live.why.slice(0, 6).join('; ')]);
+    var saved = { pos: state.pos, moved: state.userMoved };
+    try {
+      [-0.08, 0, 0.1, 0.25, 0.4, 0.55, 0.7, 0.85, 1.0].forEach(function (p) { state.pos = p; state.userMoved = true; renderComparator(); var r = holds(); out.push(['sweep: position ' + p.toFixed(2) + ' (' + ratioOf(p).toFixed(2) + '× trend)', r.ok, r.why.slice(0, 6).join('; ')]); });
+    } finally { state.pos = saved.pos; state.userMoved = saved.moved; syncSliderToState(); renderComparator(); }
+    var ok = out.every(function (x) { return x[1]; });
+    if (window.console) console.table(out.map(function (x) { return { check: x[0], pass: x[1], why: x[2] }; }));
+    return { ok: ok, checks: out };
+  };
 
   // ════════ CHANNEL CHART — bands + history + the selected position highlighted ════════
   var chart = null, selDots = [];
