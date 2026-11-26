@@ -12,7 +12,8 @@
 
    Ledger.render(el, spec): el is the container; spec:
      note     HTML above the tabs: the dollars the table is in
-     tabs     [{ id, label, columns: [{ label, unit, get(row), fmt }], rows }]
+     tabs     [{ id, label, columns: [{ label, unit, get(row), fmt }], rows,
+                 strong(row) (optional: true sets the row in bold, e.g. a median) }]
               fmt: 'usd' | 'btc' | 'text' | 'pct' (a fraction: 0.115 shows
               11.5%) | 'mult' (a multiple: 0.25 shows 0.25×)
      final    { cols: ['House', 'Bitcoin'], rows: [{ label, values: [a, b] }] }
@@ -119,7 +120,7 @@
       return '<div class="re-ledger-scroll" data-panel="' + t.id + '"' + (t.id === active ? '' : ' hidden') + '><table class="re-ledger-table"><thead><tr>' +
         t.columns.map(function(c){ return '<th>' + esc(c.label) + (c.unit ? '<span class="re-ledger-unit">' + esc(c.unit) + '</span>' : '') + '</th>'; }).join('') +
         '</tr></thead><tbody>' +
-        t.rows.map(function(r){ return '<tr>' + t.columns.map(function(c){ return '<td>' + fmt(c.get(r), c.fmt) + '</td>'; }).join('') + '</tr>'; }).join('') +
+        t.rows.map(function(r){ return '<tr' + (t.strong && t.strong(r) ? ' class="re-ledger-strong"' : '') + '>' + t.columns.map(function(c){ return '<td>' + fmt(c.get(r), c.fmt) + '</td>'; }).join('') + '</tr>'; }).join('') +
         '</tbody></table></div>' +
         howBlock('How each column is worked out', t.columns, ' data-panel="' + t.id + '"' + (t.id === active ? '' : ' hidden') + (howOpen ? ' open' : ''));
     }).join('');
@@ -170,14 +171,15 @@
   // marked row, every tab and final row explained and, by default, a Side by
   // side tab whose last row equals its difference column and, on If sold,
   // the marked row (the real-estate pages' shape). A page whose Side by side
-  // tab has another shape passes { side: false } and checks it itself.
+  // tab has another shape, or that has none, passes { side: false } and
+  // checks its own books.
   // Pages' own QA functions call it.
   function check(el, opts){
     var sp = el && el._ledgerSpec; if (!sp) return false;
     var wantSide = !(opts && opts.side === false);
     var near = function(a, b){ return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b)); };
     var side = sp.tabs.filter(function(t){ return t.id === 'side'; })[0], fin = sp.final.rows.filter(function(r){ return r.card; });
-    if (!(sp.inputs && sp.inputs.length > 5) || fin.length !== 1 || !side) return false;
+    if (!(sp.inputs && sp.inputs.length > 5) || fin.length !== 1 || (wantSide && !side)) return false;
     if (!sp.tabs.every(function(t){ return hasHow(t.columns); }) || !sp.final.rows.every(function(r){ return !!r.how; })) return false;
     if (!wantSide) return true;
     var last = side.rows[side.rows.length - 1], a = side.columns[1].get(last), b = side.columns[2].get(last);
