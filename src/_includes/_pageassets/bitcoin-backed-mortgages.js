@@ -237,6 +237,8 @@
       sellRows.innerHTML         = '';
       verdict.className = 'bbm-calc-verdict';
       verdict.innerHTML = '<p>Adjust the inputs above to model the comparison.</p>';
+      LAST = null;
+      renderLedger(null);
       return;
     }
 
@@ -373,6 +375,17 @@
 
     // ─── Render the chart (two cost lines + crossover marker) ───
     renderChart(years, pledgeSeries, sellSeries, crossoverYear);
+
+    // ─── Check the work: the same pass's values (never the DOM) ───
+    LAST = {
+      homePrice: homePrice, downPct: downPct, downPayment: downPayment, price: price, costBasis: costBasis,
+      mortRate: mortRate, premium: premium, horizon: horizon, taxRate: taxRate, repayYear: repayYear,
+      btcSold: btcSold, sellTaxPaid: sellTaxPaid, requiredCollateralBtc: requiredCollateralBtc,
+      m0: m0, sc: BBM_SC, path: P_, crossoverYear: crossoverYear, costDelta: costDelta,
+      pledgeTerminalCost: pledgeTerminalCost, sellTerminalCost: sellTerminalCost, futurePrice: futurePrice,
+      blockNum: fmtUsd(Math.abs(P_.sellTerminalCost - P_.pledgeTerminalCost))
+    };
+    renderLedger(LAST);
   }
 
   // ─── The two-scenario block above the result cards ───
@@ -400,6 +413,172 @@
       BBM_PICKED = true; BBM_SC = k; compute();
     });
   }
+
+  // ═══════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ═══════
+  // Added 2026-11-26. The engine above already builds both cost lines year
+  // by year for the chart (pathFor); the ledger shows them as tables for the
+  // scenario showing, splits the pledge line into its two interest portions,
+  // and ends with the two cards at the horizon. Every figure is the engine's
+  // own or one line of arithmetic on them, stated under the table. Nothing
+  // here changes a figure. The model counts the pledge path's extra interest
+  // but not the second-lien loan itself; the sentences say so.
+  var ledgerEl = document.getElementById('bbmLedger');
+  var LAST = null;   // the values the last compute() pass showed, for bbmQA()
+  function ledgerRows(a){
+    return a.path.years.map(function(t, i){
+      var capped = Math.min(t, a.repayYear);
+      return { t: t, price: scenarioPriceAtYear(a.sc, a.m0, t), trend: plPriceAtYear(t),
+               base: a.downPayment * a.mortRate * capped, prem: a.homePrice * a.premium * capped,
+               pledge: a.path.pledgeSeries[i], sell: a.path.sellSeries[i] };
+    });
+  }
+  function ledgerSpec(a){
+    var rows = ledgerRows(a), N = a.horizon, R = a.repayYear;
+    var names = PC ? PC.names(a.m0) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' };
+    var REV = PC ? PC.REVERT_YEARS : 3;
+    var usd0 = function(v){ return '$' + Math.round(v).toLocaleString('en-US'); };
+    var mult0 = a.m0.toFixed(2) + '×', atN = 'at year ' + N, dp = usd0(a.downPayment);
+    var stops = R < N ? ' It stops at the pay-off year, year ' + R + '.' : ' It runs to year ' + N + ', since the second lien isn’t paid off before then.';
+    var notCounted = 'The second-lien loan itself (the ' + dp + ' down payment), which the pledge path still owes or has repaid, isn’t counted.';
+    var year = { label: 'Year', unit: '', fmt: 'text', get: function(x){ return x.t === 0 ? 'Today' : 'Year ' + x.t; } };
+    var priceHow = a.sc === 'trend'
+      ? 'The Power Law trend on that date times a multiple of trend that moves in a straight line from today’s ' + mult0 + ' to 1.0 over ' + REV + ' years, then stays at 1.0. Today’s row is the price you set.'
+      : 'The Power Law trend on that date times today’s multiple of trend (' + mult0 + '), which this scenario keeps every year. Today’s row is the price you set.';
+    var pledgeCols = [year,
+      { label: 'Base-rate interest to date', unit: '$', fmt: 'usd', get: function(x){ return x.base; },
+        how: 'The standard mortgage rate on the down-payment loan, which the sell path doesn’t take out, times the years so far (simple interest).' + stops },
+      { label: 'Premium to date', unit: '$', fmt: 'usd', get: function(x){ return x.prem; },
+        how: 'The rate premium on the whole mortgage, primary and second lien, times the years so far.' + stops },
+      { label: 'Cumulative cost', unit: '$', fmt: 'usd', get: function(x){ return x.pledge; },
+        how: 'Base-rate interest plus premium: the chart’s Pledge line, and the last row is the Pledge path card. ' + notCounted },
+      { label: 'BTC pledged', unit: '₿', fmt: 'btc', get: function(){ return a.requiredCollateralBtc; },
+        how: '2.5 times the down payment at today’s bitcoin price (a 40% LTV). It stays in custody; none is sold.' }];
+    var sellCols = [year,
+      { label: 'Bitcoin price', unit: '$', fmt: 'usd', get: function(x){ return x.price; }, how: priceHow },
+      { label: 'BTC sold', unit: '₿', fmt: 'btc', get: function(x){ return x.t === 0 ? a.btcSold : null; },
+        how: 'Sold today to net the down payment after tax: the down payment divided by today’s price less the tax on each bitcoin’s gain over your cost basis. Nothing more is sold.' },
+      { label: 'Tax on the sale', unit: '$', fmt: 'usd', get: function(x){ return x.t === 0 ? a.sellTaxPaid : null; },
+        how: 'The bitcoin sold times the tax rate times each one’s gain over your cost basis (none if there is no gain). Paid today.' },
+      { label: 'Forgone BTC value', unit: '$', fmt: 'usd', get: function(x){ return x.sell; },
+        how: 'The bitcoin sold today times that year’s price: what it would be worth had you kept it. The chart’s Sell line; the last row is the Sell path card.' }];
+    var sideCols = [year,
+      { label: 'Pledge path', unit: '$', fmt: 'usd', get: function(x){ return x.pledge; }, how: 'The Pledge path tab’s cumulative cost.' },
+      { label: 'Sell path', unit: '$', fmt: 'usd', get: function(x){ return x.sell; }, how: 'The Sell path tab’s forgone value.' },
+      { label: 'Sell minus pledge', unit: '$', fmt: 'usd', get: function(x){ return x.sell - x.pledge; },
+        how: 'Sell path minus Pledge path. Above zero, pledging costs less on this model. In the last row it is the figure in the scenario block and the verdict.' },
+      { label: 'Cheaper', unit: '', fmt: 'text', get: function(x){ var d = x.sell - x.pledge; return Math.abs(d) < 0.5 ? 'level' : d > 0 ? 'pledging' : 'selling'; },
+        how: 'Where it changes between two rows, the verdict and the chart put the crossover between them, by straight-line interpolation.' }];
+    var inputs = [
+      ['Home price', usd0(a.homePrice)], ['Down payment', Math.round(a.downPct * 100) + '% (' + dp + ')'], ['Years compared', String(N)],
+      ['Second lien paid off', R < N ? 'year ' + R : 'never (interest runs to year ' + N + ')'],
+      ['Bitcoin price today', usd0(a.price)], ['Power Law trend today', usd0(rows[0].trend) + ' (bitcoin at ' + mult0 + ' trend)'],
+      ['Cost basis', usd0(a.costBasis) + ' a bitcoin'], ['Standard mortgage rate', (a.mortRate * 100).toFixed(2) + '%'],
+      ['BBM rate premium', '+' + (a.premium * 100).toFixed(2) + ' pp, on the whole mortgage'], ['Capital gains tax rate', Math.round(a.taxRate * 100) + '%'],
+      ['Bitcoin’s price', names[a.sc]],
+      ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    var capN = Math.min(N, R);
+    return {
+      hint: 'year by year, and the two paths ' + atN,
+      inputs: inputs.map(function(m){ return { label: m[0], value: m[1] }; }),
+      note: 'Dollars of each year (before inflation), on the scenario showing: <strong>' + names[a.sc] + '</strong>. The Side by side tab is the chart’s two lines; its last row is the two cards above.',
+      tabs: [{ id: 'pledge', label: 'Pledge path', columns: pledgeCols, rows: rows },
+             { id: 'sell', label: 'Sell path', columns: sellCols, rows: rows },
+             { id: 'side', label: 'Side by side', columns: sideCols, rows: rows }],
+      final: { title: 'At year ' + N, csvTitle: 'At year ' + N + ' (USD, nominal; bitcoin in BTC)', howTitle: 'How the two paths ' + atN + ' are worked out',
+        cols: ['Pledge path', 'Sell path'], rows: [
+          { label: 'Down-payment funded', values: [a.downPayment, a.downPayment], how: 'The down payment: borrowed on the second lien, or raised by selling bitcoin.' },
+          { label: 'BTC pledged (stays in custody)', fmt: 'btc', values: [a.requiredCollateralBtc, null], how: '2.5 times the down payment at today’s bitcoin price. Not sold, so no tax.' },
+          { label: 'BTC sold to fund (incl. tax leakage)', fmt: 'btc', values: [null, a.btcSold], how: 'The down payment divided by what one bitcoin nets after tax today.' },
+          { label: 'Cap-gains tax paid now', values: [0, a.sellTaxPaid], how: 'Pledging isn’t a sale. Selling: the tax rate times the gain over your cost basis on the bitcoin sold.' },
+          { label: 'Premium portion', values: [a.homePrice * a.premium * capN, 0], how: 'The rate premium times the home price times the years to ' + (R < N ? 'the pay-off year' : 'year ' + N) + '. The sell path pays no premium.' },
+          { label: 'Base-rate portion', values: [a.downPayment * a.mortRate * capN, 0], how: 'The standard rate times the down payment times the same years. The sell path doesn’t borrow the down payment.' },
+          { label: 'Bitcoin price ' + atN, values: [null, a.futurePrice], how: 'Bitcoin’s price ' + atN + ' on the scenario showing, which values the bitcoin sold.' },
+          { label: 'Cost ' + atN, values: [a.pledgeTerminalCost, a.sellTerminalCost], strong: true, card: 'The large figure on each card above',
+            how: 'Pledge path: the premium and base-rate portions. Sell path: the bitcoin sold times bitcoin’s price ' + atN + '. ' + notCounted }
+        ] },
+      csv: { filename: 'bitcoin-backed-mortgages.csv', meta: [
+        ['Last Coin Standing', 'Bitcoin-Backed Mortgages: pledge vs. sell'],
+        ['Amounts', 'nominal USD (before inflation); bitcoin in BTC'],
+        ['Page', function(){ return window.location.origin + window.location.pathname; }]] }
+    };
+  }
+  function renderLedger(a){
+    if(!ledgerEl || !window.Ledger) return;
+    if(!a){ ledgerEl.innerHTML = ''; ledgerEl._ledgerSpec = null; return; }
+    window.Ledger.render(ledgerEl, ledgerSpec(a));
+  }
+
+  // ─── QA (console: bbmQA()) ───
+  // The live ledger against the cards, the verdict and the block; every
+  // row's arithmetic; the crossover; the CSV's shape; then the same checks
+  // on a set of settings run through the page itself, which is restored.
+  window.bbmQA = function(){
+    var near = function(x, y){ return Math.abs(x - y) <= 1e-6 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function holds(a){
+      var sp = ledgerEl && ledgerEl._ledgerSpec; if(!sp || !a) return { ok: false, why: 'no ledger' };
+      var rows = sp.tabs[0].rows, last = rows[rows.length - 1], side = sp.tabs[2];
+      var fin = sp.final.rows.filter(function(r){ return r.card; })[0];
+      var why = [];
+      if(!window.Ledger.check(ledgerEl)) why.push('Ledger.check');
+      if(!(near(fin.values[0], a.pledgeTerminalCost) && near(fin.values[1], a.sellTerminalCost))) why.push('marked row != cards');
+      if(pledgeHeadline.textContent !== fmtUsd(fin.values[0]) || sellHeadline.textContent !== fmtUsd(fin.values[1])) why.push('card text');
+      if(!(near(side.columns[1].get(last), a.pledgeTerminalCost) && near(side.columns[2].get(last), a.sellTerminalCost))) why.push('side last row');
+      if(!near(Math.abs(side.columns[3].get(last)), a.costDelta)) why.push('verdict difference');
+      if(fmtUsd(Math.abs(side.columns[3].get(last))) !== a.blockNum) why.push('block figure');
+      if(!near(a.requiredCollateralBtc * a.price, 2.5 * a.downPayment)) why.push('collateral');
+      if(!near(a.btcSold * (a.price - a.taxRate * Math.max(0, a.price - a.costBasis)), a.downPayment)) why.push('bitcoin sold');
+      rows.forEach(function(x){
+        var m = x.price / x.trend;
+        if(!near(x.base + x.prem, x.pledge)) why.push('pledge split, year ' + x.t);
+        if(!near(x.sell, a.btcSold * x.price)) why.push('forgone value, year ' + x.t);
+        if(!(a.sc === 'trend' ? (x.t >= 3 ? near(m, 1) : near(m, a.m0 + (1 - a.m0) * x.t / 3)) : near(m, a.m0))) why.push('price path, year ' + x.t);
+      });
+      if(!near(rows[0].price, a.price)) why.push('today price');
+      var c = a.crossoverYear;
+      if(c !== null && c > 0 && c <= a.horizon){
+        var sgn = function(x){ return Math.sign(x.sell - x.pledge); };
+        if(sgn(rows[Math.floor(c)]) === sgn(rows[Math.min(rows.length - 1, Math.ceil(c))])) why.push('crossover rows');
+      }
+      var csv = window.Ledger.toCsv(sp);
+      if(!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 3 && csv.indexOf('# At year ' + a.horizon + ' (USD') > 0
+        && (csv.match(/^"(Today|Year \d+)",/gm) || []).length === 3 * (a.horizon + 1))) why.push('csv shape');
+      return { ok: !why.length, why: why };
+    }
+    var out = [];
+    var live = holds(LAST);
+    out.push(['live ledger: order, clarity additions, books, rows, crossover, CSV', live.ok, live.why.join('; ')]);
+    // Vectors through the page: set the controls, run compute(), check, then restore.
+    var ids = { home: homePriceInput, down: downPctSlider, price: priceInput, basis: costBasisInput, rate: mortRateSlider,
+                prem: premiumSlider, years: horizonSlider, tax: capGainsSlider, repay: earlyRepaySlider };
+    var saved = {}; Object.keys(ids).forEach(function(k){ if(ids[k]) saved[k] = ids[k].value; });
+    var savedSc = BBM_SC, savedPicked = BBM_PICKED, savedRepayMax = earlyRepaySlider ? earlyRepaySlider.max : null;
+    var V = [
+      { label: 'defaults, 3 years, stays', set: { years: 3 }, sc: 'stay' },
+      { label: '5 years, returns to trend', set: { years: 5 }, sc: 'trend' },
+      { label: '30 years, stays, a gain to tax', set: { years: 30, basis: 20000, tax: 20 }, sc: 'stay' },
+      { label: '15 years, paid off in year 7', set: { years: 15, repay: 7 }, sc: 'trend' },
+      { label: '$1.5M home, 35% down, 10% rate, +2.5 pp, 12 years', set: { home: 1500000, down: 35, rate: 10, prem: 2.5, years: 12 }, sc: 'stay' },
+      { label: 'price above trend, 3 years, returns to trend', set: { price: 260000, basis: 200000, years: 3, rate: 10, prem: 2.5 }, sc: 'trend' }];
+    try {
+      V.forEach(function(v){
+        Object.keys(saved).forEach(function(k){ ids[k].value = saved[k]; });
+        if(earlyRepaySlider) earlyRepaySlider.max = 30;
+        Object.keys(v.set).forEach(function(k){ ids[k].value = String(v.set[k]); });
+        if(!('repay' in v.set) && earlyRepaySlider) earlyRepaySlider.value = '30';
+        BBM_SC = v.sc; BBM_PICKED = true; compute();
+        var r = holds(LAST);
+        out.push(['vector: ' + v.label, r.ok, r.why.join('; ')]);
+      });
+    } finally {
+      Object.keys(saved).forEach(function(k){ ids[k].value = saved[k]; });
+      if(earlyRepaySlider && savedRepayMax !== null) earlyRepaySlider.max = savedRepayMax;
+      BBM_SC = savedSc; BBM_PICKED = savedPicked; compute();
+    }
+    var ok = out.every(function(x){ return x[1]; });
+    if(window.console) console.table(out.map(function(x){ return { check: x[0], pass: x[1], why: x[2] }; }));
+    return { ok: ok, checks: out };
+  };
 
   function row(label, value, terminal){
     return '<div class="row' + (terminal ? ' row-terminal' : '') + '">' +
