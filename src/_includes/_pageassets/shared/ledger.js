@@ -15,7 +15,9 @@
      tabs     [{ id, label, columns: [{ label, unit, get(row), fmt }], rows,
                  strong(row) (optional: true sets the row in bold, e.g. a median) }]
               fmt: 'usd' | 'btc' | 'text' | 'pct' (a fraction: 0.115 shows
-              11.5%) | 'mult' (a multiple: 0.25 shows 0.25×)
+              11.5%) | 'mult' (a multiple: 0.25 shows 0.25×) | 'price' (a
+              bitcoin price across the whole record: whole dollars from $10,
+              cents below, three figures under $1, so 2010's $0.0608 isn't $0)
      final    { cols: ['House', 'Bitcoin'], rows: [{ label, values: [a, b] }] }
               (values in dollars, or null for a blank cell; a row may set
               fmt: 'btc' or 'text' instead)
@@ -48,12 +50,14 @@
 (function(){
   'use strict';
   function usd(v){ return (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-US'); }
+  function price(v){ var a = Math.abs(v); return (v < 0 ? '−' : '') + '$' + (a >= 10 ? Math.round(a).toLocaleString('en-US') : a >= 1 ? a.toFixed(2) : String(+a.toPrecision(3))); }
   function fmt(v, kind){
     if (v === null || v === undefined || (typeof v === 'number' && !isFinite(v))) return '';
     if (kind === 'btc') return Number(v).toFixed(4);
     if (kind === 'text') return String(v);
     if (kind === 'pct') return (v < 0 ? '−' : '') + (Math.abs(v) * 100).toFixed(1) + '%';
     if (kind === 'mult') return Number(v).toFixed(2) + '×';
+    if (kind === 'price') return price(v);
     return usd(v);
   }
   function csvCell(v, kind){
@@ -62,6 +66,7 @@
     if (kind === 'text') return '"' + String(v).replace(/"/g, '""') + '"';
     if (kind === 'pct') return (Number(v) * 100).toFixed(2);
     if (kind === 'mult') return Number(v).toFixed(4);
+    if (kind === 'price') return String(Math.abs(v) >= 1000 ? Math.round(v) : +Number(v).toPrecision(6));
     return String(Math.round(v));
   }
   function head(c){ return c.label + (c.unit ? ' (' + c.unit + ')' : ''); }

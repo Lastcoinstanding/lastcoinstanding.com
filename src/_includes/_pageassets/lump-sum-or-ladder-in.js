@@ -659,7 +659,7 @@
     var winRate = ok ? (ladderWon ? b.win : 100 - b.win) : null;
     var kLad = rows.filter(function (r) { return r.adv > 0; }).length;
     var span = function (r) { return r.end - S[r.i].d; };
-    var longRows = rows.filter(function (r) { return span(r) > 1.25 * months * 30.44; });
+    var longRows = rows.filter(function (r) { return span(r) > 1.1 * months * 30.44; });   // ~12-day samples give about 0.97× the months
     var longest = longRows.reduce(function (a, r) { return !a || span(r) > span(a) ? r : a; }, null);
     var lumpMore = rows.length ? rows.reduce(function (a, r) { return a + (r.lump / r.lad - 1); }, 0) / rows.length : null;
     var todayPos = liveTodayPos != null ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS);
@@ -670,13 +670,13 @@
         how: 'A date in the price record, inside the historical window, when bitcoin was between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× its trend: within ' + WIN + ' of the slider on the channel scale, which runs on a log scale from 0 at the floor (' + PL_FLOOR.toFixed(2) + '× trend) to 1 at the upper band (' + PL_CEIL.toFixed(1) + '×). Entries after ' + fmtDay(lastStart) + ' are left out: their ladder would run past the end of the record. The first row averages the Ladder advantage column.' },
       { label: 'Against trend', unit: '×', fmt: 'mult', get: function (r) { return r.avg ? null : S[r.i].p / plPrice(S[r.i].d); },
         how: 'Bitcoin’s price that day divided by its Power Law trend.' },
-      { label: 'Price', unit: '$', fmt: 'usd', get: function (r) { return r.avg ? null : S[r.i].p; },
+      { label: 'Price', unit: '$', fmt: 'price', get: function (r) { return r.avg ? null : S[r.i].p; },
         how: 'Bitcoin’s price in the record that day: what the lump pays.' },
       { label: 'All at once', unit: '₿ per ' + perW, fmt: 'btc', get: function (r) { return r.avg ? null : r.lump; },
         how: perW + ' divided by that price.' },
       { label: 'Ladder’s last buy', unit: '', fmt: 'text', get: function (r) { return r.avg ? null : fmtDay(r.end); },
         how: 'The ladder buys at the entry’s own sample and the next ' + (n - 1) + ', ' + n + ' buys in all (' + months + ' months at 2.53 samples a month; the samples are about ' + GAP_DAYS + ' days apart).' + longNote },
-      { label: 'Ladder’s average price', unit: '$', fmt: 'usd', get: function (r) { return r.avg ? null : r.avgP; },
+      { label: 'Ladder’s average price', unit: '$', fmt: 'price', get: function (r) { return r.avg ? null : r.avgP; },
         how: 'What the ladder paid per bitcoin overall: ' + perW + ' divided by the bitcoin it bought.' },
       { label: 'Laddered', unit: '₿ per ' + perW, fmt: 'btc', get: function (r) { return r.avg ? null : r.lad; },
         how: perW + ' in ' + n + ' equal parts, each divided by the price at its sample, added up.' },
