@@ -819,6 +819,31 @@
     }).join('');
   }
 
+  // Check the work, "What went in": the same settings the CSV header states, read
+  // from state S and the engine (never from the DOM). STYLE_GUIDE 6.49.
+  function auditInputs() {
+    var it = [
+      ['Your allocation', S.allocPct + '% in bitcoin'],
+      ['Horizon', S.horizonYears + ' years'],
+      ['Bitcoin projection', modeLabel(activeMode())],
+      ['Bitcoin over the hold', mult(btcMult())],
+      ['Bitcoin against trend today', ratioX(currentRatio())],
+      ['Traditional sleeve', S.tradRatePct + '%/yr (' + mult(tradMult()) + ' over the hold)'],
+      ['Bitcoin volatility', Math.round(BTC_VOL * 100) + '%'],
+      ['Traditional sleeve volatility', Math.round(TRAD_VOL * 100) + '%'],
+      ['Correlation', CORR.toFixed(2)],
+      ['Crash depth', S.crashDepthPct + '%']
+    ];
+    if (hasUSD()) it.push(['Total portfolio', '$' + commas(S.portfolioUSD)]);
+    it.push(['Strategy over time', S.strat === 'rebal' ? 'Rebalance annually' : 'Let it ride']);
+    if (S.crashOn) it.push(['Crash on the path', 'Year ' + Math.max(1, Math.min(S.horizonYears - 1, S.crashYear)) + ', ' + (RECOVERY[S.crashRec] || RECOVERY.historical).label + ' recovery']);
+    return it;
+  }
+  function renderAuditInputs() {
+    var el = document.getElementById('asAuditInputs');
+    if (el && window.CheckTheWork) el.innerHTML = window.CheckTheWork.inputsHtml(auditInputs());
+  }
+
   // ════════ ASSUMPTIONS LINE ════════
   function renderAssumptions() {
     var el = document.getElementById('asAssumptions'); if (!el) return;
@@ -927,6 +952,7 @@
     renderCompareChart(rows);
     renderCompareTable(rows);
     renderAudit(rows);
+    renderAuditInputs();
     renderAssumptions();
     renderCarry();
     syncUrl();
@@ -1085,14 +1111,9 @@
     // Audit accordion + CSV
     var at = document.getElementById('asAuditToggle'), ab = document.getElementById('asAuditBody2');
     if (at && ab) at.addEventListener('click', function () { var open = at.getAttribute('aria-expanded') === 'true'; at.setAttribute('aria-expanded', String(!open)); ab.hidden = open; });
-    var csvBtn = document.getElementById('asCsvBtn');
-    if (csvBtn) csvBtn.addEventListener('click', function () {
-      if (!_lastRows) return;
-      var blob = new Blob([buildCsv(_lastRows)], { type: 'text/csv' });
-      var el = document.createElement('a'); el.href = URL.createObjectURL(blob); el.download = 'bitcoin-portfolio-allocation.csv';
-      document.body.appendChild(el); el.click(); document.body.removeChild(el);
-      var lbl = csvBtn.querySelector('.as-csv-label'); if (lbl) { var o = lbl.textContent; lbl.textContent = 'Downloaded'; setTimeout(function () { lbl.textContent = o; }, 1600); }
-    });
+    var csvBtn = document.getElementById('asCsvBtn'), csvCopy = document.getElementById('asCsvCopy');
+    if (csvBtn) csvBtn.addEventListener('click', function () { if (_lastRows && window.CheckTheWork) window.CheckTheWork.download(buildCsv(_lastRows), 'bitcoin-portfolio-allocation.csv'); });
+    if (csvCopy) csvCopy.addEventListener('click', function () { if (_lastRows && window.CheckTheWork) window.CheckTheWork.copy(buildCsv(_lastRows), csvCopy); });
 
     initControls();
   }
