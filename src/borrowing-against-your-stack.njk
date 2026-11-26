@@ -34,8 +34,8 @@ faq:
     a: "Under US rules a loan is not a sale, so borrowing itself realizes no gain; tax comes due when coins are sold, including coins sold later to repay the loan. Hedging the loan with offsetting positions can trigger a constructive sale under IRS §1259, and interest is deductible only depending on what the proceeds funded. The calculator models US federal long-term capital gains only, not state tax or short-term gains. This is general information, not tax advice."
 eleventyComputed:
   head_extras: "{% include '_pageassets/borrowing-against-your-stack-head.html' %}"
-  page_styles: "{% include '_pageassets/borrowing-against-your-stack.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/borrowing-against-your-stack.js' %}"
+  page_styles: "{% include '_pageassets/borrowing-against-your-stack.css' %}\n{% include '_pageassets/shared/ledger.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/ledger.js' %}\n{% include '_pageassets/borrowing-against-your-stack.js' %}"
 ---
 <section class="hero">
     <h1><em>Borrowing</em> Against Your Stack</h1>
@@ -725,6 +725,14 @@ eleventyComputed:
                     <strong>What the borrow path leaves out:</strong> the math above measures only terminal wealth at bitcoin&rsquo;s price on the scenario showing. Borrowing also carries <a href="#loan-health">liquidation risk during drawdowns</a> (covered on Loan Health &mdash; the LTV meter and channel-position math) and <a href="#question">counterparty risk if the lender fails</a> (covered in The Question &mdash; the structural argument for verifiable, non-rehypothecating custody). Neither HODL nor selling carries these tail risks; they're features of the borrow path alone. The cheapest active path isn't automatically the right one if those risks aren't tolerable for your situation.
                 </div>
             </div>
+
+            <!-- ─── Check the work (STYLE_GUIDE §6.49; shared/ledger.js) ───
+                 The loan and the three paths, year by year from today to the
+                 horizon, on the scenario showing; then the three paths at the
+                 horizon, which are the cards above. Rendered by renderLedger()
+                 in borrowing-against-your-stack.js. Outside the section's
+                 padded box so the table has the column's full width on a phone. -->
+            <div class="bas-ledger" id="basLedger"></div>
 
         </div>
     </div>

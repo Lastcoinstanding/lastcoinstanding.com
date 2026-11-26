@@ -13,11 +13,13 @@
    Ledger.render(el, spec): el is the container; spec:
      note     HTML above the tabs: the dollars the table is in
      tabs     [{ id, label, columns: [{ label, unit, get(row), fmt }], rows }]
-              fmt: 'usd' | 'btc' | 'text'
+              fmt: 'usd' | 'btc' | 'text' | 'pct' (a fraction: 0.115 shows
+              11.5%) | 'mult' (a multiple: 0.25 shows 0.25×)
      final    { cols: ['House', 'Bitcoin'], rows: [{ label, values: [a, b] }] }
               (values in dollars, or null for a blank cell; a row may set
               fmt: 'btc' or 'text' instead)
-     csv      { filename, meta: [[label, value], ...] }
+     csv      { filename, meta: [[label, value], ...] } (a value may be a
+              function, read when the CSV is made: the live link, say)
    Optional, and all of them default to the real-estate pages' words, so a
    spec that leaves them out renders and exports exactly as before:
      hint             the muted words after "Check the work"
@@ -49,12 +51,16 @@
     if (v === null || v === undefined || (typeof v === 'number' && !isFinite(v))) return '';
     if (kind === 'btc') return Number(v).toFixed(4);
     if (kind === 'text') return String(v);
+    if (kind === 'pct') return (v < 0 ? '−' : '') + (Math.abs(v) * 100).toFixed(1) + '%';
+    if (kind === 'mult') return Number(v).toFixed(2) + '×';
     return usd(v);
   }
   function csvCell(v, kind){
     if (v === null || v === undefined || (typeof v === 'number' && !isFinite(v))) return '';
     if (kind === 'btc') return Number(v).toFixed(6);
     if (kind === 'text') return '"' + String(v).replace(/"/g, '""') + '"';
+    if (kind === 'pct') return (Number(v) * 100).toFixed(2);
+    if (kind === 'mult') return Number(v).toFixed(4);
     return String(Math.round(v));
   }
   function head(c){ return c.label + (c.unit ? ' (' + c.unit + ')' : ''); }
@@ -75,7 +81,7 @@
 
   function toCsv(spec){
     var L = [];
-    (spec.csv && spec.csv.meta || []).forEach(function(m){ L.push('# ' + m[0] + ',' + String(m[1]).replace(/,/g, ';')); });
+    (spec.csv && spec.csv.meta || []).forEach(function(m){ L.push('# ' + m[0] + ',' + String(typeof m[1] === 'function' ? m[1]() : m[1]).replace(/,/g, ';')); });
     (spec.inputs || []).forEach(function(m){ L.push(q('# Input: ' + m.label) + ',' + q(m.value)); });
     spec.tabs.forEach(function(t){
       L.push(''); L.push('# ' + t.label);

@@ -373,6 +373,8 @@
       // Update displays for the bvs sliders even in empty state
       if (horizonDisplay)  horizonDisplay.textContent  = horizonSlider.value;
       if (capGainsDisplay) capGainsDisplay.textContent = capGainsSlider.value;
+      LAST_RISK = null; LAST_BVS = null;
+      renderLedger(null);
       return;
     }
 
@@ -396,6 +398,8 @@
     var monthlyInterest   = annualInterest / 12;
     var annualPctOfStack  = annualInterest / stackUsd;
 
+    LAST_RISK = { ltv: ltv, liqPrice: liqPrice, drawdownToLiq: drawdownToLiq, liqRatio: liqRatio,
+                  annualInterest: annualInterest, monthlyInterest: monthlyInterest };
     var lz = ltvZone(ltv, liqThreshold);
     var cz = channelZone(liqRatio);
     var oz = originationZone(currentRatio);
@@ -465,12 +469,19 @@
     ['stay', 'trend'].forEach(function (sc) {
       bvsBoth[sc] = computeBorrowVsSell({
         stack: stack, currentPrice: price, loan: loan, rate: rate,
-        horizonYears: horizonYears, costBasis: costBasis, taxRate: taxRate, scenario: sc
+        horizonYears: horizonYears, costBasis: costBasis, taxRate: taxRate, scenario: sc,
+        todayDays: todayDays
       });
     });
     var bvs = bvsBoth[BVS_SC];
+    LAST_BVS = bvs;
     renderBorrowVsSell(bvs, {stack: stack, loan: loan, rate: rate});
     renderBvsBlock(bvsBoth, currentRatio, horizonYears, price);
+    renderLedger({
+      stack: stack, price: price, loan: loan, rate: rate, liqThreshold: liqThreshold, liqPrice: liqPrice,
+      horizonYears: horizonYears, costBasis: costBasis, taxRate: taxRate, scenario: BVS_SC,
+      todayDays: todayDays, m0: currentRatio
+    });
 
     renderChart(price, liqPrice);
   }
@@ -723,8 +734,10 @@
     var costBasis     = args.costBasis;
     var taxRate       = args.taxRate / 100;     // % as decimal
 
-    // Future price at end of horizon = trend there × the scenario's multiple
-    var todayDays  = (Date.now()/1000 - GENESIS_TS) / 86400;
+    // Future price at end of horizon = trend there × the scenario's multiple.
+    // args.todayDays (optional, 2026-11-26): recompute() passes its own, so the
+    // cards, Loan Health and the Check the work ledger price from one "today".
+    var todayDays  = (typeof args.todayDays === 'number') ? args.todayDays : (Date.now()/1000 - GENESIS_TS) / 86400;
     var futureDays = todayDays + horizonYears * 365.25;
     var trendNow   = plPrice(todayDays);
     var m0         = trendNow > 0 ? currentPrice / trendNow : 1;
@@ -947,6 +960,194 @@
       window.history.replaceState(null, '', window.location.pathname + '?' + params.toString() + window.location.hash);
     } catch (e) {}
   });
+
+  // ═══════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ═══════
+  // Added 2026-11-26, the first page outside the real-estate series on the
+  // shared ledger. computeBorrowVsSell() prices the three paths at the
+  // horizon only; the ledger runs that same function at every whole year
+  // from today to the horizon (horizonYears = t), so each row is what the
+  // cards would show with the horizon set to that year and the last row IS
+  // the cards. Loan Health's figures are the Today row (LTV, liquidation
+  // price, fall to liquidation, liquidation against trend) and Year 1's
+  // interest. Every other column is one line of arithmetic on the engine's
+  // outputs, stated under the table. Nothing here changes a figure.
+  var basLedgerEl = document.getElementById('basLedger');
+  var LEDGER = null;                   // { args, spec }: the last one rendered, for basQA()
+  var LAST_RISK = null, LAST_BVS = null; // what Loan Health and the cards last showed
+  function ledgerRows(a) {
+    var rows = [];
+    for (var t = 0; t <= a.horizonYears; t++) {
+      var r = computeBorrowVsSell({
+        stack: a.stack, currentPrice: a.price, loan: a.loan, rate: a.rate,
+        horizonYears: t, costBasis: a.costBasis, taxRate: a.taxRate, scenario: a.scenario,
+        todayDays: a.todayDays
+      });
+      var p = r.futurePrice, trend = plPrice(a.todayDays + t * 365.25);
+      rows.push({ t: t, price: p, trend: trend, r: r,
+                  collateral: a.stack * p, ltv: a.loan / (a.stack * p),
+                  fall: 1 - a.liqPrice / p, liqVsTrend: a.liqPrice / trend });
+    }
+    return rows;
+  }
+  function ledgerSpec(a) {
+    var rows = ledgerRows(a), N = a.horizonYears, end = rows[rows.length - 1].r;
+    var names = PC ? PC.names(a.m0) : { stay: 'Stays where it is against trend', trend: 'Returns to trend over 3 years' };
+    var REV = PC ? PC.REVERT_YEARS : 3;
+    var usd0 = function (v) { return '$' + Math.round(v).toLocaleString('en-US'); };
+    var btcWords = function (v) { return Number(v).toLocaleString('en-US', { maximumFractionDigits: 8 }) + ' BTC'; };
+    var atN = 'at year ' + N, liqPct = Math.round(a.liqThreshold * 100) + '%';
+    var mult0 = a.m0.toFixed(2) + '×';
+    var year = { label: 'Year', unit: '', fmt: 'text', get: function (x) { return x.t === 0 ? 'Today' : 'Year ' + x.t; } };
+    var priceHow = a.scenario === 'trend'
+      ? 'The Power Law trend on that date times a multiple of trend that moves in a straight line from today’s ' + mult0 + ' to 1.0 over ' + REV + ' years, then stays at 1.0. Today’s row is the price you entered.'
+      : 'The Power Law trend on that date times today’s multiple of trend (' + mult0 + '), which this scenario keeps every year. Today’s row is the price you entered.';
+    var price = { label: 'Bitcoin price', unit: '$', fmt: 'usd', get: function (x) { return x.price; }, how: priceHow };
+    var priceAgain = { label: 'Bitcoin price', unit: '$', fmt: 'usd', get: function (x) { return x.price; }, how: 'As on The loan tab.' };
+    var interest = { label: 'Interest paid to date', unit: '$', fmt: 'usd', get: function (x) { return x.r.borrow.cumulativeInterest; },
+      how: 'The loan times the interest rate times the years so far (simple interest). Year 1 is the Annual interest on Loan Health. It is paid from your income, not from the stack.' };
+    var loanCols = [year, price,
+      { label: 'Collateral value', unit: '$', fmt: 'usd', get: function (x) { return x.collateral; }, how: 'Your stack times that year’s bitcoin price.' },
+      { label: 'Loan owed', unit: '$', fmt: 'usd', get: function () { return a.loan; }, how: 'The loan amount. The loan is interest-only, so the balance stays the same until it is repaid.' },
+      { label: 'LTV', unit: '%', fmt: 'pct', get: function (x) { return x.ltv; },
+        how: 'Loan owed divided by the collateral value. Today’s row is Your LTV on Loan Health. At the liquidation LTV (' + liqPct + ') or above, the lender would sell collateral; the comparison on this tab doesn’t model that, and Loan Health is where it is tested.' },
+      { label: 'Fall to liquidation', unit: '%', fmt: 'pct', get: function (x) { return x.fall; },
+        how: 'How far bitcoin can fall from that year’s price before the lender sells: 1 minus the liquidation price divided by that year’s price. Below zero, that year’s price is already under the liquidation price.' },
+      { label: 'Liquidation price', unit: '$', fmt: 'usd', get: function () { return a.liqPrice; },
+        how: 'The loan divided by your stack times the liquidation LTV, as on Loan Health. It stays the same because the loan and the stack do.' },
+      { label: 'Liquidation price against trend', unit: '× trend', fmt: 'mult', get: function (x) { return x.liqVsTrend; },
+        how: 'The liquidation price divided by the Power Law trend on that date. Under 0.42× it sits below the channel floor: bitcoin would have to break the floor before the lender sells.' },
+      interest];
+    var borrowCols = [year, priceAgain,
+      { label: 'BTC sold to repay', unit: '₿', fmt: 'btc', get: function (x) { return x.r.borrow.btcSoldAtHorizon; },
+        how: 'If the loan were repaid that year: the loan divided by what one bitcoin brings in after tax that year, which is the price less the tax rate times its gain over your cost basis.' },
+      { label: 'Tax on that sale', unit: '$', fmt: 'usd', get: function (x) { return x.r.borrow.taxPaid; },
+        how: 'The bitcoin sold times the tax rate times each one’s gain over your cost basis (none if there is no gain).' },
+      { label: 'BTC retained', unit: '₿', fmt: 'btc', get: function (x) { return x.r.borrow.btcRetained; },
+        how: 'Your stack less the bitcoin sold to repay; none if repaying would take more than the whole stack.' },
+      { label: 'Value retained', unit: '$', fmt: 'usd', get: function (x) { return x.r.borrow.btcRetained * x.price; }, how: 'BTC retained times that year’s price.' },
+      { label: 'Interest paid to date', unit: '$', fmt: 'usd', get: interest.get, how: 'As on The loan tab.' },
+      { label: 'Net wealth if repaid that year', unit: '$', fmt: 'usd', get: function (x) { return x.r.borrow.terminalWealth; },
+        how: 'Value retained less the interest paid to date: what the Borrow path card would show with the horizon set to that year. The last row is the card.' }];
+    var sellCols = [year, priceAgain,
+      { label: 'BTC sold', unit: '₿', fmt: 'btc', get: function (x) { return x.t === 0 ? x.r.sell.btcSold : null; },
+        how: 'Sold today, at today’s price: the loan divided by what one bitcoin brings in after tax today. Nothing more is sold.' },
+      { label: 'Tax on the sale', unit: '$', fmt: 'usd', get: function (x) { return x.t === 0 ? x.r.sell.taxPaid : null; },
+        how: 'The bitcoin sold times the tax rate times each one’s gain over your cost basis (none if there is no gain).' },
+      { label: 'BTC retained', unit: '₿', fmt: 'btc', get: function (x) { return x.r.sell.btcRetained; },
+        how: 'Your stack less the bitcoin sold today; none if the sale would take more than the whole stack.' },
+      { label: 'Value retained', unit: '$', fmt: 'usd', get: function (x) { return x.r.sell.terminalWealth; },
+        how: 'BTC retained times that year’s price. The last row is the Sell path card’s net wealth.' }];
+    var sideCols = [year,
+      { label: 'Just HODL', unit: '$', fmt: 'usd', get: function (x) { return x.r.hodl.terminalWealth; }, how: 'Your whole stack times that year’s price: nothing sold, no interest.' },
+      { label: 'Borrow path', unit: '$', fmt: 'usd', get: function (x) { return x.r.borrow.terminalWealth; }, how: 'The Borrow path tab’s last column for that year.' },
+      { label: 'Sell path', unit: '$', fmt: 'usd', get: function (x) { return x.r.sell.terminalWealth; }, how: 'The Sell path tab’s last column for that year.' },
+      { label: 'Borrow minus sell', unit: '$', fmt: 'usd', get: function (x) { return x.r.borrow.terminalWealth - x.r.sell.terminalWealth; },
+        how: 'Borrow path minus Sell path in the same row. In the last row it is the figure in the scenario block above: how much cheaper one path is than the other.' },
+      { label: 'Cheaper', unit: '', fmt: 'text', get: function (x) {
+          if (!x.r.sellPathFeasible) return 'sell not feasible';
+          if (!x.r.borrowPathFeasible) return 'borrow not feasible';
+          var d = x.r.borrow.terminalWealth - x.r.sell.terminalWealth;
+          return Math.abs(d) < 0.5 ? 'level' : d > 0 ? 'borrowing' : 'selling'; },
+        how: 'Borrowing where Borrow minus sell is above zero, selling where it is below. Not feasible where a path needs more bitcoin than the stack, as the cards say.' }];
+    var inputs = [
+      ['Bitcoin stack', btcWords(a.stack)], ['Bitcoin price today', usd0(a.price)],
+      ['Power Law trend today', usd0(rows[0].trend) + ' (bitcoin at ' + mult0 + ' trend)'],
+      ['Loan', usd0(a.loan)], ['Interest rate', a.rate.toFixed(1) + '% a year, interest only'],
+      ['Liquidation LTV', liqPct + ' (set on Loan Health)'], ['Years to the horizon', String(N)],
+      ['Cost basis', usd0(a.costBasis) + ' a bitcoin'], ['Capital gains tax rate', a.taxRate + '%'],
+      ['Bitcoin’s price', names[a.scenario]],
+      ['Today', new Date((GENESIS_TS + a.todayDays * 86400) * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    return {
+      hint: 'year by year, and the three paths ' + atN,
+      inputs: inputs.map(function (m) { return { label: m[0], value: m[1] }; }),
+      note: 'Dollars of each year (before inflation), on the scenario showing: <strong>' + names[a.scenario] + '</strong>. Each row runs the comparison with the horizon set to that year, so the last row is the three cards above.',
+      tabs: [{ id: 'loan', label: 'The loan', columns: loanCols, rows: rows },
+             { id: 'borrow', label: 'Borrow path', columns: borrowCols, rows: rows },
+             { id: 'sell', label: 'Sell path', columns: sellCols, rows: rows },
+             { id: 'side', label: 'Side by side', columns: sideCols, rows: rows }],
+      final: { title: 'At year ' + N, csvTitle: 'At year ' + N + ' (USD, nominal; bitcoin in BTC)', howTitle: 'How the three paths ' + atN + ' are worked out',
+        cols: ['Just HODL', 'Borrow path', 'Sell path'], rows: [
+          { label: 'Need funded today', values: [0, a.loan, a.loan], how: 'The loan, in cash today: borrowed, or raised by selling bitcoin and paying the tax. HODL funds nothing.' },
+          { label: 'BTC sold', fmt: 'btc', values: [0, end.borrow.btcSoldAtHorizon, end.sell.btcSold], how: 'Borrow path: sold ' + atN + ' to repay the loan. Sell path: sold today.' },
+          { label: 'Cap gains tax', values: [0, end.borrow.taxPaid, end.sell.taxPaid], how: 'The tax on those sales: the tax rate times each bitcoin’s gain over your cost basis.' },
+          { label: 'Cumulative interest paid', values: [0, end.borrow.cumulativeInterest, 0], how: 'The loan times the interest rate times ' + N + (N === 1 ? ' year' : ' years') + ', paid from income.' },
+          { label: 'BTC retained', fmt: 'btc', values: [end.hodl.btcRetained, end.borrow.btcRetained, end.sell.btcRetained], how: 'Your stack less the bitcoin sold: the large figure on each card.' },
+          { label: 'Net wealth ' + atN, values: [end.hodl.terminalWealth, end.borrow.terminalWealth, end.sell.terminalWealth], strong: true,
+            card: 'The Net wealth row on each card above', how: 'BTC retained times bitcoin’s price ' + atN + ', less the interest paid on the borrow path.' },
+          { label: 'Cost against HODL', values: [0, end.borrow.costVsHodl, end.sell.costVsHodl], how: 'HODL’s net wealth less this path’s: the two costs the verdict compares.' }
+        ] },
+      csv: { filename: 'borrowing-against-your-stack.csv', meta: [
+        ['Last Coin Standing', 'Borrowing Against Your Stack: Borrow vs. Sell vs. HODL'],
+        ['Amounts', 'nominal USD (before inflation); bitcoin in BTC'],
+        ['Live scenario URL', function () { return window.location.href; }]] }
+    };
+  }
+  function renderLedger(a) {
+    if (!basLedgerEl || !window.Ledger) return;
+    if (!a) { LEDGER = null; basLedgerEl.innerHTML = ''; basLedgerEl._ledgerSpec = null; return; }
+    LEDGER = { args: a, spec: ledgerSpec(a) };
+    window.Ledger.render(basLedgerEl, LEDGER.spec);
+  }
+
+  // ─── QA (console: basQA()) ───
+  // The live ledger against what Loan Health and the cards show, every row's
+  // arithmetic, and the same identities across scenarios, horizons and the
+  // infeasible cases, run through the engine directly.
+  window.basQA = function () {
+    var out = [], near = function (x, y) { return Math.abs(x - y) <= 1e-6 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function rowsHold(sp, a) {
+      var ok = true, rows = sp.tabs[0].rows;
+      sp.tabs.forEach(function (t) { ok = ok && t.rows.length === a.horizonYears + 1; });
+      rows.forEach(function (x) {
+        var tr = plPrice(a.todayDays + x.t * 365.25), m = x.price / tr;
+        ok = ok && near(x.collateral, a.stack * x.price) && near(x.ltv * x.collateral, a.loan)
+          && near(x.r.hodl.terminalWealth, a.stack * x.price)
+          && near(x.r.sell.terminalWealth, x.r.sell.btcRetained * x.price)
+          && near(x.r.borrow.terminalWealth, x.r.borrow.btcRetained * x.price - x.r.borrow.cumulativeInterest)
+          && near(x.r.borrow.cumulativeInterest, a.loan * a.rate / 100 * x.t)
+          && (a.scenario === 'trend' ? (x.t >= 3 ? near(m, 1) : near(m, a.m0 + (1 - a.m0) * x.t / 3)) : near(m, a.m0));
+      });
+      return ok && near(rows[0].price, a.price);
+    }
+    if (!LAST_BVS) out.push(['empty inputs: no panel, as the cards show none', !!basLedgerEl && basLedgerEl.innerHTML === '']);
+    else out.push(['ledger: the Check the work order and clarity additions', !!(window.Ledger && basLedgerEl && window.Ledger.check(basLedgerEl, { side: false }))]);
+    if (LEDGER && LAST_BVS && LAST_RISK) {
+      var sp = LEDGER.spec, a = LEDGER.args, rows = sp.tabs[0].rows, today = rows[0];
+      var net = sp.final.rows.filter(function (r) { return r.card; })[0], side = sp.tabs[3];
+      var lastSide = rows[rows.length - 1];
+      out.push(['books: the marked row = the three cards', near(net.values[0], LAST_BVS.hodl.terminalWealth) && near(net.values[1], LAST_BVS.borrow.terminalWealth) && near(net.values[2], LAST_BVS.sell.terminalWealth)]);
+      out.push(['books: Side by side, last row = the cards and the block', near(side.columns[1].get(lastSide), LAST_BVS.hodl.terminalWealth) && near(side.columns[2].get(lastSide), LAST_BVS.borrow.terminalWealth)
+        && near(side.columns[3].get(lastSide), LAST_BVS.sell.terminalWealth) && near(side.columns[4].get(lastSide), LAST_BVS.deltaWealth)]);
+      out.push(['books: Today row = Loan Health (LTV, liquidation price, fall, against trend)', near(today.ltv, LAST_RISK.ltv) && near(LEDGER.args.liqPrice, LAST_RISK.liqPrice)
+        && near(today.fall, LAST_RISK.drawdownToLiq) && near(today.liqVsTrend, LAST_RISK.liqRatio)]);
+      out.push(['books: Year 1 interest = Loan Health’s annual interest', rows.length < 2 || near(rows[1].r.borrow.cumulativeInterest, LAST_RISK.annualInterest)]);
+      out.push(['rows: every identity holds on the live ledger', rowsHold(sp, a)]);
+      var csv = window.Ledger.toCsv(sp);
+      out.push(['csv: settings, four tables, their sentences, the year-' + a.horizonYears + ' block', csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 4 && csv.indexOf('# At year ' + a.horizonYears + ' (USD') > 0 && (csv.match(/^"(Today|Year \d+)",/gm) || []).length === 4 * (a.horizonYears + 1)]);
+    } else if (LAST_BVS) out.push(['live ledger rendered', false]);
+    // Vectors through the engine: both scenarios, short and long horizons,
+    // a gain to tax, and each path infeasible in turn.
+    var TD = daysSinceGenesis(), tr0 = plPrice(TD), V = [
+      { stack: 1, price: tr0 * 0.53, loan: 10000, rate: 10, liqThreshold: 0.8, horizonYears: 5, costBasis: tr0 * 0.53, taxRate: 20, scenario: 'stay' },
+      { stack: 1, price: tr0 * 0.53, loan: 10000, rate: 10, liqThreshold: 0.8, horizonYears: 5, costBasis: 20000, taxRate: 20, scenario: 'trend' },
+      { stack: 2.5, price: tr0 * 0.53, loan: 50000, rate: 14, liqThreshold: 0.77, horizonYears: 1, costBasis: 30000, taxRate: 15, scenario: 'trend' },
+      { stack: 0.5, price: tr0 * 1.8, loan: 25000, rate: 3, liqThreshold: 0.8, horizonYears: 15, costBasis: 5000, taxRate: 0, scenario: 'trend' },
+      { stack: 0.1, price: tr0 * 0.53, loan: 10000, rate: 10, liqThreshold: 0.8, horizonYears: 5, costBasis: 5000, taxRate: 20, scenario: 'stay' },
+      { stack: 0.05, price: tr0 * 1.6, loan: 4000, rate: 20, liqThreshold: 0.95, horizonYears: 3, costBasis: 1000, taxRate: 40, scenario: 'trend' }];
+    V.forEach(function (v, i) {
+      v.todayDays = TD; v.m0 = v.price / tr0; v.liqPrice = v.loan / (v.stack * v.liqThreshold);
+      var sp = ledgerSpec(v), end = computeBorrowVsSell({ stack: v.stack, currentPrice: v.price, loan: v.loan, rate: v.rate, horizonYears: v.horizonYears,
+        costBasis: v.costBasis, taxRate: v.taxRate, scenario: v.scenario, todayDays: TD });
+      var fin = sp.final.rows.filter(function (r) { return r.card; })[0];
+      var finite = sp.tabs.every(function (t) { return t.rows.every(function (x) { return t.columns.every(function (c) { var g = c.get(x); return g === null || typeof g === 'string' || isFinite(g); }); }); });
+      out.push(['vector ' + (i + 1) + ' (' + v.scenario + ', ' + v.horizonYears + 'y' + (!end.sellPathFeasible ? ', sell infeasible' : '') + (!end.borrowPathFeasible ? ', borrow infeasible' : '') + ')',
+        rowsHold(sp, v) && finite && near(fin.values[1], end.borrow.terminalWealth) && near(fin.values[2], end.sell.terminalWealth) && near(fin.values[0], end.hodl.terminalWealth)]);
+    });
+    var ok = out.every(function (x) { return x[1]; });
+    if (window.console) console.table(out.map(function (x) { return { check: x[0], pass: x[1] }; }));
+    return { ok: ok, checks: out };
+  };
 
   // Helper for building rows in the comparison cards
   function row(label, value, terminal) {
