@@ -883,6 +883,18 @@
     syncUrl();
     // stash for CSV
     _last = { base: base, crashed: shown, crashedFull: crashed, reduced: reduced, crash: crash, infl: infl };
+    // "What went in" (Check the work): the settings the CSV's header lists.
+    var inEl = document.getElementById('stAuditInputs');
+    if (inEl && window.CheckTheWork) {
+      var cy = _last && _last.crash ? _last.crash : null;
+      var items = [['Bitcoin stack', SCENARIO.btcStack + ' BTC'], ['Retirement year', String(SCENARIO.retirementYear)],
+        ['Annual withdrawal', '$' + Math.round(SCENARIO.targetIncomeUSD).toLocaleString('en-US') + (SCENARIO.incomeBasis === 'fixed' ? ', the same every year' : ', rising with inflation')],
+        ['Years in retirement', String(SCENARIO.yearsInRetirement)], ['Monthly DCA until retirement', '$' + Math.round(SCENARIO.monthlyDcaUSD).toLocaleString('en-US')],
+        ['Inflation', inflationLabel()]];
+      if (cy) items.push(['Crash depth', Math.round(cy.depthPct * 100) + '%'], ['Crash year', cy.crashYear + ' (year ' + (cy.crashYear - SCENARIO.retirementYear + 1) + ' of retirement)']);
+      items.push(['Recovery', (RECOVERY[CRASH.recoveryPreset] || RECOVERY.historical).label], ['Spending cut', FLEX > 0 ? FLEX + '% while the market is below its pre-crash level' : 'off']);
+      inEl.innerHTML = window.CheckTheWork.inputsHtml(items);
+    }
   }
   var _last = null;
 
@@ -1058,6 +1070,9 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       var lbl = csvBtn.querySelector('.st-csv-label'); if (lbl) { var o = lbl.textContent; lbl.textContent = 'Downloaded'; setTimeout(function () { lbl.textContent = o; }, 1600); }
     });
+
+    var cpBtn = document.getElementById('stCsvCopy');
+    if (cpBtn) cpBtn.addEventListener('click', function () { if (_last && window.CheckTheWork) window.CheckTheWork.copy(buildCsv(_last.base, _last.crashed, _last.crash), cpBtn); });
 
     initControls();
   }

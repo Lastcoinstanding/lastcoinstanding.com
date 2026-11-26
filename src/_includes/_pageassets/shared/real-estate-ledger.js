@@ -105,10 +105,10 @@
       spec.final.cols.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
       spec.final.rows.map(function(r){ return '<tr' + (r.strong ? ' class="re-ledger-strong"' : '') + '><td>' + esc(r.label) + (r.card ? '<span class="re-ledger-mark">' + esc(r.card) + '</span>' : '') + '</td>' + r.values.map(function(v){ return '<td>' + fmt(v, 'usd') + '</td>'; }).join('') + '</tr>'; }).join('') +
       '</tbody></table></div>' + howBlock('How the sale at the end is worked out', spec.final.rows, howOpen ? ' open' : '')) : '';
-    el.innerHTML = '<details class="re-ledger"' + (open ? ' open' : '') + '><summary>Show the calculation <span class="re-ledger-hint">year by year, and the sale at the end</span></summary>' +
+    el.innerHTML = '<details class="re-ledger"' + (open ? ' open' : '') + '><summary>Check the work <span class="re-ledger-hint">year by year, and the sale at the end</span></summary>' +
       '<div class="re-ledger-body">' + inputs + '<p class="re-ledger-note">' + (spec.note || '') + '</p>' +
       '<div class="re-ledger-tabs" role="group" aria-label="Ledger">' + tabs + '</div>' + tables + final +
-      '<button type="button" class="re-ledger-csv">Download CSV</button></div></details>';
+      '<div class="ctw-actions"><button type="button" class="re-ledger-csv">Download CSV</button><button type="button" class="re-ledger-csv re-ledger-copy">Copy as CSV</button></div></div></details>';
     el.setAttribute('data-tab', active);
     el.querySelectorAll('.re-ledger-tab').forEach(function(b){
       b.addEventListener('click', function(){
@@ -131,6 +131,13 @@
       var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (spec.csv && spec.csv.filename) || 'ledger.csv';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       var o = btn.textContent; btn.textContent = 'Downloaded'; setTimeout(function(){ btn.textContent = o; }, 1600);
+    });
+    var cp = el.querySelector('.re-ledger-copy');
+    if (cp) cp.addEventListener('click', function(){
+      var text = toCsv(spec), o = cp.textContent, done = function(){ cp.classList.add('copied'); cp.textContent = 'Copied \u2713'; setTimeout(function(){ cp.classList.remove('copied'); cp.textContent = o; }, 1500); };
+      var fallback = function(){ var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'absolute'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fallback); else fallback();
     });
     el._ledgerSpec = spec;
   }

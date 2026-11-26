@@ -805,7 +805,17 @@
     var gs = document.getElementById('rtGrowSummary');
     var vs = document.getElementById('rtVerifySummary');
     if (gs) gs.innerHTML = summary;
-    if (vs) vs.innerHTML = summary;
+    if (vs && window.CheckTheWork) {
+      // "What went in" (Check the work, shared/check-the-work.css): the same
+      // settings the CSV's header lists, from SCENARIO, not from the DOM.
+      var _inf = window.ModelingAssumptions.get('inflation').value;
+      vs.innerHTML = window.CheckTheWork.inputsHtml([
+        ['Bitcoin stack', SCENARIO.btcStack + ' BTC'], ['Retirement year', String(SCENARIO.retirementYear)],
+        ['Annual withdrawal', '$' + Math.round(SCENARIO.targetIncomeUSD).toLocaleString('en-US') + (SCENARIO.incomeBasis === 'fixed' ? ', the same every year' : ', rising with inflation')],
+        ['Years in retirement', String(SCENARIO.yearsInRetirement)], ['Monthly DCA until retirement', '$' + Math.round(SCENARIO.monthlyDcaUSD).toLocaleString('en-US')],
+        ['Inflation', _inf + '% a year'], ['Bitcoin\u2019s price', rtWords().title[RT_BASIS] + (RT_BASIS === 'floor' ? PC.floorFall(rtCurrentRatio()).tag : '')],
+        ['Dollars shown', RT_DOLLARS === 'real' ? 'today\u2019s' : 'future (nominal)']]);
+    } else if (vs) vs.innerHTML = summary;
     // Income-drawn column note — phrased for the active income basis so the
     // rising-nominal / flat-real shape is never an unexplained surprise.
     var incEl = document.getElementById('rtIncomeNote');

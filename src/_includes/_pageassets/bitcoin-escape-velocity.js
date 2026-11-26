@@ -1147,7 +1147,15 @@
     tbody.innerHTML = html;
 
     var sum = document.getElementById('evVerifySummary');
-    if (sum) sum.innerHTML = scenarioSummaryHtml();
+    if (sum && window.CheckTheWork) {
+      // "What went in" (Check the work): the settings the CSV's header lists.
+      sum.innerHTML = window.CheckTheWork.inputsHtml([
+        ['Bitcoin stack at retirement', SCENARIO.btcStack + ' BTC'], ['Retirement year', String(SCENARIO.retirementYear)],
+        ['Annual withdrawal', '$' + Math.round(SCENARIO.targetIncomeUSD).toLocaleString('en-US') + (SCENARIO.incomeBasis === 'fixed' ? ', the same every year' : ', rising with inflation')],
+        ['Years in retirement', String(SCENARIO.yearsInRetirement)], ['Inflation', MA.get('inflation').value + '% a year'],
+        ['Bitcoin\u2019s price', basisTitle(PRICE_BASIS) + (PRICE_BASIS === 'floor' ? PC.floorFall(currentRatio()).tag : '')],
+        ['Dollars shown', RT_DOLLARS === 'real' ? 'today\u2019s' : 'future (nominal)']]);
+    } else if (sum) sum.innerHTML = scenarioSummaryHtml();
 
     var incEl = document.getElementById('evIncomeNote');
     if (incEl) {

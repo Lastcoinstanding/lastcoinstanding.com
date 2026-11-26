@@ -1,11 +1,7 @@
 /* PR 6a: "Show the calculation", both real-estate pages (shared/real-estate-ledger.js).
    Colours come from each page's own tokens, with fallbacks. */
-.re-ledger { margin: 1.2rem 0 0.4rem; border-top: 1px solid rgba(224,148,34,0.15); }
-.re-ledger summary { cursor: pointer; list-style: none; padding: 0.75rem 0; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber, #e09422); }
-.re-ledger summary::-webkit-details-marker { display: none; }
-.re-ledger summary::before { content: '\25B8'; display: inline-block; margin-right: 0.45rem; }
-.re-ledger[open] summary::before { content: '\25BE'; }
-.re-ledger-hint { font-weight: 400; letter-spacing: 0; text-transform: none; font-style: italic; color: var(--text-dim, var(--ink-dim, #968b7a)); margin-left: 0.4rem; }
+/* The entry row, the panel, What went in, How each column is worked out and the
+   export buttons are the sitewide Check the work treatment: shared/check-the-work.css. */
 .re-ledger-body p.re-ledger-note { font-size: 0.78rem; line-height: 1.5; color: var(--text-dim, var(--ink-dim, #968b7a)); margin: 0 0 0.7rem; }
 .re-ledger-tabs { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.6rem; }
 .re-ledger-tab { font: inherit; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(224,148,34,0.2); background: transparent; color: var(--text-dim, var(--ink-dim, #968b7a)); cursor: pointer; }
@@ -19,23 +15,6 @@
 .re-ledger-unit { display: block; font-weight: 400; font-size: 0.66rem; opacity: 0.8; }
 .re-ledger-final { min-width: 22rem; }
 .re-ledger-final .re-ledger-strong td { font-weight: 700; color: var(--text, var(--ink, #ccc6b8)); }
-/* The clarity pilot (2026-11-25): what went in, the marked headline row, how each column is worked out. */
-.re-ledger-inputs { margin: 0 0 0.8rem; padding: 0.65rem 0.8rem; border: 1px solid rgba(224,148,34,0.15); border-radius: 0.35rem; }
-.re-ledger-sub { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim, var(--ink-dim, #968b7a)); margin: 0 0 0.45rem; }
-.re-ledger-inputs dl { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.2rem 1.4rem; margin: 0; }
-.re-ledger-inputs dl > div { display: flex; justify-content: space-between; gap: 0.8rem; font-size: 0.76rem; line-height: 1.5; border-bottom: 1px solid rgba(255,255,255,0.04); }
-.re-ledger-inputs dt { color: var(--text-dim, var(--ink-dim, #968b7a)); }
-.re-ledger-inputs dd { margin: 0; text-align: right; color: var(--text, var(--ink, #ccc6b8)); font-variant-numeric: tabular-nums; }
-.re-ledger-mark { display: block; font-weight: 400; font-size: 0.68rem; white-space: normal; max-width: 22rem; color: var(--amber, #e09422); }
-.re-ledger-how { margin: -0.3rem 0 0.9rem; }
-.re-ledger-how[hidden] { display: none; }
-.re-ledger .re-ledger-how summary { padding: 0.3rem 0; font-size: 0.74rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-dim, var(--ink-dim, #968b7a)); }
-.re-ledger .re-ledger-how summary::before { content: '\25B8'; }
-.re-ledger .re-ledger-how[open] summary::before { content: '\25BE'; }
-.re-ledger-how ul { list-style: none; margin: 0.2rem 0 0; padding: 0; }
-.re-ledger-how li { font-size: 0.76rem; line-height: 1.55; color: var(--text-dim, var(--ink-dim, #968b7a)); margin: 0 0 0.3rem; }
-.re-ledger-how li strong { color: var(--text, var(--ink, #ccc6b8)); font-weight: 600; }
-.re-ledger-csv { font: inherit; font-size: 0.76rem; padding: 0.4rem 0.9rem; border-radius: 0.3rem; border: 1px solid rgba(224,148,34,0.35); background: rgba(224,148,34,0.08); color: var(--amber, #e09422); cursor: pointer; }
 
 /* PR 6c: Bitcoin vs. Real Estate's wealth chart (shared/real-estate-chart.js). */
 .re-chart-block { margin: 1.4rem 0 0.4rem; }
