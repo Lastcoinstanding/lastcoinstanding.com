@@ -447,6 +447,7 @@
       lede.innerHTML = 'Bitcoin has rarely sat <em>' + posLabel(state.pos) + '</em> in this window &mdash; too few historical entries here to read.';
       boxes.style.display = 'none';
       if (detail) detail.innerHTML = '<span class="lsl-sparse">Widen the window or move the slider toward where price has actually spent time.</span>';
+      renderLedger();
       return;
     }
     boxes.style.display = '';
@@ -464,6 +465,7 @@
     if (freqEl) freqEl.textContent = Math.round(winRate) + '%';
     if (freqSub) freqSub.textContent = 'of ' + b.n + ' historical entries here';
     if (detail) detail.innerHTML = '<span class="lsl-sparse">A demonstration across history &mdash; not a call for your own situation. That&rsquo;s the next page.</span>';
+    renderLedger();
   }
   // Apply a new slider position — from a drag (fromUser) or from the live default.
   function setSliderPos(pos, fromUser) {
@@ -539,6 +541,7 @@
     // no slider to sync — the depth lives on page 3 now.
     renderHrToday();
     renderBackstop();   // today-anchored table recomputes with the live exit price (2E-A1)
+    renderLedger();     // Check the work names today's position
   }
 
   // ════════ TABLES ════════
@@ -609,6 +612,199 @@
       updateAdvChart(); updateBoxes();
     });
   }
+
+  // ════════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ════════
+  // Added 2026-11-26. Every historical entry behind the two boxes, each one's
+  // lump and ladder side by side, then the advantage curve the chart draws, then
+  // the boxes themselves. Built from the shared engine (LadderAdvantage) at the
+  // page's state; nothing here changes a figure. Re-rendered by updateBoxes()
+  // (slider, window, ladder) and renderChannelContext() (the live price).
+  var ledgerEl = document.getElementById('lslLedger');
+  var PER = 10000;   // the comparison is a ratio of bitcoin; shown per $10,000 so the figures read easily
+  var ERA_WORDS = { 'full': 'Full: the whole record', 'post-2017': 'Post-2017: entries from January 1, 2017', 'post-2020': 'Post-2020: entries from January 1, 2020' };
+  function fmtDay(d) { return dateOf(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
+  function monthYearOf(d) { return dateOf(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  function ladderMonths() { var el = document.getElementById('lslLadder'); return el ? parseInt(el.value, 10) : 12; }
+  // The record's samples are ~12 days apart, then roughly monthly from the first
+  // gap over 25 days (the monthly refresh). A ladder is a count of samples, so
+  // one that reaches the monthly stretch runs longer than its months.
+  var SPARSE_FROM = null, GAP_DAYS = (function () {
+    var g = [], j;
+    for (j = 1; j < N; j++) { if (SPARSE_FROM == null && S[j].d - S[j - 1].d > 25) SPARSE_FROM = S[j - 1].d; if (SPARSE_FROM == null) g.push(S[j].d - S[j - 1].d); }
+    g.sort(function (a, c) { return a - c; });
+    return g.length ? g[Math.floor(g.length / 2)] : 12;
+  })();
+  // The chart's curve, point for point: the same loop as LadderAdvantage.advantageCurve,
+  // keeping each point's entry count and ladder win share.
+  function curveRows(era, n) {
+    var out = [];
+    for (var g = -0.10; g <= 1.151; g += 0.025) {
+      var bb = bucketAt(era, n, g);
+      if (bb.n >= 4) out.push({ x: +g.toFixed(4), y: bb.mean, n: bb.n, win: bb.win });
+    }
+    return out;
+  }
+  function entryRows(era, n, pos) {
+    return LA.bucketEntries(era, n, pos).map(function (i) {
+      var lump = PER / S[i].p, lad = 0;
+      for (var k = 0; k < n; k++) lad += (PER / n) / S[i + k].p;
+      return { i: i, lump: lump, lad: lad, avgP: PER / lad, end: S[i + n - 1].d, adv: LA.ladderAdvantage(i, n) / 100 };
+    });
+  }
+  function ledgerSpec() {
+    var n = state.ladderN, months = ladderMonths(), pos = state.pos, era = state.era;
+    var b = bucketAt(era, n, pos), rows = entryRows(era, n, pos), ok = b.n >= 4;
+    var lo = ratioOf(pos - WIN), hi = ratioOf(pos + WIN), perW = '$' + PER.toLocaleString('en-US');
+    var ladderWon = ok && b.mean > 0, winName = ok ? (ladderWon ? 'Laddering in' : 'Deploying all at once') : null;
+    var winRate = ok ? (ladderWon ? b.win : 100 - b.win) : null;
+    var kLad = rows.filter(function (r) { return r.adv > 0; }).length;
+    var span = function (r) { return r.end - S[r.i].d; };
+    var longRows = rows.filter(function (r) { return span(r) > 1.25 * months * 30.44; });
+    var longest = longRows.reduce(function (a, r) { return !a || span(r) > span(a) ? r : a; }, null);
+    var lumpMore = rows.length ? rows.reduce(function (a, r) { return a + (r.lump / r.lad - 1); }, 0) / rows.length : null;
+    var todayPos = liveTodayPos != null ? liveTodayPos : posOf(TODAY_PRICE, TODAY_DAYS);
+    var lastStart = S[N - n].d;
+    var longNote = longest ? ' Since ' + monthYearOf(SPARSE_FROM) + ' the record’s samples are about a month apart, so ' + (longRows.length === 1 ? 'one ladder here runs' : longRows.length + ' ladders here run') + ' longer: the longest, from ' + fmtDay(S[longest.i].d) + ', takes ' + Math.round(span(longest) / 30.44) + ' months.' : '';
+    var entCols = [
+      { label: 'Entry', unit: '', fmt: 'text', get: function (r) { return r.avg ? 'Average' : fmtDay(S[r.i].d); },
+        how: 'A date in the price record, inside the historical window, when bitcoin was between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× its trend: within ' + WIN + ' of the slider on the channel scale, which runs on a log scale from 0 at the floor (' + PL_FLOOR.toFixed(2) + '× trend) to 1 at the upper band (' + PL_CEIL.toFixed(1) + '×). Entries after ' + fmtDay(lastStart) + ' are left out: their ladder would run past the end of the record. The first row averages the Ladder advantage column.' },
+      { label: 'Against trend', unit: '×', fmt: 'mult', get: function (r) { return r.avg ? null : S[r.i].p / plPrice(S[r.i].d); },
+        how: 'Bitcoin’s price that day divided by its Power Law trend.' },
+      { label: 'Price', unit: '$', fmt: 'usd', get: function (r) { return r.avg ? null : S[r.i].p; },
+        how: 'Bitcoin’s price in the record that day: what the lump pays.' },
+      { label: 'All at once', unit: '₿ per ' + perW, fmt: 'btc', get: function (r) { return r.avg ? null : r.lump; },
+        how: perW + ' divided by that price.' },
+      { label: 'Ladder’s last buy', unit: '', fmt: 'text', get: function (r) { return r.avg ? null : fmtDay(r.end); },
+        how: 'The ladder buys at the entry’s own sample and the next ' + (n - 1) + ', ' + n + ' buys in all (' + months + ' months at 2.53 samples a month; the samples are about ' + GAP_DAYS + ' days apart).' + longNote },
+      { label: 'Ladder’s average price', unit: '$', fmt: 'usd', get: function (r) { return r.avg ? null : r.avgP; },
+        how: 'What the ladder paid per bitcoin overall: ' + perW + ' divided by the bitcoin it bought.' },
+      { label: 'Laddered', unit: '₿ per ' + perW, fmt: 'btc', get: function (r) { return r.avg ? null : r.lad; },
+        how: perW + ' in ' + n + ' equal parts, each divided by the price at its sample, added up.' },
+      { label: 'Ladder advantage', unit: '%', fmt: 'pct', get: function (r) { return r.avg ? (rows.length ? b.mean / 100 : null) : r.adv; },
+        how: 'Laddered divided by All at once, minus one: above zero where the ladder got more bitcoin, below where the lump did. The same as the price divided by the ladder’s average price, minus one.' },
+      { label: 'More bitcoin', unit: '', fmt: 'text', get: function (r) { return r.avg ? (rows.length ? 'Ladder in ' + kLad + ' of ' + rows.length : null) : (r.adv > 0 ? 'Ladder' : 'All at once'); },
+        how: 'Which tactic got more bitcoin from that entry.' }];
+    var curCols = [
+      { label: 'Channel position', unit: '0 floor · 1 upper band', fmt: 'text', get: function (r) { return r.x.toFixed(3).replace('-', '\u2212'); },
+        how: 'Points every 0.025 along the chart’s horizontal axis, from −0.10 to 1.15.' },
+      { label: 'Against trend', unit: '×', fmt: 'mult', get: function (r) { return ratioOf(r.x); }, how: 'That position as a multiple of the trend.' },
+      { label: 'Entries', unit: '', fmt: 'text', get: function (r) { return String(r.n); },
+        how: 'Entries within ' + WIN + ' of that position, chosen as on the Entries here tab. Points with fewer than 4 are left off, as on the chart.' },
+      { label: 'Ladder advantage, average', unit: '%', fmt: 'pct', get: function (r) { return r.y / 100; },
+        how: 'The average of those entries’ ladder advantage: the chart’s line, amber below zero (all at once got more bitcoin), blue above.' },
+      { label: 'Ladder got more', unit: '% of entries', fmt: 'pct', get: function (r) { return r.win / 100; },
+        how: 'The share of those entries where the ladder got more bitcoin.' }];
+    var magHow = !ok ? 'Not shown with fewer than 4 entries.'
+      : ladderWon ? 'The average ladder advantage: how much more bitcoin the ladder got, on average, as a share of what the lump got.'
+      : 'The average ladder advantage without its minus sign. Deploying all at once served better here, so this is how much less bitcoin the ladder got, on average, as a share of what the lump got. Measured the other way, as how much more bitcoin the lump got than the ladder, the average is ' + (lumpMore * 100).toFixed(1) + '%.';
+    var fin = [
+      { label: 'Entries in the window', fmt: 'text', values: [String(b.n || 0)],
+        how: 'The rows of the Entries here tab: the How often box’s “of ' + (b.n || 0) + ' historical entries here”.' + (ok ? '' : ' With fewer than 4 the page gives no verdict and says there are too few entries to read.') },
+      { label: 'Ladder advantage, average', fmt: 'pct', values: [b.n ? b.mean / 100 : null],
+        how: 'The Entries here tab’s first row. The white dot on the chart sits at this height.' },
+      { label: 'Served better', fmt: 'text', values: [winName],
+        how: 'Laddering in where the average is above zero, deploying all at once where it is below: the tactic named above the two boxes.' },
+      { label: 'How much it won by', fmt: 'pct', values: [ok ? Math.abs(b.mean) / 100 : null], card: 'The How much it won by box above, rounded to a whole percent there', how: magHow },
+      { label: 'How often it won', fmt: 'pct', values: [ok ? winRate / 100 : null],
+        how: ok ? 'The share of entries where the tactic that served better got more bitcoin: ' + (ladderWon ? kLad : rows.length - kLad) + ' of ' + rows.length + '. The How often box, rounded to a whole percent there.' : 'Not shown with fewer than 4 entries.' }];
+    var where = userMoved ? ''
+      : todayPos < 0 ? ' (the slider’s lowest point: today, at ' + ratioOf(todayPos).toFixed(2) + '×, is below the floor)'
+      : todayPos > 1 ? ' (the slider’s highest point: today, at ' + ratioOf(todayPos).toFixed(2) + '×, is above the upper band)'
+      : ' (today’s, where the slider starts)';
+    var inputs = [
+      ['Position you’re testing', ratioOf(pos).toFixed(2) + '× trend · ' + posLabel(pos) + where],
+      ['Entries matched', 'between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× trend (within ' + WIN + ' of the slider on the channel scale)'],
+      ['Historical window', ERA_WORDS[era] || era],
+      ['Ladder', months + ' months: ' + n + ' equal buys, one at each of the next ' + n + ' price samples'],
+      ['Price record', monthYearOf(S[0].d) + ' to ' + monthYearOf(S[N - 1].d) + ', ' + N + ' samples, about ' + GAP_DAYS + ' days apart' + (SPARSE_FROM != null ? ' (about a month apart since ' + monthYearOf(SPARSE_FROM) + ')' : '')],
+      ['Amounts', 'bitcoin per ' + perW + ' deployed; the comparison is a ratio, so the sum doesn’t change it'],
+      ['Today’s position', ratioOf(todayPos).toFixed(2) + '× trend · ' + posLabel(todayPos)],
+      ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    return {
+      hint: 'every entry behind the two boxes, and the curve',
+      inputs: inputs.map(function (m) { return { label: m[0], value: m[1] }; }),
+      note: 'Every entry’s two tactics, side by side, in bitcoin per ' + perW + ' at the record’s prices of the day. The last table is the two boxes above.',
+      tabs: [{ id: 'entries', label: 'Entries here', columns: entCols, rows: [{ avg: true }].concat(rows), strong: function (r) { return !!r.avg; } },
+             { id: 'curve', label: 'Across the channel', columns: curCols, rows: curveRows(era, n) }],
+      final: { title: 'At this position', csvTitle: 'At this position (the two boxes)', howTitle: 'How these figures are worked out', cols: ['At the slider'], rows: fin },
+      csv: { filename: 'lump-sum-or-ladder-in.csv', meta: [
+        ['Last Coin Standing', 'Lump Sum or Ladder In?'],
+        ['Amounts', 'bitcoin per ten thousand dollars deployed; prices in dollars of the day'],   // no commas: a meta value is one cell
+        ['Page', function () { return window.location.origin + window.location.pathname; }]] }
+    };
+  }
+  function renderLedger() {
+    if (!ledgerEl || !window.Ledger) return;
+    window.Ledger.render(ledgerEl, ledgerSpec());
+  }
+
+  // ── QA (console: lslQA()) ──
+  // The panel against the boxes, the lede and the chart; every entry rebuilt from
+  // the price record; the curve against the chart's own points; the CSV's shape;
+  // then a sweep of positions, windows and ladders through the page's own
+  // controls, restoring the reader's settings after.
+  window.lslQA = function () {
+    var near = function (x, y) { return typeof x === 'number' && typeof y === 'number' && Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function holds() {
+      var sp = ledgerEl && ledgerEl._ledgerSpec, why = [];
+      if (!sp) return { ok: false, why: ['no ledger'] };
+      if (!window.Ledger.check(ledgerEl, { side: false })) why.push('Ledger.check');
+      var n = state.ladderN, b = bucketAt(state.era, n, state.pos), ent = sp.tabs[0], cur = sp.tabs[1], fin = sp.final.rows;
+      var rows = ent.rows.slice(1), idx = LA.bucketEntries(state.era, n, state.pos), cut = LA.eraStartDay(state.era), C = ent.columns;
+      if (rows.length !== (b.n || 0) || rows.length !== idx.length || rows.some(function (r, k) { return r.i !== idx[k]; })) why.push('entry set');
+      var sum = 0, k2 = 0;
+      rows.forEach(function (r) {
+        var i = r.i, lump = PER / S[i].p, lad = 0;
+        for (var k = 0; k < n; k++) lad += (PER / n) / S[i + k].p;
+        if (Math.abs(S[i].pos - state.pos) > WIN || S[i].d < cut || i + n - 1 > N - 1) why.push('membership ' + i);
+        if (!near(C[3].get(r), lump) || !near(C[6].get(r), lad) || !near(C[5].get(r), PER / lad)) why.push('bitcoin ' + i);
+        if (!near(C[7].get(r), lad / lump - 1) || !near(C[7].get(r), C[2].get(r) / C[5].get(r) - 1)) why.push('advantage ' + i);
+        if ((C[8].get(r) === 'Ladder') !== (C[7].get(r) > 0)) why.push('winner ' + i);
+        sum += C[7].get(r); if (C[7].get(r) > 0) k2++;
+      });
+      if (rows.length && (!near(C[7].get(ent.rows[0]), sum / rows.length) || !near(C[7].get(ent.rows[0]), b.mean / 100) || C[8].get(ent.rows[0]) !== 'Ladder in ' + k2 + ' of ' + rows.length || !near(100 * k2 / rows.length, b.win))) why.push('average row');
+      var ok = b.n >= 4, boxes = document.getElementById('lslBoxes'), lede = document.getElementById('lslLede');
+      if (fin[0].values[0] !== String(b.n || 0) || (b.n ? !near(fin[1].values[0], b.mean / 100) : fin[1].values[0] !== null)) why.push('final count or average');
+      if (ok) {
+        var lw = b.mean > 0, wr = lw ? b.win : 100 - b.win;
+        if (fin[2].values[0] !== (lw ? 'Laddering in' : 'Deploying all at once') || lede.textContent.indexOf(lw ? 'laddering in' : 'deploying all at once') < 0) why.push('served better');
+        if (!near(fin[3].values[0], Math.abs(b.mean) / 100) || document.getElementById('lslBoxMag').textContent !== '+' + (fin[3].values[0] * 100).toFixed(0) + '%') why.push('how much box');
+        if (!near(fin[4].values[0], wr / 100) || document.getElementById('lslBoxFreq').textContent !== Math.round(fin[4].values[0] * 100) + '%' || document.getElementById('lslBoxFreqSub').textContent !== 'of ' + b.n + ' historical entries here') why.push('how often box');
+        if (boxes.style.display === 'none') why.push('boxes hidden');
+      } else if (fin[2].values[0] !== null || fin[3].values[0] !== null || fin[4].values[0] !== null || boxes.style.display !== 'none') why.push('too few entries');
+      var cd = advChart ? advChart.data.datasets[0].data : [];
+      if (cur.rows.length !== cd.length || cur.rows.some(function (r, k) { return r.x !== cd[k].x || r.y !== cd[k].y || r.n < 4; })) why.push('curve against the chart');
+      var mk = advChart ? advChart.data.datasets[advChart.data.datasets.length - 1].data[0] : null;
+      if (!mk || mk.x !== state.pos || (b.n ? !near(mk.y, b.mean) : mk.y !== 0)) why.push('chart dot');
+      var csv = window.Ledger.toCsv(sp);
+      if (!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 2 && csv.indexOf('# At this position') > 0)) why.push('csv shape');
+      return { ok: !why.length, why: why };
+    }
+    var out = [], live = holds();
+    out.push(['live panel: order, entries rebuilt, average, boxes, lede, curve against the chart, dot, CSV', live.ok, live.why.slice(0, 6).join('; ')]);
+    var scrub = document.getElementById('lslScrub'), ladder = document.getElementById('lslLadder');
+    var saved = { pos: state.pos, era: state.era, months: ladder ? ladder.value : '12', moved: userMoved };
+    var fire = function (el, v) { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); };
+    var pickEra = function (e) { var btn = document.querySelector('.lsl-era button[data-era="' + e + '"]'); if (btn) btn.click(); };
+    var V = [];
+    [0, 15, 33, 50, 70, 85, 100].forEach(function (p) { V.push({ era: 'post-2020', months: 12, pos: p }); });
+    ['full', 'post-2017', 'post-2020'].forEach(function (e) { [3, 24].forEach(function (m) { [0, 50, 100].forEach(function (p) { V.push({ era: e, months: m, pos: p }); }); }); });
+    V.push({ era: 'full', months: 12, pos: 40 }, { era: 'post-2017', months: 18, pos: 90 });
+    try {
+      V.forEach(function (v) {
+        pickEra(v.era); fire(ladder, v.months); fire(scrub, v.pos);
+        var r = holds();
+        out.push(['sweep: ' + v.era + ', ' + v.months + ' months, slider at ' + (v.pos / 100).toFixed(2), r.ok, r.why.slice(0, 6).join('; ')]);
+      });
+    } finally {
+      userMoved = saved.moved;
+      pickEra(saved.era); fire(ladder, saved.months); setSliderPos(saved.pos, false);
+    }
+    var allOk = out.every(function (x) { return x[1]; });
+    if (window.console) console.table(out.map(function (x) { return { check: x[0], pass: x[1], why: x[2] }; }));
+    return { ok: allOk, checks: out };
+  };
 
   // ════════ INIT ════════
   function init() {
