@@ -35,8 +35,8 @@ faq:
     a: "The record shown here suggests you should not plan on it. Below-trend entries have historically been attractive, but <em>how long</em> the market stays below trend is not predictable — which is precisely the tradeoff this tool makes visible instead of hiding."
 eleventyComputed:
   head_extras: "{% include '_pageassets/wait-or-deploy-now-head.html' %}"
-  page_styles: "{% include '_pageassets/wait-or-deploy-now.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/wait-or-deploy-now.js' %}"
+  page_styles: "{% include '_pageassets/wait-or-deploy-now.css' %}\n{% include '_pageassets/shared/ledger.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/channel-entries.js' %}\n{% include '_pageassets/shared/ledger.js' %}\n{% include '_pageassets/wait-or-deploy-now.js' %}"
 companion:
   - url: https://www.youtube.com/watch?v=aQhk4KKqMss&t=300s
     title: "Every 0.2 Bitcoin Retires You 3 Years Faster — The Robin Seyr Podcast"
@@ -140,6 +140,12 @@ companion:
     <p class="wd-wait-detail" id="wdWaitDetail">&mdash;</p>
     <p class="wd-sample-note" id="wdSampleNote">&mdash;</p>
   </section>
+
+  <!-- ════════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js), 2026-11-26 ════════
+       Every historical entry behind the result band, with the waiter's rule
+       run on each, then the band's figures. Rendered by renderLedger() from
+       renderComparator() in wait-or-deploy-now.js. -->
+  <div class="wd-ledger" id="wdLedger"></div>
 
   <!-- ════════ CROSS-LINKS — the trilogy connective tissue ════════ -->
   <section class="wd-section wd-links" aria-label="The rest of the trilogy">
