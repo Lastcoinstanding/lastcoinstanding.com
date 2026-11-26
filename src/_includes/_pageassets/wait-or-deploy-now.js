@@ -187,7 +187,12 @@
       : 'Lower entries almost never arrived here within two years.';
 
     var sample = document.getElementById('wdSampleNote');
-    if (sample) sample.innerHTML = 'Drawn from <strong>' + m.n + '</strong> historical entries within ' + (m.half <= 0.08 ? '±' + m.half.toFixed(2) : 'a widened band') + ' of this position (post-2014, each with a full two-year forward record).';
+    // The band in the page's own terms (×-trend, never the 0–1 coordinate) and the halving cycles
+    // behind it (2026-11-26, JM's ruling): entries weeks apart move together, so the cycles are
+    // the fairer count of independent history. Was "within ±0.07 of this position", which also
+    // rounded the 0.075 half-width down.
+    if (sample) { var nc = CE.bandCycles(m), mp0 = matchPos(P);
+      sample.innerHTML = 'Drawn from <strong>' + m.n + '</strong> historical entries between ' + ratioOf(mp0 - m.half).toFixed(2) + '× and ' + ratioOf(mp0 + m.half).toFixed(2) + '× trend, from <strong>' + CE.cycText(nc) + '</strong> (post-2014, each with a full two-year forward record). Entries weeks apart tend to move together, so the cycles are the fairer count of how much history this rests on.'; }
 
     renderLedger(m);
     updateChart();
@@ -213,14 +218,14 @@
         how: 'The waiter’s rule: wait for the first sample, within two years, at least ' + DROP + ' lower than the entry on the channel scale (0 at the floor, 1 at the upper band, evenly spaced in the logarithm of the multiple), which is a multiple of trend about ' + dropPct + '% lower than the entry’s.' },
       { label: 'Wait', unit: 'months', fmt: 'text', get: function (x) { return x.summary ? (m.waitLen != null ? 'median ' + (m.waitLen / MONTH_D).toFixed(1) : '') : (x.arrived ? (x.waitLen / MONTH_D).toFixed(1) : ''); }, how: 'From the entry to that lower entry. The first row is the median over the entries where one came (with an even count, the higher of the two middle values).' },
       { label: 'Price the waiter paid', unit: '$', fmt: 'price', get: function (x) { return x.summary ? null : x.waitPrice; }, how: 'The lower entry’s price; if none came, the price two years on (read between samples, in a straight line), when the waiter deploys anyway.' },
-      { label: 'Coins, waiting ÷ now', unit: '×', fmt: 'mult', get: function (x) { return x.summary ? null : x.ratio; }, how: 'The entry’s price over the waiter’s: how many times the coins waiting bought, for the same dollars.' },
+      { label: 'Coins, waiting ÷ now', unit: '×', fmt: 'mult', get: function (x) { return x.summary ? null : x.ratio; }, how: 'The entry’s price over the waiter’s: how many times the coins waiting bought, for the same dollars (the cash earns nothing while it waits).' },
       { label: 'Waiting paid', unit: '', fmt: 'text', get: function (x) { return x.summary ? nPaid + ' of ' + m.n : (x.paid ? 'Yes' : 'No'); }, how: 'Yes when waiting bought more coins (the ratio above 1), whether or not a lower entry came.' },
-      { label: 'Worst dip below entry', unit: '%', fmt: 'pct', get: function (x) { return x.summary ? m.ddDepth / 100 : x.depth; }, how: 'The lowest sample price in the two years over the entry price, minus one; zero if it never went below. The first row is the median (with an even count, the higher of the two middle values).' },
+      { label: 'Worst dip below entry', unit: '%', fmt: 'pct', get: function (x) { return x.summary ? m.ddDepth / 100 : x.depth; }, how: 'The lowest sample price in the two years over the entry price, minus one; zero if it never went below. A dip that came back between two samples isn’t seen, so this can only understate it. The first row is the median (with an even count, the higher of the two middle values).' },
       { label: 'Fell 20% or more', unit: '', fmt: 'text', get: function (x) { return x.summary ? nDD + ' of ' + m.n : (x.hadDD ? 'Yes' : 'No'); }, how: 'Whether that dip reached ' + Math.round(DD_THRESH * 100) + '% below the entry price.' },
       { label: 'Leg', unit: '', fmt: 'text', get: function (x) { return x.summary ? '' : x.leg; }, how: 'Falling if the channel position was lower than ' + CE.LEG_W + ' days before; rising otherwise. The leg sentence under the result compares the two when they differ by more than 20 points with at least 10 entries each.' }];
     var L = m.legs;
     var fin = [
-      { label: 'Entries', fmt: 'text', values: [String(m.n)], how: 'The Entries tab’s rows: the sample note’s count.' },
+      { label: 'Entries', fmt: 'text', values: [String(m.n)], how: 'The Entries tab’s rows: the sample note’s count, from ' + CE.cycText(CE.bandCycles(m)) + '.' },
       { label: 'Waiting paid', fmt: 'pct', values: [m.paid / 100], card: 'The large percentage above, rounded to a whole percent there', how: nPaid + ' of ' + m.n + ' entries where waiting bought more coins.' },
       { label: 'When a lower entry came, median', fmt: 'mult', values: [m.condRatio], how: m.nArrived + ' entries had one; the median of their coins column (with an even count, the higher of the two middle values): the figure in the line under the result.' },
       { label: 'No lower entry within two years', fmt: 'pct', values: [m.never / 100], how: 'The share of entries where none came: the counterweight line’s percentage.' },
@@ -233,7 +238,7 @@
     var tp = livePos(), gapDays = median(S.slice(1).map(function (s, k) { return s.d - S[k].d; }));
     var inputs = [
       ['Position you’re testing', ratioOf(P).toFixed(2) + '× trend · ' + posLabel(P) + below],
-      ['Entries matched', 'between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× trend, from 2014, each with two years of record after it'],
+      ['Entries matched', m.n + ' between ' + lo.toFixed(2) + '× and ' + hi.toFixed(2) + '× trend, from ' + CE.cycText(CE.bandCycles(m)) + ', from 2014, each with two years of record after it'],
       ['The waiter’s rule', 'wait for a multiple of trend about ' + dropPct + '% below the entry’s, up to two years; if none comes, deploy at the two-year price'],
       ['What counts as a dip', Math.round(DD_THRESH * 100) + '% or more below the entry price within two years'],
       ['Price record', monthYear(S[0].d) + ' to ' + monthYear(S[N - 1].d) + ', ' + N + ' samples, about every ' + Math.round(gapDays) + ' days'],
@@ -286,7 +291,9 @@
       ['falling', 'rising'].forEach(function (g, k) { var s = rows.filter(function (x) { return x.leg === g; }), v = fin[8 + k].values[0];
         if (s.length ? !near(v, s.filter(function (x) { return x.paid; }).length / s.length) : v != null) why.push('leg ' + g); });
       var t = function (id) { var e = document.getElementById(id); return e ? e.textContent : ''; };
-      if (t('wdHeroNum') !== Math.round(m.paid) + '%' || t('wdDdProb') !== Math.round(m.ddProb) + '%' || t('wdSampleNote').indexOf(String(m.n)) < 0) why.push('page text');
+      var cyc = {}; rows.forEach(function (x) { cyc[CE.epochOf(x.d0)] = 1; });
+      var note = t('wdSampleNote'), want = [String(m.n), ratioOf(mp - m.half).toFixed(2) + '×', ratioOf(mp + m.half).toFixed(2) + '×', CE.cycText(Object.keys(cyc).length)];
+      if (t('wdHeroNum') !== Math.round(m.paid) + '%' || t('wdDdProb') !== Math.round(m.ddProb) + '%' || want.some(function (w) { return note.indexOf(w) < 0; }) || note.indexOf('±') >= 0) why.push('page text');
       if (m.never >= 15 && t('wdCounter').indexOf(Math.round(m.never) + '%') < 0) why.push('counterweight');
       if (m.condRatio != null && t('wdCounter').indexOf(fmtRatio(m.condRatio)) < 0) why.push('dip ratio');
       var csv = window.Ledger.toCsv(sp);

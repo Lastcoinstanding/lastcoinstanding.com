@@ -193,6 +193,10 @@
     S: S, elig: elig,
     realPriceAt: realPriceAt, median: median, monthYear: monthYear,
     entryMetrics: entryMetrics, bandMetrics: bandMetrics,
-    LEG_W: LEG_W, legAt: legAt, legSentence: legSentence, legSentenceFor: legSentenceFor
+    LEG_W: LEG_W, legAt: legAt, legSentence: legSentence, legSentenceFor: legSentenceFor,
+    // Additive (2026-11-26, JM's ruling on the WODN sample note): how many halving cycles a
+    // band's entries come from, and the same words the leg sentence uses. Nothing else changes.
+    epochOf: epochOf, cycText: cyc,
+    bandCycles: function (m) { var ep = {}; (m && m.metrics || []).forEach(function (x) { ep[epochOf(x.d0)] = 1; }); return Object.keys(ep).length; }
   };
 })();
