@@ -597,6 +597,7 @@ z-index: 3;
 .rt-note strong { color: var(--ink); font-weight: 600; }
 .rt-income-note { margin-top: 0.5rem; }
 .rt-verify-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.rt-csv-group { display: flex; flex: none; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
 .rt-csv-btn { flex: none; min-height: 36px; background: rgba(224,148,34,0.05); border: 1px solid var(--border-faint); border-radius: 6px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 0.4rem 0.8rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
 .rt-csv-btn:hover { background: rgba(224,148,34,0.1); color: var(--ink-bright); }
 .rt-csv-btn.copied { color: var(--amber); }
