@@ -554,9 +554,11 @@
   // Provenance caption beneath the card row.
   function renderProvenance(c) {
     var el = document.getElementById('hcSample'); if (!el || !c.m) return;
-    el.innerHTML = 'Drawn from <strong>' + c.n + '</strong> historical entries within ' +
-      (c.half <= 0.08 ? '±' + c.half.toFixed(2) : 'a widened band') +
-      ' of this position (post-2014, each with a full two-year forward record). Historical, at this position &mdash; not a prediction.';
+    // ×-trend range and halving cycles (2026-11-26, JM's ruling on the twins' sample note): was
+    // "within ±0.07 of this position", the 0–1 coordinate, with the 0.075 half-width rounded down.
+    var mp = matchPos(c.pos);
+    el.innerHTML = 'Drawn from <strong>' + c.n + '</strong> historical entries between ' + ratioOf(mp - c.half).toFixed(2) + '× and ' +
+      ratioOf(mp + c.half).toFixed(2) + '× trend, from <strong>' + CE.cycText(CE.bandCycles(c.m)) + '</strong> (post-2014, each with a full two-year forward record). Entries weeks apart tend to move together, so the cycles are the fairer count of how much history this rests on. Historical, at this position &mdash; not a prediction.';
   }
 
   function targetName(c) { return c.atCap ? 'the first lower entry' : positionLabel(c.rebuyTargetPos); }
@@ -917,8 +919,8 @@
       ['Share you would sell', c.share + '%'],
       ['Tax on the sale', c.tax + '%'],
       ['Rebuy target', c.atCap ? 'The first lower position against trend, within two years' : ratioOf(c.rebuyTargetPos).toFixed(2) + '\u00d7 trend'],
-      ['Historical entries used', String(c.n)],
-      ['Neighborhood', c.half <= 0.08 ? '\u00b1' + c.half.toFixed(2) + ' of this position' : 'Widened to keep a workable sample'],
+      ['Historical entries used', c.n + ', from ' + CE.cycText(CE.bandCycles(c.m))],
+      ['Neighborhood', 'Between ' + ratioOf(matchPos(c.pos) - c.half).toFixed(2) + '\u00d7 and ' + ratioOf(matchPos(c.pos) + c.half).toFixed(2) + '\u00d7 trend'],
       ['Record', 'Since 2014, full two-year forward record']
     ];
     if (c.stack != null && isFinite(c.stack) && c.stack > 0) it.splice(2, 0, ['Your stack', stackFmt(c.stack) + ' BTC']);
