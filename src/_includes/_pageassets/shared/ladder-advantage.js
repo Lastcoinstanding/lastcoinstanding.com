@@ -81,9 +81,13 @@
       if (a !== null) vals.push(a);
     }
     if (!vals.length) return { n: 0 };
-    var m = 0, wins = 0;
-    for (var v = 0; v < vals.length; v++) { m += vals[v]; if (vals[v] > 0) wins++; }
-    return { n: vals.length, mean: m / vals.length, win: 100 * wins / vals.length };
+    var m = 0, wins = 0, lm = 0;
+    for (var v = 0; v < vals.length; v++) { m += vals[v]; if (vals[v] > 0) wins++; lm += 100 / (1 + vals[v] / 100) - 100; }
+    // lumpMean (2026-11-26, JM's ruling): the same average measured the other
+    // way, how much more bitcoin the lump got than the ladder, so that when the
+    // lump wins, "how much it won by" is the lump's own margin and not the
+    // ladder's shortfall. Additive; mean and win are unchanged.
+    return { n: vals.length, mean: m / vals.length, win: 100 * wins / vals.length, lumpMean: lm / vals.length };
   }
 
   // advantage curve across channel position (binned, sliding window)

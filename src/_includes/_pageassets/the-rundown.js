@@ -1065,12 +1065,15 @@
     var winName = ladderWon ? 'laddering in' : 'a single purchase';
     var loseName = ladderWon ? 'a single purchase' : 'laddering in';
     var winRate = ladderWon ? b.win : (100 - b.win);
+    // The winner's own margin (2026-11-26, as Lump Sum or Ladder In): when the
+    // single purchase won, how much more it got than the ladder.
+    var margin = ladderWon ? b.mean : b.lumpMean;
     setHTML('rdD2Verdict',
       'From entries at this position, <strong>' + winName + '</strong> ended with <strong>' +
-      pct0(Math.abs(b.mean)) + ' more coins</strong> than ' + loseName +
+      pct0(margin) + ' more coins</strong> than ' + loseName +
       ' on average, and won in ' + pct0(winRate) + ' of them.');
     setHTML('rdD2Cards', cards([
-      { k: 'How much it won by', v: '+' + pct0(Math.abs(b.mean)), sub: 'more coins accumulated' },
+      { k: 'How much it won by', v: '+' + pct0(margin), sub: 'more coins accumulated' },
       { k: 'How often', v: pct0(winRate), sub: 'of ' + b.n + ' entries here since 2020' },
       { k: 'Ladder length', v: '~1 year', sub: D2_N + ' buys, evenly spaced' }
     ]));
