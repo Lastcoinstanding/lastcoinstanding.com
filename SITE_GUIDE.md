@@ -3580,7 +3580,7 @@ One engine and one set of components for §14 and §14.1, so the two pages can't
 | `real-estate-carry.js` | `RealEstateCarry` | The pair's URL vocabulary and the carrying links (§46, §53.2) |
 | `real-estate-qa.js` (served at `/qa/`, loaded by `real-estate-qa-loader.js` on `?qa` only) | `rePairQA` | The tripwire: `run()` (byte-identity vectors), `parityCheck()`, `taxParityCheck()`, `booksCheck()`, `ledgerCheck()`, `all()` |
 
-**The ledger's clarity pilot (2026-11-25, a pilot).** On Bitcoin vs. Real Estate (both ledgers) and Bitcoin vs. Rental Property, "Show the calculation" now opens with *What went in*, marks the row the cards show, explains each column in a sentence, and adds a *Side by side* tab that follows the chart's basis. The other two ledger pages are unchanged. Rules: STYLE_GUIDE §6.49; what comes next: TECH_DEBT §1.x; the audit behind it: `CHECK_THE_WORK_AUDIT_2026-11-24.md` (project side). QA: `rePairQA.clarityCheck()`.
+**The ledger's clarity pilot (2026-11-25, a pilot).** On Bitcoin vs. Real Estate (both ledgers) and Bitcoin vs. Rental Property, "Show the calculation" now opens with *What went in*, marks the row the cards show, explains each column in a sentence, and adds a *Side by side* tab that follows the chart's basis. Paying Down the Mortgage and Compare Housing Plans gained the same four in the rollout PR that followed (their ledgers' final row is now marked and bold; no figure moved; their CSVs only gained lines). Rules: STYLE_GUIDE §6.49; what comes next: TECH_DEBT §1.x; the audit behind it: `CHECK_THE_WORK_AUDIT_2026-11-24.md` (project side). QA: `rePairQA.clarityCheck()`.
 
 ### 55.5 The two scenarios: `price-cases.js` and its block (2026-10-11)
 

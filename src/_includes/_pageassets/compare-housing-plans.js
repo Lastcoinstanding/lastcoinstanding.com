@@ -236,16 +236,47 @@
         { label: 'Everything sold, after tax', unit: '$', get: function (r) { return r.after / defl(r.year); }, fmt: 'usd' }
       ]; };
       var fin = function (k, f) { return [f(A.end), f(B.end)]; };
+      // The ledger's clarity additions (STYLE_GUIDE §6.49; rolled out from
+      // the pair's pilot, 2026-11-25). Sentences are written from
+      // RealEstateModel.housingCompare.
+      var HOWC = [null,
+        'The home\u2019s price today grown by the appreciation rate to that year. Zero while the plan rents.',
+        'The mortgage balance at the end of that year. Zero while the plan rents, or if it paid cash.',
+        'What the plan held at the start (the shared savings less its own up-front costs), plus bitcoin bought in months its housing cost less than the other plan\u2019s, minus bitcoin sold for a later down payment.',
+        'Bitcoin held times the scenario\u2019s price at the end of that year.',
+        'Money the plan needed when its bitcoin had run out, added up to date. It is counted against the plan.',
+        'The house if sold, after selling costs, the loan and tax, plus the bitcoin if sold, after the trading cost and tax, minus what came from income.'];
+      var aCols = cols(A), bCols = cols(B);
+      HOWC.forEach(function (h, n) { if (h) { aCols[n].how = h; bCols[n].how = h; } });
+      var sold = key !== 'held', bu = (sold ? 'if sold that year, after tax' : 'held, before any sale') + (st.display === 'real' ? ', today\u2019s $' : '');
+      var sideRows = A.rows.map(function (r, j) { return { a: r, b: B.rows[j] }; });
+      var sideCols = [
+        { label: 'Year', unit: '', fmt: 'text', get: function (x) { return aCols[0].get(x.a); } },
+        { label: 'Plan A', unit: bu, fmt: 'usd', get: function (x) { return x.a[key] / defl(x.a.year); }, how: sold ? 'Plan A\u2019s last column for that year: everything sold, after tax.' : 'Plan A\u2019s home equity plus its bitcoin, minus what came from income, before any sale.' },
+        { label: 'Plan B', unit: bu, fmt: 'usd', get: function (x) { return x.b[key] / defl(x.b.year); }, how: sold ? 'Plan B\u2019s last column for that year: everything sold, after tax.' : 'Plan B\u2019s home equity plus its bitcoin, minus what came from income, before any sale.' },
+        { label: 'Difference', unit: 'B minus A', fmt: 'usd', get: function (x) { return (x.b[key] - x.a[key]) / defl(x.a.year); }, how: 'Plan B minus Plan A, in the same row. The chart\u2019s difference line.' },
+        { label: 'Ahead', unit: '', fmt: 'text', get: function (x) { var d = x.b[key] - x.a[key]; return Math.abs(d) < 0.5 ? 'level' : d > 0 ? 'Plan B' : 'Plan A'; } }];
+      var IN = [['Plan A', describe(a)], ['Plan B', describe(b)], ['Years compared', String(H)], ['Savings at the start, both plans', usd(R.savings)],
+        ['Each month, both plans spend', 'what the dearer plan\u2019s housing costs; the cheaper plan buys bitcoin with the difference'],
+        ['Home appreciation', s.appr + '% a year'], ['Bitcoin scenario', W.name[st.scenario]], ['Bitcoin today', usd(btcNow())],
+        ['Closing costs', s.closing + '% of the price'], ['Property tax', s.ptax + '% of value a year'], ['Maintenance', s.maint + '% of value a year'],
+        ['Selling costs on the house', s.sell + '% of its value'], ['Trading cost on bitcoin', s.btctx + '% each way'],
+        ['Tax on a sale', s.tax === 'none' ? 'no capital-gains tax' : s.tax === 'custom' ? 'your own rates' : 'US rules, married filing jointly, ' + parseFloat(s.bracket) + '% bracket, state: ' + (s.state === 'OTHER' ? 'other' : s.state)],
+        ['Mortgage interest', s.ded ? 'deducted' : 'not deducted'],
+        ['Dollars shown', st.display === 'real' ? 'today\u2019s, at ' + inflPct() + '% inflation' : 'each year\u2019s']];
       window.RealEstateLedger.render($('chLedger'), {
+        inputs: IN.map(function (m) { return { label: m[0], value: m[1] }; }),
         note: 'Year by year, ' + (st.display === 'real' ? 'in today’s dollars (each year divided by inflation to then)' : 'in each year’s dollars') + '.',
-        tabs: [{ id: 'a', label: 'Plan A', columns: cols(A), rows: A.rows }, { id: 'b', label: 'Plan B', columns: cols(B), rows: B.rows }],
+        tabs: [{ id: 'a', label: 'Plan A', columns: aCols, rows: A.rows }, { id: 'b', label: 'Plan B', columns: bCols, rows: B.rows },
+               { id: 'side', label: 'Side by side', columns: sideCols, rows: sideRows }],
         final: { cols: ['Plan A', 'Plan B'], rows: [
-          { label: 'House, if sold, less the loan', values: fin(0, function (e) { return e.houseIfSold / Dh; }) },
-          { label: 'Tax on the home sale', values: fin(0, function (e) { return -e.houseTax / Dh; }) },
-          { label: 'Bitcoin, if sold', values: fin(0, function (e) { return e.btcIfSold / Dh; }) },
-          { label: 'Tax on the bitcoin', values: fin(0, function (e) { return -e.btcTax / Dh; }) },
-          { label: 'Found from income', values: [-A.shortfall / Dh, -B.shortfall / Dh] },
-          { label: 'Everything sold, after tax', values: fin(0, function (e) { return e.after / Dh; }) }
+          { label: 'House, if sold, less the loan', values: fin(0, function (e) { return e.houseIfSold / Dh; }), how: 'The home\u2019s value at the end, less selling costs and the loan still owed. Zero for a plan that rents throughout.' },
+          { label: 'Tax on the home sale', values: fin(0, function (e) { return -e.houseTax / Dh; }), how: 'Under your tax settings, on the home\u2019s gain after any home-sale exclusion.' },
+          { label: 'Bitcoin, if sold', values: fin(0, function (e) { return e.btcIfSold / Dh; }), how: 'The bitcoin\u2019s value at the end, less the trading cost.' },
+          { label: 'Tax on the bitcoin', values: fin(0, function (e) { return -e.btcTax / Dh; }), how: 'Under your tax settings, on the bitcoin\u2019s gain over what was paid for it.' },
+          { label: 'Found from income', values: [-A.shortfall / Dh, -B.shortfall / Dh], how: 'Money the plan needed when its bitcoin had run out, counted against it.' },
+          { label: 'Everything sold, after tax', values: fin(0, function (e) { return e.after / Dh; }), strong: true,
+            card: 'Plan A and Plan B in your row of the bitcoin-path table above', how: 'The four rows above it, added up.' }
         ] },
         csv: { filename: 'compare-housing-plans.csv', meta: [
           ['Plan A', describe(a)], ['Plan B', describe(b)], ['Years', H], ['Home appreciation %', s.appr], ['Scenario', W.name[st.scenario]],
@@ -376,6 +407,7 @@
   // ─── QA (console: chpQA()) ───
   window.chpQA = function () {
     var s = readShared(), out = [];
+    out.push(['ledger: clarity additions', !!(window.RealEstateLedger && window.RealEstateLedger.check($('chLedger')))]);
     var same = M.housingCompare(input(lastA, lastA, s));
     out.push(['identical plans: identical results', Math.abs(same.diffAfter) < 1e-6 && Math.abs(same.diffHeld) < 1e-6]);
     // Parity with Bitcoin vs. Real Estate: Plan A buys, Plan B rents the same house, Plan A sets the budget.
