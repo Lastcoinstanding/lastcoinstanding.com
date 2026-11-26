@@ -25,8 +25,8 @@ faq:
     a: "No &mdash; it depends on the horizon, because the power law&rsquo;s growth rate decays with age. A three-year purchase is measured against a higher bar than a thirty-year asset, so the tool matches the bar to your horizon. But the variation matters less than the level: even at forty years the bar is around 19% &mdash; still well above money-market cash at ~4%, a typical corporate cost of capital near 9%, or long-run equities at 10.86%. The bar moves; it does not come down to meet them."
 eleventyComputed:
   head_extras: "{% include '_pageassets/the-bitcoin-hurdle-rate-head.html' %}"
-  page_styles: "{% include '_pageassets/the-bitcoin-hurdle-rate.css' %}"
-  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/the-bitcoin-hurdle-rate.js' %}"
+  page_styles: "{% include '_pageassets/the-bitcoin-hurdle-rate.css' %}\n{% include '_pageassets/shared/ledger.css' %}\n{% include '_pageassets/shared/check-the-work.css' %}"
+  page_scripts: "{% include '_pageassets/shared/power-law-data.js' %}\n{% include '_pageassets/shared/reversion-durations.js' %}\n{% include '_pageassets/shared/price-cases.js' %}\n{% include '_pageassets/shared/ledger.js' %}\n{% include '_pageassets/the-bitcoin-hurdle-rate.js' %}"
 ---
 
 <section class="hero">
@@ -205,6 +205,11 @@ eleventyComputed:
   </section>
 
   <!-- ============ THE QUESTION — the argument, on-page ============ -->
+  <!-- CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js), 2026-11-26.
+       The bar at every horizon on both views, then the cards on both views.
+       Rendered by renderLedger() from render() in the-bitcoin-hurdle-rate.js. -->
+  <div class="hr-ledger" id="hrLedger"></div>
+
   <section class="hr-essay essay">
 
     <h2 class="hr-h2">What a hurdle rate is</h2>

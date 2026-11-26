@@ -637,6 +637,7 @@
     updateChart();
     updateViewLabels();
     equalizeVerdict();
+    renderLedger();
   }
 
   // ─────────── INPUT WIRING ───────────
@@ -825,6 +826,119 @@
     var presets = document.querySelector('.hr-presets'); if (presets) presets.setAttribute('data-lens', S.lens);
     applyViewUI();
   }
+
+  // ─────────── CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ───────────
+  // Added 2026-11-26. Every horizon from 1 to 40 years on both views (the
+  // chart's curves and the floor case, with the trend's own numbers behind
+  // them), then the cards on both views at the horizon picked. Built from the
+  // page's own functions; nothing here changes a figure.
+  var ledgerEl = null;
+  function usd0(v){ return '$' + Math.round(v).toLocaleString('en-US'); }
+  function crossWords(view){
+    var keep = S.view; S.view = view; var ci = crossingInfo(); S.view = keep;
+    if (ci.kind === 'always') return 'at every horizon';
+    if (ci.kind === 'never') return 'at no horizon';
+    return ci.bounds.map(function(b){ return (b.becomesCleared ? 'clears from ' : 'stops clearing at ') + b.h.toFixed(1) + ' years'; }).join(', ');
+  }
+  function ledgerSpec(){
+    var H = S.h, r = S.r / 100, t = tDays(), k = chanK(), now = plPrice(t);
+    var gated = (S.lens === 'company' && S.cashflow === 'no') || (S.lens === 'personal' && S.canWait === 'no');
+    var rows = [];
+    for (var h = 1; h <= 40; h++) rows.push({ h: h, trendPx: trendAtH(h), tm: trendMultiple(h), tc: trendCAGR(h), pc: h >= MIN_POS_H ? posCAGR(h) : null, fc: spotToFloorCAGR(h) });
+    var cols = [
+      { label: 'Horizon', unit: '', fmt: 'text', get: function(x){ return x.h + (x.h === 1 ? ' year' : ' years'); }, how: 'Every whole year the chart plots, 1 to 40.' },
+      { label: 'Trend then', unit: '$', fmt: 'usd', get: function(x){ return x.trendPx; }, how: 'The Power Law trend that many years from today: day ' + Math.round(t).toLocaleString('en-US') + ' since bitcoin’s first block plus 365.25 days a year.' },
+      { label: 'Trend multiple', unit: '×', fmt: 'mult', get: function(x){ return x.tm; }, how: 'The trend then over the trend today (' + usd0(now) + '): ((day then) ÷ (day today)) to the power ' + PL_B + '.' },
+      { label: 'Trend hurdle', unit: '% a year', fmt: 'pct', get: function(x){ return x.tc; }, how: 'The trend multiple as a yearly rate: its 1/H power, minus one. The amber curve in the From trend view.' },
+      { label: 'From today’s price', unit: '% a year', fmt: 'pct', get: function(x){ return x.pc; }, how: 'Today’s price (' + usd0(spot) + ', ' + k.toFixed(2) + '× trend) to the trend then, as a yearly rate. The amber curve in the From today view, which starts at ' + MIN_POS_H + ' years.' },
+      { label: 'Floor case', unit: '% a year', fmt: 'pct', get: function(x){ return x.fc; }, how: 'Today’s price to ' + PL_FLOOR + '× the trend then, as a yearly rate: the shaded band’s lower edge in both views.' },
+      { label: 'Your return clears', unit: '', fmt: 'text', get: function(x){ var bar = isPos() ? x.pc : x.tc; return bar == null ? '' : (r >= bar ? 'Yes' : 'No'); },
+        how: 'Your ' + S.r + '% against the bar on the view picked (' + (isPos() ? 'From today' : 'From trend') + '). The crossings the verdict names are read between these rows, a tenth of a year at a time.' }];
+    var posOk = H >= MIN_POS_H, tc = trendCAGR(H), pc = posOk ? posCAGR(H) : null, tm = trendMultiple(H), toT = trendAtH(H) / spot, fm = floorAtH(H) / spot;
+    var both = function(a, b){ return gated ? [null, null] : [a, posOk ? b : null]; };
+    var gateHow = gated ? ' Not shown: the hurdle does not apply to ' + (S.lens === 'company' ? 'a business that isn’t cashflow positive' : 'capital with a deadline') + ', as the verdict says, so the page shows no figures.' : '';
+    var fin = [
+      { label: 'Your return', fmt: 'pct', values: [r, r], how: 'The candidate return.' },
+      { label: 'The bar at ' + H + ' years', fmt: 'pct', values: both(tc, pc), card: 'The first card above, on the view picked',
+        how: 'The Trend hurdle and From today’s price columns at ' + H + ' years.' + (posOk ? '' : ' From today starts at ' + MIN_POS_H + ' years.') + gateHow },
+      { label: 'Bitcoin multiple over ' + H + ' years', fmt: 'mult', values: both(tm, toT), how: 'The trend multiple; and today’s price to the trend then. The second card.' + gateHow },
+      { label: 'If it reaches only the floor', fmt: 'mult', values: both(fm, fm), how: 'Today’s price to ' + PL_FLOOR + '× the trend then: the second card’s floor figure.' + (fm > tm ? ' Today’s price is below the floor, so even this beats the trend-to-trend multiple.' : '') + gateHow },
+      { label: usd0(NOTIONAL) + ' at your return', fmt: 'usd', values: both(NOTIONAL * Math.pow(1 + r, H), NOTIONAL * Math.pow(1 + r, H)), how: usd0(NOTIONAL) + ' grown at ' + S.r + '% for ' + H + ' years: the third card.' + gateHow },
+      { label: usd0(NOTIONAL) + ' at bitcoin', fmt: 'usd', values: both(NOTIONAL * tm, NOTIONAL * toT), how: usd0(NOTIONAL) + ' times the bitcoin multiple: the third card.' + gateHow },
+      { label: 'Position adjustment', fmt: 'pct', values: both(null, pc != null ? pc - tc : null), how: 'From today minus the trend hurdle: how far bitcoin’s place in the channel moves the bar. The fourth card, in points.' + gateHow },
+      { label: 'Bar minus your return', fmt: 'pct', values: both(tc - r, pc != null ? pc - r : null), how: 'Above zero, bitcoin has been the higher-returning use of the capital at this horizon. The company lens’s fifth card shows it in points.' + gateHow },
+      { label: 'Where your return clears the bar', fmt: 'text', values: gated ? [null, null] : [crossWords('trend'), crossWords('position')], how: 'From the chart’s domain on each view (1 to 40 years; ' + MIN_POS_H + ' to 40 from today), a tenth of a year at a time: the verdict’s crossings.' + gateHow }];
+    var lensWord = S.lens === 'company' ? 'Company: ' + (S.cashflow === 'yes' ? 'cashflow positive' : 'not cashflow positive') + ', funded by ' + S.funding : 'Personal: ' + (S.capsrc === 'sale' ? 'from selling an investment' : 'new savings') + ', ' + (S.canWait === 'yes' ? 'can wait' : S.canWait === 'limited' ? 'can wait, with limits' : 'has a deadline');
+    var inputs = [
+      ['Your return', S.r + '% a year, ' + (S.tax === 'posttax' ? 'after tax' : 'before tax')], ['Horizon', H + (H === 1 ? ' year' : ' years')], ['Lens', lensWord],
+      ['View', isPos() ? 'From today (' + k.toFixed(2) + '× trend)' : 'From trend'], ['Bitcoin today', usd0(spot) + ', ' + k.toFixed(2) + '× the trend of ' + usd0(now)],
+      ['Power Law', 'price = ' + PL_A + ' × days since the first block to the power ' + PL_B + '; today is day ' + Math.round(t).toLocaleString('en-US')],
+      ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
+    return {
+      hint: 'the bar at every horizon, on both views',
+      inputs: inputs.map(function(m){ return { label: m[0], value: m[1] }; }),
+      note: 'The chart’s curves, every whole year, on both views, with the trend’s own numbers behind them. The last table is the cards at your horizon, on both views.',
+      tabs: [{ id: 'curve', label: 'The bar by horizon', columns: cols, rows: rows, strong: function(x){ return x.h === H; } }],
+      final: { title: 'At ' + H + (H === 1 ? ' year' : ' years'), csvTitle: 'At ' + H + (H === 1 ? ' year' : ' years') + ' (both views)', howTitle: 'How these figures are worked out', cols: ['From trend', 'From today'], rows: fin },
+      csv: { filename: 'the-bitcoin-hurdle-rate.csv', meta: [
+        ['Last Coin Standing', 'The Bitcoin Hurdle Rate'],
+        ['Amounts', 'yearly rates; dollars of the day'],
+        ['Page', function(){ return window.location.origin + window.location.pathname + window.location.search; }]] }
+    };
+  }
+  function renderLedger(){
+    if (!ledgerEl) ledgerEl = document.getElementById('hrLedger');
+    if (!ledgerEl || !window.Ledger) return;
+    window.Ledger.render(ledgerEl, ledgerSpec());
+  }
+
+  // ── QA (console: hrQA()) ──
+  // Every horizon from the formulas and against the chart, the last table
+  // against the cards, the CSV's shape; then a sweep through render(),
+  // restoring the reader's settings after.
+  window.hrQA = function(){
+    var near = function(x, y){ return typeof x === 'number' && typeof y === 'number' && Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(x), Math.abs(y)); };
+    function holds(){
+      var sp = ledgerEl && ledgerEl._ledgerSpec, why = [];
+      if (!sp) return { ok: false, why: ['no ledger'] };
+      if (!window.Ledger.check(ledgerEl, { side: false })) why.push('Ledger.check');
+      var C = sp.tabs[0].columns, rows = sp.tabs[0].rows, now = plPrice(tDays()), fin = sp.final.rows;
+      rows.forEach(function(x){
+        if (!near(C[2].get(x), C[1].get(x) / now) || !near(Math.pow(1 + C[3].get(x), x.h), C[2].get(x)) || !near(Math.pow(1 + C[5].get(x), x.h), PL_FLOOR * C[1].get(x) / spot)
+          || (x.h >= MIN_POS_H && !near(Math.pow(1 + C[4].get(x), x.h), C[1].get(x) / spot))) why.push('horizon ' + x.h);
+      });
+      if (chart){
+        var cd = curveData(), up = chart.data.datasets.map(function(d){ return JSON.stringify(d.data); });
+        if (up.indexOf(JSON.stringify(cd.upper)) < 0 || up.indexOf(JSON.stringify(cd.floor)) < 0) why.push('chart data');
+        cd.upper.forEach(function(p){ var row = rows[p.x - 1]; if (!near(p.y / 100, isPos() ? row.pc : row.tc)) why.push('curve ' + p.x); });
+      }
+      var gated = (S.lens === 'company' && S.cashflow === 'no') || (S.lens === 'personal' && S.canWait === 'no'), cards = el.hrStats ? el.hrStats.querySelectorAll('.hr-stat-val') : [];
+      if (gated) { if (cards.length || fin[1].values[0] !== null) why.push('gate'); }
+      else if (!(isPos() && S.h < MIN_POS_H)) {
+        var j = isPos() ? 1 : 0, bar = fin[1].values[j];
+        if (!cards.length || cards[0].textContent !== pct(bar)) why.push('first card');
+        if (cards[2] && cards[2].textContent.indexOf(money(fin[4].values[j])) !== 0) why.push('third card');
+        if (S.h >= MIN_POS_H && cards[3] && cards[3].textContent !== ((fin[6].values[1] >= 0 ? '+' : '') + (fin[6].values[1] * 100).toFixed(1) + ' pts')) why.push('fourth card');
+        if (S.lens === 'company' && cards[4] && cards[4].textContent !== ((fin[7].values[j] >= 0 ? '+' : '') + (fin[7].values[j] * 100).toFixed(1) + ' pts/yr')) why.push('fifth card');
+      }
+      var csv = window.Ledger.toCsv(sp);
+      if (!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
+        && (csv.match(/^# How each column is worked out$/gm) || []).length === 1 && csv.indexOf('# At ') > 0)) why.push('csv shape');
+      return { ok: !why.length, why: why };
+    }
+    var out = [], live = holds();
+    out.push(['live panel: every horizon from the formulas, the chart, the cards, CSV', live.ok, live.why.slice(0, 6).join('; ')]);
+    var saved = JSON.parse(JSON.stringify(S)), picked = VIEW_PICKED;
+    var V = [[12, 10, 'company', 'trend', 'yes', 'yes'], [12, 10, 'company', 'position', 'yes', 'yes'], [35, 3, 'personal', 'trend', 'yes', 'limited'], [0, 1, 'company', 'trend', 'yes', 'yes'],
+             [50, 40, 'personal', 'position', 'yes', 'yes'], [25, 2, 'company', 'position', 'yes', 'yes'], [20, 15, 'company', 'trend', 'no', 'yes'], [20, 15, 'personal', 'position', 'yes', 'no']];
+    try {
+      _suppress = true;
+      V.forEach(function(v){ S.r = v[0]; S.h = v[1]; S.lens = v[2]; S.view = v[3]; VIEW_PICKED = true; S.cashflow = v[4]; S.canWait = v[5]; render(); var x = holds(); out.push(['sweep: ' + v.join(', '), x.ok, x.why.slice(0, 6).join('; ')]); });
+    } finally { Object.keys(saved).forEach(function(key){ S[key] = saved[key]; }); VIEW_PICKED = picked; render(); _suppress = false; }
+    var ok = out.every(function(x){ return x[1]; });
+    if (window.console) console.table(out.map(function(x){ return { check: x[0], pass: x[1], why: x[2] }; }));
+    return { ok: ok, checks: out };
+  };
 
   // ─────────── INIT ───────────
   function init(){
