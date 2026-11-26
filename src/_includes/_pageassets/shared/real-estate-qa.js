@@ -133,7 +133,7 @@
      PR 6a — "Show the calculation" on both pages. The ledger renders in its
        own container, so every vector is unchanged. New: E30 (the look-back's
        ledger, 2017) and E31 (the projection's, defaults), P27 (Path 4) and
-       P28 (Path 2): each hashes the ledger's CSV (RealEstateLedger.toCsv),
+       P28 (Path 2): each hashes the ledger's CSV (Ledger.toCsv),
        without its URL line.
      PR 6b (BvRP; M7, P4) — the chart values each year if sold, after tax,
        by default, with a Held toggle and a difference line (dataset 5).
@@ -253,8 +253,8 @@
   }
   // The ledger as its CSV, without the URL line (PR 6a).
   function captureLedger(id){
-    var n = el(id); if (!n || !n._ledgerSpec || !window.RealEstateLedger) return null;
-    return window.RealEstateLedger.toCsv(n._ledgerSpec).split('\n').filter(function(l){ return l.indexOf('# Live scenario URL') !== 0; }).join('\n');
+    var n = el(id); if (!n || !n._ledgerSpec || !window.Ledger) return null;
+    return window.Ledger.toCsv(n._ledgerSpec).split('\n').filter(function(l){ return l.indexOf('# Live scenario URL') !== 0; }).join('\n');
   }
 
   // The deflator: a preset, or a custom value (PR 4f).

@@ -1,7 +1,7 @@
 /* Check the work: the sitewide treatment (shared/check-the-work.css).
    Helpers for pages that keep their own audit table: the "What went in"
-   strip, and the two export buttons' behaviour. The real-estate ledger
-   (real-estate-ledger.js) renders the same markup itself. */
+   strip, and the two export buttons' behaviour. The shared ledger
+   (shared/ledger.js) renders the same markup itself. */
 (function(){
   function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   // items: [[label, value], ...]. Build them from the scenario the engine ran, never from the DOM.

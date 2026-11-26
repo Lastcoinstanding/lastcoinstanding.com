@@ -3,7 +3,7 @@
    The homeowner, step three of the real-estate series. Mixed-content tier
    (STYLE_GUIDE §4.2): 1100px content-area, 880px prose. Hero and tokens
    follow the lenders page; the chart, grid and ledger use the series'
-   shared styles (shared/real-estate-ledger.css). Colour tokens only; no
+   shared styles (shared/ledger.css, shared/real-estate-chart.css). Colour tokens only; no
    hex outside :root.
    ─────────────────────────────────────────────── */
 :root {

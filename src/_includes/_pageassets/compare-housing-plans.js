@@ -225,7 +225,7 @@
       ], fmt: usdK });
 
     // Ledger
-    if (window.RealEstateLedger) {
+    if (window.Ledger) {
       var cols = function (P) { return [
         { label: 'Year', unit: '', get: function (r) { return r.month === 0 ? 'Today' : 'Year ' + Math.round(r.year * 10) / 10; }, fmt: 'text' },
         { label: 'Home value', unit: '$', get: function (r) { return r.homeValue / defl(r.year); }, fmt: 'usd' },
@@ -264,7 +264,7 @@
         ['Tax on a sale', s.tax === 'none' ? 'no capital-gains tax' : s.tax === 'custom' ? 'your own rates' : 'US rules, married filing jointly, ' + parseFloat(s.bracket) + '% bracket, state: ' + (s.state === 'OTHER' ? 'other' : s.state)],
         ['Mortgage interest', s.ded ? 'deducted' : 'not deducted'],
         ['Dollars shown', st.display === 'real' ? 'today\u2019s, at ' + inflPct() + '% inflation' : 'each year\u2019s']];
-      window.RealEstateLedger.render($('chLedger'), {
+      window.Ledger.render($('chLedger'), {
         inputs: IN.map(function (m) { return { label: m[0], value: m[1] }; }),
         note: 'Year by year, ' + (st.display === 'real' ? 'in today’s dollars (each year divided by inflation to then)' : 'in each year’s dollars') + '.',
         tabs: [{ id: 'a', label: 'Plan A', columns: aCols, rows: A.rows }, { id: 'b', label: 'Plan B', columns: bCols, rows: B.rows },
@@ -407,7 +407,7 @@
   // ─── QA (console: chpQA()) ───
   window.chpQA = function () {
     var s = readShared(), out = [];
-    out.push(['ledger: clarity additions', !!(window.RealEstateLedger && window.RealEstateLedger.check($('chLedger')))]);
+    out.push(['ledger: clarity additions', !!(window.Ledger && window.Ledger.check($('chLedger')))]);
     var same = M.housingCompare(input(lastA, lastA, s));
     out.push(['identical plans: identical results', Math.abs(same.diffAfter) < 1e-6 && Math.abs(same.diffHeld) < 1e-6]);
     // Parity with Bitcoin vs. Real Estate: Plan A buys, Plan B rents the same house, Plan A sets the budget.

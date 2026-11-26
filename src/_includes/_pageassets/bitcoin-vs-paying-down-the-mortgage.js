@@ -295,7 +295,7 @@
     } else if ($('mpGrid')) $('mpGrid').innerHTML = '';
 
     // The ledger
-    if (window.RealEstateLedger) {
+    if (window.Ledger) {
       var cols = function (k) { return [
         { label: 'Year', unit: '', get: function (r) { return r.month === 0 ? 'Today' : 'Year ' + r.year; }, fmt: 'text' },
         { label: 'Loan still owed', unit: '$', get: function (r) { return r[k].balance / defl(r.year); }, fmt: 'usd' },
@@ -337,7 +337,7 @@
         ['Mortgage interest', ded ? 'deducted; the tax saved buys bitcoin' : 'not deducted'],
         ['Dollars shown', st.display === 'real' ? 'today\u2019s, at ' + inflPct() + '% inflation' : 'each year\u2019s']];
       if (v.acct && v.acct !== 'taxable') IN.push(['Bitcoin held in', 'a tax-advantaged account']);
-      window.RealEstateLedger.render($('mpLedger'), {
+      window.Ledger.render($('mpLedger'), {
         inputs: IN.map(function (m) { return { label: m[0], value: m[1] }; }),
         note: 'Year by year, ' + (st.display === 'real' ? 'in today’s dollars (each year divided by inflation to then)' : 'in each year’s dollars') + '. Bitcoin held is in bitcoin, at the scenario’s price path from today’s price.',
         tabs: [{ id: 'pay', label: 'Pay it down', columns: payCols, rows: R.rows }, { id: 'hold', label: 'Hold bitcoin', columns: holdCols, rows: R.rows },
@@ -457,7 +457,7 @@
   // ─── QA (console: mpQA()) ───
   window.mpQA = function () {
     var v = readInputs(), out = [];
-    out.push(['ledger: clarity additions', !!(window.RealEstateLedger && window.RealEstateLedger.check($('mpLedger')))]);
+    out.push(['ledger: clarity additions', !!(window.Ledger && window.Ledger.check($('mpLedger')))]);
     var z = M.paydownProjection(input(v, { extra: 0, lump: 0, growth: 0.3 }));
     out.push(['no extra cash: households identical', Math.abs(z.diffIfSold) < 1e-6 && Math.abs(z.diffHeld) < 1e-6]);
     var h = M.paydownHurdle(input(v));

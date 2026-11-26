@@ -1,8 +1,8 @@
 /* Check the work: the one sitewide treatment for "how was this number made?"
    (JM, 2026-11-26: the same entry point, name and order on every page that
-   has it). Included after each page's own CSS. Used by the real-estate
-   ledger (shared/real-estate-ledger.js) and the retirement family's audit
-   tables. Order inside, always: What went in, the table(s), How each
+   has it). Included after each page's own CSS. Used by the shared
+   ledger (shared/ledger.js: the real-estate pages and Borrowing Against
+   Your Stack) and by the pages that keep their own audit tables. Order inside, always: What went in, the table(s), How each
    column is worked out, then Download CSV and Copy as CSV.
    Colours come from each page's tokens, with fallbacks. */
 

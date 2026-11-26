@@ -873,7 +873,7 @@
   // Show the calculation (PR 6a; rulings P2): the kept rental and the
   // path, year by year, in nominal dollars as paid, and both sold at the end.
   function renderLedger(results, s){
-    if (!window.RealEstateLedger || !RE.rentalLedger) return;
+    if (!window.Ledger || !RE.rentalLedger) return;
     var L = RE.rentalLedger(s), $ = 'nominal $';
     var pathName = ['', 'Sell + Spot Bitcoin', 'HELOC + Bitcoin', 'Partial Sale + Yield', 'Sell + Yield Portfolio'][s.path];
     var yr = { label: 'Year', fmt: 'text', get: function(r){ return String(r.year); } };
@@ -952,7 +952,7 @@
     if (s.path === 3 || s.path === 4) IN.push(['Yield portfolio', 'STRC ' + s.portfolio.strc + '%, SATA ' + s.portfolio.sata + '%, lending ' + s.portfolio.lend + '%, spot bitcoin ' + s.portfolio.spot + '%']);
     IN.push(['Tax', (s.taxRegime || 'us') === 'none' ? 'no capital-gains tax' : 'US rules, ' + s.federalBracketPct + '% bracket, state: ' + (s.stateCode === 'OTHER' ? 'other' : s.stateCode)]);
     if (isReal()) IN.push(['Inflation (the Real view)', inflPct() + '% a year']);
-    RealEstateLedger.render(document.getElementById('calc-ledger'), {
+    Ledger.render(document.getElementById('calc-ledger'), {
       note: 'Every amount is in nominal dollars, as paid' + (isReal() ? '; the Real view above divides the year-' + s.holdingYears + ' totals by ' + RE.deflator(inflPct(), s.holdingYears).toFixed(2) : '') +
             '. <em>Total held</em> is the chart\u2019s line for that year; the last rows sell both at year ' + s.holdingYears + ', as the table does.',
       inputs: IN.map(function(m){ return { label: m[0], value: m[1] }; }),
