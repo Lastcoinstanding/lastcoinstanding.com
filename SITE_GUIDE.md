@@ -1984,6 +1984,18 @@ All four companions have reciprocal `related:` entries pointing back to Bitcoin 
 - **BvRP-pattern slider rows.** Label + formatted-value above, slider below — eliminates the input crowding that the older two-column input pattern caused.
 - **CSS subgrid for spectrum cards.** Cross-column row alignment via `display: contents` on the inner UL. Canonical pattern for any 3-column spectrum where corresponding rows across columns should align baselines.
 
+### Check the work (2026-11-26)
+
+In the Calculator tab, under the two-column calculator (`#bfiLedger`; inside the outputs column the tables blew the column out), on the shared ledger (STYLE_GUIDE §6.49). The page's own *Year-by-year cashflows* table stays; the panel is the full working behind it.
+
+- **What went in:** the need, the position, the horizon, the income path with its rate and tax treatment, inflation, the scenario and its rate, today's price and multiple, the stress (named as bitcoin's price only), the capital gains rate, the date.
+- **Income path / Bitcoin path:** `computePaths()`'s two loops mirrored step for step (`incomeRows()`, `btcRows()`), each year's every quantity: dividend, tax, ROC basis left, after-tax, need, reinvested or drawn and its tax, the position and its real value; the scenario's price, the stress factor, the price, need, average cost, the sale's tax, bitcoin sold (and in dollars), left, value, real value. The last year in bold.
+- **Side by side:** the chart's two real lines, the gap, which is ahead; the crossover year in bold.
+- **At year N:** both paths' real wealth (marked: the two wealth cards), nominal wealth, income drawn, tax paid, the two-scenario block's figures, the IRR card with its actual formula, the crossover.
+- **CSV:** `bitcoin-fixed-income.csv`, with the page's share query.
+- **QA: `bfiQA()`** (console). `Ledger.check(el, { side: false })`; both mirrors against `computePaths()` (real paths, dividends, bitcoin sold) and their own identities (after-tax, the position's change, the sale covering need and tax, price times stress); the crossover; the cards, the IRR, the crossover card, the two-scenario block and every cell of the cashflow table; the CSV's shape; and seven settings through `recalc()` (all four instruments, ROC and ordinary, all four stresses, all four bitcoin paths, 4 to 30 years, need from $40,000 to $500,000 on $100,000 to $2M), restoring the reader's settings and link after. No figure changed: the readouts, verdict, cards, caption, the two-scenario block, the cashflow table and the chart's data compared identical with `main` in six states.
+- **What it shows (TECH_DEBT §1.x):** the stress overlay hits bitcoin's price only (the preferred pays its rate and redeems at par in every year and stress, though the chips' tooltips say the stress tests the preferred); the "Real after-tax IRR" card is the yield times one less an average tax, minus inflation, not an IRR on the cashflows; neither path stops when it runs out (the income position goes negative, the bitcoin path keeps recording sales from an empty stack); the bitcoin path doesn't tax the gain on the bitcoin it sells to pay the tax; and ROC dividends don't lower the cost basis used for draws.
+
 ### Cross-linking
 
 The page has five reciprocal `related:` companions (each pointing in both directions):
@@ -3641,7 +3653,7 @@ One engine and one set of components for §14 and §14.1, so the two pages can't
 |---|---|---|
 | `real-estate-model.js` | `RealEstateModel` | Every calculation on both pages (PR 3 extracted it byte-identical, then PRs 4–7 built on it): `PAIR_DEFAULTS`, `RENTAL_DEFAULTS`, `YIELD_RATES`; the scenarios (M3); the deflator; the tax functions; `bvreRetro`, `bvreProjection`, `ledgerRetro`; `computeAll`, the trajectories and `rentalLedger` for the rental page |
 | `real-estate-baseline.js` (+ `components/real-estate-baseline.njk`) | `RealEstateBaseline` | The shared Baseline assumptions (appreciation and deflator), their presets, the frame line; the njk holds the pair's shared tooltips and option lists (§14, PR 4f) |
-| `ledger.js` / `ledger.css` (until 2026-11-26 `real-estate-ledger.js` / `.css`) | `Ledger` (was `RealEstateLedger`) | *Check the work*: What went in, tabs, the final rows, the sentences, the CSV (STYLE_GUIDE §6.49). Shared beyond housing since Borrowing Against Your Stack (§21); also Bitcoin-Backed Mortgages (§21), Your Deployment Plan (§33), Lump Sum or Ladder In (§32), Disciplined Rebalancing (§62), What Daily Conviction Bought (§43) and Living on Bitcoin (§22) |
+| `ledger.js` / `ledger.css` (until 2026-11-26 `real-estate-ledger.js` / `.css`) | `Ledger` (was `RealEstateLedger`) | *Check the work*: What went in, tabs, the final rows, the sentences, the CSV (STYLE_GUIDE §6.49). Shared beyond housing since Borrowing Against Your Stack (§21); also Bitcoin-Backed Mortgages (§21), Your Deployment Plan (§33), Lump Sum or Ladder In (§32), Disciplined Rebalancing (§62), What Daily Conviction Bought (§43), Living on Bitcoin (§22) and Bitcoin and Fixed Income (§24) |
 | `real-estate-chart.js` (+ `real-estate-chart.css`, which also styles the grid) | `RealEstateChart` | The tenant page's wealth charts (the rental page draws its own, in the same colours and line styles) |
 | `real-estate-grid.js` | `RealEstateGrid` | The sensitivity grid, built so the retirement flagship can adopt it (STYLE_GUIDE §6.49) |
 | `real-estate-carry.js` | `RealEstateCarry` | The pair's URL vocabulary and the carrying links (§46, §53.2) |
