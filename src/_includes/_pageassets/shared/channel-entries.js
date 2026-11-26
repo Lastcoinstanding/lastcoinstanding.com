@@ -51,7 +51,15 @@
     for (var i = 1; i < N; i++) { if (S[i].d >= absDay) { var a = S[i - 1], b = S[i], t = (absDay - a.d) / (b.d - a.d); return a.p * (1 - t) + b.p * t; } }
     return S[N - 1].p;
   }
-  function median(arr) { var m = arr.filter(function (x) { return x != null && isFinite(x); }).sort(function (a, b) { return a - b; }); return m.length ? m[Math.floor(m.length * 0.5)] : null; }
+  // The median of an even count is the average of the two middle values, as a spreadsheet's
+  // MEDIAN gives (2026-11-26, JM's ruling on the Wait or Deploy Now findings). It had taken the
+  // higher of the two, so a figure could differ from the same median rebuilt from the page's own
+  // Check the work table or CSV. Moves figures on every page that reads bandMetrics or this
+  // median: Wait or Deploy Now, How Much Cash, Bitcoin Spikes, The Rundown.
+  function median(arr) {
+    var m = arr.filter(function (x) { return x != null && isFinite(x); }).sort(function (a, b) { return a - b; }), n = m.length, h = Math.floor(n / 2);
+    return !n ? null : (n % 2 ? m[h] : (m[h - 1] + m[h]) / 2);
+  }
   function monthYear(day) { return new Date(GENESIS_TS * 1000 + day * 86400 * 1000).toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
 
   // ════════ COMPARATOR MATH — position-based waiting, post-2014, live ════════
