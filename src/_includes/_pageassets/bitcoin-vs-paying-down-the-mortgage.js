@@ -308,15 +308,47 @@
         { label: 'Interest paid (sum, dollars of each year)', unit: '$', get: function (r) { return r[k].interest; }, fmt: 'usd' },
         { label: 'If sold, after tax, less the loan', unit: '$', get: function (r) { return r[k].ifSold / defl(r.year); }, fmt: 'usd' }
       ]; };
+      // The ledger's clarity additions (STYLE_GUIDE §6.49; rolled out from
+      // the pair's pilot, 2026-11-25). Sentences are written from
+      // RealEstateModel.paydownProjection.
+      var payCols = cols('pay'), holdCols = cols('hold'), ded = R.dedRate > 0;
+      var HOWC = [null,
+        ['The balance after each month\u2019s interest, the scheduled payment and all of the extra cash, at the end of that year.',
+         'The balance after each month\u2019s interest and the scheduled payment only, at the end of that year.'],
+        ['Any of the lump sum the loan didn\u2019t need, then, once the loan is gone, the whole freed payment each month' + (ded ? ', plus the tax saved on interest' : '') + ': each less the trading cost, at that month\u2019s price.',
+         'The lump sum and each month\u2019s extra cash' + (ded ? ', plus the tax saved on interest' : '') + ', less the trading cost, at that month\u2019s price on your scenario.'],
+        ['Bitcoin held times the scenario\u2019s price at the end of that year.', 'Bitcoin held times the scenario\u2019s price at the end of that year.'],
+        ['The dollars put into bitcoin to date. The tax on a sale is worked out against this.', 'The dollars put into bitcoin to date. The tax on a sale is worked out against this.'],
+        ['Each month\u2019s balance times the monthly mortgage rate, added up to date.', 'Each month\u2019s balance times the monthly mortgage rate, added up to date.'],
+        ['Bitcoin\u2019s value, less the trading cost and the tax on its gain, less the loan still owed.', 'Bitcoin\u2019s value, less the trading cost and the tax on its gain, less the loan still owed.']];
+      HOWC.forEach(function (h, n) { if (h) { payCols[n].how = h[0]; holdCols[n].how = h[1]; } });
+      var sold = key !== 'held', bu = (sold ? 'if sold that year, after tax' : 'held, before any sale') + (st.display === 'real' ? ', today\u2019s $' : '');
+      var sideCols = [
+        payCols[0],
+        { label: 'Pay it down', unit: bu, get: function (r) { return r.pay[key] / defl(r.year); }, fmt: 'usd', how: sold ? 'The Pay it down tab\u2019s last column for that year.' : 'Bitcoin\u2019s value minus the loan still owed, before any sale.' },
+        { label: 'Hold bitcoin', unit: bu, get: function (r) { return r.hold[key] / defl(r.year); }, fmt: 'usd', how: sold ? 'The Hold bitcoin tab\u2019s last column for that year.' : 'Bitcoin\u2019s value minus the loan still owed, before any sale.' },
+        { label: 'Difference', unit: 'holding minus paying down', get: function (r) { return (r.hold[key] - r.pay[key]) / defl(r.year); }, fmt: 'usd', how: 'Hold bitcoin minus Pay it down, in the same row. The chart\u2019s difference line.' },
+        { label: 'Ahead', unit: '', fmt: 'text', get: function (r) { var d = r.hold[key] - r.pay[key]; return Math.abs(d) < 0.5 ? 'level' : d > 0 ? 'holding' : 'paying down'; } }];
+      var tpI = i.tp || {};
+      var IN = [['Loan balance', usd(v.bal)], ['Mortgage rate', v.mrate + '%'], ['Years left on the loan', String(v.yrsleft)], ['Scheduled payment', usd(R.payment) + ' a month'],
+        ['Extra cash', usd(v.extra) + ' a month'], ['Lump sum today', usd(v.lump)], ['Years compared', String(H)],
+        ['Bitcoin scenario', W.name[st.scenario]], ['Bitcoin today', usd(typeof TODAY_PRICE === 'number' ? TODAY_PRICE : 0)], ['Trading cost on bitcoin', v.btctx + '% each way'],
+        ['Tax on a sale', tpI.taxRegime === 'none' ? 'no capital-gains tax' : tpI.taxRegime === 'custom' ? 'your own rates' : 'US rules, married filing jointly, ' + tpI.federalBracketPct + '% bracket, state: ' + (tpI.stateCode === 'OTHER' ? 'other' : tpI.stateCode)],
+        ['Mortgage interest', ded ? 'deducted; the tax saved buys bitcoin' : 'not deducted'],
+        ['Dollars shown', st.display === 'real' ? 'today\u2019s, at ' + inflPct() + '% inflation' : 'each year\u2019s']];
+      if (v.acct && v.acct !== 'taxable') IN.push(['Bitcoin held in', 'a tax-advantaged account']);
       window.RealEstateLedger.render($('mpLedger'), {
+        inputs: IN.map(function (m) { return { label: m[0], value: m[1] }; }),
         note: 'Year by year, ' + (st.display === 'real' ? 'in today’s dollars (each year divided by inflation to then)' : 'in each year’s dollars') + '. Bitcoin held is in bitcoin, at the scenario’s price path from today’s price.',
-        tabs: [{ id: 'pay', label: 'Pay it down', columns: cols('pay'), rows: R.rows }, { id: 'hold', label: 'Hold bitcoin', columns: cols('hold'), rows: R.rows }],
+        tabs: [{ id: 'pay', label: 'Pay it down', columns: payCols, rows: R.rows }, { id: 'hold', label: 'Hold bitcoin', columns: holdCols, rows: R.rows },
+               { id: 'side', label: 'Side by side', columns: sideCols, rows: R.rows }],
         final: { cols: ['Pay it down', 'Hold bitcoin'], rows: [
-          { label: 'Bitcoin, value', values: [e.pay.btcValue / D, e.hold.btcValue / D] },
-          { label: 'Trading cost on a sale', values: [-e.pay.btcValue * v.btctx / 100 / D, -e.hold.btcValue * v.btctx / 100 / D] },
-          { label: 'Tax on the gain', values: [-e.pay.tax / D, -e.hold.tax / D] },
-          { label: 'Loan still owed', values: [-e.pay.balance / D, -e.hold.balance / D] },
-          { label: 'If sold, after tax, less the loan', values: [e.pay.ifSold / D, e.hold.ifSold / D] }
+          { label: 'Bitcoin, value', values: [e.pay.btcValue / D, e.hold.btcValue / D], how: 'Each side\u2019s bitcoin held at the end, times the scenario\u2019s price then.' },
+          { label: 'Trading cost on a sale', values: [-e.pay.btcValue * v.btctx / 100 / D, -e.hold.btcValue * v.btctx / 100 / D], how: 'The trading cost rate times the bitcoin\u2019s value.' },
+          { label: 'Tax on the gain', values: [-e.pay.tax / D, -e.hold.tax / D], how: 'Under your tax settings, on the sale proceeds minus what was paid for the bitcoin.' },
+          { label: 'Loan still owed', values: [-e.pay.balance / D, -e.hold.balance / D], how: 'Each side\u2019s loan balance at the end.' },
+          { label: 'If sold, after tax, less the loan', values: [e.pay.ifSold / D, e.hold.ifSold / D], strong: true,
+            card: 'The headline above is the difference between these two figures', how: 'Bitcoin\u2019s value minus the trading cost, the tax and the loan.' }
         ] },
         csv: { filename: 'bitcoin-vs-paying-down-the-mortgage.csv', meta: [
           ['Loan balance', v.bal], ['Mortgage rate %', v.mrate], ['Years left', v.yrsleft], ['Extra a month', v.extra], ['Lump sum', v.lump],
@@ -425,6 +457,7 @@
   // ─── QA (console: mpQA()) ───
   window.mpQA = function () {
     var v = readInputs(), out = [];
+    out.push(['ledger: clarity additions', !!(window.RealEstateLedger && window.RealEstateLedger.check($('mpLedger')))]);
     var z = M.paydownProjection(input(v, { extra: 0, lump: 0, growth: 0.3 }));
     out.push(['no extra cash: households identical', Math.abs(z.diffIfSold) < 1e-6 && Math.abs(z.diffHeld) < 1e-6]);
     var h = M.paydownHurdle(input(v));

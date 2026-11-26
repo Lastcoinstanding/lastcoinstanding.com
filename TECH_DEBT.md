@@ -153,7 +153,7 @@ Krueger / *Bitcoin One Million* popularizer credit in §A).
 ### 1.x The calculation ledger: generalize after the pilot (2026-11-25)
 
 `shared/real-estate-ledger.js` carries a clarity pilot on the real-estate pair (STYLE_GUIDE §6.49): what went in, the marked row, how each column is worked out, a Side by side tab. Once JM has judged it on the preview and in use:
-- Rename the component to a neutral shared ledger and move the two other real-estate pages (Paying Down the Mortgage, Compare Housing Plans) onto the four additions.
+- ~~Move the two other real-estate pages onto the four additions.~~ Done in the rollout PR (2026-11-25). Still open: rename the component to a neutral shared ledger, which is worth doing with the first page outside the real-estate series.
 - Bring the retirement family onto it: The Bitcoin Retirement, Escape Velocity and Compare Retirement Plans show year-by-year figures with no download; the Stress Test, Bitcoin Portfolio Allocation and How Much Cash each have a hand-built CSV.
 - Then the ten calculators with no ledger at all: Borrowing Against Your Stack, Bitcoin-Backed Mortgages, Your Deployment Plan, Lump Sum or Ladder In, Disciplined Rebalancing (a download for its trade log), What Daily Conviction Bought, Living on Bitcoin, Bitcoin and Fixed Income, the Hurdle Rate, Wait or Deploy Now.
 - Open: the sitewide name ("Show the calculation" or "Check the work"); whether "What went in" opens folded.

@@ -135,5 +135,20 @@
     el._ledgerSpec = spec;
   }
 
-  window.RealEstateLedger = { render: render, toCsv: toCsv };
+  // QA for the clarity additions on a rendered ledger: the inputs strip, one
+  // marked row, every tab and final row explained, and the Side by side
+  // tab's last row equal to its difference column and, on If sold, to the
+  // marked row. Pages' own QA functions call it.
+  function check(el){
+    var sp = el && el._ledgerSpec; if (!sp) return false;
+    var near = function(a, b){ return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b)); };
+    var side = sp.tabs.filter(function(t){ return t.id === 'side'; })[0], fin = sp.final.rows.filter(function(r){ return r.card; });
+    if (!(sp.inputs && sp.inputs.length > 5) || fin.length !== 1 || !side) return false;
+    if (!sp.tabs.every(function(t){ return hasHow(t.columns); }) || !sp.final.rows.every(function(r){ return !!r.how; })) return false;
+    var last = side.rows[side.rows.length - 1], a = side.columns[1].get(last), b = side.columns[2].get(last);
+    if (!near(side.columns[3].get(last), b - a)) return false;
+    if (/if sold/.test(side.columns[1].unit) && !(near(a, fin[0].values[0]) && near(b, fin[0].values[1]))) return false;
+    return true;
+  }
+  window.RealEstateLedger = { render: render, toCsv: toCsv, check: check };
 })();
