@@ -276,9 +276,14 @@
     //   = downPayment × rate × t + homePrice × premium × t
     // Simple-interest approximation; matches BvS calculator convention.
     // Stops accruing at repayYear (early-repayment of the lien).
+    // 2026-11-26 (JM's ruling on the Check the work finding): the pledge path
+    // also owes the second-lien loan itself, the down payment, which the sell
+    // path paid for with bitcoin. It is counted at face value from year 0,
+    // owed or repaid. Before this the cost was the extra interest only, which
+    // overstated pledging's advantage by the down payment at every horizon.
     function pledgeCostAtYear(t){
       var capped = Math.min(t, repayYear);
-      return downPayment * mortRate * capped + homePrice * premium * capped;
+      return downPayment + downPayment * mortRate * capped + homePrice * premium * capped;
     }
 
     // ─── Sell-path opportunity cost over t years, on a scenario ───
@@ -338,6 +343,7 @@
       row('Down-payment funded',                                                fmtUsd(downPayment)) +
       row('BTC pledged (stays in custody)',                                     fmtBtc(requiredCollateralBtc)) +
       row('Cap-gains tax paid now',                                              '$0 (loan, not a disposition)') +
+      row('Second-lien loan (the down payment, owed or repaid)',                 fmtUsd(downPayment)) +
       interestRows +
       row('Cumulative cost @ year ' + horizon,                                  fmtUsd(pledgeTerminalCost), true);
 
@@ -363,9 +369,9 @@
     if(crossoverYear !== null && crossoverYear > 0 && crossoverYear <= horizon){
       crossoverStr = ' Crossover lands at <strong>year ' + crossoverYear.toFixed(1) + '</strong>, beyond which the ' + (pledgeWins ? 'pledge path' : 'sell path') + ' becomes the cheaper finish.';
     } else if(pledgeWins){
-      crossoverStr = ' The pledge path is cheaper at every point in your horizon \u2014 cumulative interest never outpaces the value of the BTC the sell path would have given up.';
+      crossoverStr = ' The pledge path is cheaper at every point in your horizon \u2014 the loan and its extra interest never outpace the value of the BTC the sell path would have given up.';
     } else {
-      crossoverStr = ' The sell path is cheaper at every point in your horizon \u2014 the value of forgone BTC stays below the cumulative interest cost of the pledge.';
+      crossoverStr = ' The sell path is cheaper at every point in your horizon \u2014 the value of forgone BTC stays below the pledge path\u2019s loan and its extra interest.';
     }
     verdict.className = verdictCls;
     verdict.innerHTML =
@@ -420,8 +426,8 @@
   // scenario showing, splits the pledge line into its two interest portions,
   // and ends with the two cards at the horizon. Every figure is the engine's
   // own or one line of arithmetic on them, stated under the table. Nothing
-  // here changes a figure. The model counts the pledge path's extra interest
-  // but not the second-lien loan itself; the sentences say so.
+  // here changes a figure. Since 2026-11-26 the pledge path's cost includes
+  // the second-lien loan itself (the down payment) as well as its interest.
   var ledgerEl = document.getElementById('bbmLedger');
   var LAST = null;   // the values the last compute() pass showed, for bbmQA()
   function ledgerRows(a){
@@ -439,7 +445,7 @@
     var usd0 = function(v){ return '$' + Math.round(v).toLocaleString('en-US'); };
     var mult0 = a.m0.toFixed(2) + '×', atN = 'at year ' + N, dp = usd0(a.downPayment);
     var stops = R < N ? ' It stops at the pay-off year, year ' + R + '.' : ' It runs to year ' + N + ', since the second lien isn’t paid off before then.';
-    var notCounted = 'The second-lien loan itself (the ' + dp + ' down payment), which the pledge path still owes or has repaid, isn’t counted.';
+    var notCounted = 'It includes the second-lien loan itself, the ' + dp + ' down payment, which the pledge path owes or has repaid and the sell path paid with bitcoin.';
     var year = { label: 'Year', unit: '', fmt: 'text', get: function(x){ return x.t === 0 ? 'Today' : 'Year ' + x.t; } };
     var priceHow = a.sc === 'trend'
       ? 'The Power Law trend on that date times a multiple of trend that moves in a straight line from today’s ' + mult0 + ' to 1.0 over ' + REV + ' years, then stays at 1.0. Today’s row is the price you set.'
@@ -449,8 +455,10 @@
         how: 'The standard mortgage rate on the down-payment loan, which the sell path doesn’t take out, times the years so far (simple interest).' + stops },
       { label: 'Premium to date', unit: '$', fmt: 'usd', get: function(x){ return x.prem; },
         how: 'The rate premium on the whole mortgage, primary and second lien, times the years so far.' + stops },
+      { label: 'Second-lien loan', unit: '$', fmt: 'usd', get: function(){ return a.downPayment; },
+        how: 'The down payment, borrowed against the pledged bitcoin. It is owed until repaid, so it counts at face value in every year.' },
       { label: 'Cumulative cost', unit: '$', fmt: 'usd', get: function(x){ return x.pledge; },
-        how: 'Base-rate interest plus premium: the chart’s Pledge line, and the last row is the Pledge path card. ' + notCounted },
+        how: 'The loan plus base-rate interest plus premium: the chart’s Pledge line, and the last row is the Pledge path card. ' + notCounted },
       { label: 'BTC pledged', unit: '₿', fmt: 'btc', get: function(){ return a.requiredCollateralBtc; },
         how: '2.5 times the down payment at today’s bitcoin price (a 40% LTV). It stays in custody; none is sold.' }];
     var sellCols = [year,
@@ -529,7 +537,7 @@
       if(!near(a.btcSold * (a.price - a.taxRate * Math.max(0, a.price - a.costBasis)), a.downPayment)) why.push('bitcoin sold');
       rows.forEach(function(x){
         var m = x.price / x.trend;
-        if(!near(x.base + x.prem, x.pledge)) why.push('pledge split, year ' + x.t);
+        if(!near(a.downPayment + x.base + x.prem, x.pledge)) why.push('pledge split, year ' + x.t);
         if(!near(x.sell, a.btcSold * x.price)) why.push('forgone value, year ' + x.t);
         if(!(a.sc === 'trend' ? (x.t >= 3 ? near(m, 1) : near(m, a.m0 + (1 - a.m0) * x.t / 3)) : near(m, a.m0))) why.push('price path, year ' + x.t);
       });
