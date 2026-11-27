@@ -632,6 +632,57 @@
       "site": "https://nunchuk.io/inheritance"
     },
     {
+      "id": "spot-etf",
+      "group": "custodian",
+      "name": "Bitcoin ETFs",
+      "nameNote": "spot, at a brokerage",
+      "model": "Fund shares · a custodian holds the fund’s bitcoin",
+      "bitcoinOnly": null,
+      "otherAssets": "",
+      "qualifier": "Fund shares, not bitcoin",
+      "strip": {
+        "beneficiary": {
+          "value": "Where offered",
+          "note": "TOD registration, if the firm offers it"
+        },
+        "probate": {
+          "value": "Not with TOD",
+          "note": "the shares pass to the beneficiary"
+        },
+        "time": {
+          "value": "Not published",
+          "note": "varies by brokerage"
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: they re-register the shares in their name.",
+        "without": "Your heirs claim through the brokerage; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "The beneficiary re-registers the shares in their own name, typically with a copy of the death certificate and an application to the broker or transfer agent"
+      ],
+      "extra": "State law governs how securities can be registered, and each brokerage decides whether to offer transfer-on-death registration. An IRA carries its own beneficiary designation.",
+      "how": "A spot bitcoin ETF is a fund that holds bitcoin through a custodian and issues shares, which sit in your brokerage account like any other security. Brokerages often offer transfer-on-death registration on a taxable account; where you have one, the shares pass to the named beneficiary without probate, once they send a death certificate and an application to re-register them.",
+      "notPublished": [
+        "How long re-registration takes (it varies by firm)"
+      ],
+      "sources": [
+        "https://www.investor.gov/additional-resources/information/seniors/transferring-assets",
+        "https://fidelity.com/life-events/estate-planning/asset-strategies/brokerage",
+        "https://www.finra.org/investors/insights/plan-ahead-transfer-your-brokerage-account-assets-death"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://www.investor.gov/additional-resources/information/seniors/transferring-assets",
+      "siteLabel": "The SEC on transfer on death",
+      "siteWords": "Read the SEC’s page on transfer on death"
+    },
+    {
       "id": "coinbase",
       "group": "custodian",
       "name": "Coinbase",
@@ -874,57 +925,6 @@
       ],
       "asOf": "2026-11-26",
       "site": "https://river.com/inheritance"
-    },
-    {
-      "id": "spot-etf",
-      "group": "custodian",
-      "name": "Bitcoin ETFs",
-      "nameNote": "spot, at a brokerage",
-      "model": "Fund shares · a custodian holds the fund’s bitcoin",
-      "bitcoinOnly": null,
-      "otherAssets": "",
-      "qualifier": "Fund shares, not bitcoin",
-      "strip": {
-        "beneficiary": {
-          "value": "Where offered",
-          "note": "TOD registration, if the firm offers it"
-        },
-        "probate": {
-          "value": "Not with TOD",
-          "note": "the shares pass to the beneficiary"
-        },
-        "time": {
-          "value": "Not published",
-          "note": "varies by brokerage"
-        }
-      },
-      "codes": {
-        "heirUse": "nothing",
-        "without": "no",
-        "renew": "none"
-      },
-      "fit": {
-        "heir": "Your heirs need no key: they re-register the shares in their name.",
-        "without": "Your heirs claim through the brokerage; there is no path around it.",
-        "renew": "Nothing to renew."
-      },
-      "documents": [
-        "The beneficiary re-registers the shares in their own name, typically with a copy of the death certificate and an application to the broker or transfer agent"
-      ],
-      "extra": "State law governs how securities can be registered, and each brokerage decides whether to offer transfer-on-death registration. An IRA carries its own beneficiary designation.",
-      "how": "A spot bitcoin ETF is a fund that holds bitcoin through a custodian and issues shares, which sit in your brokerage account like any other security. Brokerages often offer transfer-on-death registration on a taxable account; where you have one, the shares pass to the named beneficiary without probate, once they send a death certificate and an application to re-register them.",
-      "notPublished": [
-        "How long re-registration takes (it varies by firm)"
-      ],
-      "sources": [
-        "https://www.investor.gov/additional-resources/information/seniors/transferring-assets",
-        "https://fidelity.com/life-events/estate-planning/asset-strategies/brokerage",
-        "https://www.finra.org/investors/insights/plan-ahead-transfer-your-brokerage-account-assets-death"
-      ],
-      "asOf": "2026-11-26",
-      "site": "https://www.investor.gov/additional-resources/information/seniors/transferring-assets",
-      "siteLabel": "The SEC on transfer on death",
-      "siteWords": "Read the SEC’s page on transfer on death"
     },
     {
       "id": "strike",
