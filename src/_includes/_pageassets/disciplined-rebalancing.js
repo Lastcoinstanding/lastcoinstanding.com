@@ -722,18 +722,27 @@
         if (c.i === 4) fails.push('<b>' + c.name + ': never sold.</b> The spike peaked at ' + fx(c.peak) + ' trend, below the sell rule\'s ' + fx(S.R.sx) + '.');
         return;
       }
-      var s = c.sell, b = c.buy, trip = tripOf(s, b, LAST.p), m = trip.m, buyCell, cum0 = cum;
-      cum *= m;
-      if (b) buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>');
-      else buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>';
-      var row = m < 0.995 ? 'lost' : m > 1.005 ? 'won' : '';
-      html += '<tr class="' + row + '">' + c1 + '<td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td>' + stackCells(stack * cum, stack * (cum - cum0), stack) + '</tr>';
-      if (trip.lost) {
-        var r = trip.kind === 'deadline' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.'
-          : trip.kind === 'cash' ? 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.'
-          : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (trip.kind === 'higher' ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '');
-        fails.push('<b>' + c.name + ': ' + mult(m) + ' the bitcoin.</b> ' + r);
-      }
+      // Every round trip in the cycle, not only the first (2026-11-26, JM's
+      // ruling on the Check the work finding): a rule that sells again in the
+      // same cycle gets a row per sale, so Your stack ends where the headline
+      // does. The first row carries the cycle's name; later rows say which sale.
+      var trips = tripsOf(T).filter(function(tr){ return cycName(tr.s.d) === c.name; });
+      if (!trips.length) trips = [tripOf(c.sell, c.buy, LAST.p)];
+      trips.forEach(function(trip, k){
+        var s = trip.s, b = trip.b, m = trip.m, buyCell, cum0 = cum;
+        cum *= m;
+        var cell1 = k === 0 ? c1 : '<td class="dr2-again"><span class="s">' + c.name + ' · sale ' + (k + 1) + ' of ' + trips.length + '</span></td>';
+        if (b) buyCell = my(b.d) + ' · ' + price(b.p) + '<span class="s">' + fx(b.r) + ' trend' + (b.why === 'fallback' ? '</span><span class="dr2-tag fb">deadline</span>' : '</span>');
+        else buyCell = '<span class="dr2-tag cash">still in cash</span><span class="s">valued at today\'s price</span>';
+        var row = m < 0.995 ? 'lost' : m > 1.005 ? 'won' : '';
+        html += '<tr class="' + row + '">' + cell1 + '<td>' + my(s.d) + ' · ' + price(s.p) + '<span class="s">' + fx(s.r) + ' trend · sold ' + Math.round(s.amt / s.before * 100) + '%</span></td><td>' + buyCell + '</td><td class="n">' + (s.tax > 0 ? usd(s.tax * stack) : '—') + '</td><td class="n mult">' + mult(m) + (m < 0.995 ? '<span class="s">Lost bitcoin</span>' : '') + '</td>' + stackCells(stack * cum, stack * (cum - cum0), stack) + '</tr>';
+        if (trip.lost) {
+          var r = trip.kind === 'deadline' ? 'The buy-back level never came; the buy-back rule\'s ' + S.R.cap + '-month deadline bought back at ' + price(b.p) + '.'
+            : trip.kind === 'cash' ? 'Sold at ' + price(s.p) + '; price never fell to ' + fx(S.R.rx) + ' trend. Still in cash.'
+            : 'Sold at ' + price(s.p) + ', bought back at ' + price(b.p) + (trip.kind === 'higher' ? ', a higher price.' : '.') + (s.tax > 0 ? ' Tax took part of the sale.' : '');
+          fails.push('<b>' + c.name + (trips.length > 1 ? ', sale ' + (k + 1) : '') + ': ' + mult(m) + ' the bitcoin.</b> ' + r);
+        }
+      });
     });
     $('dr2CycBody').innerHTML = html;
     $('dr2WorthNote').textContent = priceNote();
@@ -1425,7 +1434,7 @@
   // ════════ CHECK THE WORK (STYLE_GUIDE §6.49; shared/ledger.js) ════════
   // Added 2026-11-26. The trade log behind the cycle table and the headline
   // results: every sale and buy back from the cycle table's start, the round
-  // trips they make (all of them: the cycle table shows the first sale of each
+  // trips they make (all of them; since 2026-11-26 the cycle table has a row for each too
   // cycle), then the two headline runs. Built from the engine's own events
   // (RuleEngine.run) as render() ran them; nothing here changes a figure.
   var ledgerEl = $('drLedger');
@@ -1460,7 +1469,8 @@
       if (e.t !== 'sell') return;
       var b = T.ev[i + 1] && T.ev[i + 1].t === 'buy' ? T.ev[i + 1] : null;
       var before = e.before * k, after = b ? b.after * k : T.end * k;
-      out.push({ s: e, b: b, cyc: cycName(e.d), share: e.amt / e.before, before: before, after: after, m: after / before, inTable: firsts.indexOf(e) >= 0 });
+      var cy = cycName(e.d), kk = out.filter(function(o){ return o.cyc === cy; }).length;
+      out.push({ s: e, b: b, cyc: cy, k: kk, share: e.amt / e.before, before: before, after: after, m: after / before, inTable: true });
     });
     return out;
   }
@@ -1477,9 +1487,7 @@
       : 'The gain on the bitcoin sold, lot by lot (' + (O.lots === 'hifo' ? 'highest cost first' : 'oldest first') + '): ' + pctTxt(lt) + ' on a lot held a year or more, ' + pctTxt(sh) + ' on one held less (' + RE.ST_RATE + '% federal' + (O.niit ? ' + 3.8% NIIT' : '') + (st ? ' + ' + pctTxt(st) + ' state' : '') + '); never below zero across the lots sold. Your stack starts as one lot at the start price; each buy back is a new lot at its price.';
     var cadence = 'about 12 days apart' + (SPARSE_FROM != null ? ' (about a month apart since ' + my(SPARSE_FROM) + ')' : '');
     var startName = S.start.slice(0, 4);
-    var tableStack = k * trips.reduce(function(a, r){ return a * (r.inTable ? r.m : 1); }, 1);
-    var hidden = trips.filter(function(r){ return !r.inTable; }).length;
-    var hiddenNote = hidden ? ' Here ' + (hidden === 1 ? 'one sale is' : hidden + ' sales are') + ' not in the cycle table, so its Your stack column ends at ' + btcf(tableStack) + ' where the rules ended at ' + btcf(T.end * k) + '.' : '';
+    var hiddenNote = '';
     var tradeCols = [
       { label: 'Date', unit: '', fmt: 'text', get: function(r){ return dayText(r.d); },
         how: 'The sample on which it happened. The record is one sample ' + cadence + ', and a rule fires on the first sample past its level.' },
@@ -1503,8 +1511,8 @@
       { label: 'Stack before', unit: '₿', fmt: 'btc', get: function(r){ return r.before; }, how: 'The bitcoin held just before the sale.' },
       { label: 'Stack after', unit: '₿', fmt: 'btc', get: function(r){ return r.after; }, how: 'The bitcoin held after the buy back.' },
       { label: 'Round trip', unit: '×', fmt: 'mult', get: function(r){ return r.m; }, how: 'Stack after divided by stack before: the cycle table’s Round trip. Multiplied together, the round trips give the result.' },
-      { label: 'In the cycle table', unit: '', fmt: 'text', get: function(r){ return r.inTable ? 'Yes' : 'No: a later sale in this cycle'; },
-        how: 'The cycle table shows each cycle’s first sale. A rule that sells again in the same cycle has those round trips here only, and the cycle table’s Your stack column multiplies only the round trips it shows.' + hiddenNote }];
+      { label: 'In the cycle table', unit: '', fmt: 'text', get: function(r){ return r.k === 0 ? 'Its own row' : 'Sale ' + (r.k + 1) + ' of the cycle, its own row'; },
+        how: 'Since 2026-11-26 the cycle table has a row for every round trip, so a rule that sells more than once in a cycle shows each sale, and its Your stack column ends where the result does.' }];
     var runs = [['Since 2011', a11], ['Since 2014', a14]];
     if (S.start === '2017-01') runs.push(['From 2017', T]);
     var sums = runs.map(function(x){ return runSummary(x[1]); });
@@ -1576,16 +1584,17 @@
       }
       var prod = tp.rows.reduce(function(a, x){ return a * x.m; }, 1);
       if (tp.rows.length !== T.ev.filter(function(e){ return e.t === 'sell'; }).length || (tp.rows.length && !near(prod * k, T.end * k))) why.push('round trips to the result');
-      tp.rows.forEach(function(x){
+      var saleRows = Array.prototype.filter.call(document.querySelectorAll('#dr2CycBody tr'), function(row){ return !row.classList.contains('never'); });
+      var shown = tp.rows.filter(function(x){ return T.cyc.some(function(c){ return c.covered && c.name === x.cyc; }); });
+      if (saleRows.length !== shown.length) why.push('cycle table count');
+      shown.forEach(function(x, j){
         if (x.b && !near(x.m, tripOf(x.s, x.b, T.last.p).m)) why.push('round trip ' + x.cyc);
-        if (x.inTable) {
-          var tr2 = Array.prototype.filter.call(document.querySelectorAll('#dr2CycBody tr'), function(row){ return row.children[0].textContent.indexOf(x.cyc) === 0; })[0];
-          var cell = tr2 && tr2.querySelector('td.mult');
-          if (!cell || cell.textContent.indexOf(mult(x.m)) !== 0) why.push('cycle table ' + x.cyc);
-        }
+        var cell = saleRows[j] && saleRows[j].querySelector('td.mult');
+        if (!cell || cell.textContent.indexOf(mult(x.m)) !== 0) why.push('cycle table ' + x.cyc + ' sale ' + (x.k + 1));
       });
-      var withSale = T.cyc.filter(function(c){ return c.covered && c.sell; }).length;
-      if (tp.rows.filter(function(x){ return x.inTable; }).length !== withSale) why.push('cycle table count');
+      var allRows = document.querySelectorAll('#dr2CycBody tr'), lastRow = allRows[allRows.length - 1];
+      var stackCell = lastRow && lastRow.querySelector('td.mult') && lastRow.querySelector('td.mult').nextElementSibling;
+      if (shown.length === tp.rows.length && (!stackCell || stackCell.textContent.indexOf(btcf(T.end * k)) !== 0)) why.push('cycle table stack vs result');
       var a11 = RE.run(S.R, engineOpts(S.O, '2011-01')), a14 = RE.run(S.R, engineOpts(S.O, '2014-01'));
       [[a11, 'dr2R11'], [a14, 'dr2R14']].forEach(function(x, j){
         var a = x[0], s = runSummary(a);
