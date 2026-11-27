@@ -467,9 +467,11 @@ eleventyComputed:
 
         <div class="section lob-math-section">
             <h3>The drawdown stress test</h3>
-            <p class="prose">The drawdown scenario applies a single 50% bitcoin price shock at the end of the chosen year <em>Y</em>. The LoB end-state under this stress is:</p>
-            <div class="lob-math-eq">value<sub>LoB,drawdown</sub>(h) = B &times; (1 + r)<sup>Y</sup> &times; 0.5 &times; (1 + r)<sup>h&minus;Y</sup></div>
-            <p class="prose">The float recovers and continues compounding after the drawdown; the test does not assume bitcoin stays at the drawdown level. The visualization shows the chart line dipping at year <em>Y</em> and resuming its trajectory thereafter, with the friction continuing to accumulate. The point of the stress test isn&rsquo;t to model bitcoin&rsquo;s actual volatility &mdash; it&rsquo;s to give the user a single visual answer to &ldquo;what happens if I&rsquo;m unlucky?&rdquo;</p>
+            <p class="prose">The drawdown scenario applies a single 50% bitcoin price shock at the end of the chosen year <em>Y</em>. At the bottom, the float is worth:</p>
+            <div class="lob-math-eq">value<sub>LoB,bottom</sub>(Y) = 0.5 &times; gross<sub>LoB</sub>(Y) &minus; friction(Y)</div>
+            <p class="prose">After that it recovers, at a constant catch-up rate, to the scenario&rsquo;s path by the horizon <em>h</em>:</p>
+            <div class="lob-math-eq">value<sub>LoB,drawdown</sub>(t) = value<sub>LoB,bottom</sub>(Y) &times; (value<sub>LoB</sub>(h) / value<sub>LoB,bottom</sub>(Y))<sup>(t&minus;Y)/(h&minus;Y)</sup></div>
+            <p class="prose">So the end state equals the no-drawdown end state: the cost of the shock is borne in the years in between, paying bills from a float worth half as much, not in where you finish. That is the calculator&rsquo;s Power Law assumption that drawdowns are temporary; the test does not assume bitcoin stays at the drawdown level. A bitcoin that never recovered would end with the 50% loss still in it. The visualization shows the chart line dipping at year <em>Y</em> and climbing back to the path by the horizon, with the friction continuing to accumulate. <em>Corrected November 26, 2026:</em> this tab had given the end state as <code>B &times; (1 + r)<sup>Y</sup> &times; 0.5 &times; (1 + r)<sup>h&minus;Y</sup></code>, which keeps the 50% loss to the end and so disagreed with the calculator. The point of the stress test isn&rsquo;t to model bitcoin&rsquo;s actual volatility &mdash; it&rsquo;s to give the user a single visual answer to &ldquo;what happens if I&rsquo;m unlucky?&rdquo;</p>
         </div>
 
         <div class="section lob-math-section">
