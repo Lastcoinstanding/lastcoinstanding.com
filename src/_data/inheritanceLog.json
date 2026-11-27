@@ -14,7 +14,7 @@
       "text": "Strike launched beneficiary plans: up to 15 beneficiaries, or a trust, under a transfer-on-death agreement signed in the app, for US individuals and sole proprietors outside Louisiana.",
       "source": "https://strike.me/updates/" },
     {"date": "2025-11-12", "kind": "provider", "type": "launch", "plan": "nunchuk-onchain",
-      "text": "Nunchuk 2.0 added its on-chain inheritance design: after the date you set, a spending path that doesn’t need Nunchuk’s key, with a kit for heirs to claim alone.",
+      "text": "Nunchuk 2.0 added an on-chain inheritance option: after the date you set, a spending path that doesn’t need Nunchuk’s key, with a kit for heirs to claim alone.",
       "source": "https://nunchuk.io/blog/autonomous-inheritance" }
   ]
 }

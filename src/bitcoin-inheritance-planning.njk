@@ -20,9 +20,9 @@ faq:
   - q: "Do heirs pay capital gains tax on inherited bitcoin?"
     a: "Under US federal rules the IRS treats bitcoin as property, and property inherited from someone who has died generally takes its fair market value on the date of death as the heir&rsquo;s basis, so the gain built up in the owner&rsquo;s lifetime isn&rsquo;t taxed when the heir sells. Bitcoin given away during your life keeps your basis instead, and bitcoin inside a traditional IRA is different again: beneficiaries owe income tax on what they withdraw. State rules vary. This summarizes IRS publications; it isn&rsquo;t tax advice."
   - q: "Which bitcoin inheritance service is best?"
-    a: "This page doesn&rsquo;t rank them, because each design trades one dependency for another. Plans that rely on a company (AnchorWatch, Bitkey, Casa, Nunchuk&rsquo;s off-chain plan, Onramp, Swan Vault, Unchained) depend on it still operating; timelock plans (Liana, Nunchuk&rsquo;s on-chain plan) depend on you renewing on time and your heir handling a key; custodial accounts go through probate unless a beneficiary is named. The page&rsquo;s three questions show what each design would ask of your heirs."
+    a: "This page doesn&rsquo;t rank them, because each solution trades one dependency for another. Solutions that rely on a company (AnchorWatch, Bitkey, Casa, Nunchuk&rsquo;s off-chain version, Onramp, Swan Vault, Unchained) depend on its claim process, and if the company fails your heirs need enough of your keys to go around it; timelock solutions (Liana, Nunchuk&rsquo;s on-chain version) depend on you renewing on time and your heir handling a key; custodial accounts go through probate unless a beneficiary is named. The page&rsquo;s three questions show what each solution would ask of your heirs."
   - q: "What is a timelock inheritance plan?"
-    a: "A wallet whose spending rules change after a set time, enforced by bitcoin itself. Your key can always spend; an heir&rsquo;s key can spend only after the bitcoin has sat unmoved for a period you choose, or after a date you set. You keep it closed by moving the bitcoin before the time runs out. It needs no company, but it can&rsquo;t tell death from a long illness or a forgotten renewal, and your heir needs the key and the wallet&rsquo;s details. Liana and Nunchuk&rsquo;s on-chain plan work this way."
+    a: "A wallet whose spending rules change after a set time, enforced by bitcoin itself. Your key can always spend; an heir&rsquo;s key can spend only after the bitcoin has sat unmoved for a period you choose, or after a date you set. You keep it closed by moving the bitcoin before the time runs out. It needs no company, but it can&rsquo;t tell death from a long illness or a forgotten renewal, and your heir needs the key and the wallet&rsquo;s details. Liana and Nunchuk&rsquo;s on-chain version work this way."
 eleventyComputed:
   head_extras: "{% include '_pageassets/bitcoin-inheritance-planning-head.html' %}"
   page_styles: "{% include '_pageassets/bitcoin-inheritance-planning.css' %}"
@@ -50,8 +50,8 @@ eleventyComputed:
 
 <section class="hero">
     <h1>Bitcoin Inheritance <em>Planning</em></h1>
-    <div class="hero-subtitle">Passing on your bitcoin: what your heirs would have to do, design by design.</div>
-    <p class="subtitle">If you died tomorrow, could the people you chose get your bitcoin, and what would they have to do? First, what every plan has to solve. Then three questions about your heirs, and seventeen ways to pass bitcoin on, each described the same way from the provider&rsquo;s own pages. Nothing here is ranked or recommended.</p>
+    <div class="hero-subtitle">Passing on your bitcoin: the solutions compared, and what each asks of your heirs.</div>
+    <p class="subtitle">If you died tomorrow, could your family get your bitcoin, and what would they have to do? First, what every plan has to solve. Then three questions about your heirs, and each solution compared, described the same way from the provider&rsquo;s own pages. Nothing here is ranked or recommended.</p>
 </section>
 
 <main class="content-area">
@@ -63,18 +63,18 @@ eleventyComputed:
     <section class="bi-solve" id="what-to-solve" aria-labelledby="solveTitle">
         <div class="bi-eyebrow">Before any provider</div>
         <h2 id="solveTitle" class="bi-h2">What every plan has to solve</h2>
-        <p class="bi-lede">Bitcoin is the first major asset with no registrar to petition. A court can order a bank or a broker to hand an account to your executor; nothing can make the network move bitcoin without a valid signature. So every plan has to settle two things, and it fails if they don&rsquo;t meet.</p>
+        <p class="bi-lede">Most of us know we will die but don&rsquo;t expect it soon, so the planning gets put off, and with bitcoin, putting it off can cost more than with anything else you own. Bitcoin is the first major asset with no registrar to petition. A court can order a bank or a broker to hand an account to your executor; nothing can make the bitcoin network move bitcoin without a valid signature. So every plan has to settle two things, and it fails if they don&rsquo;t meet.</p>
         <div class="bi-two">
             <div class="bi-two-cell">
                 <h3>Who is entitled</h3>
-                <p>Legal title: a will, a trust, or a beneficiary named on an account. It decides who should get the bitcoin. It doesn&rsquo;t move any.</p>
+                <p>Legal title: a will, a trust, or a beneficiary named on an account. It decides who should get the bitcoin, but on its own it can&rsquo;t move any.</p>
             </div>
             <div class="bi-two-cell">
                 <h3>Who can sign</h3>
-                <p>Access: a key, or a company that holds one. It moves the bitcoin, whoever is entitled. An heir with title and no key is stuck, and so is a key with no title.</p>
+                <p>Access: a key, or a company that holds one. It moves the bitcoin to whoever is entitled. An heir with title and no key is stuck, and so is a key with no title.</p>
             </div>
         </div>
-        <p class="bi-solve-p">Every design puts the ability to sign somewhere, and your heirs then depend on whatever holds it. There are three places it can go.</p>
+        <p class="bi-solve-p">Every solution puts the ability to sign in one of three places: with a company that holds a key, in a timelock written into the wallet itself, or with a custodian that holds the bitcoin. Your heirs then depend on that company, that timelock or that custodian.</p>
         <div class="bi-spine-wrap">
             <table class="bi-spine">
                 <thead>
@@ -83,7 +83,7 @@ eleventyComputed:
                 <tbody>
                 {% for g in inheritance.groups %}
                     <tr>
-                        <th scope="row"><a href="#{{ g.id }}">{{ g.title }}</a><span class="bi-spine-how">{{ g.how }}</span></th>
+                        <th scope="row"><a href="#{{ g.id }}">{{ g.title }}</a><span class="bi-spine-how">{{ g.how }}{% if g.howTip %}{{ tip(g.howTip.title, g.howTip.body) }}{% endif %}{{ g.howRest }}</span></th>
                         <td data-label="What your heirs depend on">{{ g.depends }}</td>
                         <td data-label="What can go wrong">{{ g.risk }}</td>
                         <td class="bi-spine-who" data-label="On this page">{% for p in inheritance.plans %}{% if p.group == g.id %}<span class="bi-who"><a href="#card-{{ p.id }}">{{ planName(p) }}</a></span>{% endif %}{% endfor %}</td>
@@ -92,7 +92,7 @@ eleventyComputed:
                 </tbody>
             </table>
         </div>
-        <p class="bi-moral">No design removes the dependency; each one moves it.</p>
+        <p class="bi-moral">Every solution leaves your heirs depending on something. The choice is what.</p>
         <p class="bi-solve-p">Whichever you choose, your heirs have to know the plan exists: where the instructions are, who to call, and what not to touch. A plan nobody can find works no better than no plan.</p>
     </section>
 
@@ -102,17 +102,17 @@ eleventyComputed:
         because a link carrying them would read as a shortlist. -#}
     <section class="bi-ask" id="your-heirs" aria-labelledby="askTitle">
         <h2 id="askTitle" class="bi-ask-title">What would your heirs need?</h2>
-        <p class="bi-ask-lede">Three questions about you and the people you&rsquo;d leave bitcoin to. Answer any of them and each card below adds a line saying what its design would ask, and a card your answer rules out is dimmed, with the reason. Nothing is scored, and your answers stay on this page: they aren&rsquo;t saved or sent anywhere.</p>
+        <p class="bi-ask-lede">Three questions about you and your heirs, to leave you with a shortlist: the solutions that fit your situation, and the tradeoffs each one asks you to accept. Answer any of them and each card below adds a line saying what that solution would ask; a card your answer rules out is dimmed, with the reason. Nothing is scored, and your answers stay on this page: they aren&rsquo;t saved or sent anywhere.</p>
         <div class="bi-qs">
             <div class="bi-q" role="group" aria-labelledby="q-heir">
-                <div class="bi-q-text" id="q-heir">Could your heir use a hardware wallet unaided?{{ tip('A hardware wallet, unaided.', 'Setting one up, restoring a wallet from a seed phrase and signing a transaction, with no company to call. Some designs need this; others give the heir an app, a company&rsquo;s help, or nothing to operate at all.') }}</div>
+                <div class="bi-q-text" id="q-heir">Could your heir use a hardware wallet <span class="nw">unaided?{{ tip('A hardware wallet, unaided.', 'Setting one up, restoring a wallet from a seed phrase and signing a transaction, with no company to call. Some solutions need this; others give the heir an app, a company&rsquo;s help, or nothing to operate at all.') }}</span></div>
                 <div class="bi-seg">
                     <button type="button" class="bi-opt" data-q="heir" data-a="yes" aria-pressed="false">Yes</button>
                     <button type="button" class="bi-opt" data-q="heir" data-a="no" aria-pressed="false">No</button>
                 </div>
             </div>
             <div class="bi-q" role="group" aria-labelledby="q-without">
-                <div class="bi-q-text" id="q-without">Do you want it to work if the company no longer exists?{{ tip('If the company is gone.', 'Companies close, merge and change terms. Some designs still work without the company, some work only if your heir holds more of your keys, and some don&rsquo;t. <em>Must</em> dims the ones that don&rsquo;t; <em>prefer</em> only marks them.') }}</div>
+                <div class="bi-q-text" id="q-without">Do you want it to work if the company no longer <span class="nw">exists?{{ tip('If the company is gone.', 'Companies close, merge and change terms. Some solutions still work without the company, some work only if your heir holds more of your keys, and some don&rsquo;t. <em>Must</em> dims the ones that don&rsquo;t; <em>prefer</em> only marks them.') }}</span></div>
                 <div class="bi-seg">
                     <button type="button" class="bi-opt" data-q="without" data-a="must" aria-pressed="false">Must</button>
                     <button type="button" class="bi-opt" data-q="without" data-a="prefer" aria-pressed="false">Prefer</button>
@@ -120,7 +120,7 @@ eleventyComputed:
                 </div>
             </div>
             <div class="bi-q" role="group" aria-labelledby="q-renew">
-                <div class="bi-q-text" id="q-renew">Would you renew a setting once a year, every year?{{ tip('Renewing a setting.', 'A timelock has to be pushed back while you are alive, by moving the bitcoin or changing a date. Miss it and your heir&rsquo;s path can open early. Some designs need this, some only if you pick a near date, most need nothing.', true) }}</div>
+                <div class="bi-q-text" id="q-renew">Would you renew a setting once a year, every <span class="nw">year?{{ tip('Renewing a setting.', 'A timelock has to be pushed back while you are alive, by moving the bitcoin or changing a date. Miss it and your heir&rsquo;s path can open early. Some solutions need this, some only if you pick a near date, most need nothing.', true) }}</span></div>
                 <div class="bi-seg">
                     <button type="button" class="bi-opt" data-q="renew" data-a="yes" aria-pressed="false">Yes</button>
                     <button type="button" class="bi-opt" data-q="renew" data-a="no" aria-pressed="false">No</button>
@@ -128,11 +128,27 @@ eleventyComputed:
             </div>
         </div>
         <div class="bi-ask-foot">
-            <span class="bi-count" id="biCount" aria-live="polite">{{ inheritance.plans.length }} plans in three groups</span>
+            <span class="bi-count" id="biCount" aria-live="polite">{{ inheritance.plans.length }} solutions in three groups</span>
             <button type="button" class="bi-clear" id="biClear" hidden>Clear answers</button>
         </div>
         <p class="bi-read-line">Each card read from the provider&rsquo;s own pages, <strong>{{ inheritanceLogIndex.checkedRange or inheritance.asOfLabel }}</strong>; the date is on every card, and <a href="#what-changed">What changed</a> logs every check.</p>
     </section>
+
+    {#- How to read a card (JM, 27 Nov: above the cards and closed by default,
+        so it's there when wanted and never stands between the reader and the
+        cards). The arrow row opens it; a link to #how-to-read opens it too. -#}
+    <details class="bi-howto" id="how-to-read">
+        <summary class="bi-howto-sum">
+            <span class="bi-howto-text"><h2 class="bi-howto-title">How to read a card</h2><span class="bi-howto-hint">What each line means, the marks, &ldquo;not published&rdquo;, and why nothing is ranked</span></span>
+            <span class="bi-howto-arrow" aria-hidden="true">&rsaquo;</span>
+        </summary>
+        <div class="bi-howto-body">
+            <p>A card&rsquo;s face carries what you decide with: the wait, what your heir needs, whether the solution works without the company, what you would have to renew, your heir&rsquo;s steps, the price, what distinguishes the solution and its catch. The row at the foot opens the rest in larger type: how the solution works in plain words, who holds which keys, the upkeep, the price in full, identity checks, what the provider doesn&rsquo;t publish, and the dated sources, with a link to the provider&rsquo;s own page. The address bar then names the solution, so one card can be linked to.</p>
+            <p><strong>The marks.</strong> <span class="bi-tag yes">&#10003; Bitcoin only</span> means the provider holds nothing else; <span class="bi-tag no">Not bitcoin only</span> names what else it holds. The dashed <span class="bi-tag qual">qualifier</span> flags something that isn&rsquo;t bitcoin at all, such as a fund&rsquo;s shares.</p>
+            <p><strong>&ldquo;Not published&rdquo; is a value.</strong> Where a provider doesn&rsquo;t say how long a claim takes or what an heir must send, the card says so rather than guessing, and the gap is itself something to ask the provider about. Each card lists its gaps in the detail.</p>
+            <p><strong>Groups, not ranks.</strong> Cards sit with others that put the ability to sign in the same place, alphabetically. There is no order by price or speed and no best badge. The solutions that ask least of your heir put a company in the middle; the ones that need no company ask the most of them. Both facts are on their cards.</p>
+        </div>
+    </details>
 
     {% for g in inheritance.groups %}
     <section class="bi-group" id="{{ g.id }}" data-group="{{ g.id }}">
@@ -159,16 +175,16 @@ eleventyComputed:
                 {% if not g.short %}
                 <div class="bi-wait" data-f="wait"><span class="bi-k">The wait{{ tip('The wait.', 'How long after your death, or after your heir&rsquo;s claim, before the bitcoin can move, and who can stop a claim made while you are alive.') }}</span><b>{{ p.wait.value }}</b><span class="bi-n">{{ p.wait.note }}</span></div>
                 <div class="bi-strip">
-                    <div data-f="heir"><div class="k"><span class="kt">Your heir needs{{ tip('Your heir needs.', 'What your heir has to hold or operate to claim: nothing technical, an app, one of your keys with the company&rsquo;s help, or a key and the wallet&rsquo;s details on their own.') }}</span></div><div class="v">{{ p.strip.heir.value }}</div><div class="p">{{ p.strip.heir.note }}</div></div>
-                    <div data-f="without" class="bi-w-{{ p.codes.without }}"><div class="k"><span class="kt">Without the company{{ tip('Without the company.', 'Whether your heir could still get the bitcoin if the company closed. <em>Partly</em> means only with more of your keys or details than the plan normally gives your heir.') }}</span></div><div class="v">{{ p.strip.without.value }}</div><div class="p">{{ p.strip.without.note }}</div></div>
-                    <div data-f="renew"><div class="k"><span class="kt">You renew{{ tip('You renew.', 'Anything you must keep doing while alive for the plan to stay closed, such as moving the bitcoin before a timelock runs out.', true) }}</span></div><div class="v">{{ p.strip.renew.value }}</div><div class="p">{{ p.strip.renew.note }}</div></div>
+                    <div data-f="heir"><div class="k"><span class="kt">Your heir <span class="nw">needs{{ tip('Your heir needs.', 'What your heir has to hold or operate to claim: nothing technical, an app, one of your keys with the company&rsquo;s help, or a key and the wallet&rsquo;s details on their own.') }}</span></span></div><div class="v">{{ p.strip.heir.value }}</div><div class="p">{{ p.strip.heir.note }}</div></div>
+                    <div data-f="without" class="bi-w-{{ p.codes.without }}"><div class="k"><span class="kt">Without the <span class="nw">company{{ tip('Without the company.', 'Whether your heir could still get the bitcoin if the company closed. <em>Partly</em> means only with more of your keys or details than the solution normally gives your heir.') }}</span></span></div><div class="v">{{ p.strip.without.value }}</div><div class="p">{{ p.strip.without.note }}</div></div>
+                    <div data-f="renew"><div class="k"><span class="kt">You <span class="nw">renew{{ tip('You renew.', 'Anything you must keep doing while alive to keep your heir&rsquo;s path closed, such as moving the bitcoin before a timelock runs out.', true) }}</span></span></div><div class="v">{{ p.strip.renew.value }}</div><div class="p">{{ p.strip.renew.note }}</div></div>
                 </div>
                 <div class="bi-steps" data-f="steps"><span class="bi-l">What your heir does</span><ol>{% for s in p.steps %}<li>{{ s }}</li>{% endfor %}</ol></div>
                 <div class="bi-price" data-f="price"><span class="bi-l">Price</span><b>{{ p.price.headline }}</b></div>
                 {% else %}
                 <div class="bi-strip">
-                    <div data-f="beneficiary" class="bi-b-{{ 'yes' if (p.strip.beneficiary.value == 'Yes' or p.strip.beneficiary.value == 'Where offered') else ('part' if p.strip.beneficiary.value == 'IRA only' else 'no') }}"><div class="k"><span class="kt">Beneficiary in advance{{ tip('Beneficiary in advance.', 'Whether you can name who inherits the account before you die (a transfer-on-death registration), so the account can pass without probate.') }}</span></div><div class="v">{{ p.strip.beneficiary.value }}</div><div class="p">{{ p.strip.beneficiary.note }}</div></div>
-                    <div data-f="probate"><div class="k"><span class="kt">Probate{{ tip('Probate.', 'The court process that confirms a will and appoints an executor. Without a named beneficiary, a custodian usually asks for the executor&rsquo;s court papers before it releases anything.') }}</span></div><div class="v">{{ p.strip.probate.value }}</div><div class="p">{{ p.strip.probate.note }}</div></div>
+                    <div data-f="beneficiary" class="bi-b-{{ 'yes' if (p.strip.beneficiary.value == 'Yes' or p.strip.beneficiary.value == 'Where offered') else ('part' if p.strip.beneficiary.value == 'IRA only' else 'no') }}"><div class="k"><span class="kt">Beneficiary in <span class="nw">advance{{ tip('Beneficiary in advance.', 'Whether you can name who inherits the account before you die (a transfer-on-death registration), so the account can pass without probate.') }}</span></span></div><div class="v">{{ p.strip.beneficiary.value }}</div><div class="p">{{ p.strip.beneficiary.note }}</div></div>
+                    <div data-f="probate"><div class="k"><span class="kt"><span class="nw">Probate{{ tip('Probate.', 'The court process that confirms a will and appoints an executor. Without a named beneficiary, a custodian usually asks for the executor&rsquo;s court papers before it releases anything.') }}</span></span></div><div class="v">{{ p.strip.probate.value }}</div><div class="p">{{ p.strip.probate.note }}</div></div>
                     <div data-f="time"><div class="k"><span class="kt">Time to claim</span></div><div class="v{% if p.strip.time.value == 'Not published' %} np{% endif %}">{{ p.strip.time.value }}</div><div class="p">{{ p.strip.time.note }}</div></div>
                 </div>
                 <div class="bi-docs" data-f="documents"><span class="bi-l">What your heirs send</span><ul>{% for d in p.documents %}<li>{{ d }}</li>{% endfor %}</ul></div>
@@ -193,7 +209,7 @@ eleventyComputed:
                 <details class="bi-more" data-id="{{ p.id }}">
                     <summary class="bi-more-btn"><span>{% if g.short %}How it works, what isn&rsquo;t published, sources{% else %}How it works, keys, upkeep, price, sources{% endif %}</span><span class="bi-more-arrow" aria-hidden="true">&rsaquo;</span></summary>
                     <div class="bi-more-body">
-                        <div class="bi-how"><span class="bi-l">How this plan works</span><p>{{ p.how }}</p><a class="bi-site bi-site-big" href="{{ p.site }}" rel="nofollow noopener" target="_blank">{% if p.siteWords %}{{ p.siteWords }}{% else %}Read it in {{ p.name }}&rsquo;s own words{% endif %} <span aria-hidden="true">&nearr;</span></a></div>
+                        <div class="bi-how"><span class="bi-l">How this solution works</span><p>{{ p.how }}</p><a class="bi-site bi-site-big" href="{{ p.site }}" rel="nofollow noopener" target="_blank">{% if p.siteWords %}{{ p.siteWords }}{% else %}Read it in {{ p.name }}&rsquo;s own words{% endif %} <span aria-hidden="true">&nearr;</span></a></div>
                         <dl class="bi-dl">
                             {% if not g.short %}
                             <dt>Who holds which keys</dt><dd data-f="keys">{{ p.keys }}</dd>
@@ -215,7 +231,7 @@ eleventyComputed:
     </section>
     {% endfor %}
 
-    <dialog class="bi-dialog" id="biDialog" aria-label="Plan detail">
+    <dialog class="bi-dialog" id="biDialog" aria-label="Solution detail">
         <div class="bi-dialog-bar"><span class="bi-dialog-crumb" id="biDialogCrumb"></span><button type="button" class="bi-dialog-close" id="biDialogClose" aria-label="Close">&times;</button></div>
         <div class="bi-dialog-body" id="biDialogBody"></div>
     </dialog>
@@ -223,11 +239,12 @@ eleventyComputed:
     {#- The counter-case at full weight (design §6): each design's failure, the
         lost-bitcoin record with its method, and the scam aimed at heirs. -#}
     <section class="bi-prose" id="what-can-go-wrong">
-        <h2>What can go wrong, design by design</h2>
-        <p><strong>A company&rsquo;s help</strong> puts a company in your heirs&rsquo; path. If it closes, freezes accounts or changes its terms before they claim, the claim as designed stops. Most of these plans keep a way around the company, but it usually needs more of your keys than an heir is given: Casa&rsquo;s Sovereign Recovery and Unchained&rsquo;s Caravan route need two keys, Bitkey&rsquo;s exit kit is for the owner, not the heir. The waiting periods are there because anyone named can start a claim while you are alive.</p>
+        <h2>What can go wrong, solution by solution</h2>
+        <p class="bi-lede">Every solution involves tradeoffs; there is no silver bullet.</p>
+        <p><strong>A company&rsquo;s help</strong> puts a company in your heirs&rsquo; path. If the company closes, freezes accounts or changes its terms before they claim, the claim process stops, though in most of these solutions the bitcoin stays where it is, in a wallet the company can&rsquo;t move alone. Most of these solutions keep a way around the company, but it usually needs more of your keys than an heir is given. A common setup: you hold two keys of a 2-of-3 multisig, enough to move the bitcoin yourself, and give your heir one, so your heir can&rsquo;t move anything alone while you are alive; after your death, that one key needs the company&rsquo;s, or another of yours, to make two. Casa&rsquo;s Sovereign Recovery and Unchained&rsquo;s Caravan route need two keys, and Bitkey&rsquo;s exit kit is for the owner, not the heir. The waiting periods are there because anyone named can start a claim while you are alive.</p>
         <p><strong>A timelock</strong> can&rsquo;t tell death from a long stay in hospital or a forgotten renewal. Miss a refresh and your heir&rsquo;s key can spend while you are alive; lose the recovery key or the wallet&rsquo;s description and no one can spend at all. There is nobody to ask for an exception.</p>
         <p><strong>A custodian</strong> puts a company back between you and your bitcoin, which is the arrangement self-custody exists to avoid. If the custodian fails, your heirs inherit a claim on it rather than bitcoin. Without a named beneficiary, they wait for probate before anything moves.</p>
-        <p><strong>No plan at all</strong> is how bitcoin is lost. Estimates of lost bitcoin rest on how long unmoved bitcoin is presumed gone: in 2017 Chainalysis put it at 2.78 to 3.79 million, counting coins unmoved for years and about a million attributed to Satoshi, and the count doesn&rsquo;t say how much was lost to death rather than to lost keys (<a href="https://fortune.com/2017/11/25/lost-bitcoins" rel="nofollow noopener" target="_blank">Fortune, reporting Chainalysis</a>). In 2024, Chainalysis counted 1.8 million unmoved since 2014, some of which has since moved again (<a href="https://fortune.com/crypto/2024/04/24/bitcoin-wallets-waking-up-lost-coins-satoshi" rel="nofollow noopener" target="_blank">Fortune</a>).</p>
+        <p><strong>No plan at all</strong> is, in my judgment, the most common way bitcoin is lost at a death. Estimates of lost bitcoin rest on how long unmoved bitcoin is presumed gone: in 2017 Chainalysis put it at 2.78 to 3.79 million, counting coins unmoved for years and about a million attributed to Satoshi, and the count doesn&rsquo;t say how much was lost to death rather than to lost keys (<a href="https://fortune.com/2017/11/25/lost-bitcoins" rel="nofollow noopener" target="_blank">Fortune, reporting Chainalysis</a>). In 2024, Chainalysis counted 1.8 million unmoved since 2014, some of which has since moved again (<a href="https://fortune.com/crypto/2024/04/24/bitcoin-wallets-waking-up-lost-coins-satoshi" rel="nofollow noopener" target="_blank">Fortune</a>).</p>
         <p><strong>Scams aimed at families.</strong> The FBI has warned twice about fictitious law firms that contact people who have lost cryptocurrency, claim to work with government agencies, and charge fees to &ldquo;recover&rdquo; it (<a href="https://www.ic3.gov/PSA/2024/PSA240624" rel="nofollow noopener" target="_blank">2024</a>, <a href="https://www.ic3.gov/PSA/2025/PSA250813" rel="nofollow noopener" target="_blank">2025</a>). A grieving family that can&rsquo;t reach a relative&rsquo;s bitcoin is the audience they want. Law enforcement doesn&rsquo;t charge fees to investigate, no law firm is an official partner of a US agency, and no one needs your seed phrase to help with an estate.</p>
     </section>
 
@@ -250,7 +267,7 @@ eleventyComputed:
             <h2 id="lawTitle" class="bi-law-title">Inheritance and US law: facts that apply to any plan</h2>
             <span class="bi-tag qual">US federal &middot; not tax or legal advice</span>
         </div>
-        <p class="bi-law-lede">These hold whichever design you choose. They are facts from the IRS and the SEC, not steps: state law varies, and an estate attorney, and for taxes a CPA, applies them to a particular estate.</p>
+        <p class="bi-law-lede">These hold whichever solution you choose. They are facts from the IRS and the SEC, not steps: state law varies, and an estate attorney, and for taxes a CPA, applies them to a particular estate.</p>
         <dl class="bi-law-grid">
             <div><dt>Bitcoin is property for tax</dt><dd>For US tax purposes, the IRS treats digital assets, bitcoin included, as property, not currency. <a class="bi-src" href="https://www.irs.gov/digitalassets" rel="nofollow noopener" target="_blank">IRS</a></dd></div>
             <div><dt>Inherited property takes a new basis</dt><dd>The basis of property inherited from someone who has died is generally its fair market value on the date of death, whether or not an estate tax return is filed. No IRS page I read applies this to bitcoin by name; it is the rule for property. <a class="bi-src" href="https://www.irs.gov/node/17430" rel="nofollow noopener" target="_blank">IRS</a> <a class="bi-src" href="https://www.law.cornell.edu/cfr/text/26/1.1014-1" rel="nofollow noopener" target="_blank">26 CFR 1.1014-1</a></dd></div>
@@ -291,17 +308,10 @@ eleventyComputed:
         {% endif %}
     </section>
 
-    <section class="bi-prose" id="how-to-read">
-        <h2>How to read a card</h2>
-        <p>A card&rsquo;s face carries what you decide with: the wait, what your heir needs, whether the plan works without the company, what you would have to renew, your heir&rsquo;s steps, the price, what distinguishes the design and its catch. The row at the foot opens the rest in larger type: how the plan works in plain words, who holds which keys, the upkeep, the price in full, identity checks, what the provider doesn&rsquo;t publish, and the dated sources, with a link to the provider&rsquo;s own page. The address bar then names the plan, so one card can be linked to.</p>
-        <p><strong>The marks.</strong> <span class="bi-tag yes">&#10003; Bitcoin only</span> means the provider holds nothing else; <span class="bi-tag no">Not bitcoin only</span> names what else it holds. The dashed <span class="bi-tag qual">qualifier</span> flags something that isn&rsquo;t bitcoin at all, such as a fund&rsquo;s shares.</p>
-        <p><strong>&ldquo;Not published&rdquo; is a value.</strong> Where a provider doesn&rsquo;t say how long a claim takes or what an heir must send, the card says so rather than guessing, and the gap is itself something to ask the provider about. Each card lists its gaps in the detail.</p>
-        <p><strong>Groups, not ranks.</strong> Cards sit with others that put the dependency in the same place, alphabetically. There is no order by price or speed and no best badge. The designs that ask least of your heir put a company in the middle; the one that needs no company asks the most of them. Both facts are on their cards.</p>
-    </section>
 
     <section class="bi-prose" id="what-this-is-not">
         <h2>What this page is, and isn&rsquo;t</h2>
-        <p>It is a description of how bitcoin passes to heirs today, as each provider describes its own service, read on the date each card carries. It carries no affiliate or referral links, and no provider has paid for a card. It isn&rsquo;t a recommendation of any design or provider, and it isn&rsquo;t legal or tax advice: an estate plan is a legal document, and the US law panel says where a lawyer comes in.</p>
+        <p>It is a description of how bitcoin passes to heirs today, as each provider describes its own service, read on the date each card carries. It carries no affiliate or referral links, and no provider has paid for a card. It isn&rsquo;t a recommendation of any solution or provider, and it isn&rsquo;t legal or tax advice: an estate plan is a legal document, and the US law panel says where a lawyer comes in.</p>
         <p><strong>A relationship to declare:</strong> I hold an Unchained IRA vault and pay Unchained&rsquo;s standard fee for it. Unchained&rsquo;s card is written from Unchained&rsquo;s own pages, like every other.</p>
         <p>Figures come from each provider&rsquo;s own pages, never from a competitor&rsquo;s comparison: two comparison tables that providers on this page publish were found to misstate the services they compare. If a card is wrong or a term has moved, the <a href="#pfWrap">feedback form</a> below reaches the person who maintains it.</p>
     </section>

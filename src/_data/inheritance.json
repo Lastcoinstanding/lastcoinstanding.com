@@ -1,15 +1,20 @@
 {
   "asOf": "2026-11-26",
   "asOfLabel": "26 Nov 2026",
-  "note": "One object per plan card on /bitcoin-inheritance-planning (Bitcoin Inheritance Planning). Every line is what the provider published on the card's asOf, read from its sources; each provider's figures come from that provider's own pages, never a competitor's comparison table. 'not published' is a value, never an estimate: anything a provider doesn't publish goes in notPublished and is closed through the change log (src/_data/inheritanceLog.json) when it is. Groups are the three places a plan can put the dependency (company, timelock, custodian); within a group, cards are alphabetical, never ranked. Full cards (company, timelock) carry: wait {value, note}; strip {heir, without, renew} each {value, note}; steps (what your heir does); price {headline, detail}; keys; keep (what you must keep doing); gone (if the company is gone); identity; distinguishing; catch; how (the plain paragraph in the detail); notPublished; sources; site. Short cards (custodian) carry strip {beneficiary, probate, time}, documents, extra and how. codes drive the three-question device in bitcoin-inheritance-planning.js: heirUse nothing | app | assisted | unaided (what the heir must operate); without yes | partly | unknown | no (does a path work with the company gone); renew none | chosen | required (must the owner renew something). fit holds the plain line the device shows for each question. twin links a provider's second design. Refresh: MONTHLY_REFRESH_CHECKLIST §7.7; DATA_AUDIT INH-1 to INH-17.",
+  "note": "One object per plan card on /bitcoin-inheritance-planning (Bitcoin Inheritance Planning). Every line is what the provider published on the card's asOf, read from its sources; each provider's figures come from that provider's own pages, never a competitor's comparison table. 'not published' is a value, never an estimate: anything a provider doesn't publish goes in notPublished and is closed through the change log (src/_data/inheritanceLog.json) when it is. Groups are the three places a solution can put the ability to sign (company, timelock, custodian); within a group, cards are alphabetical, never ranked. Full cards (company, timelock) carry: wait {value, note}; strip {heir, without, renew} each {value, note}; steps (what your heir does); price {headline, detail}; keys; keep (what you must keep doing); gone (if the company is gone); identity; distinguishing; catch; how (the plain paragraph in the detail); notPublished; sources; site. Short cards (custodian) carry strip {beneficiary, probate, time}, documents, extra and how. codes drive the three-question device in bitcoin-inheritance-planning.js: heirUse nothing | app | assisted | unaided (what the heir must operate); without yes | partly | unknown | no (does a path work with the company gone); renew none | chosen | required (must the owner renew something). fit holds the plain line the device shows for each question. twin links a provider's second version. Refresh: MONTHLY_REFRESH_CHECKLIST §7.7; DATA_AUDIT INH-1 to INH-17.",
   "groups": [
     {
       "id": "company",
       "title": "A company’s help",
-      "depends": "The company still operating, and its claim process",
-      "how": "A company holds one of the keys, or all of them, and co-signs or transfers for your heir after a waiting period or a document check.",
-      "risk": "The company fails, freezes or changes its terms before your heir claims. Waiting periods exist because anyone named can start a claim while you are alive.",
-      "sub": "A company holds one of the keys, or all of them, and runs a claim process for your heirs. What separates these cards: who holds which keys, what your heir has to operate, how long the claim takes and who can stop it, and whether anything works if the company is gone."
+      "depends": "The company’s claim process; if the company is gone, enough of your keys and the wallet’s details",
+      "how": "A company holds one of several keys in a multisig wallet",
+      "howTip": {
+        "title": "Multisig.",
+        "body": "A wallet that needs more than one key to move its bitcoin. In a 2-of-3, any two of three keys sign, so one key alone, a company’s included, can’t move anything."
+      },
+      "howRest": ", or all of them, and co-signs or transfers for your heir after a waiting period or a document check.",
+      "risk": "If the company fails, freezes or changes its terms, the bitcoin stays in the wallet, but your heirs lose the simple claim and need enough keys, usually yours, to reach it. Waiting periods exist because anyone named can start a claim while you are alive.",
+      "sub": "A company holds one of the keys, or all of them, and runs a claim process for your heirs. In most of these solutions you hold keys too, and the company’s key can’t move the bitcoin on its own: its part is to co-sign once your heirs’ claim checks out. Onramp is the exception: Onramp and two partner institutions hold all three keys, and you hold none. What separates these cards: who holds which keys, what your heir has to operate, how long the claim takes and who can stop it, and whether anything works if the company is gone."
     },
     {
       "id": "timelock",
@@ -75,7 +80,7 @@
         "headline": "$100–$1,000 a month",
         "detail": "Custody by vault value: $100 a month up to $500,000, $175 up to $1 million, $375 up to $2.5 million, $700 up to $5 million, $1,000 above that, the cap for individuals and small businesses. Insurance is optional, from $4,000 a year per $1 million of cover, with a $250,000 minimum policy. AnchorWatch’s FAQ still quotes its older price, 0.02% a month."
       },
-      "keys": "On a Flagship vault you hold one hardware key (the 1-Key vault) or a 2-of-3 of your own keys (the 3-Key vault), beside AnchorWatch’s keyset; while you are insured both sides must sign. AnchorWatch’s recovery partner CoinCorner holds a keyset for the recovery path. A third design, Multi-Institution Custody, splits the keys 2-of-3 across AnchorWatch, BitGo and CoinCorner, and you hold none.",
+      "keys": "On a Flagship vault you hold one hardware key (the 1-Key vault) or a 2-of-3 of your own keys (the 3-Key vault), beside AnchorWatch’s keyset; while you are insured both sides must sign. AnchorWatch’s recovery partner CoinCorner holds a keyset for the recovery path. A third option, Multi-Institution Custody, splits the keys 2-of-3 across AnchorWatch, BitGo and CoinCorner, and you hold none.",
       "keep": "Nothing for inheritance. An insured vault renews yearly, and the renewal resets the vault’s timelock cycle; a lapsed policy leaves the vault working. Leave your heirs the Inheritance Contact Letter, and keep the beneficiary named on your account current.",
       "gone": "Partly. AnchorWatch gives every client the vault’s Recovery Script, which runs in Bitcoin Core: with your key, the vault becomes spendable without AnchorWatch from day 380 of an insured vault’s cycle, or day 335 of an uninsured one. An heir without your key depends on AnchorWatch and CoinCorner’s recovery path.",
       "identity": "You: an AnchorWatch account; insurance, if you add it, is priced on your vault and risk profile. Your heir: verified as your beneficiary by AnchorWatch and CoinCorner before recovery; the documents asked for are not published.",
@@ -239,7 +244,7 @@
       "qualifier": null,
       "twin": {
         "id": "nunchuk-onchain",
-        "label": "Nunchuk’s on-chain design"
+        "label": "Nunchuk’s on-chain version"
       },
       "wait": {
         "value": "Your date",
@@ -278,13 +283,13 @@
         "headline": "$480 a year",
         "detail": "Honey Badger, $480 a year (two 2-of-4 wallets with inheritance planning); Honey Badger Premier, $2,100 (3-of-5 wallets). The guided claim service needs an active subscription."
       },
-      "keys": "Honey Badger is a 2-of-4 multisig: you hold three keys, one of them reserved for inheritance, and Nunchuk holds the fourth. In this design Nunchuk’s key won’t co-sign a claim before the activation date.",
+      "keys": "Honey Badger is a 2-of-4 multisig: you hold three keys, one of them reserved for inheritance, and Nunchuk holds the fourth. In this version Nunchuk’s key won’t co-sign a claim before the activation date.",
       "keep": "Push the activation date back before it arrives, as often as the date you chose requires; you can change the date, the beneficiaries and the instructions at any time. Keep the subscription active for the guided claim.",
-      "gone": "No. Nunchuk enforces the date and its key co-signs the claim. Nunchuk’s on-chain design, in the next group, is the one with a path that doesn’t need Nunchuk.",
+      "gone": "No. Nunchuk enforces the date and its key co-signs the claim. Nunchuk’s on-chain version, in the next group, is the one with a path that doesn’t need Nunchuk.",
       "identity": "None for you or your heir: the plan runs on secrets you leave (the Magic Phrase and the inheritance key), not on proof of identity.",
       "distinguishing": "The date, beneficiaries and instructions can change at any time, and an inheritance can be split across heirs and dates.",
       "catch": "Nunchuk enforces the date and co-signs, so the plan works only while Nunchuk operates.",
-      "how": "Nunchuk’s Honey Badger plan is a 2-of-4 multisig: you hold three keys, one of them reserved for inheritance, and Nunchuk holds the fourth. In this design the plan lies dormant until an activation date you choose, and Nunchuk enforces it: its key won’t co-sign a claim before the date. After it, your beneficiary starts a claim with the Magic Phrase you left them and uses the inheritance key, either its seed phrase or an encrypted backup opened with a Backup Password. If you chose a buffer period, 7 or 30 days, Nunchuk notifies you during it and you can deny the claim if you are alive. You can move the date, change beneficiaries, or split the inheritance across heirs and dates at any time. The plan needs Nunchuk, and the guided claim needs an active subscription. One design or the other is chosen at setup; switching means moving funds to a new wallet.",
+      "how": "Nunchuk’s Honey Badger plan is a 2-of-4 multisig: you hold three keys, one of them reserved for inheritance, and Nunchuk holds the fourth. In this version the plan lies dormant until an activation date you choose, and Nunchuk enforces it: its key won’t co-sign a claim before the date. After it, your beneficiary starts a claim with the Magic Phrase you left them and uses the inheritance key, either its seed phrase or an encrypted backup opened with a Backup Password. If you chose a buffer period, 7 or 30 days, Nunchuk notifies you during it and you can deny the claim if you are alive. You can move the date, change beneficiaries, or split the inheritance across heirs and dates at any time. The plan needs Nunchuk, and the guided claim needs an active subscription. One version or the other is chosen at setup; switching means moving funds to a new wallet.",
       "notPublished": [
         "How long a claim takes after the buffer"
       ],
@@ -574,7 +579,7 @@
       "qualifier": null,
       "twin": {
         "id": "nunchuk-offchain",
-        "label": "Nunchuk’s off-chain design"
+        "label": "Nunchuk’s off-chain version"
       },
       "wait": {
         "value": "Your date",
@@ -619,7 +624,7 @@
       "identity": "None for you or your heir.",
       "distinguishing": "Nunchuk’s guided claim while it operates, and a path enforced by the chain itself if it doesn’t.",
       "catch": "The date is fixed in the bitcoin: a near date means moving the wallet before it arrives, a far date means your heir waits for it.",
-      "how": "In Nunchuk’s on-chain design the inheritance rule is written into the bitcoin itself. You hold three keys of a 2-of-4 and Nunchuk holds one. At the date you set, the spending rules change on the chain so that your heir’s inheritance key can spend with no part for Nunchuk (in plans set up since November 2026, two inheritance keys). While Nunchuk operates your heir can use its guided claim; if it doesn’t, the Bitcoin Inheritance Kit you receive at setup, with open-source tools and the wallet configuration, lets them claim alone. The date can’t be changed in place: to push it back you move to a new wallet before it arrives, and Nunchuk’s app automates the move. One design or the other is chosen at setup; switching means moving funds to a new wallet.",
+      "how": "In Nunchuk’s on-chain version the inheritance rule is written into the bitcoin itself. You hold three keys of a 2-of-4 and Nunchuk holds one. At the date you set, the spending rules change on the chain so that your heir’s inheritance key can spend with no part for Nunchuk (in plans set up since November 2026, two inheritance keys). While Nunchuk operates your heir can use its guided claim; if it doesn’t, the Bitcoin Inheritance Kit you receive at setup, with open-source tools and the wallet configuration, lets them claim alone. The date can’t be changed in place: to push it back you move to a new wallet before it arrives, and Nunchuk’s app automates the move. One version or the other is chosen at setup; switching means moving funds to a new wallet.",
       "notPublished": [
         "Limits on how far ahead the date can be set"
       ],

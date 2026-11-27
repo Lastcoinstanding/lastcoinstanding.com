@@ -97,7 +97,10 @@
       }).join('');
       fit.hidden = !v.lines.length;
     }
-    if (flag) flag.textContent = v.conflict ? 'Conflicts with your answers: ' + v.reasons.join(' · ') : '';
+    /* The flag is a tag on the card's top edge (so a flagged card never pushes
+       its row down); the reasons are read out to screen readers and shown in
+       the card's own ✕ lines below. */
+    if (flag) flag.innerHTML = v.conflict ? '<span aria-hidden="true">&#10005; </span>Conflicts with your answers<span class="sr-only">: ' + esc(v.reasons.join(' · ')) + '</span>' : '';
     card.classList.toggle('bi-off', v.conflict);
     return v;
   }
@@ -109,9 +112,9 @@
     opts.forEach(function (b) { b.setAttribute('aria-pressed', String(ANS[b.dataset.q] === b.dataset.a)); });
     if (clearEl) clearEl.hidden = !answered;
     if (countEl) {
-      if (!answered) countEl.textContent = cards.length + ' plans in three groups';
-      else if (!off) countEl.innerHTML = 'None of the ' + cards.length + ' plans conflicts with your answers; each card says what it would ask.';
-      else countEl.innerHTML = '<strong>' + off + ' of ' + cards.length + '</strong> plans conflict with your answers and are dimmed; each says why.';
+      if (!answered) countEl.textContent = cards.length + ' solutions in three groups';
+      else if (!off) countEl.innerHTML = 'None of the ' + cards.length + ' solutions conflicts with your answers; each card says what it would ask.';
+      else countEl.innerHTML = '<strong>' + off + ' of ' + cards.length + '</strong> solutions conflict with your answers and are dimmed; each says why.';
     }
   }
 
@@ -236,4 +239,11 @@
       if (el) { el.classList.add('bi-hl'); el.title = (c.was ? 'Was ' + c.was + ' before ' : 'Changed ') + label; }
     });
   });
+
+  /* How to read a card sits closed above the cards (JM, 27 Nov 2026); a link
+     to #how-to-read opens it. */
+  var howto = document.getElementById('how-to-read');
+  function openHowto() { if (howto && location.hash === '#how-to-read') howto.open = true; }
+  openHowto();
+  window.addEventListener('hashchange', openHowto);
 })();

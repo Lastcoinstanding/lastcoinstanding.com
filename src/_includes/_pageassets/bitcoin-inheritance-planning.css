@@ -106,13 +106,46 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
 .bi-group { margin-top: 2.4rem; scroll-margin-top: 80px; }
 .bi-grp { font-family: var(--font-b); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.4rem; }
 .bi-grp-sub { font-size: 0.9rem; color: var(--text-dim); margin: 0 0 1rem; max-width: 80ch; line-height: 1.6; }
-.bi-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: stretch; }
+/* The grid, not the card, is the size container: a container query puts
+   layout containment on its element, and an element with layout containment
+   can't be a subgrid (§5 below). */
+.bi-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: stretch; container: bigrid / inline-size; }
 @media (min-width: 700px)  { .bi-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1080px) { .bi-grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* ─── 6. THE CARD ─── */
-.bi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; scroll-margin-top: 80px; transition: opacity 0.2s; container: bicard / inline-size; position: relative; }
+.bi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; scroll-margin-top: 80px; transition: opacity 0.2s; position: relative; }
 .bi-card.bi-off { opacity: 0.45; }
+/* Rows of cards share their section lines (JM, 27 Nov 2026: "the text is
+   slightly misaligned horizontally across the three cards"). Each card takes
+   twelve rows of its group's grid as a subgrid, one per section, so a
+   section starts on the same line in every card of a row: the wait, the
+   strip, the steps, the price, the check's lines, the pair, the foot. A
+   section a card lacks leaves its row empty in that card. Spacing is margin,
+   not gap, so a row that no card in the line uses takes no room. Browsers
+   without subgrid keep the plain column (STYLE_GUIDE §6.58). */
+@supports (grid-template-rows: subgrid) {
+    .bi-grid { row-gap: 0; }
+    .bi-grid > .bi-card { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: subgrid; grid-row: span 12; row-gap: 0; margin-bottom: 1rem; }
+    .bi-grid > .bi-card > * { margin-top: 0.7rem; align-self: start; }
+    /* Row 1 always holds an empty item, so the card's top padding has an
+       item to sit on; the flag rides the top edge like the fresh badge. */
+    .bi-grid > .bi-card::before { content: ''; grid-row: 1; display: block; height: 0; }
+    .bi-grid > .bi-card > .bi-flag:not(:empty) { position: absolute; top: 0; left: 1.2rem; right: auto; max-width: calc(100% - 2.4rem); transform: translateY(-50%); margin: 0; z-index: 1; padding: 0.2rem 0.55rem; font-size: 0.6rem; background-color: var(--bg-card); background-image: linear-gradient(var(--red-soft), var(--red-soft)); }
+    .bi-grid > .bi-card > .bi-head { grid-row: 2; margin-top: 0; }
+    .bi-grid > .bi-card > .bi-wait { grid-row: 3; min-height: 0; }
+    .bi-grid > .bi-card > .bi-strip { grid-row: 4; }
+    .bi-grid > .bi-card > .bi-steps, .bi-grid > .bi-card > .bi-docs { grid-row: 5; }
+    .bi-grid > .bi-card > .bi-price, .bi-grid > .bi-card > .bi-extra { grid-row: 6; }
+    .bi-grid > .bi-card > .bi-fit { grid-row: 7; align-self: stretch; }
+    .bi-grid > .bi-card > .bi-pair { grid-row: 8; }
+    .bi-grid > .bi-card > .bi-rel { grid-row: 9; }
+    .bi-grid > .bi-card > .bi-twin { grid-row: 10; }
+    .bi-grid > .bi-card > .bi-links { grid-row: 11; }
+    .bi-grid > .bi-card > .bi-more { grid-row: 12; }
+    /* the row now sets the lines, so the reserved heights go */
+    .bi-grid > .bi-card .bi-head .bi-model { min-height: 0; }
+}
 .bi-card.bi-off:hover, .bi-card.bi-off:focus-within { opacity: 0.8; }
 /* The head: the name and the chips share the first row; the model line runs
    the full card width under them and reserves two lines, so the heads of a
@@ -151,6 +184,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-b); -w
    columns start on one line; the ? flows after the label's last word. */
 .bi-strip .k { font-size: 0.6rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim); min-height: 2.7em; display: flex; align-items: flex-end; justify-content: center; line-height: 1.15; }
 .bi-strip .kt { display: block; }
+.nw { white-space: nowrap; }
 .bi-strip .v { font-size: 0.98rem; color: var(--text-bright); font-weight: 600; line-height: 1.25; margin-top: 0.15rem; overflow-wrap: anywhere; }
 .bi-strip .v.np { color: var(--text-dim); font-weight: 500; font-size: 0.9rem; }
 .bi-strip .p { font-size: 0.74rem; color: var(--text-dim); line-height: 1.38; margin-top: 0.15rem; }
@@ -262,6 +296,24 @@ a.bi-twin { align-self: flex-start; font-size: 0.8rem; color: var(--amber); text
 }
 .bi-dialog .help-tip .tip-content { z-index: 60; }
 
+/* How to read a card: a closed row above the cards (JM, 27 Nov 2026). The
+   same arrow as a card's details row; the heading stays an h2 inside the
+   summary, so the outline keeps it. */
+.bi-howto { margin: 2.2rem 0 0; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+.bi-howto-sum { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1.15rem; cursor: pointer; list-style: none; }
+.bi-howto-sum::-webkit-details-marker { display: none; }
+.bi-howto-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.9rem; min-width: 0; }
+.bi-howto-title { margin: 0; font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; }
+.bi-howto-hint { font-size: 0.8rem; color: var(--text-dim); }
+.bi-howto-arrow { font-size: 1.5rem; line-height: 1; color: var(--amber); transition: transform 0.15s; flex: 0 0 auto; }
+.bi-howto[open] .bi-howto-arrow { transform: rotate(90deg); }
+.bi-howto-sum:hover .bi-howto-title { color: var(--amber); }
+.bi-howto-sum:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 10px; }
+.bi-howto-body { padding: 0.2rem 1.15rem 0.6rem; max-width: 880px; }
+.bi-howto-body p { font-size: 0.95rem; line-height: 1.7; color: var(--text); margin: 0 0 0.9rem; }
+.bi-howto-body p strong { color: var(--text-bright); font-weight: 600; }
+.bi-howto-body .bi-tag { font-size: 0.6rem; padding: 0.18rem 0.45rem; vertical-align: middle; }
+
 /* ─── 9. PROSE, THE LAW PANEL, THE CHANGE LOG ─── */
 .bi-prose { max-width: 880px; margin: 3.2rem auto 0; }
 .bi-prose h2 { font-family: var(--font-d); font-size: 1.7rem; font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; margin: 0 0 0.8rem; }
@@ -312,13 +364,27 @@ a.bi-src:hover { color: var(--amber); }
 
 /* A card too narrow for its name beside the chips moves the chips under the
    model line. Every card in a row has the same width, so a row switches
-   together and stays aligned. */
-@container bicard (max-width: 309px) {
-    .bi-head { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
-    .bi-head .bi-chips { grid-column: 1; grid-row: 3; flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: none; margin-top: 0.5rem; }
-    .bi-head .bi-tag { text-align: left; }
-    .bi-head .bi-tag .bi-sub { display: inline; }
-    .bi-head .bi-tag .bi-sub-sep { display: inline; }
+   together and stays aligned. The width asked of the grid is the one at
+   which a card's content falls under 310px: three columns below 1080px of
+   grid, two below 714px (card padding and border 40px, gaps 16px). Phones
+   are handled by the 520px rule in §11. */
+@media (min-width: 1080px) {
+    @container bigrid (max-width: 1080px) {
+        .bi-head { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+        .bi-head .bi-chips { grid-column: 1; grid-row: 3; flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: none; margin-top: 0.5rem; }
+        .bi-head .bi-tag { text-align: left; }
+        .bi-head .bi-tag .bi-sub { display: inline; }
+        .bi-head .bi-tag .bi-sub-sep { display: inline; }
+    }
+}
+@media (min-width: 700px) and (max-width: 1079.98px) {
+    @container bigrid (max-width: 714px) {
+        .bi-head { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+        .bi-head .bi-chips { grid-column: 1; grid-row: 3; flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: none; margin-top: 0.5rem; }
+        .bi-head .bi-tag { text-align: left; }
+        .bi-head .bi-tag .bi-sub { display: inline; }
+        .bi-head .bi-tag .bi-sub-sep { display: inline; }
+    }
 }
 
 /* ─── 11. MOBILE ─── */

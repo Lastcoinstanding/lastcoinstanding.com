@@ -32,8 +32,8 @@ TEMPLATE = "og-synthesis.jpg"
 TITLE_REST_LINES = ["Bitcoin", "Inheritance"]
 TITLE_ACCENT = "Planning"
 SUBTITLE_LINES = [
-    "Passing on your bitcoin: what your heirs",
-    "would have to do, design by design.",
+    "Passing on your bitcoin: the solutions",
+    "compared, and what each asks of your heirs.",
 ]
 URL_FOOTER = "LASTCOINSTANDING.COM/BITCOIN-INHERITANCE-PLANNING"
 # Left text column: starts at x=100, the seam gradient begins at x=620. Keep a
