@@ -3,7 +3,7 @@
   "nextCheck": "2027-01-01",
   "nextCheckLabel": "1 Jan 2027",
   "entries": [
-    {"date": "2026-11-26", "kind": "page", "type": "added",
+    {"date": "2026-11-27", "kind": "page", "type": "added",
       "text": "Page published with seventeen cards in three groups, each read against the provider’s own pages on 25 and 26 November 2026. Lines a provider doesn’t publish are marked “not published” on the card." },
     {"date": "2026-11-26", "kind": "check", "read": 17, "changed": 0,
       "text": "First reading: all seventeen cards checked line by line against each provider’s own pages. Three items the research had carried as open are now on the providers’ pages: Casa’s death-certificate route (Private Client), Nunchuk’s 7- or 30-day buffer (off-chain plans), and the day AnchorWatch’s recovery path opens (day 335, insured). The rest stay “not published”." },
