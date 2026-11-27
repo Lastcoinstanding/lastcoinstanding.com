@@ -367,6 +367,11 @@
     var afterTaxCashflow = 0;
     var totalNominalReceived = 0;
     var basisDepleteYear = 1 / path.yield; // years until ROC basis depletes at gross yield
+    // 2026-11-26 (JM's ruling on the Check the work findings): the position
+    // stops at zero. In the year it runs out it funds what it can; after that
+    // the need goes unmet. incomeFunded is what the path actually pays out
+    // each year, the cashflows the IRR card reads.
+    var incomeFunded = [], incomeRunOut = null;
 
     for (var y = 1; y <= years; y++){
       var grossDividend = positionValue * path.yield;
@@ -396,7 +401,7 @@
       dividendsPerYear.push(netDividend);
 
       // User withdraws need; surplus reinvested into position
-      var surplus = netDividend - needThisYear;
+      var surplus = netDividend - needThisYear, funded = needThisYear;
       if (surplus > 0){
         positionValue += surplus;
         basis += surplus; // new basis from new capital
@@ -406,10 +411,18 @@
         var withdrawal = -surplus;
         var gainPortion = positionValue > basis ? Math.min(withdrawal, (positionValue - basis) * (withdrawal / positionValue)) : 0;
         var withdrawalTax = gainPortion * ltcgRate;
-        positionValue -= (withdrawal + withdrawalTax);
-        basis -= (withdrawal - gainPortion);
-        basisRemaining = Math.max(0, basisRemaining - withdrawal);
+        if (withdrawal + withdrawalTax >= positionValue){
+          // Runs out: what is left pays its share of the draw and of its tax.
+          funded = netDividend + (withdrawal + withdrawalTax > 0 ? positionValue * withdrawal / (withdrawal + withdrawalTax) : 0);
+          positionValue = 0; basis = 0; basisRemaining = 0;
+          if (incomeRunOut === null) incomeRunOut = y;
+        } else {
+          positionValue -= (withdrawal + withdrawalTax);
+          basis -= (withdrawal - gainPortion);
+          basisRemaining = Math.max(0, basisRemaining - withdrawal);
+        }
       }
+      incomeFunded.push(funded);
 
       nominalIncomePath.push(positionValue);
       realIncomePath.push(positionValue / Math.pow(1 + infl, y));
@@ -432,6 +445,7 @@
       var nominalBtcPath = [state.position];
       var realBtcPath = [state.position];
       var btcSoldPerYear = [];   // nominal USD value of BTC sold to fund need + tax each year
+      var btcFunded = [], btcRunOut = null;   // 2026-11-26: never sells more than it holds
 
       // Apply stress: drawdown happens in months 1..duration, then a linear
       // recovery back to the selected path (not to trend; DEFAULTS_POLICY §3, item 10)
@@ -467,6 +481,14 @@
         // Sell enough additional BTC to cover the tax
         var extraSale = btcSaleTax / btcPrice;
         btcToSell += extraSale;
+        var fundedBtc = needThisYearBtc;
+        if (btcToSell > btcUnits){
+          // Runs out: sell what is left; it covers that share of the need and its tax.
+          fundedBtc = btcToSell > 0 ? needThisYearBtc * (btcUnits / btcToSell) : 0;
+          btcToSell = btcUnits;
+          if (btcRunOut === null) btcRunOut = y2;
+        }
+        btcFunded.push(fundedBtc);
 
         btcSoldPerYear.push(btcToSell * btcPrice);
         btcUnits = Math.max(0, btcUnits - btcToSell);
@@ -478,7 +500,8 @@
         btcPriceTrajectory.push(btcPrice);
       }
       return { nominalBtcPath: nominalBtcPath, realBtcPath: realBtcPath,
-               btcSoldPerYear: btcSoldPerYear, btcPriceTrajectory: btcPriceTrajectory };
+               btcSoldPerYear: btcSoldPerYear, btcPriceTrajectory: btcPriceTrajectory,
+               btcFunded: btcFunded, btcRunOut: btcRunOut };
     }
     var btcRun = btcSellAsNeeded(state.btcScenario);
     // Both scenarios' end wealth, for the two-scenario block (one of them is btcRun).
@@ -517,7 +540,23 @@
     } else {
       effectiveTax = taxBracket;
     }
-    var displayIRR = path.yield * (1 - effectiveTax) * 100 - state.inflation;
+    // 2026-11-26 (JM's ruling): the card is now the true real after-tax IRR,
+    // as its tooltip always said: the rate that discounts the real cashflows
+    // (minus the position today, each year's income actually paid, the
+    // position redeemed at the horizon) to zero. It had been the proxy
+    // yield × (1 − average tax) − inflation (3.90% against 4.69% at the
+    // defaults); effectiveTax above stays only for the record.
+    function realIrr(){
+      var cf = [-state.position];
+      for (var k = 1; k <= years; k++) cf.push(incomeFunded[k - 1] / Math.pow(1 + infl, k));
+      cf[years] += realIncomePath[years];
+      var npv = function(r){ var s = 0; for (var k = 0; k < cf.length; k++) s += cf[k] / Math.pow(1 + r, k); return s; };
+      var lo = -0.99, hi = 1;
+      if (npv(lo) < 0) return lo; if (npv(hi) > 0) return hi;
+      for (var it = 0; it < 200; it++){ var mid = (lo + hi) / 2; if (npv(mid) > 0) lo = mid; else hi = mid; }
+      return (lo + hi) / 2;
+    }
+    var displayIRR = years > 0 ? realIrr() * 100 : 0;
 
     return {
       realIncomePath: realIncomePath,
@@ -532,6 +571,8 @@
       finalRealBtcWealth: realBtcPath[realBtcPath.length - 1],
       btcEnd: btcEnd,
       displayIRR: displayIRR,
+      incomeFunded: incomeFunded, incomeRunOut: incomeRunOut,
+      btcFunded: btcRun.btcFunded, btcRunOut: btcRun.btcRunOut,
       pathLabel: path.label
     };
   }
@@ -569,6 +610,8 @@
         msg += ', with a ' + (state.stressDrawdown * 100).toFixed(0) + '% drawdown over ' + state.stressDurationMonths + ' months';
       }
       msg += '.';
+      if (result.incomeRunOut !== null) msg += ' The income path runs out in year ' + result.incomeRunOut + '; after that the need goes unmet.';
+      if (result.btcRunOut !== null) msg += ' The bitcoin path runs out in year ' + result.btcRunOut + '; after that the need goes unmet.';
       if (state.btcScenario !== 'floor') msg += ' The faint line is the same path if bitcoin ' + window.PriceCases.floorVerb(currentMultiple()).toLowerCase() + ' to the floor.';
       captionEl.textContent = msg;
     }
@@ -749,15 +792,22 @@
         else { var taxable = grossDividend - basisRemaining; basisRemaining = 0; tax = taxable * ltcgRate; kind = 'roc-out'; }
       } else if (path.treatment === 'ordinary-fed-only'){ tax = grossDividend * (taxBracket * 0.75); kind = 'fed'; }
       else { tax = grossDividend * taxBracket; }
-      var net = grossDividend - tax, surplus = net - need, reinvested = 0, withdrawn = 0, wTax = 0;
+      var net = grossDividend - tax, surplus = net - need, reinvested = 0, withdrawn = 0, wTax = 0, funded = need, out = false;
       if (surplus > 0){ positionValue += surplus; basis += surplus; basisRemaining += surplus; reinvested = surplus; }
       else if (surplus < 0){
         var withdrawal = -surplus;
         var gainPortion = positionValue > basis ? Math.min(withdrawal, (positionValue - basis) * (withdrawal / positionValue)) : 0;
-        wTax = gainPortion * ltcgRate; positionValue -= (withdrawal + wTax); basis -= (withdrawal - gainPortion);
-        basisRemaining = Math.max(0, basisRemaining - withdrawal); withdrawn = withdrawal;
+        wTax = gainPortion * ltcgRate;
+        if (withdrawal + wTax >= positionValue){
+          var share = withdrawal + wTax > 0 ? withdrawal / (withdrawal + wTax) : 0;
+          funded = net + positionValue * share; withdrawn = positionValue * share; wTax = positionValue - withdrawn;
+          positionValue = 0; basis = 0; basisRemaining = 0; out = true;
+        } else {
+          positionValue -= (withdrawal + wTax); basis -= (withdrawal - gainPortion);
+          basisRemaining = Math.max(0, basisRemaining - withdrawal); withdrawn = withdrawal;
+        }
       }
-      rows.push({ y: y, start: start, gross: grossDividend, tax: tax, kind: kind, net: net, need: need, reinvested: reinvested, withdrawn: withdrawn, wTax: wTax, end: positionValue, rocLeft: basisRemaining, real: positionValue / Math.pow(1 + infl, y) });
+      rows.push({ y: y, start: start, gross: grossDividend, tax: tax, kind: kind, net: net, need: need, funded: funded, out: out, reinvested: reinvested, withdrawn: withdrawn, wTax: wTax, end: positionValue, rocLeft: basisRemaining, real: positionValue / Math.pow(1 + infl, y) });
     }
     return rows;
   }
@@ -770,9 +820,10 @@
       var scen = scenarioPrice(scenario, y, years), factor = 1;
       if (mx > 0 && y <= dur * 2){ if (y <= dur) factor = 1 - mx * (y / dur); else factor = 1 - mx * (1 - (y - dur) / dur); }
       var px = scen * factor, need = state.incomeNeed * Math.pow(1 + infl, y - 1), forNeed = need / px;
-      var avg = units > 0 ? cost / units : 0, gain = Math.max(0, (px - avg) * forNeed), tax = gain * ltcgRate, forTax = tax / px, sold = forNeed + forTax, before = units;
+      var avg = units > 0 ? cost / units : 0, gain = Math.max(0, (px - avg) * forNeed), tax = gain * ltcgRate, forTax = tax / px, sold = forNeed + forTax, before = units, funded = need, short = sold > units;
+      if (short){ funded = sold > 0 ? need * (units / sold) : 0; sold = units; }
       units = Math.max(0, units - sold); cost = Math.max(0, cost - avg * sold);
-      rows.push({ y: y, scen: scen, factor: factor, px: px, need: need, avg: avg, gain: gain, tax: tax, forNeed: forNeed, forTax: forTax, sold: sold, soldUsd: sold * px, before: before, short: sold > before + 1e-12, left: units, value: units * px, real: units * px / Math.pow(1 + infl, y) });
+      rows.push({ y: y, scen: scen, factor: factor, px: px, need: need, funded: funded, avg: avg, gain: gain, tax: tax, forNeed: forNeed, forTax: forTax, sold: sold, soldUsd: sold * px, before: before, short: short, left: units, value: units * px, real: units * px / Math.pow(1 + infl, y) });
     }
     return rows;
   }
@@ -782,7 +833,7 @@
     var scName = sc === 'floor' ? 'Drifts to the floor (a path to test)' : sc === 'upper' ? 'Peaks at ' + UPPER_TARGET + '× trend (a path to test)' : names[sc];
     var roc = path.treatment === 'roc' && state.preferredTaxTreatment === 'roc';
     var taxWord = roc ? 'return of capital: no tax while the basis lasts, then ' + state.ltcgRate + '% on the rest' : path.treatment === 'ordinary-fed-only' ? state.taxBracket + '% × 0.75 (federal only, the state part taken as a quarter of the bracket)' : state.taxBracket + '% as ordinary income';
-    var ranOut = btc.filter(function(r){ return r.short; }), negInc = inc.filter(function(r){ return r.end < 0; });
+    var ranOut = btc.filter(function(r){ return r.short; }), negInc = inc.filter(function(r){ return r.out; });
     var stressWord = state.stressDrawdown > 0 ? (state.stressDrawdown * 100).toFixed(0) + '% over ' + state.stressDurationMonths + ' months, on bitcoin’s price only' : 'none';
     var incCols = [
       { label: 'Year', unit: '', fmt: 'text', get: function(x){ return 'Year ' + x.y; }, how: 'Each year of the horizon. Dollars are nominal; the last column deflates.' },
@@ -792,9 +843,10 @@
       { label: 'After tax', unit: '$', fmt: 'usd', get: function(x){ return x.net; }, how: 'The dividend less the tax: the cashflow table’s Dividend received.' },
       { label: 'Need', unit: '$', fmt: 'usd', get: function(x){ return x.need; }, how: 'The annual income need, ' + usd0(state.incomeNeed) + ', grown by ' + state.inflation + '% inflation a year.' },
       { label: 'Reinvested', unit: '$', fmt: 'usd', get: function(x){ return x.reinvested || null; }, how: 'When the after-tax dividend beats the need, the surplus buys more of the instrument at par.' },
-      { label: 'Drawn from principal', unit: '$', fmt: 'usd', get: function(x){ return x.withdrawn || null; }, how: 'When it falls short, the gap is sold from the position.' },
+      { label: 'Drawn from principal', unit: '$', fmt: 'usd', get: function(x){ return x.withdrawn || null; }, how: 'When it falls short, the gap is sold from the position, never more than is left.' },
       { label: 'Tax on the draw', unit: '$', fmt: 'usd', get: function(x){ return x.withdrawn ? x.wTax : null; }, how: 'The draw’s share of any gain over the cost basis, at ' + state.ltcgRate + '%, also taken from the position.' + (roc ? ' The cost basis here isn’t reduced by the return-of-capital dividends; only the ROC allowance is.' : '') },
-      { label: 'Position at the end', unit: '$', fmt: 'usd', get: function(x){ return x.end; }, how: 'Redeemed at par at the horizon: no price risk and no tax on redemption are modelled.' + (negInc.length ? ' It goes below zero from year ' + negInc[0].y + ': the draws exceed the position, and the model does not stop.' : '') },
+      { label: 'Position at the end', unit: '$', fmt: 'usd', get: function(x){ return x.end; }, how: 'Redeemed at par at the horizon: no price risk and no tax on redemption are modelled. Never below zero.' + (negInc.length ? ' It runs out in year ' + negInc[0].y + '.' : '') },
+      { label: 'Income paid', unit: '$', fmt: 'usd', get: function(x){ return x.funded; }, how: 'The need, when the path can meet it. In the year the position runs out, what is left pays its share of the draw and of the draw’s tax; after that, nothing.' },
       { label: 'Real value', unit: '$', fmt: 'usd', get: function(x){ return x.real; }, how: 'The position deflated by ' + state.inflation + '% a year: the chart’s income line.' }];
     if (roc) incCols.splice(4, 0, { label: 'ROC basis left', unit: '$', fmt: 'usd', get: function(x){ return x.rocLeft; }, how: 'The return-of-capital allowance left after this year: what the position cost, less the dividends that used it up, plus any reinvestment.' });
     var btcCols = [
@@ -805,9 +857,10 @@
       { label: 'Need', unit: '$', fmt: 'usd', get: function(x){ return x.need; }, how: 'The same need as the income path.' },
       { label: 'Average cost', unit: '$', fmt: 'usd', get: function(x){ return x.avg; }, how: 'The cost basis per bitcoin, averaged: the position bought at today’s ' + usd0(window.TODAY_PRICE) + ', less the cost of what has been sold.' },
       { label: 'Tax on the sale', unit: '$', fmt: 'usd', get: function(x){ return x.tax; }, how: 'The gain on the bitcoin sold for the need, price less average cost, at ' + state.ltcgRate + '%.' },
-      { label: 'Bitcoin sold', unit: '₿', fmt: 'btc', get: function(x){ return x.sold; }, how: 'The need over the price, plus the tax over the price. The extra sold for the tax has a gain too, which isn’t taxed here.' },
+      { label: 'Bitcoin sold', unit: '₿', fmt: 'btc', get: function(x){ return x.sold; }, how: 'The need over the price, plus the tax over the price, never more than is held. The extra sold for the tax has a gain too, which isn’t taxed here (the page’s limits section says so).' },
       { label: 'Sold, in dollars', unit: '$', fmt: 'usd', get: function(x){ return x.soldUsd; }, how: 'Bitcoin sold times the price: the cashflow table’s Bitcoin sold.' },
-      { label: 'Bitcoin left', unit: '₿', fmt: 'btc', get: function(x){ return x.left; }, how: 'What was held less what was sold, never below zero.' + (ranOut.length ? ' It runs out in year ' + ranOut[0].y + ': from then the sales aren’t there to make, but the model still counts the need as met.' : '') },
+      { label: 'Bitcoin left', unit: '₿', fmt: 'btc', get: function(x){ return x.left; }, how: 'What was held less what was sold, never below zero.' + (ranOut.length ? ' It runs out in year ' + ranOut[0].y + '.' : '') },
+      { label: 'Income paid', unit: '$', fmt: 'usd', get: function(x){ return x.funded; }, how: 'The need, when there is bitcoin to sell. In the year it runs out, the last of it pays that share of the need; after that, nothing.' },
       { label: 'Value', unit: '$', fmt: 'usd', get: function(x){ return x.value; }, how: 'Bitcoin left times the price.' },
       { label: 'Real value', unit: '$', fmt: 'usd', get: function(x){ return x.real; }, how: 'Deflated by ' + state.inflation + '% a year: the chart’s bitcoin line.' }];
     var side = inc.map(function(r, i){ return { y: r.y, a: r.real, b: btc[i].real }; });
@@ -817,15 +870,14 @@
       { label: 'Bitcoin path', unit: '$, real', fmt: 'usd', get: function(x){ return x.b; }, how: 'The Bitcoin path tab’s real value.' },
       { label: 'Bitcoin minus income', unit: '$, real', fmt: 'usd', get: function(x){ return x.b - x.a; }, how: 'The gap between the chart’s two lines.' },
       { label: 'Ahead', unit: '', fmt: 'text', get: function(x){ return x.b > x.a ? 'Bitcoin' : 'Income'; }, how: 'The first year bitcoin is ahead is the crossover the card shows.' }];
-    var effTax = roc ? (Math.max(0, H - Math.min(H, 1 / path.yield)) / H) * (state.ltcgRate / 100) : path.treatment === 'ordinary-fed-only' ? (state.taxBracket / 100) * 0.75 : state.taxBracket / 100;
     var fin = [
       { label: 'Real wealth at year ' + H, fmt: 'usd', values: [result.finalRealIncomeWealth, result.finalRealBtcWealth], card: 'The two End-of-horizon wealth cards above', how: 'Each path’s last real value.' },
       { label: 'Nominal wealth at year ' + H, fmt: 'usd', values: [inc[inc.length - 1].end, btc[btc.length - 1].value], how: 'Before deflating.' },
-      { label: 'Income drawn over the horizon', fmt: 'usd', values: [inc.reduce(function(a, r){ return a + r.need; }, 0), btc.reduce(function(a, r){ return a + r.need; }, 0)], how: 'The need, every year, on both paths (nominal).' },
+      { label: 'Income paid over the horizon', fmt: 'usd', values: [inc.reduce(function(a, r){ return a + r.funded; }, 0), btc.reduce(function(a, r){ return a + r.funded; }, 0)], how: 'Each path’s Income paid column, summed (nominal). Below the need in total only if a path runs out.' },
       { label: 'Tax paid over the horizon', fmt: 'usd', values: [inc.reduce(function(a, r){ return a + r.tax + r.wTax; }, 0), btc.reduce(function(a, r){ return a + r.tax; }, 0)], how: 'Income path: tax on dividends and on draws. Bitcoin path: tax on sales (nominal).' },
       { label: 'Bitcoin path if it stays (the block)', fmt: 'usd', values: [result.finalRealIncomeWealth, result.btcEnd.stay], how: 'The two-scenario block’s figures: the bitcoin path run on each scenario, beside the income path, which doesn’t depend on bitcoin.' },
       { label: 'Bitcoin path if it returns (the block)', fmt: 'usd', values: [result.finalRealIncomeWealth, result.btcEnd.trend], how: 'The same, if bitcoin returns to trend over 3 years.' },
-      { label: 'Real after-tax IRR (the card)', fmt: 'pct', values: [result.displayIRR / 100, null], how: 'Not an internal rate of return on the cashflows, as its tooltip says: the card shows the yield times one less an average tax rate, minus inflation: ' + (path.yield * 100).toFixed(1) + '% × (1 − ' + (effTax * 100).toFixed(1) + '%) − ' + state.inflation + '%.' + (roc ? ' The average tax counts ' + state.ltcgRate + '% only for the years after the basis would run out at the gross yield (' + (1 / path.yield).toFixed(1) + ' years).' : '') },
+      { label: 'Real after-tax IRR (the card)', fmt: 'pct', values: [result.displayIRR / 100, null], how: 'The income path’s real internal rate of return: the rate that discounts its real cashflows to zero. Those are minus ' + usd0(state.position) + ' today, each year’s Income paid deflated by ' + state.inflation + '% a year, and the real position redeemed at year ' + H + '. Found by bisection.' },
       { label: 'Crossover year', fmt: 'text', values: [result.crossoverYear !== null ? 'Year ' + result.crossoverYear : 'After year ' + H, ''], how: 'The first year the bitcoin path’s real value beats the income path’s: the Side by side tab.' }];
     var inputs = [
       ['Annual income need', usd0(state.incomeNeed) + ', grown by inflation'], ['Initial position', usd0(state.position)], ['Horizon', H + (H === 1 ? ' year' : ' years')],
@@ -865,7 +917,7 @@
       if (!window.Ledger.check(ledgerEl, { side: false })) why.push('Ledger.check');
       var R = computePaths(), inc = sp.tabs[0].rows, btc = sp.tabs[1].rows, side = sp.tabs[2].rows, fin = sp.final.rows;
       inc.forEach(function(x, i){ if (!near(x.real, R.realIncomePath[i + 1]) || !near(x.net, R.dividendsPerYear[i]) || !near(x.net, x.gross - x.tax) || !near(x.end - x.start, x.reinvested - x.withdrawn - x.wTax)) why.push('income year ' + x.y); });
-      btc.forEach(function(x, i){ if (!near(x.real, R.realBtcPath[i + 1]) || !near(x.soldUsd, R.btcSoldPerYear[i]) || !near(x.sold * x.px, x.need + x.tax) || !near(x.px, x.scen * x.factor)) why.push('bitcoin year ' + x.y); });
+      btc.forEach(function(x, i){ if (!near(x.real, R.realBtcPath[i + 1]) || !near(x.soldUsd, R.btcSoldPerYear[i]) || !near(x.sold * x.px, x.short ? x.before * x.px : x.need + x.tax) || !near(x.px, x.scen * x.factor)) why.push('bitcoin year ' + x.y); });
       var cross = null; side.forEach(function(x){ if (cross === null && x.b > x.a) cross = x.y; });
       if (cross !== R.crossoverYear) why.push('crossover');
       var t = function(id){ var e = document.getElementById(id); return e ? e.textContent : null; };
