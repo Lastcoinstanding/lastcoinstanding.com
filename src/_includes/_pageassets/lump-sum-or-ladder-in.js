@@ -254,7 +254,9 @@
               title: function (it) { return 'Channel position ' + (+it[0].parsed.x).toFixed(2); },
               label: function (it) {
                 var y = it.parsed.y;
-                return (y < 0 ? 'all-now +' + Math.abs(y).toFixed(0) + '%' : 'ladder +' + y.toFixed(0) + '%') + ' BTC';
+                // In the chart's own terms, the ladder's advantage (2026-11-26: had read
+                // a negative point as "all-now +N%", the ladder's shortfall as the lump's margin).
+                return y < 0 ? 'ladder ' + y.toFixed(0) + '% BTC (all at once got more)' : 'ladder +' + y.toFixed(0) + '% BTC';
               }
             }
           }
@@ -460,7 +462,10 @@
       + (ladderWon ? 'lsl-win-ladder' : 'lsl-win-lump') + '">' + winName + '</span>:';
     boxes.classList.toggle('is-ladder', ladderWon);
     boxes.classList.toggle('is-lump', !ladderWon);
-    if (magEl) magEl.textContent = '+' + Math.abs(adv).toFixed(0) + '%';
+    // The winner's own margin: the ladder's average advantage, or, when the lump
+    // won, how much more the lump got than the ladder (2026-11-26; had shown
+    // the ladder's shortfall, which understates it: +35% where the lump got +54%).
+    if (magEl) magEl.textContent = '+' + (ladderWon ? adv : b.lumpMean).toFixed(0) + '%';
     if (magSub) magSub.textContent = 'more BTC accumulated';
     if (freqEl) freqEl.textContent = Math.round(winRate) + '%';
     if (freqSub) freqSub.textContent = 'of ' + b.n + ' historical entries here';
@@ -696,7 +701,7 @@
         how: 'The share of those entries where the ladder got more bitcoin.' }];
     var magHow = !ok ? 'Not shown with fewer than 4 entries.'
       : ladderWon ? 'The average ladder advantage: how much more bitcoin the ladder got, on average, as a share of what the lump got.'
-      : 'The average ladder advantage without its minus sign. Deploying all at once served better here, so this is how much less bitcoin the ladder got, on average, as a share of what the lump got. Measured the other way, as how much more bitcoin the lump got than the ladder, the average is ' + (lumpMore * 100).toFixed(1) + '%.';
+      : 'Deploying all at once served better here, so this is the lump’s own margin: how much more bitcoin the lump got than the ladder, as a share of what the ladder got, averaged over the entries (each entry’s lump over ladder, minus one). Measured the ladder’s way it is the average advantage without its minus sign, ' + Math.abs(b.mean).toFixed(1) + '%.';
     var fin = [
       { label: 'Entries in the window', fmt: 'text', values: [String(b.n || 0)],
         how: 'The rows of the Entries here tab: the How often box’s “of ' + (b.n || 0) + ' historical entries here”.' + (ok ? '' : ' With fewer than 4 the page gives no verdict and says there are too few entries to read.') },
@@ -704,7 +709,7 @@
         how: 'The Entries here tab’s first row. The white dot on the chart sits at this height.' },
       { label: 'Served better', fmt: 'text', values: [winName],
         how: 'Laddering in where the average is above zero, deploying all at once where it is below: the tactic named above the two boxes.' },
-      { label: 'How much it won by', fmt: 'pct', values: [ok ? Math.abs(b.mean) / 100 : null], card: 'The How much it won by box above, rounded to a whole percent there', how: magHow },
+      { label: 'How much it won by', fmt: 'pct', values: [ok ? (ladderWon ? b.mean : b.lumpMean) / 100 : null], card: 'The How much it won by box above, rounded to a whole percent there', how: magHow },
       { label: 'How often it won', fmt: 'pct', values: [ok ? winRate / 100 : null],
         how: ok ? 'The share of entries where the tactic that served better got more bitcoin: ' + (ladderWon ? kLad : rows.length - kLad) + ' of ' + rows.length + '. The How often box, rounded to a whole percent there.' : 'Not shown with fewer than 4 entries.' }];
     var where = userMoved ? ''
@@ -768,7 +773,7 @@
       if (ok) {
         var lw = b.mean > 0, wr = lw ? b.win : 100 - b.win;
         if (fin[2].values[0] !== (lw ? 'Laddering in' : 'Deploying all at once') || lede.textContent.indexOf(lw ? 'laddering in' : 'deploying all at once') < 0) why.push('served better');
-        if (!near(fin[3].values[0], Math.abs(b.mean) / 100) || document.getElementById('lslBoxMag').textContent !== '+' + (fin[3].values[0] * 100).toFixed(0) + '%') why.push('how much box');
+        if (!near(fin[3].values[0], (b.mean > 0 ? b.mean / 100 : rows.reduce(function (s, r) { return s + 1 / (1 + C[7].get(r)) - 1; }, 0) / rows.length)) || document.getElementById('lslBoxMag').textContent !== '+' + (fin[3].values[0] * 100).toFixed(0) + '%') why.push('how much box');
         if (!near(fin[4].values[0], wr / 100) || document.getElementById('lslBoxFreq').textContent !== Math.round(fin[4].values[0] * 100) + '%' || document.getElementById('lslBoxFreqSub').textContent !== 'of ' + b.n + ' historical entries here') why.push('how often box');
         if (boxes.style.display === 'none') why.push('boxes hidden');
       } else if (fin[2].values[0] !== null || fin[3].values[0] !== null || fin[4].values[0] !== null || boxes.style.display !== 'none') why.push('too few entries');
