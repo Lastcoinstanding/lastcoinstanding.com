@@ -121,10 +121,15 @@
     return a;
   }
   function btcHeldAt(events, priceAt, t) { var btc = 0; for (var i = 0; i < events.length; i++) if (events[i].d <= t + 1e-9) btc += (events[i].w * state.sum) / priceAt(events[i].d); return btc; }
+  // The sum not yet spent at t (2026-11-26, JM's ruling on the Check the work
+  // finding): a plan still buying at a hold counts that money at face value, as
+  // cash, rather than as nothing. Before, a 36-month ladder's 2-year figure
+  // left out a third of the sum.
+  function unspentAt(events, t) { var w = 0; for (var i = 0; i < events.length; i++) if (events[i].d > t + 1e-9) w += events[i].w; return w * state.sum; }
   // multiple (value/sum) for a plan deployed at entryDay, valued `span` days later (real record)
   function planMultiple(style, entryDay, span) {
-    var price = function (d) { return realPriceAt(entryDay + d); };
-    return btcHeldAt(buyEvents(style), price, span) * price(span) / state.sum;
+    var price = function (d) { return realPriceAt(entryDay + d); }, ev = buyEvents(style);
+    return (btcHeldAt(ev, price, span) * price(span) + unspentAt(ev, span)) / state.sum;
   }
 
   // ── Entry set: historical entries within ±0.07 of today's (floor-clamped) position,
@@ -161,7 +166,8 @@
     STYLES.forEach(function (s) {
       grid[s] = HOLDS.map(function (h) {
         var span = h * YEAR_D, ev = buyEvents(s);
-        var a = btcHeldAt(ev, tj, span) * tj(span) / state.sum, b = btcHeldAt(ev, rv, span) * rv(span) / state.sum;
+        var cash = unspentAt(ev, span);
+        var a = (btcHeldAt(ev, tj, span) * tj(span) + cash) / state.sum, b = (btcHeldAt(ev, rv, span) * rv(span) + cash) / state.sum;
         return { lo: Math.min(a, b), hi: Math.max(a, b) };
       });
     });
@@ -433,15 +439,15 @@
     var usd0 = function (v) { return '$' + Math.round(v).toLocaleString('en-US'); };
     // Buys with no money in them (a hybrid at 0% or 100% now) add nothing; the tab leaves them out.
     var shown = ev.filter(function (e) { return e.w > 1e-12; });
-    // A plan still buying at a hold: the page values only the bitcoin bought by
-    // then, so the money not yet spent adds nothing to that figure. Said where it applies.
+    // A plan still buying at a hold: the money not yet spent counts at face
+    // value, as cash (since 2026-11-26). Said where it applies.
     var lateNote = function (j) {
       var span = HOLDS[j] * YEAR_D, rest = shown.filter(function (e) { return e.d > span + 1e-9; });
       if (!rest.length) return '';
       var u = rest.reduce(function (a, e) { return a + e.w; }, 0), first = Math.round(rest[0].d / MONTH_D);
       return ' At ' + HOLDS[j] + ' years this plan still has ' + (rest.length === 1 ? 'one buy' : rest.length + ' buys') + ' to make (' + usd0(u * sum) + ', ' + (u * 100).toFixed(1) + '% of the sum)' +
         (rest[0].d - span < 1 ? ': month ' + first + ' is ' + (first * MONTH_D).toFixed(2) + ' days from today, and ' + HOLDS[j] + ' years is ' + span.toFixed(1) : '') +
-        '. The page counts only the bitcoin bought by then, so the money not yet spent adds nothing to the ' + HOLDS[j] + '-year figure.';
+        '. That money counts at face value, as cash not yet spent, in the ' + HOLDS[j] + '-year figure.';
     };
     var lateAll = HOLDS.map(function (h, j) { return lateNote(j); }).join('');
     // Today's multiple is taken at the start of today, midnight UTC (TODAY_DAYS);
@@ -455,7 +461,7 @@
       var h = HOLDS[j];
       return { label: h + ' yr', unit: '× the sum', fmt: 'mult',
         get: function (x) { return x.median ? R.grid[s][j] : (S[x.i].d <= LAST_D - h * YEAR_D ? planMultiple(s, S[x.i].d, h * YEAR_D) : null); },
-        how: 'What the plan turned each dollar into, held ' + h + ' years from that entry: the bitcoin it bought from that date, at the record’s price on each buy date, times the price ' + h + ' years after the entry. Blank where the entry isn’t ' + h + ' years old yet; the median uses only the entries that are.' + lateNote(j) };
+        how: 'What the plan turned each dollar into, held ' + h + ' years from that entry: the bitcoin it bought from that date, at the record’s price on each buy date, times the price ' + h + ' years after the entry, plus any of the sum not yet spent, at face value. Blank where the entry isn’t ' + h + ' years old yet; the median uses only the entries that are.' + lateNote(j) };
     };
     var entryCols = [
       { label: 'Entry', unit: '', fmt: 'text', get: function (x) { return x.median ? 'Median' : monthYear(S[x.i].d); },
@@ -478,15 +484,16 @@
         how: 'The trend on that date times a multiple that moves in a straight line from today’s ' + mult0 + ' to 1.0 over ' + REV + ' years, then stays at 1.0.' },
       { label: 'BTC if it returns', unit: '₿', fmt: 'btc', get: function (x) { return x.w * sum / ret(x.d); }, how: 'Dollars divided by that price.' }];
     // Value tab: what the buys are worth at each hold, on each scenario.
-    var valueRows = HOLDS.map(function (h) { var span = h * YEAR_D; return { h: h, sBtc: btcHeldAt(ev, stay, span), sP: stay(span), rBtc: btcHeldAt(ev, ret, span), rP: ret(span) }; });
+    var valueRows = HOLDS.map(function (h) { var span = h * YEAR_D; return { h: h, sBtc: btcHeldAt(ev, stay, span), sP: stay(span), rBtc: btcHeldAt(ev, ret, span), rP: ret(span), cash: unspentAt(ev, span) }; });
     var valueCols = [
       { label: 'Year', unit: '', fmt: 'text', get: function (x) { return 'Year ' + x.h; } },
       { label: 'BTC held if it stays', unit: '₿', fmt: 'btc', get: function (x) { return x.sBtc; }, how: 'The bitcoin from every buy made by then (the Your buys tab).' + lateAll },
       { label: 'Price if it stays', unit: '$', fmt: 'usd', get: function (x) { return x.sP; }, how: 'As on the Your buys tab, at that year.' },
-      { label: 'Value if it stays', unit: '$', fmt: 'usd', get: function (x) { return x.sBtc * x.sP; }, how: 'BTC held times that price. Divided by the sum, it is one end of the Projection table’s range.' },
+      { label: 'Cash not yet spent', unit: '$', fmt: 'usd', get: function (x) { return x.cash || null; }, how: 'The part of the sum the plan hasn’t bought with yet, counted at face value. Blank once every buy is made.' },
+      { label: 'Value if it stays', unit: '$', fmt: 'usd', get: function (x) { return x.sBtc * x.sP + x.cash; }, how: 'BTC held times that price, plus any cash not yet spent. Divided by the sum, it is one end of the Projection table’s range.' },
       { label: 'BTC held if it returns', unit: '₿', fmt: 'btc', get: function (x) { return x.rBtc; }, how: 'As above, at this scenario’s prices.' },
       { label: 'Price if it returns', unit: '$', fmt: 'usd', get: function (x) { return x.rP; }, how: 'As on the Your buys tab, at that year.' },
-      { label: 'Value if it returns', unit: '$', fmt: 'usd', get: function (x) { return x.rBtc * x.rP; }, how: 'BTC held times that price. Divided by the sum, it is the other end of the range.' }];
+      { label: 'Value if it returns', unit: '$', fmt: 'usd', get: function (x) { return x.rBtc * x.rP + x.cash; }, how: 'BTC held times that price, plus any cash not yet spent. Divided by the sum, it is the other end of the range.' }];
     var styleWords = s === 'lump' ? 'Lump sum, all today'
       : s === 'ladder' ? 'Ladder in, equal parts over ' + state.durMonths + ' months'
       : 'Hybrid: ' + state.front + '% today, the rest over ' + state.durMonths + ' months';
@@ -500,7 +507,7 @@
       ['Bitcoin’s price from today', NM.stay + ', or ' + NM.trend.charAt(0).toLowerCase() + NM.trend.slice(1)],
       ['Today', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })]];
     var mine = HOLDS.map(function (h, j) {
-      var a = valueRows[j].sBtc * valueRows[j].sP / sum, b = valueRows[j].rBtc * valueRows[j].rP / sum;
+      var a = (valueRows[j].sBtc * valueRows[j].sP + valueRows[j].cash) / sum, b = (valueRows[j].rBtc * valueRows[j].rP + valueRows[j].cash) / sum;
       return { label: h + ' years', fmt: 'mult', values: [R.grid[s][j], a, b], how: '' };
     });
     mine.forEach(function (r, j) {
@@ -567,7 +574,9 @@
         var sb = 0, rb = 0, t = x.h * YEAR_D;
         buys.rows.forEach(function (b) { if (b.d <= t + 1e-9) { sb += buys.columns[4].get(b); rb += buys.columns[6].get(b); } });
         if (!near(sb, x.sBtc) || !near(rb, x.rBtc)) why.push('held ' + x.h);
-        if (!near(val.columns[3].get(x) / state.sum, fin[j].values[1]) || !near(val.columns[6].get(x) / state.sum, fin[j].values[2])) why.push('value ' + x.h);
+        var spent = 0; buys.rows.forEach(function (b) { if (b.d <= t + 1e-9) spent += buys.columns[2].get(b); });
+        if (!near(x.cash + spent, state.sum)) why.push('cash ' + x.h);
+        if (!near(val.columns[4].get(x) / state.sum, fin[j].values[1]) || !near(val.columns[7].get(x) / state.sum, fin[j].values[2])) why.push('value ' + x.h);
       });
       var csv = window.Ledger.toCsv(sp);
       if (!(csv.indexOf('# Last Coin Standing,') === 0 && (csv.match(/^# Input: /gm) || []).length === sp.inputs.length
