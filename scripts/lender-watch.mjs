@@ -1,15 +1,21 @@
 #!/usr/bin/env node
-/* lender-watch — has any lender's own page changed since last week?
-   (JM 2026-10-01; MONTHLY_REFRESH_CHECKLIST §7.6; SITE_GUIDE §57)
+/* lender-watch — has any lender's or inheritance provider's own page changed
+   since last week? (JM 2026-10-01; MONTHLY_REFRESH_CHECKLIST §7.6 and §7.7;
+   SITE_GUIDE §57 and §67)
 
    Reads every page a /bitcoin-lenders card cites (each card's `sources` and
-   `site` in src/_data/lenders.json) in a real browser, keeps only the lines that
+   `site` in src/_data/lenders.json) and, since 2026-11-26, every page a
+   /bitcoin-inheritance-planning card cites (the same two fields in
+   src/_data/inheritance.json), in a real browser, keeps only the lines that
    carry terms (a figure with %, $ or a term-like word, or rehypothecation /
-   availability language), and compares them with the previous run's snapshot.
+   availability language, or the page's sentences), and compares them with the
+   previous run's snapshot. A page new to the watch has no baseline, so its
+   first run records it and reports nothing.
 
    It never edits the site. A changed page is a lead for a person to read, not
-   a fact: the card changes only after the change is verified on the lender's
-   page and logged in src/_data/lenderLog.json, which is what readers see.
+   a fact: the card changes only after the change is verified on the
+   provider's page and logged in src/_data/lenderLog.json or
+   src/_data/inheritanceLog.json, which is what readers see.
 
    Usage:
      node scripts/lender-watch.mjs --prev prev/state.json --out out/
@@ -69,11 +75,17 @@ function signal(text) {
   return out;
 }
 
-const lenders = JSON.parse(fs.readFileSync('src/_data/lenders.json', 'utf8')).lenders;
-const pages = new Map();   // url -> [lender names]
-for (const l of lenders) for (const u of [...l.sources, l.site]) {
+/* The card pages watched: data file, the array in it, and how a card's name
+   reads in the report. Both arrays carry `sources` (URLs) and `site`. */
+const WATCHED = [
+  { file: 'src/_data/lenders.json', key: 'lenders', label: (c) => c.name },
+  { file: 'src/_data/inheritance.json', key: 'plans', label: (c) => `${c.name}${c.nameNote ? ' (' + c.nameNote + ')' : ''}, inheritance` },
+];
+const pages = new Map();   // url -> [card names]
+for (const w of WATCHED) for (const c of JSON.parse(fs.readFileSync(w.file, 'utf8'))[w.key]) for (const u of [...c.sources, c.site]) {
   if (!pages.has(u)) pages.set(u, []);
-  if (!pages.get(u).includes(l.name)) pages.get(u).push(l.name);
+  const name = w.label(c);
+  if (!pages.get(u).includes(name)) pages.get(u).push(name);
 }
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -146,10 +158,10 @@ const cap = (xs, n) => xs.slice(0, n).map((x) => '  - `' + x.replace(/`/g, "'").
 const ok = urls.filter((u) => state.pages[u].status === 'ok').length;
 const skipped = urls.filter((u) => state.pages[u].status === 'skipped').length;
 
-let md = `## Lender pages: ${changed.length} changed since the last run\n\n`;
+let md = `## Lender and inheritance pages: ${changed.length} changed since the last run\n\n`;
 md += PREV ? `Compared with the run of ${PREV.run.slice(0, 10)}. ` : `**First run: this snapshot is the baseline; nothing to compare yet.** `;
 md += `${ok} of ${urls.length} pages read, ${blocked.length} couldn't be read, ${skipped} not watched (live markets and forum threads, read by hand monthly).\n\n`;
-md += `A change here is a lead, not a fact. Before a card changes: read the lender's page, edit \`src/_data/lenders.json\`, and log it in \`src/_data/lenderLog.json\` with \`changes\` (MONTHLY_REFRESH_CHECKLIST §7.6). Many hits are wording or layout.\n\n`;
+md += `A change here is a lead, not a fact. Before a card changes: read the provider's page, edit \`src/_data/lenders.json\` (or \`inheritance.json\` for a card named "inheritance"), and log it in \`src/_data/lenderLog.json\` (or \`inheritanceLog.json\`) with \`changes\` (MONTHLY_REFRESH_CHECKLIST §7.6, §7.7). Many hits are wording or layout.\n\n`;
 for (const c of changed) {
   md += `### ${by(c.u)}\n${c.u}\n`;
   if (c.moved) md += `- Now redirects: ${c.moved[0]} → ${c.moved[1]}\n`;

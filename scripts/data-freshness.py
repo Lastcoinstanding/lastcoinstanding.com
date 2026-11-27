@@ -241,6 +241,18 @@ def lender_cards():
            'oldest: ' + ', '.join(stale[:4]) + ('…' if len(stale) > 4 else ''))
 
 
+# /bitcoin-inheritance-planning: every card carries the date its provider's
+# pages were read; the whole card is re-read monthly (§7.7, SITE_GUIDE §67).
+@safe
+def inheritance_cards():
+    d = json.loads(read(SRC, '_data', 'inheritance.json'))
+    oldest = min(dt.date.fromisoformat(p['asOf']) for p in d['plans'])
+    stale = [p['name'] + (' (%s)' % p['nameNote'] if p.get('nameNote') else '') for p in d['plans'] if dt.date.fromisoformat(p['asOf']) == oldest]
+    by_age('Inheritance cards (src/_data/inheritance.json: %d plans; oldest read)' % len(d['plans']),
+           oldest, 35, 45, 'monthly (full card)', '§7.7', 'inheritance.json',
+           'oldest: ' + ', '.join(stale[:4]) + ('…' if len(stale) > 4 else ''))
+
+
 # ── Quarterly ─────────────────────────────────────────────────────────────────
 @safe
 def metcalfe():

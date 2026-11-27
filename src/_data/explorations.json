@@ -565,6 +565,15 @@
     "interactive": true
   },
   {
+    "_comment": "Bitcoin Inheritance Planning (2026-11-26, JM's rulings of that day): how bitcoin passes to heirs. What every plan has to solve first (the three places the ability to sign can sit: a company, a timelock on the chain, a custodian), then a three-question check of what the reader's heirs could manage, then seventeen plan cards from src/_data/inheritance.json in the description-card format of bitcoin-lenders, and a sourced US law panel. interactive: true (the three-question check, the detail dialog). NO calculator_tile, the lender page's posture: it describes a market, it computes nothing personal. Nav beside Bitcoin Lenders Compared in Living on Bitcoin, per the ruling.",
+    "slug": "bitcoin-inheritance-planning",
+    "launched": "2026-11-26",
+    "title": "Bitcoin Inheritance Planning",
+    "category": "numbers",
+    "group": "Living on Bitcoin",
+    "interactive": true
+  },
+  {
     "slug": "bitcoin-backed-mortgages",
     "title": "Bitcoin-Backed Mortgages",
     "category": "numbers",

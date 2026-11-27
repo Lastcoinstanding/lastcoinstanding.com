@@ -60,6 +60,7 @@ It reads every data series, dated block and dated string straight from the sourc
 | Regulatory status lines (CLARITY Act etc.) on Bull & Bear and Bitcoin as Collateral *(judgement)* | `.njk` | Congress.gov, press | §2, §3 |
 | How Much Bitcoin? risk-free rate (move it at ±50bp) | `how-much-bitcoin.njk` / `.js` | FRED `DTB3` | §3 |
 | Bitcoin as Collateral loan table and its "as of" | `bitcoin-as-collateral.njk` | lender pages | §3, §8.6 |
+| Bitcoin Inheritance Planning: every card in full, and the change log | `src/_data/inheritance.json`, `inheritanceLog.json` | each provider's own pages | §7.7 |
 | Cross-page agreement: Strategy's BTC count, the STRC rate, reserve figures | BFI, STRC page, rental page | 8-K | §0.7 |
 | For Podcast Hosts: the three dated facts (copied from Horizon, Heatmap, BvSM) | `for-hosts.njk` | those pages | §3 |
 | The live price loads | `/dashboard` | — | §5 step 7 |
@@ -833,6 +834,17 @@ Twenty cards in `src/_data/lenders.json`, each with `asOf` and `sources`. Rates 
 - **Events to watch** (each is a card edit the same day): a lender pausing withdrawals or liquidating at scale; a regulatory action; a US launch or exit (Hodl Hodl barred US persons in June 2026; Nexo returned in February 2026; Kraken Borrow US launched 2026-09-24); a product the page doesn't have (add a card, never a paragraph).
 - **After any edit**, run the chat-side probe (`ln-qa.js`): parity with the BAS formula at every card, the own-LTV path, filters, NY/TX state verdicts, mobile overflow.
 
+## 7.7. Bitcoin Inheritance Planning — the cards (MONTHLY, every card in full, `/bitcoin-inheritance-planning.html`)
+
+Seventeen cards in `src/_data/inheritance.json` (SITE_GUIDE §67), each with `asOf`, `sources`, `site` and a `notPublished` list. Prices, claim processes and beneficiary features move (Strike launched beneficiary plans on 2026-07-29; AnchorWatch moved to fixed custody fees in October 2026; Nunchuk added an on-chain design in November 2025), so:
+
+- **Start from the weekly watch.** Since 2026-11-26 the `lender-watch` issue also lists inheritance pages whose lines changed (cards named "… , inheritance"). A hit is a lead, not a change: open the page and decide.
+- **Monthly, every card in full.** Re-read each provider's own pages (the card's `sources`) for every line: the wait and who can stop a claim, what the heir needs, whether it works without the company, what the owner must renew, the steps, price and the plan it needs, keys, upkeep, identity checks, beneficiary, probate, documents. Then the `notPublished` list: a line that is now published moves onto the card and out of the list.
+- **Every check goes in the log.** One `check` entry per re-read even when nothing moved; one `provider` entry per change (`type` launch / terms / price / availability / exit; `plan` = card id; `source`; text from what to what; `changes: [{field, was}]` with fields wait, heir, without, renew, steps, price, keys, keep, gone, identity, beneficiary, probate, time, documents, which lights the card's 14-day marker); set `nextCheck`. A card added or removed is a `page` entry. The build fails on an unknown plan id, kind or field. A changed card moves its `asOf` and gets a Recent Updates entry.
+- **If an answer code changes, re-run the check's QA.** `codes.heirUse`, `codes.without`, `codes.renew` and the `fit` words decide what the three questions say on each card; after editing them run the interaction probe (all 36 answer combinations) and look at the card under each answer.
+- **Rules that don't move.** Facts from the provider's own pages only, never a competitor's comparison (two were found misstating the services they compare); press only where the provider publishes nothing, and labelled. A withheld line stays *not published*, never estimated. No ranking, no "best", no referral links.
+- **Events to watch** (each a card edit the same day): a provider closing, pausing withdrawals or changing its claim process; a new beneficiary or inheritance feature at a provider on the page; a provider not on the page launching one (a card, never a paragraph; JM decides additions; candidates noted 2026-11-26: Cash App, Robinhood, Bitcoin Keeper, Theya).
+
 ## 8. Institutional guidance citations — How Much Bitcoin? (quarterly is fine)
 
 The gap ladder and §B cite live institutional positions. Quarterly, verify:
@@ -1100,6 +1112,7 @@ Pages that state what the law is, or what is pending, go stale when a bill passe
 - **Living on Bitcoin**: tax notes (njk ~66, 87–88, 171, 290, 332, 433, 442; the $200 threshold in js ~231–234) and the CLARITY Act status (~88).
 - **Borrowing Against Your Stack**: DFAL and the state count (njk ~131), §1259, step-up basis, the capital-gains rates. njk ~151 says "The PARITY Act of 2026 confirmed §1259 applies to digital assets", but Spend and Replace and Living on Bitcoin say PARITY has not passed. Resolve that (TECH_DEBT).
 - **Bitcoin-Backed Mortgages**: the QM prepayment cap, the GENIUS Act, capital-gains rates, §1259, Fannie Mae's conservatorship.
+- **Bitcoin Inheritance Planning**: the US law panel (`#us-law`): the federal basic exclusion amount (**every January**, when the IRS publishes the new year's figure: $15,000,000 for deaths in 2026), the basis-at-death and gift-basis rules, inherited IRA treatment (Pub. 590-B), transfer-on-death registration (Investor.gov) and RUFADAA. Re-read each against its linked source; the panel's "Read on" date moves with it. The FAQ on capital gains quotes the same rules.
 - **Paper Bitcoin**: the IBIT prospectus terms, in-kind redemption, SIPC, retirement-account access.
 - **Bitcoin vs. Rental Property**: California AB 1154 (njk ~151).
 - **Risks to Bitcoin**: China's rounds of restriction (Circular 42, Feb 2026).
@@ -1275,6 +1288,7 @@ In January, once the prior year's data is complete. `scripts/data-freshness.py` 
 5. **The footer's © year** (`layouts/base.njk`).
 6. **The Gallery's BTC-per-house line** ("20 / 1.4 / 0.23 / 0.06 BTC", `the-gallery.njk` ~236) changes on 1 January.
 7. **The static chart image** `bitcoin-vs-house-prices.png` (2026-10-20): after `homeData` and `btcData` gain the year, rerun `python3 scripts/build-chart-images.py` (from production once the data is merged, or `--base` a preview), commit the PNG at the repo root, and check `curl -I https://lastcoinstanding.com/bitcoin-vs-house-prices.png` returns `image/png`. If the height changed, update the `<img>` `height` on `bitcoin-vs-real-estate.njk` to match, and update the alt text's years (2013 to 2025, the path to 2032) with the chart's (§6).
+8. **The federal estate-tax exclusion** on Bitcoin Inheritance Planning's law panel (`bitcoin-inheritance-planning.njk`, *The federal estate tax*, and its source link): on 1 January the line must name the new year and the IRS's figure for it (the IRS publishes it the autumn before). $15,000,000 for deaths in 2026 (§9.11).
 
 ## 12. Event-driven triggers (from 2026-09-29)
 
