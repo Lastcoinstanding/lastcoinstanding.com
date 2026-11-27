@@ -5,6 +5,9 @@ name: Lender page watch
 # §7.6; SITE_GUIDE §57.) Runs scripts/lender-watch.mjs over every page a
 # /bitcoin-lenders card cites and compares the lines that carry terms with the
 # previous run's snapshot, kept as a run artifact (90 days), not in the repo.
+# Since 2026-11-26 it also reads every page a /bitcoin-inheritance-planning
+# card cites (inheritance.json; MONTHLY_REFRESH §7.7, SITE_GUIDE §67), in the
+# same run and the same issue.
 #
 # Read-only on the repo: it commits nothing and never edits a card. A change it
 # finds is a lead for a person: read the lender's page, edit lenders.json, log

@@ -1,0 +1,1035 @@
+{
+  "asOf": "2026-11-26",
+  "asOfLabel": "26 Nov 2026",
+  "note": "One object per plan card on /bitcoin-inheritance-planning (Bitcoin Inheritance Planning). Every line is what the provider published on the card's asOf, read from its sources; each provider's figures come from that provider's own pages, never a competitor's comparison table. 'not published' is a value, never an estimate: anything a provider doesn't publish goes in notPublished and is closed through the change log (src/_data/inheritanceLog.json) when it is. Groups are the three places a solution can put the ability to sign (company, timelock, custodian); within a group, cards are alphabetical, never ranked. Full cards (company, timelock) carry: wait {value, note}; strip {heir, without, renew} each {value, note}; steps (what your heir does); price {headline, detail}; keys; keep (what you must keep doing); gone (if the company is gone); identity; distinguishing; catch; how (the plain paragraph in the detail); notPublished; sources; site. Short cards (custodian) carry strip {beneficiary, probate, time}, documents, extra and how. codes drive the three-question device in bitcoin-inheritance-planning.js: heirUse nothing | app | assisted | unaided (what the heir must operate); without yes | partly | unknown | no (does a path work with the company gone); renew none | chosen | required (must the owner renew something). fit holds the plain line the device shows for each question. twin links a provider's second version. Refresh: MONTHLY_REFRESH_CHECKLIST §7.7; DATA_AUDIT INH-1 to INH-17.",
+  "groups": [
+    {
+      "id": "company",
+      "title": "A company’s help",
+      "depends": "The company’s claim process; if the company is gone, enough of your keys and the wallet’s details",
+      "how": "A company holds one of several keys in a multisig wallet",
+      "howTip": {
+        "title": "Multisig.",
+        "body": "A wallet that needs more than one key to move its bitcoin. In a 2-of-3, any two of three keys sign, so one key alone, a company’s included, can’t move anything."
+      },
+      "howRest": ", or all of them, and co-signs or transfers for your heir after a waiting period or a document check.",
+      "risk": "If the company fails, freezes or changes its terms, the bitcoin stays in the wallet, but your heirs lose the simple claim and need enough keys, usually yours, to reach it. Waiting periods exist because anyone named can start a claim while you are alive.",
+      "sub": "A company holds one of the keys, or all of them, and runs a claim process for your heirs. In most of these solutions you hold keys too, and the company’s key can’t move the bitcoin on its own: its part is to co-sign once your heirs’ claim checks out. Onramp is the exception: Onramp and two partner institutions hold all three keys, and you hold none. What separates these cards: who holds which keys, what your heir has to operate, how long the claim takes and who can stop it, and whether anything works if the company is gone."
+    },
+    {
+      "id": "timelock",
+      "title": "A timelock on the chain",
+      "depends": "You renewing it on time; your heir holding a key and the wallet’s details",
+      "how": "Bitcoin’s own rules let an heir’s key spend after a set time, with no one’s permission.",
+      "risk": "A missed renewal opens the heir’s path while you are alive; a timelock can’t tell death from a long stay in hospital; a lost key or wallet description strands the bitcoin.",
+      "sub": "Bitcoin itself opens a path for your heir after a set time, and no company has to agree. The price is upkeep: the clock has to be pushed back while you are alive, and your heir has to hold the right key and the wallet’s description. AnchorWatch’s vaults use timelocks too, with the company in the recovery path; its card is under A company’s help."
+    },
+    {
+      "id": "custodian",
+      "title": "A custodian’s paperwork",
+      "depends": "Probate, unless a beneficiary was named in advance",
+      "how": "A company holds the bitcoin; your heirs claim it with documents.",
+      "risk": "Probate’s delay and cost where no beneficiary was named; the custodian failing, which would leave your heirs a claim on a company rather than bitcoin.",
+      "short": true,
+      "sub": "A company holds the bitcoin and your heirs inherit a claim on it, settled with documents: a named beneficiary where the custodian offers one, probate where it doesn’t. These cards are shorter because the process is a bank’s: whether you can name someone in advance, what papers the custodian asks for, and whether probate comes first. All of them share one catch, which is why no card repeats it: the custodian holds the bitcoin, so your heirs inherit a claim on a company."
+    }
+  ],
+  "plans": [
+    {
+      "id": "anchorwatch",
+      "group": "company",
+      "name": "AnchorWatch",
+      "model": "Timelocked multisig vault · your key, AnchorWatch’s keyset",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "wait": {
+        "value": "Up to 335 days",
+        "note": "until the recovery path opens: day 335 of an insured vault’s yearly cycle, day 380 uninsured"
+      },
+      "strip": {
+        "heir": {
+          "value": "Nothing technical",
+          "note": "no key or seed phrase"
+        },
+        "without": {
+          "value": "Partly",
+          "note": "only your key and the Recovery Script"
+        },
+        "renew": {
+          "value": "Nothing",
+          "note": "the insurance renews; inheritance needs nothing"
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "partly",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key or device: they contact AnchorWatch.",
+        "without": "Without AnchorWatch, only your own key and the vault’s Recovery Script work, and only once the timelock allows.",
+        "renew": "Nothing to renew for inheritance; the insurance renews yearly."
+      },
+      "steps": [
+        "Contacts AnchorWatch, using the Inheritance Contact Letter you left them.",
+        "Is verified as your beneficiary by AnchorWatch and its recovery partner, CoinCorner.",
+        "Once the vault’s recovery path is open, the two firms recover the bitcoin for them with their own keys."
+      ],
+      "price": {
+        "headline": "$100–$1,000 a month",
+        "detail": "Custody by vault value: $100 a month up to $500,000, $175 up to $1 million, $375 up to $2.5 million, $700 up to $5 million, $1,000 above that, the cap for individuals and small businesses. Insurance is optional, from $4,000 a year per $1 million of cover, with a $250,000 minimum policy. AnchorWatch’s FAQ still quotes its older price, 0.02% a month."
+      },
+      "keys": "On a Flagship vault you hold one hardware key (the 1-Key vault) or a 2-of-3 of your own keys (the 3-Key vault), beside AnchorWatch’s keyset; while you are insured both sides must sign. AnchorWatch’s recovery partner CoinCorner holds a keyset for the recovery path. A third option, Multi-Institution Custody, splits the keys 2-of-3 across AnchorWatch, BitGo and CoinCorner, and you hold none.",
+      "keep": "Nothing for inheritance. An insured vault renews yearly, and the renewal resets the vault’s timelock cycle; a lapsed policy leaves the vault working. Leave your heirs the Inheritance Contact Letter, and keep the beneficiary named on your account current.",
+      "gone": "Partly. AnchorWatch gives every client the vault’s Recovery Script, which runs in Bitcoin Core: with your key, the vault becomes spendable without AnchorWatch from day 380 of an insured vault’s cycle, or day 335 of an uninsured one. An heir without your key depends on AnchorWatch and CoinCorner’s recovery path.",
+      "identity": "You: an AnchorWatch account; insurance, if you add it, is priced on your vault and risk profile. Your heir: verified as your beneficiary by AnchorWatch and CoinCorner before recovery; the documents asked for are not published.",
+      "distinguishing": "The recovery path for your heirs is written into the vault with timelocks, and they need no key or seed phrase.",
+      "catch": "Heirs wait for the recovery path, up to 335 days into the vault’s cycle, and the claim runs through two companies’ checks.",
+      "how": "You keep one hardware key, or two of three, and AnchorWatch holds a second set of keys; while you are insured both must sign, so neither side can move the bitcoin alone. The vault is built with timelocks. On an insured vault, from day 335 of its yearly cycle AnchorWatch and its recovery partner CoinCorner can together recover the bitcoin if your keys are lost or you have died, and from day 380 your own key can spend alone; on an uninsured vault the order is reversed, your key alone from day 335 and the two firms from day 380. Your heirs don’t need your keys or a seed phrase: they contact AnchorWatch, using the Inheritance Contact Letter you leave them, and are verified as your beneficiary. Custody is a flat monthly fee by vault size; insurance is optional and priced separately.",
+      "notPublished": [
+        "The documents a beneficiary must show",
+        "How long verification takes once the recovery path is open",
+        "Whether heirs can be helped before day 335"
+      ],
+      "sources": [
+        "https://www.anchorwatch.com/inheritance",
+        "https://www.anchorwatch.com/faqs",
+        "https://www.anchorwatch.com/custody/pricing",
+        "https://www.anchorwatch.com/blog/the-flagship-single-key-vault-self-custody-reinforced",
+        "https://www.anchorwatch.com/terms"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://www.anchorwatch.com/inheritance"
+    },
+    {
+      "id": "bitkey",
+      "group": "company",
+      "name": "Bitkey",
+      "model": "2-of-3 wallet by Block · your phone, your device, Block’s server",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "wait": {
+        "value": "6 months",
+        "note": "from your heir’s claim; you get alerts and can cancel it"
+      },
+      "strip": {
+        "heir": {
+          "value": "Own Bitkey",
+          "note": "their own device; the app guides them"
+        },
+        "without": {
+          "value": "No",
+          "note": "needs Bitkey’s server key"
+        },
+        "renew": {
+          "value": "Nothing",
+          "note": "stay reachable for alerts"
+        }
+      },
+      "codes": {
+        "heirUse": "assisted",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heir sets up their own Bitkey device; the app walks them through it.",
+        "without": "The transfer needs Bitkey’s server key, so it depends on Bitkey operating.",
+        "renew": "Nothing to renew; stay reachable for six months if anyone claims."
+      },
+      "steps": [
+        "Accepts your invitation in their Bitkey app, with their own Bitkey device.",
+        "After your death, starts an inheritance claim in the app.",
+        "Waits six months; if you don’t cancel, the claim is approved.",
+        "Confirms the transfer in the app, and the bitcoin moves to their own Bitkey wallet."
+      ],
+      "price": {
+        "headline": "$250 device",
+        "detail": "The Bitkey device was $250 on Bitkey’s inheritance page when read on 25 Nov 2026; you and your heir each need one. Bitkey publishes no separate fee for inheritance."
+      },
+      "keys": "You hold two keys: one in the Bitkey app on your phone, one in the Bitkey device. Block holds the third on its servers, and any two can sign. Your heir holds nothing of yours until a claim is approved, when your encrypted app key is released to their app.",
+      "keep": "Nothing to renew. Keep your contact details current and alerts on, so you would see a claim started while you are alive.",
+      "gone": "No. The heir’s transfer is co-signed by Bitkey’s server key. Bitkey’s Emergency Exit Kit lets you, the owner, move your bitcoin without Block’s servers, using your app key and your device; it is not a path for your heir.",
+      "identity": "None for you or your beneficiary: Bitkey asks for no identity checks. Your beneficiary has to accept an invitation in the app.",
+      "distinguishing": "No identity checks for anyone, and the whole claim runs in an app built for people new to bitcoin.",
+      "catch": "Six months is the minimum wait, and the claim needs Block’s server key, so it depends on Bitkey still operating.",
+      "how": "Bitkey is a 2-of-3 wallet: one key in the app on your phone, one in the Bitkey device, one on Block’s servers, and any two can spend. You invite a beneficiary in the app and they accept with their own Bitkey. Until they make a claim they can’t see your balance or move anything. When they claim, a six-month security period starts and you get alerts; if you are alive you can cancel it. If no one cancels, the claim is approved, your encrypted app key is released to their app, and with Block’s server key they move the bitcoin to their own Bitkey wallet. Bitkey asks for no identity checks from either of you.",
+      "notPublished": [],
+      "sources": [
+        "https://bitkey.world/features/inheritance",
+        "https://support.bitkey.world/hc/en-us/articles/32141067207444-What-is-Inheritance-and-how-does-it-work",
+        "https://support.bitkey.world/hc/en-us/articles/32971326968212-Can-a-beneficiary-access-my-Bitkey-wallet-and-how-does-sharing-the-App-Key-affect-security",
+        "https://bitkey.world/blog/inheritance-is-live-heres-how-it-works",
+        "https://support.bitkey.world/hc/en-us/articles/24395170222868-What-is-an-Emergency-Exit-Kit-and-how-does-it-work"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://bitkey.world/features/inheritance"
+    },
+    {
+      "id": "casa",
+      "group": "company",
+      "name": "Casa",
+      "model": "Multisig vault · on Standard, you hold two keys and Casa one",
+      "bitcoinOnly": false,
+      "otherAssets": "ether, stablecoins",
+      "qualifier": null,
+      "wait": {
+        "value": "6 months",
+        "note": "from your recipient’s request, which you can reject. Private Client: a death certificate instead"
+      },
+      "strip": {
+        "heir": {
+          "value": "Casa app",
+          "note": "no hardware on a Standard vault"
+        },
+        "without": {
+          "value": "Partly",
+          "note": "only with enough of your own keys"
+        },
+        "renew": {
+          "value": "Nothing",
+          "note": "a key health check every six months"
+        }
+      },
+      "codes": {
+        "heirUse": "app",
+        "without": "partly",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your recipient needs only the Casa app on a Standard vault.",
+        "without": "The claim needs Casa; without it, only Sovereign Recovery with enough of your own keys.",
+        "renew": "Nothing to renew; a key health check every six months."
+      },
+      "steps": [
+        "Accepts your invitation in the Casa app, by email, with no ID.",
+        "After your death, requests vault access in the app; no death certificate is needed.",
+        "Waits six months while Casa notifies you every month.",
+        "Signs with the shared mobile key and asks the Casa Recovery Key to co-sign."
+      ],
+      "price": {
+        "headline": "$250 a year",
+        "detail": "Inheritance is included on every plan: Standard $250 a year (3-key vault), Premium $2,100 (5-key), Private Client $7,500 (5- or 6-key, with the death-certificate route). Your recipient gets a free membership."
+      },
+      "keys": "On a 3-key Standard vault any two keys sign: you hold a mobile key and a hardware key, and Casa holds a recovery key. Your recipient is given a copy of your mobile key and sees the Casa Recovery Key, but can use neither until a claim completes. On 5- and 6-key vaults a hardware key is shared as well.",
+      "keep": "Nothing to renew. You and your recipient each run a health check on the shared keys every six months (Casa sends reminders), and you stay reachable so you can reject a request made while you are alive. Casa says that if your membership lapses during a claim, your recipient can still get access.",
+      "gone": "Not through the claim: the shared keys unlock only when Casa’s six-month process completes. Casa’s Sovereign Recovery instructions, emailed at setup, let anyone holding enough of the vault’s keys move the bitcoin with open-source software, so an heir with two of your three keys and those instructions could still recover.",
+      "identity": "Standard and Premium: none for your recipient, invited by email only. Private Client: both of you give government ID at setup, and the death-certificate route takes a US death certificate.",
+      "distinguishing": "Inheritance is included at no extra cost on every plan, and your recipient needs nothing but the Casa app.",
+      "catch": "Casa doesn’t verify death on Standard and Premium: the six-month wait, and your chance to reject, are the only check.",
+      "how": "Casa vaults are multisig. On the Standard plan any two of three keys sign: you hold two and Casa holds a recovery key. You name a recipient in the app and share keys with them, locked until a claim succeeds. After your death your recipient requests access in the app, with no death certificate or other proof. A six-month verification period starts, Casa notifies you every month, and if you are alive you can reject the request. When it ends, your recipient signs with the shared mobile key and asks Casa’s recovery key to co-sign, and the bitcoin moves. Private Client members can instead have the recipient send a US death certificate, which Casa checks by hand in place of the six months.",
+      "notPublished": [
+        "How long the Private Client death-certificate check takes"
+      ],
+      "sources": [
+        "https://casa.io/inheritance",
+        "https://support.casa.io/knowledge/inheritance-faqs-vault-owner",
+        "https://support.casa.io/knowledge/inheritance-recipient-how-to-request-access",
+        "https://support.casa.io/knowledge/other-inheritance-questions-for-vault-owners",
+        "https://docs.casa.io/wealth-security-protocol/chosen-features/inheritance",
+        "https://support.casa.io/knowledge/what-happens-to-my-funds-if-casa-shuts-down"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://casa.io/inheritance"
+    },
+    {
+      "id": "nunchuk-offchain",
+      "group": "company",
+      "name": "Nunchuk",
+      "nameNote": "off-chain date",
+      "model": "2-of-4 multisig · you hold three keys, Nunchuk one",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "twin": {
+        "id": "nunchuk-onchain",
+        "label": "Nunchuk’s on-chain version"
+      },
+      "wait": {
+        "value": "Your date",
+        "note": "nothing before the date you set; then an optional 7- or 30-day buffer in which you can deny the claim"
+      },
+      "strip": {
+        "heir": {
+          "value": "Key + phrase",
+          "note": "inheritance key and Magic Phrase, guided"
+        },
+        "without": {
+          "value": "No",
+          "note": "Nunchuk enforces the date and co-signs"
+        },
+        "renew": {
+          "value": "Only if near",
+          "note": "push the date back before it arrives"
+        }
+      },
+      "codes": {
+        "heirUse": "assisted",
+        "without": "no",
+        "renew": "chosen"
+      },
+      "fit": {
+        "heir": "Your heir uses the inheritance key and the Magic Phrase, with Nunchuk’s guided claim.",
+        "without": "Needs Nunchuk to enforce the date and co-sign.",
+        "renew": "Only if you set a near date: then you push it back before it arrives. A far date needs nothing, and your heir waits for it."
+      },
+      "steps": [
+        "After the activation date, starts a claim in Nunchuk with the Magic Phrase you left them.",
+        "Waits out the buffer, if you set one (7 or 30 days); you are notified and can deny it.",
+        "Uses the inheritance key (its seed phrase, or an encrypted backup and its Backup Password), and Nunchuk co-signs the transfer."
+      ],
+      "price": {
+        "headline": "$480 a year",
+        "detail": "Honey Badger, $480 a year (two 2-of-4 wallets with inheritance planning); Honey Badger Premier, $2,100 (3-of-5 wallets). The guided claim service needs an active subscription."
+      },
+      "keys": "Honey Badger is a 2-of-4 multisig: you hold three keys, one of them reserved for inheritance, and Nunchuk holds the fourth. In this version Nunchuk’s key won’t co-sign a claim before the activation date.",
+      "keep": "Push the activation date back before it arrives, as often as the date you chose requires; you can change the date, the beneficiaries and the instructions at any time. Keep the subscription active for the guided claim.",
+      "gone": "No. Nunchuk enforces the date and its key co-signs the claim. Nunchuk’s on-chain version, in the next group, is the one with a path that doesn’t need Nunchuk.",
+      "identity": "None for you or your heir: the plan runs on secrets you leave (the Magic Phrase and the inheritance key), not on proof of identity.",
+      "distinguishing": "The date, beneficiaries and instructions can change at any time, and an inheritance can be split across heirs and dates.",
+      "catch": "Nunchuk enforces the date and co-signs, so the plan works only while Nunchuk operates.",
+      "how": "Nunchuk’s Honey Badger plan is a 2-of-4 multisig: you hold three keys, one of them reserved for inheritance, and Nunchuk holds the fourth. In this version the plan lies dormant until an activation date you choose, and Nunchuk enforces it: its key won’t co-sign a claim before the date. After it, your beneficiary starts a claim with the Magic Phrase you left them and uses the inheritance key, either its seed phrase or an encrypted backup opened with a Backup Password. If you chose a buffer period, 7 or 30 days, Nunchuk notifies you during it and you can deny the claim if you are alive. You can move the date, change beneficiaries, or split the inheritance across heirs and dates at any time. The plan needs Nunchuk, and the guided claim needs an active subscription. One version or the other is chosen at setup; switching means moving funds to a new wallet.",
+      "notPublished": [
+        "How long a claim takes after the buffer"
+      ],
+      "sources": [
+        "https://nunchuk.io/inheritance",
+        "https://www.nunchuk.io/pricing",
+        "https://nunchuk.io/blog/casa",
+        "https://nunchuk.io/blog/phased-rollout"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://nunchuk.io/inheritance"
+    },
+    {
+      "id": "onramp",
+      "group": "company",
+      "name": "Onramp",
+      "model": "2-of-3 across Onramp, BitGo and CoinCover · you hold none",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "wait": {
+        "value": "None set",
+        "note": "beneficiaries send a death certificate; the claim time is not published"
+      },
+      "strip": {
+        "heir": {
+          "value": "Nothing technical",
+          "note": "no keys or seed phrases"
+        },
+        "without": {
+          "value": "Not published",
+          "note": "built to survive one institution failing"
+        },
+        "renew": {
+          "value": "Nothing",
+          "note": "beneficiaries named on the account"
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "unknown",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your beneficiaries need no keys: they send a death certificate.",
+        "without": "Onramp says the vault survives any one institution failing; how heirs would claim if Onramp itself failed isn’t published.",
+        "renew": "Nothing to renew."
+      },
+      "steps": [
+        "Contacts Onramp after your death.",
+        "Provides a death certificate and verification.",
+        "Receives the bitcoin under your Transfer on Death agreement, with no seed phrases or technical steps."
+      ],
+      "price": {
+        "headline": "$250 a month",
+        "detail": "Core, from $250 a month or $2,400 a year (up to 10 BTC), includes the multi-institution vault and inheritance planning; Private is from 0.04% a month. Naming beneficiaries costs nothing extra."
+      },
+      "keys": "Onramp, BitGo and CoinCover each hold one key offline, and any two sign. You hold no key: you instruct transfers through your Onramp account. The vault is titled in your name or your trust’s.",
+      "keep": "Nothing to renew. Keep your beneficiaries current (primary and contingent, changeable at any time) and your subscription paid.",
+      "gone": "Not published. Onramp says no single institution can fail and cost you your bitcoin; it doesn’t publish how beneficiaries would claim if Onramp itself were the one to fail.",
+      "identity": "Your beneficiaries: a death certificate and identity verification. The inheritance pages don’t describe your own account checks.",
+      "distinguishing": "Beneficiaries need no keys or technical steps: a Transfer on Death agreement names them, as at a brokerage.",
+      "catch": "You hold no key. Three institutions do, so your bitcoin, like your heirs’ claim, rests on them.",
+      "how": "Onramp holds your bitcoin in a vault titled to you or your trust and secured by three institutions: Onramp, BitGo and CoinCover each hold one key offline, and any two sign. You hold no key; you instruct transfers through your account. Inheritance is a Transfer on Death agreement: you name primary and contingent beneficiaries, or a trust, and can change them at any time. When you die, your beneficiaries contact Onramp with a death certificate and verification, and Onramp transfers the bitcoin to them outside probate, with no seed phrase or technical step on their side. Core starts at $250 a month and includes the vault and inheritance planning.",
+      "notPublished": [
+        "How long a beneficiary claim takes",
+        "How beneficiaries would claim if Onramp itself failed"
+      ],
+      "sources": [
+        "https://onrampbitcoin.com/products/inheritance",
+        "https://onrampbitcoin.com/pricing",
+        "https://onrampbitcoin.com/products/multi-institution-custody",
+        "https://onrampbitcoin.com/knowledge-center/which-onramp-account-is-right-for-me-trade-core-and-private-compared",
+        "https://onrampbitcoin.com/knowledge-center/what-happens-to-your-bitcoin-when-you-die"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://onrampbitcoin.com/products/inheritance"
+    },
+    {
+      "id": "swan-vault",
+      "group": "company",
+      "name": "Swan Vault",
+      "model": "2-of-3 multisig · two keys on Jade devices, Swan one",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "wait": {
+        "value": "None set",
+        "note": "Swan co-signs once your executor shows court papers; its review time is not published"
+      },
+      "strip": {
+        "heir": {
+          "value": "Your key",
+          "note": "one of your two keys, with Swan’s help"
+        },
+        "without": {
+          "value": "Partly",
+          "note": "only with both of your keys"
+        },
+        "renew": {
+          "value": "Nothing",
+          "note": "keep your estate documents current"
+        }
+      },
+      "codes": {
+        "heirUse": "assisted",
+        "without": "partly",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heir needs one of your hardware keys, with Swan’s help.",
+        "without": "Without Swan, only with both of your keys and the wallet’s details.",
+        "renew": "Nothing to renew."
+      },
+      "steps": [
+        "Your executor or trustee shows Swan documents from a probate office or court naming them.",
+        "Your heir brings at least one of your two hardware keys.",
+        "Swan co-signs with its cloud key, and the bitcoin moves."
+      ],
+      "price": {
+        "headline": "$30 a month",
+        "detail": "$30 a month for a vault up to $150,000, then 0.02% of the vault a month, capped at $500; a $319 welcome package with two Jade Plus devices."
+      },
+      "keys": "A 2-of-3 multisig: you hold two keys on Blockstream Jade devices, and Swan holds the third, a cloud key it manages. Swan can’t move your bitcoin alone, and any withdrawal using the cloud key has a 72-hour hold.",
+      "keep": "Nothing to renew. Plan how your heir will reach at least one of your keys, and keep your will or trust current: Swan co-signs only for someone with legal authority.",
+      "gone": "Partly. Swan says a vault can be recovered without Swan using the two keys you hold. An heir with only one of your keys needs Swan’s cloud key.",
+      "identity": "Your executor or trustee: documents from a probate office or court showing their appointment (Swan may ask for letters testamentary, a death certificate and others).",
+      "distinguishing": "Your heir needs only one of your two keys, because Swan’s key supplies the second signature once legal authority is shown.",
+      "catch": "Swan co-signs only after probate or court documents, so your heir needs both a key and legal authority before anything moves.",
+      "how": "Swan Vault is a 2-of-3 multisig: you hold two keys on Blockstream Jade devices and Swan holds a cloud key, so Swan can’t move your bitcoin alone. When you die, two things have to come together. Legal title: your executor or trustee shows Swan documents from a probate office or court naming them. A key: your heir needs at least one of your two hardware keys, because Swan’s key is only one of the two signatures. Swan then co-signs with its cloud key and the bitcoin moves. With both of your keys and the wallet’s details, the vault can be recovered without Swan.",
+      "notPublished": [
+        "How long Swan’s review takes",
+        "Any fee for helping heirs"
+      ],
+      "sources": [
+        "https://help.swanbitcoin.com/hc/en-us/articles/21863411250583-What-happens-to-the-Bitcoin-in-my-Swan-Vault-if-I-pass-away",
+        "https://www.swanbitcoin.com/vault/",
+        "https://www.swanbitcoin.com/education/best-bitcoin-wallet/",
+        "https://www.swanbitcoin.com/product-updates/best-place-to-buy-bitcoin-a-decision-framework-not-a-ranking/"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://www.swanbitcoin.com/vault/"
+    },
+    {
+      "id": "unchained",
+      "group": "company",
+      "name": "Unchained",
+      "model": "2-of-3 multisig · you hold two keys, Unchained one",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "relationship": "I hold an Unchained IRA vault and pay its standard fee.",
+      "wait": {
+        "value": "None set",
+        "note": "Unchained co-signs once legal title is shown; a named beneficiary makes it faster"
+      },
+      "strip": {
+        "heir": {
+          "value": "Your key",
+          "note": "one of your keys, with Unchained’s help"
+        },
+        "without": {
+          "value": "Partly",
+          "note": "only with both keys and the config file"
+        },
+        "renew": {
+          "value": "Nothing",
+          "note": "keep beneficiary and key plan current"
+        }
+      },
+      "codes": {
+        "heirUse": "assisted",
+        "without": "partly",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heir needs one of your keys (a seed phrase or device), with Unchained’s help.",
+        "without": "Without Unchained, only with both of your keys and the vault’s configuration file.",
+        "renew": "Nothing to renew."
+      },
+      "steps": [
+        "Contacts Unchained’s inheritance team.",
+        "Shows legal title: as the vault’s named beneficiary, the IRA’s beneficiary, the trust’s trustee, or your executor with probate documents.",
+        "Brings at least one of your keys, found with the Inheritance Protocol you left them.",
+        "Unchained co-signs, and the bitcoin moves."
+      ],
+      "price": {
+        "headline": "$250 a year",
+        "detail": "$250 a year per vault, or per IRA. Signature ($6,000 the first year, then $4,500) includes inheritance setup and coordination for your heirs; the Inheritance Boot Camp ($4,000) adds estate documents and a funded trust vault. The Inheritance Protocol is a free PDF."
+      },
+      "keys": "A 2-of-3 multisig: you hold two keys (hardware wallets or seed phrases) and Unchained holds one. Two keys are always needed, so Unchained can’t move your bitcoin alone, and a death certificate on its own releases nothing.",
+      "keep": "Nothing to renew. Keep the vault’s beneficiary current and your heirs able to reach a key, using the Inheritance Protocol’s letters and instructions. IRA beneficiaries are named on the IRA itself.",
+      "gone": "Partly. Your two keys and the vault’s wallet configuration file can spend without Unchained, using the open-source tool Caravan. An heir with only one of your keys needs Unchained’s.",
+      "identity": "You: identity verified when you open the account, which Unchained says helps it support heirs later. Your heir: identity and legal documents checked, faster with a named beneficiary on file.",
+      "distinguishing": "Legal title and key access are planned together: a named transfer-on-death beneficiary (US), trust vaults, and IRA beneficiaries beside the key plan.",
+      "catch": "Your heir has to reach one of your keys as well as prove legal title; a death certificate alone releases nothing.",
+      "how": "An Unchained vault is a 2-of-3 multisig: you hold two keys and Unchained holds one, so Unchained can never move bitcoin alone and a death certificate on its own releases nothing. Inheritance needs legal title and a key. Title comes from a transfer-on-death beneficiary named on the vault (one primary and one contingent; individuals must be US-based), an IRA beneficiary, a trust vault’s trustee, or an executor with probate documents. The key is one of your two, a seed phrase or hardware wallet your heir can reach using the Inheritance Protocol, a free set of letters and instructions. Your heir contacts Unchained’s inheritance team, shows title and brings the key, and Unchained co-signs. With both of your keys and the vault’s configuration file, the bitcoin can be moved without Unchained, using the open-source tool Caravan.",
+      "notPublished": [
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://unchained.com/inheritance",
+        "https://www.unchained.com/pricing",
+        "https://help.unchained.com/how-do-i-access-my-loved-ones-account",
+        "https://help.unchained.com/how-do-tod-beneficiaries-work-for-personal-vaults",
+        "https://help.unchained.com/who-can-i-add-as-a-beneficiary",
+        "https://help.unchained.com/unchained-inheritance-materials",
+        "https://help.unchained.com/what-personal-information-is-needed-to-set-up-a-vault",
+        "https://www.unchained.com/blog/external-spend-workflow"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://unchained.com/inheritance"
+    },
+    {
+      "id": "liana",
+      "group": "timelock",
+      "name": "Liana",
+      "model": "Open-source wallet · a recovery key after a timelock",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "wait": {
+        "value": "Your timelock",
+        "note": "each coin opens to your heir’s key after sitting unmoved for the period you set, at most about 15 months"
+      },
+      "strip": {
+        "heir": {
+          "value": "Key + descriptor",
+          "note": "recovery key and wallet descriptor, alone"
+        },
+        "without": {
+          "value": "Yes",
+          "note": "Bitcoin enforces it; no company"
+        },
+        "renew": {
+          "value": "Required",
+          "note": "move each coin before its timelock ends"
+        }
+      },
+      "codes": {
+        "heirUse": "unaided",
+        "without": "yes",
+        "renew": "required"
+      },
+      "fit": {
+        "heir": "Your heir uses the recovery key and the wallet descriptor themselves; there is no one to call.",
+        "without": "Works with no company at all.",
+        "renew": "You must move each coin before its timelock runs out, at most about every 15 months, or your heir’s key can spend it while you are alive."
+      },
+      "steps": [
+        "Waits until the timelock on your coins has run out; it restarts whenever you move them.",
+        "Opens the wallet in Liana, or in Bitcoin Core, from the descriptor you left them.",
+        "Signs with the recovery key and sends the bitcoin to their own wallet."
+      ],
+      "price": {
+        "headline": "Free",
+        "detail": "Liana is free, open-source software. Liana Business, for organizations, adds hosted infrastructure and support; its price is not published."
+      },
+      "keys": "You choose. Typically your own key, or a multisig, on the primary path, which can always spend; and one or more recovery keys held by heirs, which can spend only after the timelock. A wallet can have several recovery paths, for example any two of three family keys after a year. No company holds a key.",
+      "keep": "Move each coin at least once before its timelock runs out (a refresh), or the recovery key can spend it while you are alive. Liana shows which coins are close and has a button to send them back to yourself. Bitcoin’s rules cap this kind of timelock at 65,535 blocks, about 15 months.",
+      "gone": "Yes. The timelock is part of the bitcoin itself, and the wallet can be recovered in Bitcoin Core from its descriptor; Wizardsardine isn’t in the path.",
+      "identity": "None: there is no account.",
+      "distinguishing": "No company is in the path at any point: Bitcoin’s own rules open the heir’s key, and you can set more than one recovery path.",
+      "catch": "The timelock can’t tell death from a long illness or a forgotten refresh: miss one and your heir’s key can spend while you are alive.",
+      "how": "Liana is a desktop wallet built around a timelocked recovery path. Your primary key can always spend. A recovery key, which you give to an heir, can spend a coin only after that coin has sat unmoved for a period you choose. Moving a coin restarts its clock, so in normal life you refresh the coins before the period runs out, and Liana has a button for it. If you die, the coins stop moving, the period runs out, and your heir signs with the recovery key, in Liana or in Bitcoin Core, using the wallet descriptor you left them. No company holds a key, and none is needed at any point.",
+      "notPublished": [
+        "A default timelock length"
+      ],
+      "sources": [
+        "https://github.com/wizardsardine/liana",
+        "https://docs.rs/crate/liana/2.0.0/source/README.md",
+        "https://github.com/wizardsardine/liana/blob/d9d6684661c7bc838fb0669c58d90ab172108b1c/doc/RECOVER.md",
+        "https://bips.dev/68/",
+        "https://wizardsardine.com/liana/business"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://wizardsardine.com/liana/"
+    },
+    {
+      "id": "nunchuk-onchain",
+      "group": "timelock",
+      "name": "Nunchuk",
+      "nameNote": "on-chain date",
+      "model": "2-of-4 multisig · at your date, a path without Nunchuk",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "twin": {
+        "id": "nunchuk-offchain",
+        "label": "Nunchuk’s off-chain version"
+      },
+      "wait": {
+        "value": "Your date",
+        "note": "the date set on the chain at setup; after it, the inheritance path is open"
+      },
+      "strip": {
+        "heir": {
+          "value": "Key + config",
+          "note": "inheritance key and config, guided or alone"
+        },
+        "without": {
+          "value": "Yes",
+          "note": "after the date, no Nunchuk key needed"
+        },
+        "renew": {
+          "value": "Only if near",
+          "note": "move to a new wallet before the date"
+        }
+      },
+      "codes": {
+        "heirUse": "assisted",
+        "without": "yes",
+        "renew": "chosen"
+      },
+      "fit": {
+        "heir": "Your heir uses the inheritance key and the wallet configuration, with Nunchuk’s guided claim or alone.",
+        "without": "After the date, works without Nunchuk.",
+        "renew": "Only if you set a near date: move to a new wallet before it arrives. A far date needs nothing, and your heir waits for it."
+      },
+      "steps": [
+        "After your timelock date, starts Nunchuk’s guided claim, or uses the Bitcoin Inheritance Kit to claim alone.",
+        "Uses the inheritance key (two keys, in plans set up since November 2026) and the wallet configuration.",
+        "Sends the bitcoin to their own wallet; Nunchuk’s key isn’t needed."
+      ],
+      "price": {
+        "headline": "$480 a year",
+        "detail": "Honey Badger, $480 a year, or Honey Badger Premier, $2,100. If the subscription has lapsed, your heir can reactivate the guided claim for 0.3% of the bitcoin claimed, or claim alone with the kit."
+      },
+      "keys": "Honey Badger is a 2-of-4 multisig: you hold three keys and Nunchuk one. At the date you set, the spending rules on the chain change so that your heir’s inheritance key, or keys, can spend without Nunchuk’s key. In plans set up since November 2026, the inheritance path needs two keys.",
+      "keep": "Nothing, if you set a far date. To keep a near date, move to a new wallet before it arrives: an on-chain date can’t be changed in place, and Nunchuk’s app automates the move.",
+      "gone": "Yes, after the date. The Bitcoin Inheritance Kit you receive at setup, with open-source tools and the wallet configuration, lets your heir claim without Nunchuk.",
+      "identity": "None for you or your heir.",
+      "distinguishing": "Nunchuk’s guided claim while it operates, and a path enforced by the chain itself if it doesn’t.",
+      "catch": "The date is fixed in the bitcoin: a near date means moving the wallet before it arrives, a far date means your heir waits for it.",
+      "how": "In Nunchuk’s on-chain version the inheritance rule is written into the bitcoin itself. You hold three keys of a 2-of-4 and Nunchuk holds one. At the date you set, the spending rules change on the chain so that your heir’s inheritance key can spend with no part for Nunchuk (in plans set up since November 2026, two inheritance keys). While Nunchuk operates your heir can use its guided claim; if it doesn’t, the Bitcoin Inheritance Kit you receive at setup, with open-source tools and the wallet configuration, lets them claim alone. The date can’t be changed in place: to push it back you move to a new wallet before it arrives, and Nunchuk’s app automates the move. One version or the other is chosen at setup; switching means moving funds to a new wallet.",
+      "notPublished": [
+        "Limits on how far ahead the date can be set"
+      ],
+      "sources": [
+        "https://nunchuk.io/inheritance",
+        "https://nunchuk.io/blog/autonomous-inheritance",
+        "https://www.nunchuk.io/pricing"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://nunchuk.io/inheritance"
+    },
+    {
+      "id": "spot-etf",
+      "group": "custodian",
+      "name": "Bitcoin ETFs",
+      "nameNote": "spot, at a brokerage",
+      "model": "Fund shares · a custodian holds the fund’s bitcoin",
+      "bitcoinOnly": null,
+      "otherAssets": "",
+      "qualifier": "Fund shares, not bitcoin",
+      "strip": {
+        "beneficiary": {
+          "value": "Where offered",
+          "note": "TOD registration, if the firm offers it"
+        },
+        "probate": {
+          "value": "Not with TOD",
+          "note": "the shares pass to the beneficiary"
+        },
+        "time": {
+          "value": "Not published",
+          "note": "varies by brokerage"
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: they re-register the shares in their name.",
+        "without": "Your heirs claim through the brokerage; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "The beneficiary re-registers the shares in their own name, typically with a copy of the death certificate and an application to the broker or transfer agent"
+      ],
+      "extra": "State law governs how securities can be registered, and each brokerage decides whether to offer transfer-on-death registration. An IRA carries its own beneficiary designation.",
+      "how": "A spot bitcoin ETF is a fund that holds bitcoin through a custodian and issues shares, which sit in your brokerage account like any other security. Brokerages often offer transfer-on-death registration on a taxable account; where you have one, the shares pass to the named beneficiary without probate, once they send a death certificate and an application to re-register them.",
+      "notPublished": [
+        "How long re-registration takes (it varies by firm)"
+      ],
+      "sources": [
+        "https://www.investor.gov/additional-resources/information/seniors/transferring-assets",
+        "https://fidelity.com/life-events/estate-planning/asset-strategies/brokerage",
+        "https://www.finra.org/investors/insights/plan-ahead-transfer-your-brokerage-account-assets-death"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://www.investor.gov/additional-resources/information/seniors/transferring-assets",
+      "siteLabel": "The SEC on transfer on death",
+      "siteWords": "Read the SEC’s page on transfer on death"
+    },
+    {
+      "id": "coinbase",
+      "group": "custodian",
+      "name": "Coinbase",
+      "model": "Exchange · Coinbase holds the bitcoin",
+      "bitcoinOnly": false,
+      "otherAssets": "other crypto",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "No",
+          "note": "not on individual accounts"
+        },
+        "probate": {
+          "value": "Needed",
+          "note": "or a small-estate affidavit"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: the executor sends Coinbase documents.",
+        "without": "Your heirs claim through Coinbase; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "The death certificate",
+        "Probate documents: a probate order, letters testamentary or of administration, an affidavit for collection, or a small-estate affidavit",
+        "Government photo ID of the person named in them",
+        "A letter signed by that person telling Coinbase what to do with the balance"
+      ],
+      "extra": "Coinbase says the account passes under your estate planning documents or your state’s intestacy law.",
+      "how": "Coinbase holds the bitcoin, and individual accounts can’t name a beneficiary, so the account passes with your estate. Your executor starts a request through Coinbase’s contact form and sends the documents; Coinbase may ask for more by email.",
+      "notPublished": [
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://help.coinbase.com/en/coinbase/managing-my-account/other/how-do-i-gain-access-to-a-deceased-family-members-coinbase-account.html"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://help.coinbase.com/en/coinbase/managing-my-account/other/how-do-i-gain-access-to-a-deceased-family-members-coinbase-account.html"
+    },
+    {
+      "id": "fidelity-crypto",
+      "group": "custodian",
+      "name": "Fidelity Crypto",
+      "model": "Brokerage crypto account · Fidelity holds the bitcoin",
+      "bitcoinOnly": false,
+      "otherAssets": "other crypto",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "No",
+          "note": "not on the account; its IRA uses the linked IRA’s"
+        },
+        "probate": {
+          "value": "Through the estate",
+          "note": "no beneficiary, so it goes with the estate"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: the claim is paperwork with Fidelity.",
+        "without": "Your heirs claim through Fidelity; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "Not published in Fidelity Crypto’s help center; Fidelity’s customer service handles it"
+      ],
+      "extra": "A Fidelity Crypto IRA uses the beneficiary designation on its linked Fidelity brokerage IRA, so it can pass outside probate.",
+      "how": "Fidelity Crypto is a crypto account beside your Fidelity brokerage accounts, held by Fidelity Digital Assets. You can’t name beneficiaries on it, so it passes with your estate. A Fidelity Crypto IRA is different: its beneficiaries are the ones named on the linked brokerage IRA.",
+      "notPublished": [
+        "The documents a Fidelity Crypto claim needs",
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://www.fidelity.com/crypto/help/account-basics/fidelity-crypto",
+        "https://www.fidelity.com/crypto/help/account-basics/fidelity-crypto-ira",
+        "https://www.fidelity.com/learning-center/smart-money/what-is-a-beneficiary"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://www.fidelity.com/crypto/help/account-basics/fidelity-crypto"
+    },
+    {
+      "id": "gemini",
+      "group": "custodian",
+      "name": "Gemini",
+      "model": "Exchange · Gemini holds the bitcoin",
+      "bitcoinOnly": false,
+      "otherAssets": "other crypto",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "No",
+          "note": "Gemini suggests an estate attorney"
+        },
+        "probate": {
+          "value": "Through the estate",
+          "note": "no beneficiary, so it goes with the estate"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: the claim is paperwork with Gemini.",
+        "without": "Your heirs claim through Gemini; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "Not published in Gemini’s help center"
+      ],
+      "extra": "Gemini’s help center suggests treating the account like a traditional brokerage account in your estate plan, with an estate attorney.",
+      "how": "Gemini holds the bitcoin and offers no beneficiary designation, so the account passes with your estate. Its help center doesn’t publish the claim process; your executor contacts Gemini support.",
+      "notPublished": [
+        "The documents a claim needs",
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://support.gemini.com/hc/en-gb/articles/4404721257499-How-can-I-add-a-beneficiary-to-my-exchange-account"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://support.gemini.com/hc/en-gb/articles/4404721257499-How-can-I-add-a-beneficiary-to-my-exchange-account"
+    },
+    {
+      "id": "kraken",
+      "group": "custodian",
+      "name": "Kraken",
+      "model": "Exchange · Kraken holds the bitcoin",
+      "bitcoinOnly": false,
+      "otherAssets": "other crypto",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "No",
+          "note": "not currently offered"
+        },
+        "probate": {
+          "value": "Needed",
+          "note": "proof of the representative’s appointment"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: the claim is paperwork with Kraken.",
+        "without": "Your heirs claim through Kraken; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "The death certificate, a full color image of the official document (funeral-home certificates aren’t accepted)",
+        "The document appointing the estate’s legal representative, such as a probate grant or letters of administration",
+        "A color copy of each representative’s government photo ID",
+        "A signed, dated letter from them confirming the death and their role"
+      ],
+      "extra": "Kraken’s compliance team handles claims and may ask for more documents after one is submitted.",
+      "how": "Kraken holds the bitcoin and offers no beneficiary designation. The estate’s legal representative submits a claim with Kraken’s form and the documents, and Kraken’s compliance team takes it from there.",
+      "notPublished": [
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://support.kraken.com/articles/deceased-client-account-claims"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://support.kraken.com/articles/deceased-client-account-claims"
+    },
+    {
+      "id": "river",
+      "group": "custodian",
+      "name": "River",
+      "model": "Bitcoin brokerage · River holds the bitcoin",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "Yes",
+          "note": "a plan sets up transfer on death"
+        },
+        "probate": {
+          "value": "Not with a plan",
+          "note": "beneficiaries claim directly"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: they send River a death certificate and their ID.",
+        "without": "Your heirs claim through River; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "With a beneficiary plan: the death certificate and the beneficiary’s government photo ID",
+        "Without one: the death certificate, letters testamentary (or of administration) naming the executor, and their photo ID",
+        "Each beneficiary opens a River account and passes identity checks"
+      ],
+      "extra": "River may sell bitcoin or use dollars in the account to settle anything owed to River before it transfers the rest.",
+      "how": "River lets you name individuals, trusts or organizations as beneficiaries, which sets up a transfer-on-death registration on the account. After your death, beneficiaries email River with the documents, open River accounts of their own, and River transfers the assets to them.",
+      "notPublished": [
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://support.river.com/hc/en-us/articles/52319848171923-How-do-I-claim-a-River-account-as-a-beneficiary",
+        "https://river.com/legal/tod",
+        "https://support.river.com/kb/guide/en/how-do-i-create-a-beneficiary-plan-8pr1vdAD4m/Steps/2135317"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://river.com/inheritance"
+    },
+    {
+      "id": "strike",
+      "group": "custodian",
+      "name": "Strike",
+      "model": "Bitcoin app · Strike holds the bitcoin",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "Yes",
+          "note": "a transfer-on-death plan; US, not Louisiana"
+        },
+        "probate": {
+          "value": "Not stated",
+          "note": "Strike’s pages don’t mention it"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: the claim is paperwork with Strike.",
+        "without": "Your heirs claim through Strike; there is no path around it.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "Not published: Strike’s pages describe setting up a plan, not what beneficiaries send to claim"
+      ],
+      "extra": "Up to 15 beneficiaries (people or a trust), each given a percentage; no contingent beneficiaries, so a share of someone who dies first is split among the others. An open loan or credit line must be repaid and closed before its collateral passes on.",
+      "how": "Since July 2026 Strike lets you name up to 15 beneficiaries, or a trust, under a transfer-on-death agreement you sign in the app; you can edit or void the plan at any time. Strike hasn’t published the claim steps for beneficiaries.",
+      "notPublished": [
+        "What beneficiaries send to claim",
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://strike.me/support/how-do-i-create-a-beneficiary-plan/",
+        "https://strike.me/updates/"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://strike.me/support/how-do-i-create-a-beneficiary-plan/"
+    },
+    {
+      "id": "swan",
+      "group": "custodian",
+      "name": "Swan",
+      "nameNote": "account and IRA",
+      "model": "Brokerage · BitGo Trust or Bakkt holds it; IRAs at Equity Trust",
+      "bitcoinOnly": true,
+      "otherAssets": "",
+      "qualifier": null,
+      "strip": {
+        "beneficiary": {
+          "value": "IRA only",
+          "note": "named on IRAs; other accounts follow your estate"
+        },
+        "probate": {
+          "value": "Needed",
+          "note": "outside an IRA: court papers naming the executor"
+        },
+        "time": {
+          "value": "Not published",
+          "note": ""
+        }
+      },
+      "codes": {
+        "heirUse": "nothing",
+        "without": "no",
+        "renew": "none"
+      },
+      "fit": {
+        "heir": "Your heirs need no key: the claim is paperwork with Swan and its custodian.",
+        "without": "Your heirs claim through Swan and its custodian; there is no path around them.",
+        "renew": "Nothing to renew."
+      },
+      "documents": [
+        "A certified copy of the death certificate",
+        "Letters testamentary, or court documents naming the executor, dated within the last six months",
+        "An affidavit of domicile",
+        "Trust documents, if any",
+        "ID and contact details for the executor, trustee or successor"
+      ],
+      "extra": "For an IRA, the beneficiaries named on it submit a request with a certified death certificate; Swan and Equity Trust may ask for a call or video conference.",
+      "how": "Swan’s custodial accounts are held in your name at a custodian, BitGo Trust or Bakkt, and its IRAs at Equity Trust. Outside an IRA, ownership passes under your estate documents or state law: the executor sends Swan the documents, the custodian checks them, and Swan relays the transfer instructions. IRA beneficiaries claim with a death certificate. Swan Vault, its multisig product, has its own card above.",
+      "notPublished": [
+        "How long a claim takes"
+      ],
+      "sources": [
+        "https://help.swanbitcoin.com/hc/en-us/articles/4422654013335-How-can-I-access-the-funds-of-a-Swan-account-holder-who-has-passed-away",
+        "https://help.swanbitcoin.com/hc/en-us/articles/19397890557335-What-happens-to-my-IRA-if-I-pass-away"
+      ],
+      "asOf": "2026-11-26",
+      "site": "https://help.swanbitcoin.com/hc/en-us/articles/4422654013335-How-can-I-access-the-funds-of-a-Swan-account-holder-who-has-passed-away"
+    }
+  ]
+}

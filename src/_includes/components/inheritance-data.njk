@@ -1,0 +1,8 @@
+{#
+  Injects src/_data/inheritance.json as window.INHERITANCE for the page script on
+  /bitcoin-inheritance-planning (the same pattern as lenders-data.njk). The
+  cards themselves are rendered by Nunjucks in bitcoin-inheritance-planning.njk;
+  the script only runs the three-question check and the detail dialog, so the
+  page is complete without JS. See SITE_GUIDE "Bitcoin Inheritance Planning".
+#}
+<script>window.INHERITANCE = {{ inheritance | dump | safe }};</script>

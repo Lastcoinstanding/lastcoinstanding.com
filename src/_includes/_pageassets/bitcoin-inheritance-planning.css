@@ -1,0 +1,431 @@
+/* ───────────────────────────────────────────────
+   BITCOIN INHERITANCE PLANNING — PAGE CSS
+
+   The description card (STYLE_GUIDE §6.50, drawn from /bitcoin-lenders) under
+   the page prefix bi-, plus three parts of this page's own: the spine (what
+   every plan has to solve), the three-question check (§6.58), and the US law
+   panel. Mixed-content tier (STYLE_GUIDE §4.2): 1100px content-area, 880px
+   prose. Cards three across from 1080px, two from 700px, one below. Colour
+   through tokens only; no hex outside :root.
+
+   Sections:
+   1. Tokens
+   2. Hero + content-area (the lender page's register)
+   3. What every plan has to solve: the two cells and the spine table
+   4. The three-question check
+   5. Groups + grid
+   6. The card (full and short)
+   7. The check's lines and the conflict flag
+   8. The details row and the detail dialog
+   9. Prose, the law panel, the change log
+  10. Help-tip (canonical §6.13, same markup and tokens as the lender page)
+  11. Mobile
+   ─────────────────────────────────────────────── */
+
+/* ─── 1. TOKENS ─── */
+:root {
+    --bg: #0a0908;
+    --bg-card: #111110;
+    --bg-raise: #161513;
+    --amber: #e09422;
+    --amber-dim: #b8791c;
+    --amber-glow: rgba(224,148,34,0.15);
+    --amber-soft: rgba(224,148,34,0.08);
+    --amber-line: rgba(224,148,34,0.45);
+    --text: #e8e0d4;
+    --text-dim: #9a9080;
+    --text-muted: #877e6f; --line-muted: #6a6256;
+    --text-bright: #f2eee8;
+    --red: #d0665a;
+    --red-dim: rgba(208,102,90,0.45);
+    --red-soft: rgba(208,102,90,0.08);
+    --green: #5fa872;
+    --green-dim: rgba(95,168,114,0.45);
+    --border: #1e1c1a;
+    --border-lt: #2a2826;
+    --shadow: rgba(0,0,0,0.6);
+    --backdrop: rgba(10,9,8,0.82);
+    --font-d: 'Cormorant Garamond', Georgia, serif;
+    --font-b: 'Inter', -apple-system, sans-serif;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-b); -webkit-font-smoothing: antialiased; }
+
+/* ─── 2. HERO + CONTENT-AREA ─── */
+.content-area { position: relative; max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+.hero { position: relative; text-align: center; max-width: 820px; margin: 0 auto; padding: 5rem 2rem 2.5rem; }
+.hero h1 { font-family: var(--font-d); font-size: clamp(2.6rem, 5.2vw, 4.2rem); font-weight: 500; color: var(--text); line-height: 1.05; letter-spacing: -0.015em; margin: 0 0 0.6rem; }
+.hero h1 em { font-style: italic; color: var(--amber); font-weight: 500; }
+.hero-subtitle { font-family: var(--font-d); font-size: clamp(1.1rem, 2vw, 1.35rem); color: var(--text-dim); margin: 0 auto 1.4rem; max-width: 720px; line-height: 1.5; }
+.hero .subtitle { font-size: clamp(0.98rem, 1.8vw, 1.1rem); line-height: 1.7; color: var(--text-dim); max-width: 680px; margin: 0 auto; font-weight: 400; }
+
+/* ─── 3. WHAT EVERY PLAN HAS TO SOLVE ─── */
+.bi-solve { max-width: 1100px; margin: 2rem auto 0; }
+.bi-eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.4rem; }
+.bi-h2 { font-family: var(--font-d); font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; margin: 0 0 0.8rem; line-height: 1.15; }
+.bi-lede, .bi-solve-p { font-size: 1rem; line-height: 1.75; color: var(--text); margin: 0 0 1rem; max-width: 880px; }
+.bi-two { display: grid; grid-template-columns: 1fr; gap: 0.8rem; margin: 1.2rem 0 1.4rem; }
+@media (min-width: 700px) { .bi-two { grid-template-columns: 1fr 1fr; } }
+.bi-two-cell { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+.bi-two-cell h3 { font-family: var(--font-b); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.35rem; }
+.bi-two-cell p { margin: 0; font-size: 0.94rem; line-height: 1.6; color: var(--text); }
+.bi-spine-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.4rem 0 1rem; border: 1px solid var(--border); border-radius: 10px; }
+.bi-spine { width: 100%; border-collapse: collapse; font-size: 0.88rem; line-height: 1.5; min-width: 640px; }
+.bi-spine th, .bi-spine td { text-align: left; vertical-align: top; padding: 0.8rem 0.9rem; border-top: 1px solid var(--border); }
+.bi-spine thead th { border-top: 0; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); background: var(--bg-card); }
+.bi-spine tbody th { width: 26%; font-weight: 600; }
+.bi-spine tbody th a { font-family: var(--font-d); font-size: 1.2rem; font-weight: 600; color: var(--text-bright); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); line-height: 1.2; }
+.bi-spine-how { display: block; margin-top: 0.35rem; font-size: 0.82rem; font-weight: 400; color: var(--text-dim); line-height: 1.5; }
+.bi-spine td { color: var(--text); }
+.bi-spine-who a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); white-space: nowrap; }
+.bi-who + .bi-who::before { content: ', '; color: var(--text-dim); }
+.bi-moral { font-family: var(--font-d); font-style: italic; font-size: clamp(1.25rem, 2.4vw, 1.5rem); color: var(--amber); margin: 0.8rem 0 1rem; line-height: 1.35; }
+
+/* ─── 4. THE THREE-QUESTION CHECK ─── */
+.bi-ask { margin: 2.4rem 0 1.6rem; padding: 1.2rem 1.3rem 1rem; border: 1px solid var(--border-lt); border-radius: 12px; background: var(--bg-card); }
+.bi-ask-title { font-family: var(--font-d); font-size: 1.6rem; font-weight: 500; color: var(--text-bright); margin: 0 0 0.4rem; letter-spacing: -0.01em; }
+.bi-ask-lede { font-size: 0.92rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 1rem; max-width: 80ch; }
+.bi-qs { display: grid; gap: 0.7rem; }
+.bi-q { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; padding: 0.65rem 0; border-top: 1px solid var(--border); }
+.bi-q:first-child { border-top: 0; }
+.bi-q-text { font-size: 0.96rem; color: var(--text); font-weight: 500; flex: 1 1 20rem; display: block; }
+.bi-seg { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; }
+.bi-opt { font-family: var(--font-b); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; border: 1px solid var(--border-lt); background: none; color: var(--text-dim); border-radius: 999px; padding: 0.5rem 0.95rem; min-height: 40px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+.bi-opt:hover { color: var(--text); border-color: var(--line-muted); }
+.bi-opt[aria-pressed="true"] { border-color: var(--amber); color: var(--amber); background: var(--amber-soft); }
+.bi-opt:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.bi-ask-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-top: 0.8rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.bi-count { font-size: 0.82rem; color: var(--text-dim); }
+.bi-count strong { color: var(--text-bright); font-weight: 600; }
+.bi-clear { font-family: var(--font-b); font-size: 0.78rem; font-weight: 600; color: var(--amber); background: none; border: 0; border-bottom: 1px dotted var(--amber-dim); padding: 0.2rem 0; cursor: pointer; }
+.bi-clear[hidden] { display: none; }
+.bi-read-line { margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
+.bi-read-line strong { color: var(--text); font-weight: 600; }
+.bi-read-line a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+
+/* ─── 5. GROUPS + GRID ─── */
+.bi-group { margin-top: 2.4rem; scroll-margin-top: 80px; }
+.bi-grp { font-family: var(--font-b); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.4rem; }
+.bi-grp-sub { font-size: 0.9rem; color: var(--text-dim); margin: 0 0 1rem; max-width: 80ch; line-height: 1.6; }
+/* The grid, not the card, is the size container: a container query puts
+   layout containment on its element, and an element with layout containment
+   can't be a subgrid (§5 below). */
+.bi-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: stretch; container: bigrid / inline-size; }
+@media (min-width: 700px)  { .bi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .bi-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ─── 6. THE CARD ─── */
+.bi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.7rem; min-width: 0; scroll-margin-top: 80px; transition: opacity 0.2s; position: relative; }
+.bi-card.bi-off { opacity: 0.45; }
+/* Rows of cards share their section lines (JM, 27 Nov 2026: "the text is
+   slightly misaligned horizontally across the three cards"). Each card takes
+   twelve rows of its group's grid as a subgrid, one per section, so a
+   section starts on the same line in every card of a row: the wait, the
+   strip, the steps, the price, the check's lines, the pair, the foot. A
+   section a card lacks leaves its row empty in that card. Spacing is margin,
+   not gap, so a row that no card in the line uses takes no room. Browsers
+   without subgrid keep the plain column (STYLE_GUIDE §6.58). */
+@supports (grid-template-rows: subgrid) {
+    .bi-grid { row-gap: 0; }
+    .bi-grid > .bi-card { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: subgrid; grid-row: span 12; row-gap: 0; margin-bottom: 1rem; }
+    .bi-grid > .bi-card > * { margin-top: 0.7rem; align-self: start; }
+    /* Row 1 always holds an empty item, so the card's top padding has an
+       item to sit on; the flag rides the top edge like the fresh badge. */
+    .bi-grid > .bi-card::before { content: ''; grid-row: 1; display: block; height: 0; }
+    .bi-grid > .bi-card > .bi-flag:not(:empty) { position: absolute; top: 0; left: 1.2rem; right: auto; max-width: calc(100% - 2.4rem); transform: translateY(-50%); margin: 0; z-index: 1; padding: 0.2rem 0.55rem; font-size: 0.6rem; background-color: var(--bg-card); background-image: linear-gradient(var(--red-soft), var(--red-soft)); }
+    .bi-grid > .bi-card > .bi-head { grid-row: 2; margin-top: 0; }
+    .bi-grid > .bi-card > .bi-wait { grid-row: 3; min-height: 0; }
+    .bi-grid > .bi-card > .bi-strip { grid-row: 4; }
+    .bi-grid > .bi-card > .bi-steps, .bi-grid > .bi-card > .bi-docs { grid-row: 5; }
+    .bi-grid > .bi-card > .bi-price, .bi-grid > .bi-card > .bi-extra { grid-row: 6; }
+    .bi-grid > .bi-card > .bi-fit { grid-row: 7; align-self: stretch; }
+    .bi-grid > .bi-card > .bi-pair { grid-row: 8; }
+    .bi-grid > .bi-card > .bi-rel { grid-row: 9; }
+    .bi-grid > .bi-card > .bi-twin { grid-row: 10; }
+    .bi-grid > .bi-card > .bi-links { grid-row: 11; }
+    .bi-grid > .bi-card > .bi-more { grid-row: 12; }
+    /* the row now sets the lines, so the reserved heights go */
+    .bi-grid > .bi-card .bi-head .bi-model { min-height: 0; }
+}
+.bi-card.bi-off:hover, .bi-card.bi-off:focus-within { opacity: 0.8; }
+/* The head: the name and the chips share the first row; the model line runs
+   the full card width under them and reserves two lines, so the heads of a
+   row of cards end at the same height (STYLE_GUIDE §6.50's rule). */
+.bi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(2.4rem, auto) auto; column-gap: 0.6rem; align-items: center; }
+.bi-head-text { display: contents; }
+.bi-head .bi-name { grid-column: 1; grid-row: 1; }
+.bi-head .bi-model { grid-column: 1 / -1; grid-row: 2; min-height: 2.9em; }
+.bi-head .bi-chips { grid-column: 2; grid-row: 1; }
+.bi-name { font-family: var(--font-d); font-size: 1.6rem; font-weight: 600; color: var(--text-bright); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
+.bi-name-note { font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); white-space: nowrap; }
+.bi-model { font-size: 0.74rem; color: var(--text-dim); margin-top: 0.2rem; line-height: 1.45; }
+.bi-chips { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; max-width: 9.8rem; }
+.bi-tag { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.28rem 0.55rem; border-radius: 6px; text-align: right; line-height: 1.3; }
+.bi-tag.yes  { color: var(--green); border: 1px solid var(--green-dim); }
+.bi-tag.no   { color: var(--red);   border: 1px solid var(--red-dim); }
+.bi-tag.qual { color: var(--amber); border: 1px dashed var(--amber-dim); }
+/* In the top-right column the other assets take their own line; where the
+   chips run in a row under the model line they follow a middle dot. */
+.bi-tag .bi-sub { display: block; }
+.bi-tag .bi-sub-sep { display: none; }
+.bi-prose .bi-tag, .bi-law-head .bi-tag { font-size: 0.6rem; padding: 0.18rem 0.45rem; vertical-align: middle; }
+/* The wait: label, the value on its own line, the note under it. The block
+   reserves its height (label + value + three note lines) so the strips of a
+   row of cards line up, the lender card's rule (STYLE_GUIDE §6.50). Notes are
+   written to fit three lines at card width. */
+.bi-wait { display: flex; flex-direction: column; min-height: 6.9rem; }
+.bi-k { display: inline-flex; align-items: center; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.15rem; }
+.bi-wait b { font-size: 1.55rem; color: var(--text-bright); font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; }
+.bi-n { font-size: 0.8rem; color: var(--text-dim); line-height: 1.45; margin-top: 0.2rem; }
+.bi-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0.6rem 0; }
+.bi-strip > div { text-align: center; min-width: 0; }
+/* Headers reserve two lines and sit at the bottom, so the three values align
+   whatever a header's length (the lender card's rule, STYLE_GUIDE §6.50). */
+/* Labels sit on the bottom of a two-line box, so the values of the three
+   columns start on one line; the ? flows after the label's last word. */
+.bi-strip .k { font-size: 0.6rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim); min-height: 2.7em; display: flex; align-items: flex-end; justify-content: center; line-height: 1.15; }
+.bi-strip .kt { display: block; }
+.nw { white-space: nowrap; }
+.bi-strip .v { font-size: 0.98rem; color: var(--text-bright); font-weight: 600; line-height: 1.25; margin-top: 0.15rem; overflow-wrap: anywhere; }
+.bi-strip .v.np { color: var(--text-dim); font-weight: 500; font-size: 0.9rem; }
+.bi-strip .p { font-size: 0.74rem; color: var(--text-dim); line-height: 1.38; margin-top: 0.15rem; }
+.bi-w-yes .v, .bi-b-yes .v { color: var(--green); }
+.bi-w-partly .v, .bi-w-unknown .v, .bi-b-part .v { color: var(--amber); }
+.bi-w-no .v, .bi-b-no .v { color: var(--red); }
+.bi-l { display: block; font-weight: 600; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
+.bi-steps ol { margin: 0; padding-left: 1.2rem; font-size: 0.86rem; line-height: 1.5; color: var(--text); }
+.bi-steps li { margin: 0.12rem 0; padding-left: 0.1rem; }
+.bi-steps li::marker { color: var(--amber); font-weight: 600; }
+.bi-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+.bi-price .bi-l { display: inline; margin: 0; }
+.bi-price b { font-size: 1rem; color: var(--text-bright); font-weight: 600; }
+.bi-docs ul, .bi-np, .bi-hist { margin: 0; padding-left: 1.1rem; font-size: 0.86rem; line-height: 1.5; color: var(--text); }
+.bi-docs li { margin: 0.12rem 0; }
+.bi-extra { margin: 0; font-size: 0.84rem; line-height: 1.5; color: var(--text-dim); }
+.bi-pair { display: grid; gap: 0.5rem; font-size: 0.88rem; line-height: 1.5; }
+.bi-pair .plus .bi-l { color: var(--green); }
+.bi-pair .catch .bi-l { color: var(--red); }
+.bi-rel { margin: 0; font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; border-left: 2px solid var(--amber-line); padding-left: 0.6rem; }
+.bi-rel a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+a.bi-twin { align-self: flex-start; font-size: 0.8rem; color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+.bi-links { display: flex; justify-content: flex-end; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+.bi-checked { margin-right: auto; font-size: 0.72rem; color: var(--text-dim); white-space: nowrap; }
+.bi-site { font-size: 0.78rem; color: var(--text-dim); text-decoration: none; border-bottom: 1px dotted var(--line-muted); }
+.bi-site:hover { color: var(--amber); border-color: var(--amber-dim); }
+.bi-site-big { display: inline-block; margin-top: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--amber); border: 1px solid var(--amber-dim); border-radius: 8px; padding: 0.45rem 0.8rem; }
+.bi-site-big:hover { background: var(--amber-soft); }
+.bi-dl { display: grid; grid-template-columns: 8.5rem 1fr; gap: 0.5rem 0.8rem; margin: 0; font-size: 0.86rem; line-height: 1.55; }
+.bi-dl dt { color: var(--text-dim); }
+.bi-dl dd { margin: 0; color: var(--text); }
+.bi-hist li { margin: 0.15rem 0; }
+.bi-hist time { color: var(--text-muted); margin-right: 0.3rem; }
+.bi-hist a { color: var(--amber); }
+.bi-how .bi-l { color: var(--amber); }
+.bi-how p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+.bi-foot { border-top: 1px solid var(--border); padding-top: 0.6rem; font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; overflow-wrap: anywhere; }
+.bi-foot a { color: var(--text-dim); text-decoration: underline dotted; text-underline-offset: 2px; }
+
+/* The fresh-change badge (the lender page's marker, 14 days after a provider
+   change logged with a date; bitcoin-inheritance-planning.js shows it). */
+.bi-tag.bi-changed { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--amber); border: 1px solid var(--amber-line); background: var(--amber-soft); text-decoration: none; }
+.bi-tag.bi-changed[hidden] { display: none; }
+/* On a card, the badge rides the top edge, so a card with news keeps its
+   head the height of its row's; in the dialog it sits with the chips. */
+.bi-head .bi-changed { position: absolute; top: 0; right: 1.2rem; transform: translateY(-50%); background-color: var(--bg-card); background-image: linear-gradient(var(--amber-soft), var(--amber-soft)); z-index: 1; }
+.bi-dialog-body .bi-head .bi-changed { position: static; transform: none; }
+.bi-pulse { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); flex: 0 0 auto; }
+.bi-pulse::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--amber); opacity: 0.45; animation: bi-pulse-halo 2.2s ease-out infinite; pointer-events: none; }
+@keyframes bi-pulse-halo { 0% { transform: scale(0.35); opacity: 0.55; } 100% { transform: scale(3.2); opacity: 0; } }
+.bi-card.bi-fresh { border-color: var(--amber-line); }
+.bi-hl { background: var(--amber-soft); box-shadow: inset 2px 0 0 var(--amber); border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { .bi-pulse::before { animation: none; opacity: 0.25; transform: scale(1.8); } }
+
+/* ─── 7. THE CHECK'S LINES AND THE CONFLICT FLAG ─── */
+.bi-flag { display: none; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.35rem 0.6rem; border-radius: 6px; margin: -0.2rem 0 0.1rem; line-height: 1.4; color: var(--red); border: 1px solid var(--red-dim); }
+.bi-flag:not(:empty) { display: block; }
+.bi-fit { display: grid; gap: 0.35rem; padding: 0.55rem 0.65rem; border-radius: 8px; background: var(--bg-raise); border: 1px solid var(--border); }
+.bi-fit[hidden] { display: none; }
+.bi-fit-line { display: grid; grid-template-columns: 1.1rem 1fr; gap: 0.35rem; font-size: 0.82rem; line-height: 1.45; color: var(--text); }
+.bi-fit-i { font-weight: 700; text-align: center; }
+.bi-fit-ok .bi-fit-i { color: var(--green); }
+.bi-fit-warn .bi-fit-i { color: var(--amber); }
+.bi-fit-rule .bi-fit-i { color: var(--red); }
+.bi-fit-rule { color: var(--text-bright); }
+
+/* ─── 8. THE DETAILS ROW AND THE DETAIL DIALOG ─── */
+.bi-more { margin-top: auto; border-top: 1px solid var(--border); padding-top: 0.55rem; }
+.bi-more-btn { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; list-style: none; cursor: pointer; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; color: var(--amber); padding: 0.35rem 0; min-height: 32px; }
+.bi-more-btn::-webkit-details-marker { display: none; }
+.bi-more-btn:hover { color: var(--text-bright); }
+.bi-more-arrow { font-size: 1.3rem; line-height: 1; transition: transform 0.15s; }
+.bi-more[open] .bi-more-arrow { transform: rotate(90deg); }
+.bi-more-body { display: grid; gap: 0.8rem; padding-top: 0.7rem; }
+.bi-js .bi-more[open] .bi-more-body { display: none; }
+
+.bi-dialog { background: var(--bg-card); color: var(--text); border: 1px solid var(--border-lt); border-radius: 12px; padding: 0; width: min(920px, calc(100vw - 2rem)); max-height: calc(100vh - 3rem); box-shadow: 0 30px 80px var(--shadow); }
+.bi-dialog::backdrop { background: var(--backdrop); backdrop-filter: blur(2px); }
+.bi-dialog-bar { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1.4rem; background: var(--bg-card); border-bottom: 1px solid var(--border); z-index: 1; }
+.bi-dialog-crumb { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+.bi-dialog-close { font-family: var(--font-b); font-size: 1.6rem; line-height: 1; color: var(--text-dim); background: none; border: 1px solid var(--border-lt); border-radius: 8px; width: 2.4rem; height: 2.4rem; cursor: pointer; }
+.bi-dialog-close:hover { color: var(--text-bright); border-color: var(--line-muted); }
+.bi-dialog-body { padding: 1.4rem 1.6rem 1.8rem; display: grid; gap: 1.1rem; font-size: 1rem; line-height: 1.65; }
+.bi-dialog-body .bi-name { font-size: 2.2rem; }
+.bi-dialog-body .bi-model { font-size: 0.86rem; }
+.bi-dialog-body .bi-chips { max-width: 16rem; }
+.bi-dialog-body .bi-tag { font-size: 0.72rem; padding: 0.34rem 0.65rem; }
+.bi-dialog-body .bi-head, .bi-dialog-body .bi-wait { min-height: 0; }
+.bi-dialog-body .bi-head .bi-model { min-height: 0; }
+.bi-dialog-body .bi-head { grid-template-rows: auto auto; }
+.bi-dialog-body .bi-wait b { font-size: 2rem; }
+.bi-dialog-body .bi-n { font-size: 0.95rem; }
+.bi-dialog-body .bi-strip { padding: 0.9rem 0; gap: 0.8rem; }
+.bi-dialog-body .bi-strip .k { font-size: 0.7rem; min-height: 0; }
+.bi-dialog-body .bi-strip .v { font-size: 1.25rem; }
+.bi-dialog-body .bi-strip .p { font-size: 0.86rem; }
+.bi-dialog-body .bi-steps ol, .bi-dialog-body .bi-docs ul { font-size: 1rem; line-height: 1.6; }
+.bi-dialog-body .bi-pair { font-size: 1rem; line-height: 1.6; gap: 0.8rem; align-self: start; align-content: start; }
+.bi-dialog-body .bi-dl { grid-template-columns: 10rem 1fr; gap: 0.6rem 1rem; font-size: 0.98rem; line-height: 1.6; }
+.bi-dialog-body .bi-how p { font-size: 1.02rem; line-height: 1.65; }
+.bi-dialog-body .bi-foot { font-size: 0.86rem; }
+.bi-dialog-body .bi-more { margin-top: 0; border-top: 0; padding-top: 0; }
+.bi-dialog-body .bi-more-btn, .bi-dialog-body .bi-links { display: none; }
+.bi-dialog-body .bi-more-body { display: grid !important; padding-top: 0; gap: 1rem; }
+.bi-dialog-body .bi-flag, .bi-dialog-body .bi-how { grid-column: 1 / -1; }
+@media (min-width: 760px) {
+    .bi-dialog-body { grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+    .bi-dialog-body .bi-head, .bi-dialog-body .bi-wait, .bi-dialog-body .bi-strip, .bi-dialog-body .bi-fit, .bi-dialog-body .bi-rel, .bi-dialog-body .bi-extra, .bi-dialog-body .bi-twin { grid-column: 1 / -1; }
+}
+.bi-dialog .help-tip .tip-content { z-index: 60; }
+
+/* How to read a card: a closed row above the cards (JM, 27 Nov 2026). The
+   same arrow as a card's details row; the heading stays an h2 inside the
+   summary, so the outline keeps it. */
+.bi-howto { margin: 2.2rem 0 0; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+.bi-howto-sum { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1.15rem; cursor: pointer; list-style: none; }
+.bi-howto-sum::-webkit-details-marker { display: none; }
+.bi-howto-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.9rem; min-width: 0; }
+.bi-howto-title { margin: 0; font-family: var(--font-d); font-size: 1.3rem; font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; }
+.bi-howto-hint { font-size: 0.8rem; color: var(--text-dim); }
+.bi-howto-arrow { font-size: 1.5rem; line-height: 1; color: var(--amber); transition: transform 0.15s; flex: 0 0 auto; }
+.bi-howto[open] .bi-howto-arrow { transform: rotate(90deg); }
+.bi-howto-sum:hover .bi-howto-title { color: var(--amber); }
+.bi-howto-sum:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 10px; }
+.bi-howto-body { padding: 0.2rem 1.15rem 0.6rem; max-width: 880px; }
+.bi-howto-body p { font-size: 0.95rem; line-height: 1.7; color: var(--text); margin: 0 0 0.9rem; }
+.bi-howto-body p strong { color: var(--text-bright); font-weight: 600; }
+.bi-howto-body .bi-tag { font-size: 0.6rem; padding: 0.18rem 0.45rem; vertical-align: middle; }
+
+/* ─── 9. PROSE, THE LAW PANEL, THE CHANGE LOG ─── */
+.bi-prose { max-width: 880px; margin: 3.2rem auto 0; }
+.bi-prose h2 { font-family: var(--font-d); font-size: 1.7rem; font-weight: 500; color: var(--text-bright); letter-spacing: -0.01em; margin: 0 0 0.8rem; }
+.bi-prose p { font-size: 0.98rem; line-height: 1.75; color: var(--text); margin: 0 0 1rem; }
+.bi-prose p strong { color: var(--text-bright); font-weight: 600; }
+.bi-prose a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+.bi-diy { margin: 0 0 1rem; padding-left: 1.2rem; font-size: 0.98rem; line-height: 1.7; }
+.bi-diy li { margin: 0 0 0.6rem; }
+.bi-diy strong { color: var(--text-bright); }
+
+.bi-law { max-width: 880px; margin: 3.2rem auto 0; padding: 1.3rem 1.4rem 1.1rem; border: 1px solid var(--border-lt); border-left: 3px solid var(--amber-dim); border-radius: 10px; background: var(--bg-card); }
+.bi-law-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 0.5rem; }
+.bi-law-title { font-family: var(--font-d); font-size: 1.55rem; font-weight: 500; color: var(--text-bright); margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
+.bi-law-lede { font-size: 0.9rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 1rem; }
+.bi-law-grid { display: grid; grid-template-columns: 1fr; gap: 0.9rem 1.6rem; margin: 0; }
+@media (min-width: 760px) { .bi-law-grid { grid-template-columns: 1fr 1fr; } }
+.bi-law-grid dt { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin: 0 0 0.25rem; }
+.bi-law-grid dd { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+a.bi-src { display: inline-block; font-size: 0.74rem; color: var(--text-dim); text-decoration: none; border-bottom: 1px dotted var(--line-muted); margin-left: 0.15rem; white-space: nowrap; }
+a.bi-src::after { content: ' \2197'; }
+a.bi-src:hover { color: var(--amber); }
+.bi-law-foot { margin: 1.1rem 0 0; padding-top: 0.8rem; border-top: 1px solid var(--border); font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); }
+
+.bi-log { max-width: 1100px; margin: 3.2rem auto 0; padding: 1.4rem 1.6rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+.bi-log-title { font-family: var(--font-d); font-size: 1.55rem; font-weight: 500; color: var(--text-bright); margin: 0 0 0.4rem; }
+.bi-log-lede { font-size: 0.88rem; line-height: 1.6; color: var(--text-dim); margin: 0 0 1rem; max-width: 860px; }
+.bi-log-lede strong { color: var(--text); font-weight: 600; }
+.bi-log-list { list-style: none; margin: 0; padding: 0; }
+.bi-log-item { display: grid; grid-template-columns: 7.2rem 9.5rem 1fr; gap: 0.25rem 1rem; padding: 0.6rem 0; border-top: 1px solid var(--border); font-size: 0.86rem; line-height: 1.55; }
+.bi-log-item time { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bi-log-who { color: var(--amber); font-weight: 600; }
+.bi-log-who a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber-dim); }
+.bi-log-check .bi-log-who, .bi-log-page .bi-log-who { color: var(--text-dim); }
+.bi-log-text { color: var(--text); }
+.bi-log-src { color: var(--amber); white-space: nowrap; font-size: 0.8rem; text-decoration: none; }
+.bi-log-more { margin-top: 0.4rem; font-size: 0.82rem; }
+.bi-log-more summary { cursor: pointer; color: var(--amber); padding: 0.4rem 0; }
+
+/* ─── 10. HELP-TIP (canonical §6.13; the lender page's markup and tokens) ─── */
+.help-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 0.65rem; font-weight: 600; line-height: 1; color: var(--text-muted); background: transparent; border: 1px solid var(--line-muted); border-radius: 50%; cursor: help; margin-left: 0.35rem; vertical-align: middle; position: relative; transition: color 0.2s, border-color 0.2s; user-select: none; font-family: var(--font-b); letter-spacing: 0; text-transform: none; }
+.help-tip:hover, .help-tip:focus { color: var(--amber); border-color: var(--amber); outline: none; }
+.help-tip .tip-content { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: min(260px, calc(100vw - 32px)); padding: 0.85rem 1rem; font-family: var(--font-b); font-size: 0.8rem; font-weight: 400; line-height: 1.5; color: var(--text); background: var(--bg-card); border: 1px solid var(--amber-glow); border-radius: 5px; box-shadow: 0 4px 18px var(--shadow); z-index: 50; text-align: left; letter-spacing: 0; text-transform: none; white-space: normal; }
+.help-tip .tip-content strong { color: var(--text-bright); font-weight: 600; }
+.help-tip .tip-content em { color: var(--amber-dim); font-style: italic; }
+.help-tip:hover .tip-content, .help-tip:focus .tip-content, .help-tip:focus-within .tip-content { display: block; }
+.help-tip.help-tip-right .tip-content { left: auto; right: 0; }
+.bi-strip .k .help-tip, .bi-k .help-tip { margin-left: 0.2rem; width: 12px; height: 12px; font-size: 0.56rem; flex: 0 0 auto; }
+
+/* A card too narrow for its name beside the chips moves the chips under the
+   model line. Every card in a row has the same width, so a row switches
+   together and stays aligned. The width asked of the grid is the one at
+   which a card's content falls under 310px: three columns below 1080px of
+   grid, two below 714px (card padding and border 40px, gaps 16px). Phones
+   are handled by the 520px rule in §11. */
+@media (min-width: 1080px) {
+    @container bigrid (max-width: 1080px) {
+        .bi-head { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+        .bi-head .bi-chips { grid-column: 1; grid-row: 3; flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: none; margin-top: 0.5rem; }
+        .bi-head .bi-tag { text-align: left; }
+        .bi-head .bi-tag .bi-sub { display: inline; }
+        .bi-head .bi-tag .bi-sub-sep { display: inline; }
+    }
+}
+@media (min-width: 700px) and (max-width: 1079.98px) {
+    @container bigrid (max-width: 714px) {
+        .bi-head { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+        .bi-head .bi-chips { grid-column: 1; grid-row: 3; flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: none; margin-top: 0.5rem; }
+        .bi-head .bi-tag { text-align: left; }
+        .bi-head .bi-tag .bi-sub { display: inline; }
+        .bi-head .bi-tag .bi-sub-sep { display: inline; }
+    }
+}
+
+/* ─── 11. MOBILE ─── */
+@media (max-width: 700px) {
+    /* The spine table becomes one block per row on a phone: four columns at
+       375px would scroll sideways inside their box and cut every cell. */
+    .bi-spine-wrap { overflow: visible; border: 0; }
+    .bi-spine { min-width: 0; display: block; }
+    .bi-spine thead { display: none; }
+    .bi-spine tbody, .bi-spine tr { display: block; }
+    .bi-spine tr { border: 1px solid var(--border); border-radius: 10px; margin: 0 0 0.8rem; padding: 0.3rem 0.2rem 0.5rem; background: var(--bg-card); }
+    .bi-spine th, .bi-spine td { display: block; width: auto; border-top: 0; padding: 0.45rem 0.8rem; }
+    .bi-spine tbody th { width: auto; }
+    .bi-spine td::before { content: attr(data-label); display: block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.15rem; }
+    .bi-spine-who a { white-space: normal; }
+}
+@media (max-width: 720px) {
+    .content-area { padding: 0 1.25rem 3rem; }
+    .hero { padding: 3.5rem 1.25rem 1.8rem; }
+    .bi-ask { padding: 1rem 0.95rem 0.9rem; }
+    .bi-law { padding: 1.1rem 1rem 1rem; }
+    .bi-log { padding: 1.1rem 1rem; }
+    .bi-log-item { grid-template-columns: 1fr; gap: 0.1rem; }
+}
+@media (max-width: 520px) {
+    .bi-head { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+    .bi-head .bi-model { min-height: 0; }
+    .bi-head .bi-chips { grid-column: 1; grid-row: 3; flex-direction: row; flex-wrap: wrap; align-items: flex-start; max-width: none; margin-top: 0.5rem; }
+    .bi-tag { text-align: left; }
+    .bi-tag .bi-sub, .bi-tag .bi-sub-sep { display: inline; }
+    .bi-wait { min-height: 0; }
+    .bi-strip .v { font-size: 0.9rem; }
+    .bi-strip .p { font-size: 0.72rem; }
+    .bi-dl { grid-template-columns: 1fr; gap: 0.1rem; }
+    .bi-dl dd { margin-bottom: 0.45rem; }
+    .bi-dialog { width: calc(100vw - 1rem); max-height: calc(100vh - 1rem); border-radius: 10px; }
+    .bi-dialog-body { padding: 1rem 1rem 1.4rem; }
+    .bi-dialog-body .bi-chips { max-width: none; }
+    .bi-dialog-body .bi-strip { gap: 0.4rem; }
+    .bi-dialog-body .bi-strip .v { font-size: 1.05rem; }
+    .bi-dialog-body .bi-strip .p { font-size: 0.78rem; }
+    .bi-dialog-body .bi-dl { grid-template-columns: 1fr; }
+    .bi-q-text { flex-basis: 100%; }
+}

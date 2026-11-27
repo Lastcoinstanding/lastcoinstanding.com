@@ -1,0 +1,20 @@
+{
+  "note": "The dated change log on /bitcoin-inheritance-planning, in the shape of lenderLog.json (lenders v2 C, JM's rulings 2026-10-01): a What changed section above the cards, a badge on a card whose newest provider change is under 14 days old, and each card's Changes logged line. Seeded with the provider changes the 24-26 Nov 2026 research found with exact, sourced dates; undated changes are left out. Every re-read is logged even when nothing moved. Entries may go in any order: inheritanceLogIndex.js sorts them by date. kind: 'check' (a re-read of the cards; give read and changed counts; plans: [...] when it covered only some) | 'page' (a card added, removed or brought into line with the provider's pages: type added | removed | updated) | 'provider' (something the provider changed: type launch | terms | price | availability | exit). plan: the card id in inheritance.json; the build fails on an unknown id. source: the provider's own page for the change where there is one. changes (optional): [{field, was}] with field one of wait, heir, without, renew, steps, price, keys, keep, gone, identity, beneficiary, probate, time, documents; the card highlights those lines for 14 days. Procedure: MONTHLY_REFRESH_CHECKLIST §7.7.",
+  "nextCheck": "2027-01-01",
+  "nextCheckLabel": "1 Jan 2027",
+  "entries": [
+    {"date": "2026-11-27", "kind": "page", "type": "added",
+      "text": "Page published with seventeen cards in three groups, each read against the provider’s own pages on 25 and 26 November 2026. Lines a provider doesn’t publish are marked “not published” on the card." },
+    {"date": "2026-11-26", "kind": "check", "read": 17, "changed": 0,
+      "text": "First reading: all seventeen cards checked line by line against each provider’s own pages. Three items the research had carried as open are now on the providers’ pages: Casa’s death-certificate route (Private Client), Nunchuk’s 7- or 30-day buffer (off-chain plans), and the day AnchorWatch’s recovery path opens (day 335, insured). The rest stay “not published”." },
+    {"date": "2026-10-19", "kind": "provider", "type": "launch", "plan": "anchorwatch",
+      "text": "AnchorWatch Trust Company opened as a Nevada-chartered qualified custodian, with fixed-dollar custody fees by vault size (press: The Block). AnchorWatch’s own pricing page, read on 26 November, shows flat monthly fees for its vaults, capped at $1,000 a month for individuals and small businesses; its FAQ still quotes the older 0.02% a month.",
+      "source": "https://theblock.co/news/business/2026-10-19-anchorwatch-bitcoin-custody-insurance-421011" },
+    {"date": "2026-07-29", "kind": "provider", "type": "launch", "plan": "strike",
+      "text": "Strike launched beneficiary plans: up to 15 beneficiaries, or a trust, under a transfer-on-death agreement signed in the app, for US individuals and sole proprietors outside Louisiana.",
+      "source": "https://strike.me/updates/" },
+    {"date": "2025-11-12", "kind": "provider", "type": "launch", "plan": "nunchuk-onchain",
+      "text": "Nunchuk 2.0 added an on-chain inheritance option: after the date you set, a spending path that doesn’t need Nunchuk’s key, with a kit for heirs to claim alone.",
+      "source": "https://nunchuk.io/blog/autonomous-inheritance" }
+  ]
+}
